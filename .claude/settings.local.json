@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create vite@latest . -- --template react-ts --yes)",
+      "Bash(npm create vite@latest . -- --template react-ts)",
+      "Bash(npx create-vite@latest . --template react-ts)",
+      "Bash(npm install)",
+      "Bash(npx tsc -p tsconfig.app.json --noEmit)",
+      "Bash(npm run build)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm install --save-dev @playwright/test)",
+      "Bash(npx playwright install chromium)",
+      "Bash(npx playwright test --reporter=list)",
+      "Bash(npx playwright test \"admin-dashboard\" --grep \"shows the org name\" --reporter=list)",
+      "Bash(npx playwright test)",
+      "Bash(npx playwright test tests/e2e/admin-dashboard.spec.ts --grep \"MemberDetail\")"
+    ]
+  }
+}

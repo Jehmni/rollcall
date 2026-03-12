@@ -1,0 +1,28 @@
+
+> rollcall@1.0.0 lint
+> eslint .
+
+
+C:\Users\ofone\Documents\JEHMNi\Portfolio\rollcall\src\contexts\AuthContext.tsx
+  130:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\ofone\Documents\JEHMNi\Portfolio\rollcall\src\pages\AdminDashboard.tsx
+  120:14  error  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ofone\Documents\JEHMNi\Portfolio\rollcall\src\pages\OrgDetail.tsx
+  122:14  error  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ofone\Documents\JEHMNi\Portfolio\rollcall\src\pages\UnitDashboard.tsx
+  147:14  error  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ofone\Documents\JEHMNi\Portfolio\rollcall\tests\e2e\admin-auth.spec.ts
+  11:29  error  'mockUnitAdmins' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ofone\Documents\JEHMNi\Portfolio\rollcall\tests\e2e\admin-dashboard.spec.ts
+  12:3  error  'mockServices' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ofone\Documents\JEHMNi\Portfolio\rollcall\tests\e2e\csv-import.spec.ts
+  89:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 7 problems (6 errors, 1 warning)
+
