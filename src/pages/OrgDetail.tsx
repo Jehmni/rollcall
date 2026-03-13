@@ -281,7 +281,7 @@ export default function OrgDetail() {
 
                 <Input
                   label="Unit Name"
-                  placeholder="e.g. Youth Choir, Adult Class"
+                  placeholder="e.g. Volunteers, Teams, Classes"
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
                   error={error ?? undefined}

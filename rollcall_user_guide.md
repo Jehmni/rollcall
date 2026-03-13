@@ -5,7 +5,7 @@ Welcome to Rollcally! This guide explains how the platform works from start to f
 ---
 
 ## 1. Getting Started: The Setup
-Everything in Rollcally starts with an **Organization** (this could be your church, school, or social club).
+Everything in Rollcally starts with an **Organization** (this could be your community group, team, or organization).
 
 ### Use Case A: For Organization Creators (Owners)
 If you are the primary leader, you'll start by creating your Organization. 
@@ -23,7 +23,7 @@ If your church/club already uses Rollcally:
 
 ## 2. Organizing Your Community: Units
 Organizations are big, so Rollcally breaks them down into **Units**.
-* **Examples**: "Youth Choir," "Men’s Fellowship," "Bible Study Group," or "Sunday School."
+* **Examples**: "Youth Group," "Men’s Fellowship," "Bible Study Group," or "Training Class."
 
 ### Use Case: Managing a Unit
 As an admin, you can create a Unit to manage your specific department.
@@ -54,7 +54,7 @@ Rollcally is designed for speed. The system remembers your members so they don't
 * **One-Tap Check-in**: For returning members, the system recognizes their device and greets them with a "Welcome Back" screen. They simply tap "I'm Here" to finish.
 * **Integrated QR Scanner**: Already on the app but need to switch services? Tap the camera icon in the header to scan any Rollcally QR code instantly.
 * **Native Scanning**: Scanning a Rollcally QR from your phone's camera will prompt you to open the app directly to your attendance page—no browser needed.
-* **Section Filtering**: For large groups (like a 100-person choir), members can tap their section (e.g., "Alto") to instantly filter the list and find their name.
+* **Section Filtering**: For large groups (like a 100-person group), members can tap their section (e.g., "Group A") to instantly filter the list and find their name.
 * **Security & Honesty**:
     * **Device Locking**: To keep records honest, each phone is linked to one member for that service. One person cannot check in for their friends using the same phone.
     * **Location Check**: Members must be at the venue to check in. If they are too far away, the system will politely ask them to try again once they arrive.

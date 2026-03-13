@@ -175,13 +175,13 @@ export default function AdminDashboard() {
                 <div>
                   <h3 className="font-semibold text-gray-900">{editingOrg ? 'Rename Organization' : 'Start a New Organization'}</h3>
                   <p className="text-xs text-gray-500">
-                    {editingOrg ? 'Update the name of your organization.' : 'Choose a name for your group, choir, or church.'}
+                    {editingOrg ? 'Update the name of your organization.' : 'Choose a name for your group, team, or organization.'}
                   </p>
                 </div>
               </div>
               <Input
                 label="Organization Name"
-                placeholder="e.g. Liverpool Community Choir"
+                placeholder="e.g. Community Group, Sports Team, or Church"
                 value={newName}
                 onChange={e => setNewName(e.target.value)}
                 error={error ?? undefined}

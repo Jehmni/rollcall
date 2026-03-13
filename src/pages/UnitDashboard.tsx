@@ -221,7 +221,7 @@ export default function UnitDashboard() {
                   label="Unit Name"
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
-                  placeholder="e.g. Youth Choir"
+                  placeholder="e.g. Volunteers, Youth Group, or Staff"
                   required
                 />
                 <Input

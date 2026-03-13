@@ -30,7 +30,7 @@ export default defineConfig({
       manifest: {
         name: 'Rollcally',
         short_name: 'Rollcally',
-        description: 'Professional Attendance & Engagement',
+        description: 'Smart attendance tracking for any organization',
         theme_color: '#1d4ed8',
         background_color: '#ffffff',
         display: 'standalone',

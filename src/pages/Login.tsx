@@ -36,7 +36,7 @@ export default function Login() {
 
     if (error) {
       if (error.message.toLowerCase().includes('not found') || error.status === 422) {
-        setError('This email is not registered. Please contact your choir leader.')
+        setError('This email is not registered. Please contact your administrator.')
       } else {
         setError(error.message)
       }
