@@ -4,7 +4,29 @@ export type MemberStatus = 'active' | 'inactive'
 export interface Organization {
   id: string
   name: string
+  created_by_admin_id: string
   created_at: string
+}
+
+export type OrgRole = 'owner' | 'member'
+
+export interface OrganizationMember {
+  id: string
+  organization_id: string
+  admin_id: string
+  role: OrgRole
+  joined_at: string
+}
+
+export type JoinRequestStatus = 'pending' | 'approved' | 'rejected'
+
+export interface JoinRequest {
+  id: string
+  organization_id: string
+  admin_id: string
+  status: JoinRequestStatus
+  created_at: string
+  organization?: Organization // Optional join
 }
 
 export interface Unit {
@@ -12,6 +34,7 @@ export interface Unit {
   org_id: string
   name: string
   description: string | null
+  created_by_admin_id: string
   created_at: string
 }
 

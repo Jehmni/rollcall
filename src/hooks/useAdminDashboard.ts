@@ -9,7 +9,15 @@ export function useOrganizations() {
   const [loading, setLoading] = useState(true)
 
   const fetch = useCallback(async () => {
-    const { data } = await supabase.from('organizations').select('*').order('name')
+    // Fetch only organizations the user is a member of
+    const { data } = await supabase
+      .from('organizations')
+      .select(`
+        *,
+        organization_members!inner(admin_id)
+      `)
+      .order('name')
+    
     setOrgs(data ?? [])
     setLoading(false)
   }, [])
@@ -19,7 +27,9 @@ export function useOrganizations() {
   async function createOrg(name: string): Promise<Organization> {
     const { data, error } = await supabase.from('organizations').insert({ name }).select().single()
     if (error) throw error
-    setOrgs(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
+    
+    // The RLS policy/trigger should handle membership, but we refetch to be sure
+    await fetch()
     return data
   }
 
@@ -40,6 +50,7 @@ export function useOrganizations() {
 
 // ── Units ────────────────────────────────────────────────────────────────────
 
+
 export function useUnits(orgId: string | null) {
   const [units, setUnits] = useState<Unit[]>([])
   const [loading, setLoading] = useState(true)
@@ -57,7 +68,11 @@ export function useUnits(orgId: string | null) {
     if (!orgId) throw new Error('No org selected')
     const { data, error } = await supabase
       .from('units')
-      .insert({ org_id: orgId, name, description: description ?? null })
+      .insert({ 
+        org_id: orgId, 
+        name, 
+        description: description ?? null 
+      })
       .select()
       .single()
     if (error) throw error

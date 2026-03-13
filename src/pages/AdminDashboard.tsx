@@ -152,11 +152,20 @@ export default function AdminDashboard() {
             <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500">
               {isSuper ? 'All Organizations' : 'Your Organizations'}
             </h2>
-            <Button size="sm" onClick={() => { setShowCreate(!showCreate); setEditingOrg(null); setNewName('') }} className="shadow-lg shadow-blue-200/50">
-              <Plus className="h-4 w-4 mr-1.5" /> New Organization
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                onClick={() => navigate('/admin/discover')}
+              >
+                Find an Organization
+              </Button>
+              <Button size="sm" onClick={() => { setShowCreate(!showCreate); setEditingOrg(null); setNewName('') }} className="shadow-lg shadow-blue-200/50">
+                <Plus className="h-4 w-4 mr-1.5" /> New Organization
+              </Button>
+            </div>
           </div>
-
+激
           {(showCreate || editingOrg) && (
             <form onSubmit={editingOrg ? handleUpdate : handleCreate} className="mb-6 rounded-2xl bg-white p-6 shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
               <div className="flex items-center gap-3 mb-1">

@@ -13,6 +13,7 @@ import UnitDashboard from './pages/UnitDashboard'
 import UnitMembers from './pages/UnitMembers'
 import AdminServiceDetail from './pages/AdminServiceDetail'
 import MemberDetail from './pages/MemberDetail'
+import AdminOrgDiscovery from './pages/AdminOrgDiscovery'
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
 
           {/* Admin — protected */}
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin/discover" element={<AdminRoute><AdminOrgDiscovery /></AdminRoute>} />
           <Route path="/admin/orgs/:orgId" element={<AdminRoute><OrgDetail /></AdminRoute>} />
           <Route path="/admin/units/:unitId" element={<AdminRoute><UnitDashboard /></AdminRoute>} />
           <Route path="/admin/units/:unitId/members" element={<AdminRoute><UnitMembers /></AdminRoute>} />

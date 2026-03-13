@@ -1,0 +1,134 @@
+import { useState, useCallback } from 'react'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
+import type { Organization, JoinRequest, OrganizationMember } from '../types'
+
+export function useOrganizations() {
+  const { session } = useAuth()
+  const user = session?.user
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const searchOrganizations = useCallback(async (query: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { data, error: err } = await supabase
+        .from('organizations')
+        .select('*')
+        .ilike('name', `%${query}%`)
+        .order('name')
+      
+      if (err) throw err
+      return data as Organization[]
+    } catch (err: any) {
+      setError(err.message)
+      return []
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const requestToJoin = useCallback(async (orgId: string) => {
+    if (!user) return
+    setLoading(true)
+    setError(null)
+    try {
+      const { error: err } = await supabase
+        .from('join_requests')
+        .insert({
+          organization_id: orgId,
+          admin_id: user.id,
+          status: 'pending'
+        })
+      if (err) throw err
+    } catch (err: any) {
+      setError(err.message)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [user])
+
+  const getMyJoinRequests = useCallback(async () => {
+    if (!user) return []
+    try {
+      const { data, error: err } = await supabase
+        .from('join_requests')
+        .select('*, organization:organizations(*)')
+        .eq('admin_id', user.id)
+      
+      if (err) throw err
+      return data as JoinRequest[]
+    } catch (err) {
+      console.error('Error fetching join requests:', err)
+      return []
+    }
+  }, [user])
+
+  const getOrgJoinRequests = useCallback(async (orgId: string) => {
+    try {
+      const { data, error: err } = await supabase
+        .from('join_requests')
+        .select(`
+          *,
+          admin:admin_id (
+            email,
+            user_metadata
+          )
+        `)
+        .eq('organization_id', orgId)
+        .eq('status', 'pending')
+      
+      if (err) throw err
+      return data
+    } catch (err) {
+      console.error('Error fetching org join requests:', err)
+      return []
+    }
+  }, [])
+
+  const respondToJoinRequest = useCallback(async (requestId: string, status: 'approved' | 'rejected') => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { error: err } = await supabase
+        .from('join_requests')
+        .update({ status })
+        .eq('id', requestId)
+      
+      if (err) throw err
+    } catch (err: any) {
+      setError(err.message)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const getOrgMembers = useCallback(async (orgId: string) => {
+    try {
+      const { data, error: err } = await supabase
+        .from('organization_members')
+        .select('*')
+        .eq('organization_id', orgId)
+      
+      if (err) throw err
+      return data as OrganizationMember[]
+    } catch (err) {
+      console.error('Error fetching org members:', err)
+      return []
+    }
+  }, [])
+
+  return {
+    loading,
+    error,
+    searchOrganizations,
+    requestToJoin,
+    getMyJoinRequests,
+    getOrgJoinRequests,
+    respondToJoinRequest,
+    getOrgMembers
+  }
+}
