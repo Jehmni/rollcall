@@ -2,16 +2,20 @@ import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { CheckCircle, Clock, AlertCircle, Users, Search, ArrowLeft, ShieldCheck } from 'lucide-react'
 import { useAttendance } from '../hooks/useAttendance'
-import { useServiceMembers, type PublicMember } from '../hooks/useChoristers'
+import { useServiceMembers, useMemberById, type PublicMember } from '../hooks/useChoristers'
 import { Button } from '../components/ui/Button'
 
-type Step = 'list' | 'confirm' | 'done'
+type Step = 'welcome' | 'list' | 'confirm' | 'done'
 
 export default function CheckIn() {
   const [searchParams] = useSearchParams()
   const [step, setStep] = useState<Step>('list')
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<PublicMember | null>(null)
+  const [activeSection, setActiveSection] = useState<string | null>(null)
+
+  const storedMemberId = localStorage.getItem('rollcall_member_id')
+  const { member: recognizedMember } = useMemberById(storedMemberId)
 
   const paramServiceId = searchParams.get('service_id')
   const serviceId = paramServiceId ?? sessionStorage.getItem('pending_service_id')
@@ -19,6 +23,13 @@ export default function CheckIn() {
   useEffect(() => {
     if (paramServiceId) sessionStorage.setItem('pending_service_id', paramServiceId)
   }, [paramServiceId])
+
+  useEffect(() => {
+    if (recognizedMember && step === 'list') {
+      setStep('welcome')
+      setSelected(recognizedMember)
+    }
+  }, [recognizedMember, step])
 
   const { members, loading: listLoading, error: listError } = useServiceMembers(serviceId, query)
   const { status, checkedInName, errorMessage, checkIn, reset } = useAttendance(serviceId)
@@ -40,6 +51,11 @@ export default function CheckIn() {
   function handleSelect(m: PublicMember) {
     setSelected(m)
     setStep('confirm')
+  }
+
+  function handleStartLinking() {
+    setStep('list')
+    setSelected(null)
   }
 
   async function handleConfirm() {
@@ -75,7 +91,7 @@ export default function CheckIn() {
           <div>
             <h1 className="text-lg font-bold text-gray-900 leading-tight">Rollcall</h1>
             <p className="text-xs text-gray-400">
-              {step === 'list' ? 'Tap your name to check in' : step === 'confirm' ? 'Confirm your identity' : ''}
+              {step === 'welcome' ? 'Welcome back!' : step === 'list' ? 'Tap your name to check in' : step === 'confirm' ? 'Confirm your identity' : ''}
             </p>
           </div>
         </div>
@@ -96,20 +112,72 @@ export default function CheckIn() {
           </div>
         )}
 
+        {/* Welcome Back Flow */}
+        {!noService && step === 'welcome' && selected && (
+          <div className="mt-8 flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+             <div className="text-center">
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-100 text-3xl font-bold text-blue-700 shadow-inner">
+                  {selected.name.charAt(0)}
+                </div>
+                <h2 className="mt-4 text-2xl font-bold text-gray-900">Welcome back, {selected.name.split(' ')[0]}!</h2>
+                <p className="text-gray-500 mt-1">Ready for today&apos;s service?</p>
+             </div>
+             
+             <div className="flex flex-col gap-3">
+                <Button size="xl" onClick={handleConfirm} className="w-full py-8 text-lg shadow-xl shadow-blue-200">
+                  <CheckCircle className="mr-2 h-6 w-6" /> I&apos;m Here
+                </Button>
+                <button 
+                  onClick={handleStartLinking}
+                  className="text-sm text-gray-400 hover:text-blue-600 transition-colors py-2"
+                >
+                  Not {selected.name}? Tap here to change
+                </button>
+             </div>
+          </div>
+        )}
+
         {/* Member list */}
         {!noService && step === 'list' && (
-          <div className="flex flex-col gap-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <input
-                type="search"
-                placeholder="Search your name…"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm shadow-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-                autoFocus
-              />
+          <div className="flex flex-col gap-4 animate-in fade-in duration-300">
+            {/* Search and Filters */}
+            <div className="flex flex-col gap-3">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="search"
+                  placeholder="Search your name…"
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm shadow-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 placeholder:text-gray-300"
+                  autoFocus
+                />
+              </div>
+
+              {/* Section Filters */}
+              {Object.keys(grouped).length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                  <button
+                    onClick={() => setActiveSection(null)}
+                    className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+                      !activeSection ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-gray-500 hover:bg-gray-50 ring-1 ring-gray-100'
+                    }`}
+                  >
+                    All Sections
+                  </button>
+                  {Object.keys(grouped).map(s => s && (
+                    <button
+                      key={s}
+                      onClick={() => setActiveSection(s)}
+                      className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+                        activeSection === s ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-gray-500 hover:bg-gray-50 ring-1 ring-gray-100'
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {listLoading && (
@@ -126,29 +194,32 @@ export default function CheckIn() {
               <p className="py-8 text-center text-sm text-gray-400">No members match your search.</p>
             )}
 
-            {!listLoading && Object.entries(grouped).map(([section, sectionMembers]) => (
-              <div key={section}>
-                {section && (
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400 px-1">{section}</p>
-                )}
-                <div className="flex flex-col gap-1">
-                  {sectionMembers.map(m => (
-                    <button
-                      key={m.id}
-                      onClick={() => handleSelect(m)}
-                      className="flex min-h-[3.5rem] items-center justify-between rounded-xl bg-white px-5 py-4 shadow-sm ring-1 ring-gray-100 hover:ring-blue-300 hover:shadow-md active:scale-[0.98] transition-all text-left"
-                    >
-                      <span className="text-base font-medium text-gray-900">{m.name}</span>
-                      {m.section && (
-                        <span className="ml-3 flex-shrink-0 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
-                          {m.section}
-                        </span>
-                      )}
-                    </button>
-                  ))}
+            {!listLoading && Object.entries(grouped)
+              .filter(([section]) => !activeSection || section === activeSection)
+              .map(([section, sectionMembers]) => (
+                <div key={section} className="animate-in fade-in slide-in-from-left-2 duration-300">
+                  {section && !activeSection && (
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400 px-1">{section}</p>
+                  )}
+                  <div className="flex flex-col gap-1.5">
+                    {sectionMembers.map(m => (
+                      <button
+                        key={m.id}
+                        onClick={() => handleSelect(m)}
+                        className="flex min-h-[3.5rem] items-center justify-between rounded-xl bg-white px-5 py-4 shadow-sm ring-1 ring-gray-100 hover:ring-blue-300 hover:shadow-md active:scale-[0.98] transition-all text-left"
+                      >
+                        <span className="text-base font-medium text-gray-900">{m.name}</span>
+                        {m.section && !activeSection && (
+                          <span className="ml-3 flex-shrink-0 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
+                            {m.section}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            }
           </div>
         )}
 

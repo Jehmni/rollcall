@@ -22,6 +22,9 @@ create table if not exists units (
   org_id      uuid not null references organizations(id) on delete cascade,
   name        text not null,
   description text,
+  latitude    numeric,
+  longitude   numeric,
+  radius_meters int default 100,
   created_at  timestamptz not null default now()
 );
 
@@ -157,11 +160,15 @@ as $$
   limit 150; -- Safety cap for public view
 $$;
 
-grant execute on function get_service_members(uuid, text) to anon;
-
 -- Records a check-in for a member at a service.
--- Used by the public check-in page (no auth required).
-create or replace function checkin_by_id(p_member_id uuid, p_service_id uuid)
+-- Enforces mandatory security: Unique member per service, device locking, and location radius.
+create or replace function checkin_by_id(
+  p_member_id uuid, 
+  p_service_id uuid,
+  p_device_id text default null,
+  p_lat numeric default null,
+  p_lng numeric default null
+)
 returns json
 language plpgsql
 security definer
@@ -169,15 +176,39 @@ as $$
 declare
   v_member   members;
   v_service  services;
+  v_unit     units;
   v_existing attendance;
+  v_dist     float;
 begin
-  -- Validate service exists
-  select * into v_service from services where id = p_service_id;
+  -- 1. Validate Service and Unit
+  select s.*, u.latitude, u.longitude, u.radius_meters 
+  into v_service, v_unit
+  from services s
+  join units u on u.id = s.unit_id
+  where s.id = p_service_id;
+  
   if not found then
     return json_build_object('success', false, 'error', 'invalid_service');
   end if;
 
-  -- Validate member exists and belongs to that service's unit
+  -- 2. Security: Location Check (Mandatory if unit has coordinates)
+  if v_unit.latitude is not null and v_unit.longitude is not null then
+    if p_lat is null or p_lng is null then
+      return json_build_object('success', false, 'error', 'location_required');
+    end if;
+    
+    -- Very basic distance approximation (Haversine would be better but this is simplified for SQL)
+    v_dist := 111320 * sqrt(
+      pow(p_lat - v_unit.latitude, 2) + 
+      pow(cos(v_unit.latitude * pi()/180) * (p_lng - v_unit.longitude), 2)
+    );
+    
+    if v_dist > v_unit.radius_meters then
+      return json_build_object('success', false, 'error', 'too_far', 'distance', floor(v_dist));
+    end if;
+  end if;
+
+  -- 3. Validate Member
   select * into v_member
   from members
   where id = p_member_id
@@ -188,7 +219,7 @@ begin
     return json_build_object('success', false, 'error', 'not_found');
   end if;
 
-  -- Check if already checked in
+  -- 4. Security: Prevent Double Check-ins
   select * into v_existing
   from attendance
   where service_id = p_service_id and member_id = p_member_id;
@@ -197,9 +228,22 @@ begin
     return json_build_object('success', false, 'error', 'already_checked_in', 'name', v_member.name);
   end if;
 
-  -- Insert attendance record
-  insert into attendance (service_id, member_id, checked_in, checkin_time)
-  values (p_service_id, p_member_id, true, now());
+  -- 5. Security: Device Locking (Mandatory)
+  -- If this service already has a check-in from this device for a DIFFERENT member, block it.
+  if p_device_id is not null then
+    if exists (
+      select 1 from attendance 
+      where service_id = p_service_id 
+        and device_id = p_device_id 
+        and member_id != p_member_id
+    ) then
+      return json_build_object('success', false, 'error', 'device_locked');
+    end if;
+  end if;
+
+  -- 6. Insert Record
+  insert into attendance (service_id, member_id, checked_in, checkin_time, device_id, latitude, longitude)
+  values (p_service_id, p_member_id, true, now(), p_device_id, p_lat, p_lng);
 
   return json_build_object('success', true, 'name', v_member.name);
 end;
