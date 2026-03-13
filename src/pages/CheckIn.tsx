@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { CheckCircle, Clock, AlertCircle, Users, Search, ArrowLeft, ShieldCheck } from 'lucide-react'
+import { CheckCircle, Clock, AlertCircle, Users, Search, ArrowLeft, ShieldCheck, QrCode } from 'lucide-react'
 import { useAttendance } from '../hooks/useAttendance'
 import { useServiceMembers, useMemberById, type PublicMember } from '../hooks/useChoristers'
 import { Button } from '../components/ui/Button'
+import { QRScanner } from '../components/QRScanner'
 
 type Step = 'welcome' | 'list' | 'confirm' | 'done'
 
@@ -13,6 +14,7 @@ export default function CheckIn() {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<PublicMember | null>(null)
   const [activeSection, setActiveSection] = useState<string | null>(null)
+  const [showScanner, setShowScanner] = useState(false)
 
   const storedMemberId = localStorage.getItem('rollcall_member_id')
   const { member: recognizedMember } = useMemberById(storedMemberId)
@@ -70,6 +72,14 @@ export default function CheckIn() {
     reset()
   }
 
+  function handleScan(scannedServiceId: string) {
+    const params = new URLSearchParams(searchParams)
+    params.set('service_id', scannedServiceId)
+    window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
+    setShowScanner(false)
+    window.location.reload() // Reload to catch new service_id in hooks
+  }
+
   const noService = !serviceId
 
   return (
@@ -84,7 +94,7 @@ export default function CheckIn() {
             <ArrowLeft className="h-5 w-5 text-blue-700" />
           </button>
         )}
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-1 items-center gap-2.5">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-700 shadow">
             <Users className="h-5 w-5 text-white" />
           </div>
@@ -95,6 +105,14 @@ export default function CheckIn() {
             </p>
           </div>
         </div>
+        
+        <button
+          onClick={() => setShowScanner(true)}
+          className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-gray-100 hover:bg-blue-50 hover:ring-blue-100 transition-colors"
+          title="Scan QR Code"
+        >
+          <QrCode className="h-5 w-5 text-blue-700" />
+        </button>
       </header>
 
       <div className="flex-1 px-4 pb-8">
@@ -320,6 +338,13 @@ export default function CheckIn() {
           Admin Portal
         </button>
       </footer>
+
+      {showScanner && (
+        <QRScanner 
+          onScan={handleScan} 
+          onClose={() => setShowScanner(false)} 
+        />
+      )}
     </div>
   )
 }
