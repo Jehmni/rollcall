@@ -82,5 +82,17 @@ Rollcall isn't just about data; it's about people.
 7. **Birthdays** are celebrated automatically as they arise.
 
 ---
+ 
+ ## 7. Troubleshooting: Permissions
+Rollcall needs access to your **Camera** (for scanning) and **Location** (to confirm you are at the venue).
+
+### How to Grant Permission
+1. **The Prompt**: When you tap the Camera icon or the Check-in button, your browser will ask: *"rollcall.app wants to use your camera."*
+2. **Tap Allow**: Simply tap **Allow** or **Agree**.
+3. **If you blocked it by mistake**:
+    * **On iPhone/Safari**: Tap the **'AA'** icon in the address bar -> **Website Settings** -> Set Camera/Location to **Allow**.
+    * **On Android/Chrome**: Tap the **Three Dots (⋮)** -> **Settings** -> **Site Settings** -> **Camera/Location** -> Find rollcall.app and tap **Allow**.
+
+---
 
 **Rollcall ensures you spend less time on paperwork and more time building your community.**
