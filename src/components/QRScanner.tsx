@@ -60,7 +60,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
             }
           } catch (e) {
             console.error('Invalid QR URL', decodedText)
-            setError('Not a valid Rollcall service QR code')
+            setError('Not a valid Rollcally service QR code')
           }
         },
         () => {} // Silent frame errors
@@ -107,7 +107,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                     </div>
                     <p className="mb-2 font-bold text-white">Camera Access Denied</p>
                     <p className="mb-6 text-sm text-gray-400 leading-relaxed">
-                      To scan QR codes, Rollcall needs permission to use your camera. 
+                      To scan QR codes, Rollcally needs permission to use your camera. 
                       Please enable it in your browser settings.
                     </p>
                     <Button 

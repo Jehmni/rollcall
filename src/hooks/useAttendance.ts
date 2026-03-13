@@ -43,10 +43,10 @@ export function useAttendance(serviceId: string | null) {
     }
 
     // Capture or generate device ID
-    let deviceId = localStorage.getItem('rollcall_device_id')
+    let deviceId = localStorage.getItem('rollcally_device_id')
     if (!deviceId) {
-      deviceId = crypto.randomUUID()
-      localStorage.setItem('rollcall_device_id', deviceId)
+      deviceId = self.crypto.randomUUID()
+      localStorage.setItem('rollcally_device_id', deviceId)
     }
 
     const { data, error } = await supabase.rpc('checkin_by_id', {
@@ -67,7 +67,7 @@ export function useAttendance(serviceId: string | null) {
 
     if (result.success) {
       setCheckedInName(result.name ?? null)
-      localStorage.setItem('rollcall_member_id', memberId)
+      localStorage.setItem('rollcally_member_id', memberId)
       setStatus('success')
     } else {
       if (result.name) setCheckedInName(result.name)

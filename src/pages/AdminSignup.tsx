@@ -80,7 +80,7 @@ export default function AdminSignup() {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Create Admin Account</h1>
-            <p className="mt-2 text-gray-500 text-sm">Join Rollcall to manage your organization's attendance</p>
+            <p className="mt-2 text-gray-500 text-sm">Join Rollcally to manage your organization's attendance</p>
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 -- ============================================================
--- Rollcall — Multi-tenant schema
+-- Rollcally — Multi-tenant schema
 -- Run this in Supabase SQL Editor (Dashboard → SQL Editor → New query)
 -- ============================================================
 

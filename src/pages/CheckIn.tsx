@@ -16,7 +16,7 @@ export default function CheckIn() {
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const [showScanner, setShowScanner] = useState(false)
 
-  const storedMemberId = localStorage.getItem('rollcall_member_id')
+  const storedMemberId = localStorage.getItem('rollcally_member_id')
   const { member: recognizedMember } = useMemberById(storedMemberId)
 
   const paramServiceId = searchParams.get('service_id')
@@ -99,7 +99,7 @@ export default function CheckIn() {
             <Users className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-gray-900 leading-tight">Rollcall</h1>
+            <h1 className="text-lg font-bold text-gray-900 leading-tight">Rollcally</h1>
             <p className="text-xs text-gray-400">
               {step === 'welcome' ? 'Welcome back!' : step === 'list' ? 'Tap your name to check in' : step === 'confirm' ? 'Confirm your identity' : ''}
             </p>

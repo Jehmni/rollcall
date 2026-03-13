@@ -134,7 +134,7 @@ export default function AdminDashboard() {
       <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center justify-between sticky top-0 z-20 border-b border-gray-100">
         <div className="flex items-center gap-2">
           <Building2 className="h-5 w-5 text-blue-700" />
-          <span className="font-semibold text-gray-900">Rollcall</span>
+          <span className="font-semibold text-gray-900">Rollcally</span>
           {isSuper && (
             <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">Super Admin</span>
           )}
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
             <Card className="rounded-3xl bg-white p-12 text-center shadow-xl shadow-gray-200/50 border border-gray-50 overflow-hidden relative">
               <div className="absolute -top-10 -right-10 h-40 w-40 bg-blue-50 rounded-full opacity-50 blur-3xl"></div>
               <Building2 className="mx-auto mb-6 h-16 w-16 text-blue-100" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Welcome to Rollcall</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Welcome to Rollcally</h3>
               <p className="text-gray-500 mb-8 max-w-sm mx-auto">
                 Ready to start tracking? Create your first organization to begin managing units and take attendance.
               </p>

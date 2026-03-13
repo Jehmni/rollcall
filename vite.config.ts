@@ -28,9 +28,9 @@ export default defineConfig({
         ],
       },
       manifest: {
-        name: 'Choir Rollcall',
-        short_name: 'Rollcall',
-        description: 'QR-based attendance for choir members',
+        name: 'Rollcally',
+        short_name: 'Rollcally',
+        description: 'Professional Attendance & Engagement',
         theme_color: '#1d4ed8',
         background_color: '#ffffff',
         display: 'standalone',

@@ -55,7 +55,7 @@ export default function Login() {
             <Music className="h-8 w-8 text-white" />
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900">Choir Rollcall</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Rollcally</h1>
             <p className="text-sm text-gray-500">Attendance made simple</p>
           </div>
         </div>

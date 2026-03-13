@@ -63,7 +63,7 @@ export default function Landing() {
         </div>
 
         <footer className="relative mt-16 text-sm text-gray-400">
-          <p>© {new Date().getFullYear()} Rollcall Attendance System</p>
+          <p>© {new Date().getFullYear()} Rollcally Attendance System</p>
         </footer>
       </div>
     </div>
