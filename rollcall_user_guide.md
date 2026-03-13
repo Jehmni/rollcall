@@ -52,6 +52,8 @@ The heart of Rollcall is tracking who shows up.
 ### Use Case: The Smart Member Experience (Check-in)
 Rollcall is designed for speed. The system remembers your members so they don't have to search every time.
 * **One-Tap Check-in**: For returning members, the system recognizes their device and greets them with a "Welcome Back" screen. They simply tap "I'm Here" to finish.
+* **Integrated QR Scanner**: Already on the app but need to switch services? Tap the camera icon in the header to scan any Rollcall QR code instantly.
+* **Native Scanning**: Scanning a Rollcall QR from your phone's camera will prompt you to open the app directly to your attendance page—no browser needed.
 * **Section Filtering**: For large groups (like a 100-person choir), members can tap their section (e.g., "Alto") to instantly filter the list and find their name.
 * **Security & Honesty**:
     * **Device Locking**: To keep records honest, each phone is linked to one member for that service. One person cannot check in for their friends using the same phone.
@@ -75,7 +77,8 @@ Rollcall isn't just about data; it's about people.
 3. **Members** are added to these Units.
 4. **Services** are scheduled when events happen.
 5. **Check-in Links** are shared, and **Smart Check-in** recognizes members for one-tap attendance.
-6. **Attendance** is tracked live with **Security Checks** (Location/Device) to ensure accuracy.
+6. **QR Scanning** (Native or In-App) provides instant access to service events.
+7. **Attendance** is tracked live with **Security Checks** (Location/Device) to ensure accuracy.
 7. **Birthdays** are celebrated automatically as they arise.
 
 ---

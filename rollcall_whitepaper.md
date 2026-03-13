@@ -16,7 +16,7 @@ Rollcall addresses these issues through a distributed responsibility model, real
 ## 3. Core Pillars
 
 ### 3.1 Smart Check-In Experience
-Rollcall provides a frictionless, "one-tap" check-in experience. The system leverages device recognition to identify returning members, reducing the attendance process for repeat visitors to a single interaction. For large organizations, the system incorporates section-based filtering to ensure members can find their names instantly. 
+Rollcall provides a frictionless, "one-tap" check-in experience. The system leverages device recognition to identify returning members, reducing the attendance process for repeat visitors to a single interaction. Integrated QR scanning and native PWA deep-linking ensure that members are always one scan away from participation. 
 
 ### 3.2 Birthday Engagement
 A built-in notification engine monitors member birthdays, firing alerts to administrators 24 hours in advance and on the day of the event. This ensures that no milestone is missed, fostering a warmer community environment.
@@ -38,6 +38,7 @@ Rollcall operates on a 100% serverless architecture using **Supabase**. This eli
 ### 4.2 Frontend Excellence
 The frontend is a high-performance **React** application built with **Vite**. 
 - **Modern UI/UX**: Uses a custom design system with Glassmorphism, smooth gradients, and micro-animations.
+- **Native Deep-Linking**: Optimized for PWA "Standalone" mode, allowing standard camera apps to identify and open attendance flows directly within the application.
 - **Real-time Sync**: Leverages Supabase Real-time to update attendance lists instantly without page refreshes.
 
 ### 4.3 Visual Identity & User Experience
