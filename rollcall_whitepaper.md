@@ -15,8 +15,8 @@ Rollcall addresses these issues through a distributed responsibility model, real
 
 ## 3. Core Pillars
 
-### 3.1 Attendance Management
-Rollcall provides a frictionless check-in experience. Admins can create and manage specific "Units" (e.g., Youth Choir, Senior Class), while members can check themselves in via a public-facing page secured by deep-linking and backend validation.
+### 3.1 Smart Check-In Experience
+Rollcall provides a frictionless, "one-tap" check-in experience. The system leverages device recognition to identify returning members, reducing the attendance process for repeat visitors to a single interaction. For large organizations, the system incorporates section-based filtering to ensure members can find their names instantly. 
 
 ### 3.2 Birthday Engagement
 A built-in notification engine monitors member birthdays, firing alerts to administrators 24 hours in advance and on the day of the event. This ensures that no milestone is missed, fostering a warmer community environment.
@@ -54,8 +54,11 @@ Security is baked into the database layer. RLS policies ensure that:
 - Owners have full visibility over their organization but cannot interfere with other organizations.
 - Public check-in pages are strictly limited to necessary data (names and sections).
 
-### 5.2 Join Request Workflow
-Access to an organization is gated by a request-and-approval workflow. This prevents unauthorized administration and ensures that only trusted individuals can manage sensitive member data.
+### 5.2 Mandatory Security Governance
+Beyond RLS, Rollcall enforces strictly governed check-in protocols:
+- **Device Locking**: Prevents attendance fraud by strictly associating one device with one member per service.
+- **Geofencing (Location Verification)**: Enforces physical presence by rejecting check-ins from devices outside the configured venue radius.
+- **Join Request Workflow**: Access to organization management is gated by a multi-step request-and-approval system to prevent unauthorized administration.
 
 ## 6. Engineering Excellence & CI/CD
 Rollcall is production-ready with a robust delivery pipeline:

@@ -49,10 +49,14 @@ The heart of Rollcall is tracking who shows up.
 2. **The Signature Check-in Link**: Rollcall generates a unique link for every service. 
 3. **Share or Scan**: You can share this link in your WhatsApp group, post it on social media, or display it as a QR code at your venue.
 
-### Use Case: The Member Experience (Check-in)
-* **One-Click attendance**: Members click the link on their phones.
-* **Search & Confirm**: They search for their name, click it, and they are marked as "Present."
-* **Real-time Updates**: On your Admin Dashboard, the headcount updates live as people check in. You see exactly who is in the room as it happens.
+### Use Case: The Smart Member Experience (Check-in)
+Rollcall is designed for speed. The system remembers your members so they don't have to search every time.
+* **One-Tap Check-in**: For returning members, the system recognizes their device and greets them with a "Welcome Back" screen. They simply tap "I'm Here" to finish.
+* **Section Filtering**: For large groups (like a 100-person choir), members can tap their section (e.g., "Alto") to instantly filter the list and find their name.
+* **Security & Honesty**:
+    * **Device Locking**: To keep records honest, each phone is linked to one member for that service. One person cannot check in for their friends using the same phone.
+    * **Location Check**: Members must be at the venue to check in. If they are too far away, the system will politely ask them to try again once they arrive.
+* **Real-time Updates**: On your Admin Dashboard, the headcount updates live. You see exactly who is in the room as it happens.
 
 ---
 
@@ -70,8 +74,9 @@ Rollcall isn't just about data; it's about people.
 2. **Units** are created for different departments.
 3. **Members** are added to these Units.
 4. **Services** are scheduled when events happen.
-5. **Check-in Links** are shared with members.
-6. **Attendance** is tracked live, and **Birthdays** are celebrated as they arise.
+5. **Check-in Links** are shared, and **Smart Check-in** recognizes members for one-tap attendance.
+6. **Attendance** is tracked live with **Security Checks** (Location/Device) to ensure accuracy.
+7. **Birthdays** are celebrated automatically as they arise.
 
 ---
 
