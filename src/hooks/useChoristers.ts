@@ -64,3 +64,29 @@ export function useMemberById(memberId: string | null) {
 
   return { member, loading, error }
 }
+
+// Fetch branding info for a service (Org name)
+export function useEventBranding(serviceId: string | null) {
+  const [orgName, setOrgName] = useState<string>('Rollcally')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!serviceId) return
+
+    setLoading(true)
+    supabase
+      .from('services')
+      .select('units(organizations(name))')
+      .eq('id', serviceId)
+      .single()
+      .then(({ data, error }) => {
+        if (!error && data) {
+          const name = (data as any).units?.organizations?.name
+          if (name) setOrgName(name)
+        }
+        setLoading(false)
+      })
+  }, [serviceId])
+
+  return { orgName, loading }
+}

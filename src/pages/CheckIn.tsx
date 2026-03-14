@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
-import { CheckCircle, Clock, AlertCircle, Users, Search, ArrowLeft, ShieldCheck, QrCode } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { CheckCircle, Clock, AlertCircle, Users, Search, Settings, LayoutDashboard, Calendar, Cake } from 'lucide-react'
+import { TallyCount } from '../components/TallyCount'
 import { useAttendance } from '../hooks/useAttendance'
-import { useServiceMembers, useMemberById, type PublicMember } from '../hooks/useChoristers'
+import { useServiceMembers, useMemberById, useEventBranding, type PublicMember } from '../hooks/useChoristers'
 import { Button } from '../components/ui/Button'
 import { QRScanner } from '../components/QRScanner'
 
@@ -10,7 +11,6 @@ type Step = 'welcome' | 'list' | 'confirm' | 'done'
 
 export default function CheckIn() {
   const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
   const [step, setStep] = useState<Step>('list')
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<PublicMember | null>(null)
@@ -36,6 +36,7 @@ export default function CheckIn() {
 
   const { members, loading: listLoading, error: listError } = useServiceMembers(serviceId, query)
   const { status, checkedInName, errorMessage, checkIn, reset } = useAttendance(serviceId)
+  const { orgName } = useEventBranding(serviceId)
 
   const filtered = members
 
@@ -85,38 +86,22 @@ export default function CheckIn() {
 
   return (
     <div className="flex min-h-screen flex-col bg-brand-secondary">
-      {/* Header */}
-      <header className="flex items-center gap-3 px-4 pt-10 pb-4">
-        {(step === 'confirm' || step === 'list' || step === 'welcome') && (
-          <button
-            onClick={step === 'confirm' ? handleBack : () => navigate('/')}
-            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl hover:bg-brand-primary/5 transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5 text-brand-primary" />
-          </button>
-        )}
-        <div className="flex flex-1 items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-primary shadow-lg shadow-brand-primary/20">
-            <Users className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-brand-text leading-tight">Rollcally</h1>
-            <p className="text-xs text-gray-400">
-              {step === 'welcome' ? 'Welcome back!' : step === 'list' ? 'Scan QR code to check in' : step === 'confirm' ? 'Confirm your identity' : ''}
+      {/* High-Contrast Header */}
+      <header className="bg-brand-primary px-6 pt-12 pb-8 rounded-b-[2rem] shadow-xl shadow-brand-primary/20 relative z-10">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col">
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">Rollcally</h1>
+            <p className="text-xs font-bold text-white/50 uppercase tracking-[0.2em] mt-1">
+              {orgName}
             </p>
           </div>
+          <button className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors text-white">
+            <Settings className="h-5 w-5" />
+          </button>
         </div>
-        
-        <button
-          onClick={() => setShowScanner(true)}
-          className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm border border-brand-border hover:bg-brand-secondary transition-colors"
-          title="Scan QR Code"
-        >
-          <QrCode className="h-5 w-5 text-brand-primary" />
-        </button>
       </header>
 
-      <div className="flex-1 px-4 pb-8">
+      <div className="flex-1 px-4 -mt-4 pb-24 relative z-20">
 
         {/* No service */}
         {noService && (
@@ -131,28 +116,41 @@ export default function CheckIn() {
           </div>
         )}
 
-        {/* Welcome Back Flow */}
         {!noService && step === 'welcome' && selected && (
-          <div className="mt-8 flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="text-center">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-brand-primary/5 text-3xl font-bold text-brand-primary border border-brand-primary/10">
-              {selected.name.charAt(0)}
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl shadow-brand-primary/10 border border-brand-border flex flex-col items-center text-center">
+              <div className="flex items-start justify-between w-full mb-8">
+                <div className="text-left">
+                  <h2 className="text-4xl font-black text-brand-text leading-[1.1] tracking-tight">
+                    Welcome<br />Back,<br />{selected.name.split(' ')[0]}!
+                  </h2>
+                </div>
+                <TallyCount count={5} className="mt-2" />
+              </div>
+              
+              <Button 
+                size="xl" 
+                onClick={handleConfirm} 
+                className="w-full py-8 text-xl font-black tracking-widest uppercase rounded-[2rem] shadow-2xl shadow-brand-primary/30 transition-transform active:scale-95 bg-brand-primary hover:bg-brand-primary/90"
+              >
+                I&apos;m Here
+              </Button>
+
+              {/* Birthday Prompt Mockup */}
+              <div className="mt-8 bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-3 shadow-sm w-full">
+                <div className="p-2 bg-brand-gold/10 rounded-lg">
+                  <Cake className="h-5 w-5 text-brand-gold" />
+                </div>
+                <p className="text-sm font-bold text-brand-text">Birthday tomorrow! Tap to share?</p>
+              </div>
+
+              <button 
+                onClick={handleStartLinking}
+                className="mt-8 text-xs font-bold uppercase tracking-widest text-brand-slate hover:text-brand-primary transition-colors"
+              >
+                Not {selected.name}? Tap here to change
+              </button>
             </div>
-            <h2 className="mt-4 text-2xl font-bold text-brand-text">Welcome back, {selected.name.split(' ')[0]}!</h2>
-            <p className="text-brand-slate mt-1">Ready for today&apos;s event?</p>
-         </div>
-             
-             <div className="flex flex-col gap-3">
-            <Button size="xl" onClick={handleConfirm} className="w-full py-8 text-lg shadow-xl shadow-brand-primary/20">
-              <CheckCircle className="mr-2 h-6 w-6" /> I&apos;m Here
-            </Button>
-            <button 
-              onClick={handleStartLinking}
-              className="text-sm text-brand-slate hover:text-brand-primary transition-colors py-2"
-            >
-              Not {selected.name}? Tap here to change
-            </button>
-         </div>
           </div>
         )}
 
@@ -329,16 +327,28 @@ export default function CheckIn() {
         )}
       </div>
 
-      {/* Admin Link Footer */}
-       <footer className="mt-auto px-4 py-6 text-center">
-        <button
-          onClick={() => window.location.href = '/admin'}
-          className="inline-flex items-center gap-2 text-xs font-medium text-brand-slate hover:text-brand-primary transition-colors"
-        >
-          <ShieldCheck className="h-3.5 w-3.5" />
-          Admin Portal
+      {/* Styled Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-brand-border px-6 py-4 flex items-center justify-between shadow-[0_-4px_20px_0_rgba(0,0,0,0.05)] z-30">
+        <button className="flex flex-col items-center gap-1 group">
+          <LayoutDashboard className="h-6 w-6 text-brand-slate group-hover:text-brand-primary transition-colors" />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-brand-slate group-hover:text-brand-primary">Dashboard</span>
         </button>
-      </footer>
+        <button className="flex flex-col items-center gap-1 group">
+          <div className="relative">
+            <Users className="h-6 w-6 text-brand-primary" />
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-primary rounded-full"></div>
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary">Members</span>
+        </button>
+        <button className="flex flex-col items-center gap-1 group">
+          <Calendar className="h-6 w-6 text-brand-slate group-hover:text-brand-primary transition-colors" />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-brand-slate group-hover:text-brand-primary">Services</span>
+        </button>
+        <button className="flex flex-col items-center gap-1 group">
+          <Settings className="h-6 w-6 text-brand-slate group-hover:text-brand-primary transition-colors" />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-brand-slate group-hover:text-brand-primary">Settings</span>
+        </button>
+      </nav>
 
       {showScanner && (
         <QRScanner 
