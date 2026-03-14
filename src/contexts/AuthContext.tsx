@@ -79,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function signIn(credentials: SignInWithPasswordCredentials) {
     const { error } = await supabase.auth.signInWithPassword(credentials)
+    if (error) console.error('Supabase Auth Error:', error)
     return { error }
   }
 

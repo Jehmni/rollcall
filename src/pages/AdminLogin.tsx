@@ -40,9 +40,14 @@ export default function AdminLogin() {
     setLoading(false)
 
     if (signInError) {
-      setError(signInError.message === 'Invalid login credentials' 
-        ? 'Invalid email or password' 
-        : signInError.message)
+      console.error('Login error:', signInError)
+      if (signInError.message === 'Invalid login credentials') {
+        setError('Invalid email or password')
+      } else if (signInError.message.includes('Email not confirmed')) {
+        setError('Please confirm your email address before signing in.')
+      } else {
+        setError(signInError.message)
+      }
       return
     }
 
