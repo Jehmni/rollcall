@@ -11,13 +11,14 @@ Everything in Rollcally starts with an **Organization** (this could be your comm
 If you are the primary leader, you'll start by creating your Organization. 
 1. **Register**: Sign up as an administrator.
 2. **Setup**: Name your organization (e.g., "St. Peter’s Bolton").
-3. **The Dashboard**: Once created, you have the "Master Key" to the organization. You can manage everything, including settings and deletion.
+3. **The Dashboard**: Once created, you have the "Master Key" to the organization. You can manage everything, including all units, settings, and deletion, regardless of who created them.
 
 ### Use Case B: For Joining an Existing Organization
 If your church/club already uses Rollcally:
 1. **Discover**: Search for your organization's name in the "Discover" section.
 2. **Request to Join**: Send a request to the owner to be added as an admin.
 3. **Approval**: Once the owner approves you, you’ll see the organization's units on your dashboard.
+4. **Permissions**: As an admin (Member), you can create your own units and manage them. However, you will have "View Only" access to units created by others unless you are the Organization Owner.
 
 ---
 
@@ -27,7 +28,7 @@ Organizations are big, so Rollcally breaks them down into **Units**.
 
 ### Use Case: Managing a Unit
 As an admin, you can create a Unit to manage your specific department.
-* **Distributed Responsibility**: If you create a unit, *you* are responsible for it. The organization owner can see it, but you manage the day-to-day work. This keeps things organized and prevents any one person from being overwhelmed.
+* **Distributed Responsibility**: If you create a unit, *you* are responsible for it. The organization owner has full oversight and can edit or delete it, but other admins in the organization can only view your unit's data without making changes. This ensures data integrity and prevents unauthorized modifications.
 
 ---
 
@@ -44,10 +45,10 @@ Once your Unit is ready, it’s time to add your people.
 ## 4. The Main Event: Events & Attendance
 The heart of Rollcally is tracking who shows up.
 
-### Use Case: Running a Event
-1. **Create a Event**: Give it a name (e.g., "Sunday Event" or "Weekly Rehearsal").
+### Use Case: Running an Event
+1. **Create an Event**: Give it a name (e.g., "Sunday Service" or "Weekly Rehearsal").
 2. **The Signature Check-in Link**: Rollcally generates a unique link for every Event. 
-3. **Share or Scan**: You can share this link in your WhatsApp group, post it on social media, or display it as a QR code at your venue.
+3. **Share or Scan**: You can share this link in your WhatsApp group, post it on social media, or display it as a QR code at your venue. The QR code explicitly prompts members to "scan qr code to check in".
 
 ### Use Case: The Smart Member Experience (Check-in)
 Rollcally is designed for speed. The system remembers your members so they don't have to search every time.
@@ -68,6 +69,7 @@ Rollcally isn't just about data; it's about people.
 ### Use Case: The Birthday Notification
 * **The Bell Icon**: If a member has a birthday, a notification bell will appear on your dashboard.
 * **Badge of Honor**: On a member's birthday, a special cake icon appears next to their name in your lists, so you can give them a warm welcome when you see them.
+* **Role Badges**: To help you stay oriented, Rollcally displays your current access level in the header (e.g., "Org Owner", "Unit Manager", or "View Only").
 
 ---
 
@@ -77,7 +79,7 @@ Rollcally isn't just about data; it's about people.
 3. **Members** are added to these Units.
 4. **Events** are scheduled when events happen.
 5. **Check-in Links** are shared, and **Smart Check-in** recognizes members for one-tap attendance.
-6. **QR Scanning** (Native or In-App) provides instant access to Event events.
+6. **QR Scanning** (Native or In-App) provides instant access to Event attendance.
 7. **Attendance** is tracked live with **Security Checks** (Location/Device) to ensure accuracy.
 7. **Birthdays** are celebrated automatically as they arise.
 

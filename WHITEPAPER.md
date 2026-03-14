@@ -3,16 +3,14 @@
 
 ---
 
-## 1. Executive Summary
-
 Rollcall is a mobile-first Progressive Web App (PWA) for managing attendance at recurring group events — primarily church choirs, youth groups, and similar organisations. Members check in by scanning a QR code on their phone. Administrators monitor attendance in real time, manage rosters, and export absence lists.
 
-The system is multi-tenant: one deployment serves multiple organisations, each with one or more named units (e.g. "Main Choir", "Youth Group"). Each unit has its own admin, its own member roster, and its own services.
+The system is multi-tenant: one deployment serves multiple organisations, each with one or more named units (e.g. "Main Choir", "Youth Group"). Each unit has its own manager, its own member roster, and its own events.
 
 **What is fully built and tested:**
-- Full database schema with Row Level Security
-- All three user roles: public member check-in, unit admin, super admin
-- Eight admin pages across the hierarchy (org list → org detail → unit dashboard → service detail, member roster, member attendance history, and login)
+- Full database schema with Row Level Security (RLS)
+- All three user roles: public member check-in, unit manager, org owner, and super admin
+- Eight admin pages across the hierarchy (org list → org detail → unit dashboard → event detail, member roster, member attendance history, and login)
 - Public check-in flow (scan QR → pick name → confirm → result) with accessibility-compliant tap targets
 - Offline-capable check-in: Workbox service worker caches the member list for low-signal venues
 - Realtime attendance updates via Supabase subscriptions
@@ -53,22 +51,22 @@ rollcall/
 │   │   ├── ProtectedRoute.tsx    — AdminRoute (wraps all /admin/* routes)
 │   │   └── ui/
 │   │       ├── Button.tsx
-│   │       ├── Card.tsx          — StatCard used in service and member detail
+│   │       ├── Card.tsx          — StatCard used in event and member detail
 │   │       └── Input.tsx         — label + input with htmlFor wired
 │   ├── hooks/
 │   │   ├── useAttendance.ts      — check-in RPC call + status machine
-│   │   ├── useChoristers.ts      — useServiceMembers (public, no auth)
+│   │   ├── useChoristers.ts      — useEventMembers (public, no auth)
 │   │   └── useAdminDashboard.ts  — useOrganizations, useUnits, useUnitAdmins,
-│   │                               useServices, useAdminDashboard
+│   │                               useEvents, useAdminDashboard
 │   ├── pages/
 │   │   ├── CheckIn.tsx           — public check-in flow
 │   │   ├── AdminLogin.tsx        — magic link login
 │   │   ├── AdminDashboard.tsx    — super admin: org list
 │   │   ├── OrgDetail.tsx         — super admin: unit list for one org
-│   │   ├── UnitDashboard.tsx     — services list + unit admin management
+│   │   ├── UnitDashboard.tsx     — events list + unit admin management
 │   │   ├── UnitMembers.tsx       — member roster CRUD + bulk CSV import
 │   │   ├── MemberDetail.tsx      — per-member attendance history + stats
-│   │   └── AdminServiceDetail.tsx — attendance view + QR + exports
+│   │   └── AdminEventDetail.tsx  — attendance view + QR + exports
 │   ├── types/
 │   │   └── index.ts              — all shared TypeScript interfaces
 │   ├── lib/
@@ -94,22 +92,25 @@ All tables live in the `public` schema. UUIDs everywhere. Row Level Security is 
 
 ```
 organizations           — top-level tenants (e.g. "Grace Baptist Church")
-  id, name, created_at
+  id, name, created_by_admin_id (Org Owner), created_at
+
+organization_members    — junction table for admins belonging to an org
+  id, organization_id, admin_id, role ('owner'|'member'), joined_at
 
 units                   — sub-groups within an org (e.g. "Main Choir")
-  id, org_id → organizations, name, description, created_at
+  id, org_id, created_by_admin_id (Unit Creator), name, description, created_at
 
 members                 — roster for a unit
   id, unit_id → units, name, phone, section, status ('active'|'inactive'), created_at
 
-services                — a specific event/date for a unit
-  id, unit_id → units, date, service_type ('rehearsal'|'sunday_service'), created_at
+services                — a specific event/date for a unit (internally "services")
+  id, unit_id → units, date, service_type ('rehearsal'|'sunday_service'|'meeting'), created_at
   UNIQUE (unit_id, date, service_type)
 
 attendance              — one row per check-in
   id, service_id → services, member_id → members,
   checked_in (bool, always true), checkin_time, created_at
-  UNIQUE (service_id, member_id)               — prevents double check-in at DB level
+  UNIQUE (service_id, member_id)
 
 unit_admins             — maps a Supabase auth user to a unit
   id, unit_id → units, user_id → auth.users, created_at
@@ -124,7 +125,9 @@ Two `SECURITY DEFINER` functions make policy definitions clean:
 
 ```sql
 is_super_admin()  — checks auth.jwt() -> user_metadata ->> 'role' = 'superadmin'
-is_unit_admin(p_unit_id uuid) — checks if auth.uid() has a row in unit_admins for that unit
+is_org_member(p_org_id uuid) — checks if auth.uid() is in organization_members for that org
+is_org_owner_by_unit(p_unit_id uuid) — checks if auth.uid() is an 'owner' of the org owning the unit
+is_unit_manager(p_unit_id uuid) — checks if auth.uid() is the unit creator OR org owner
 ```
 
 ### RPC Functions
@@ -132,7 +135,7 @@ is_unit_admin(p_unit_id uuid) — checks if auth.uid() has a row in unit_admins 
 | Function | Auth | Purpose |
 |---|---|---|
 | `get_service_members(p_service_id)` | **anon** | Public: returns active member list for a service's unit |
-| `checkin_by_id(p_member_id, p_service_id)` | **anon** | Public: records a check-in, returns `{success, error?, name?}` |
+| `checkin_by_id(p_member_id, p_service_id, p_device_id, p_lat, p_lng)` | **anon** | Public: records check-in with location/device security |
 | `get_service_members_full(p_service_id)` | authenticated | Admin: members with `checked_in` and `checkin_time` |
 | `add_unit_admin_by_email(p_unit_id, p_email)` | authenticated | Super admin only: looks up user by email, inserts `unit_admins` row |
 
@@ -159,17 +162,17 @@ No authentication whatsoever. The check-in page is at `/checkin?service_id={uuid
 
 The page calls two RPC functions granted to `anon`:
 1. `get_service_members` — fetch the member list
-2. `checkin_by_id` — record the check-in
+2. `checkin_by_id` — record the check-in (validates location and device locking)
 
-### 5.2 Unit Admins
+### 5.2 Organization Members (Admins)
 
-Unit admins sign in via magic link (`signInWithOtp`). They have a row in `unit_admins` linking their `auth.users.id` to one or more units. Their `user_metadata` has no special `role` field.
+Admins are authenticated via magic link or password. Their access is determined by the `organization_members` table and unit ownership.
 
-After login, `AuthContext` calls `fetchAdminUnits(userId)` which queries `unit_admins` with a join to `units` and `organizations`. The result is stored in `adminUnits: UnitWithOrg[]`.
+**Org Owners:** Have full CRUD access to all units in their organization.
+**Unit Creators:** Have full CRUD access to units they personally created.
+**Members:** Have Select (View Only) access to other units in their organization.
 
-**Single-unit redirect:** If a unit admin has exactly one unit, `AdminLogin.tsx` redirects them directly to `/admin/units/{unitId}` instead of `/admin`, skipping the super admin org list.
-
-**Multi-unit picker:** If they have more than one unit, `AdminDashboard.tsx` renders a simple unit picker (not the org list, which is super admin only).
+**Single-unit redirect:** If an admin is the manager of exactly one unit, they are redirected to `/admin/units/{unitId}` after login.
 
 ### 5.3 Super Admin
 
@@ -211,10 +214,10 @@ const { session, isSuper, adminUnits, loading, signOut } = useAuth()
 /admin/login                              → AdminLogin
 /admin                                    → AdminRoute → AdminDashboard (super admin org list OR unit picker)
 /admin/orgs/:orgId                        → AdminRoute → OrgDetail (unit list for one org)
-/admin/units/:unitId                      → AdminRoute → UnitDashboard (services for one unit)
+/admin/units/:unitId                      → AdminRoute → UnitDashboard (events for one unit)
 /admin/units/:unitId/members              → AdminRoute → UnitMembers (roster CRUD + CSV import)
 /admin/units/:unitId/members/:memberId    → AdminRoute → MemberDetail (attendance history)
-/admin/units/:unitId/services/:serviceId  → AdminRoute → AdminServiceDetail (attendance view)
+/admin/units/:unitId/events/:serviceId    → AdminRoute → AdminEventDetail (attendance view)
 *                                         → redirect to /checkin
 ```
 
@@ -231,13 +234,13 @@ const { session, isSuper, adminUnits, loading, signOut } = useAuth()
 3. **done** — Renders one of four result screens based on `useAttendance.status`:
    - `success` — "You're in!"
    - `already_checked_in` — "Already checked in"
-   - `not_found | invalid_service | error` — "Something went wrong"
+   - `not_found | invalid_event | error` — "Something went wrong"
 
 The back arrow in the `confirm` header calls `handleBack()` which resets to `list`.
 
 **Accessibility / tap targets:** Member buttons have `min-h-[3.5rem]` (56 px — above the 44 px accessibility minimum), `py-4`, `px-5`, and `text-base` name text. This ensures usability for older or low-dexterity users in poor lighting conditions.
 
-**Offline:** The Workbox service worker caches the `get_service_members` RPC response under the `member-list-cache` cache (7-day TTL, up to 30 services). On subsequent visits in low-signal venues the list loads from cache while the network request races in the background (3-second timeout).
+**Offline:** The Workbox service worker caches the `get_service_members` RPC response under the `member-list-cache` cache (7-day TTL, up to 30 events). On subsequent visits in low-signal venues the list loads from cache while the network request races in the background (3-second timeout).
 
 ### 7.2 AdminLogin (`/admin/login`)
 
@@ -267,19 +270,19 @@ Uses `useOrganizations()` to get the org name (finds by `orgId` from the already
 
 ### 7.5 UnitDashboard (`/admin/units/:unitId`)
 
-The main working screen for any admin.
+The main working screen for any admin. Displays the list of events and provides management options based on role.
 
-**Header buttons (super admin):** back arrow → Units icon (members) → UserCog icon (admin management panel) → LogOut
+**Header buttons:** back arrow → Units icon (members) → UserCog icon (admin management panel, Org Owner only) → LogOut
 
-**Header buttons (unit admin with 1 unit):** no back arrow → Users → LogOut
+**Role Context:** A badge in the header displays "Org Owner", "Unit Manager", or "View Only".
 
 Fetches the unit (inline `useEffect`, not a hook) with the org join: `supabase.from('units').select('*, organization:organizations(name)').eq('id', unitId).single()`
 
-Uses `useServices(unitId)` — services split into `upcoming` (date >= today) and `past`.
+Uses `useEvents(unitId)` — events (internally "services") split into `upcoming` (date >= today) and `past`.
 
-Uses `useUnitAdmins(isSuper ? unitId : null)` — only fetched for super admin. The admin panel (toggled by UserCog) lets super admin add admins by email via the `add_unit_admin_by_email` RPC.
+Uses `useUnitAdmins(isOrgOwner ? unitId : null)` — only fetched for organization owners or super admins. The admin panel (toggled by UserCog) lets owners add admins by email via the `add_unit_admin_by_email` RPC.
 
-**Service date filtering:** Uses JavaScript's current date (`new Date().toISOString().split('T')[0]`) compared against `service.date` (a string). This means "today" is when the service's date equals today's ISO date.
+**Event date filtering:** Uses JavaScript's current date (`new Date().toISOString().split('T')[0]`) compared against `event.date` (a string). This means "today" is when the event's date equals today's ISO date.
 
 ### 7.6 UnitMembers (`/admin/units/:unitId/members`)
 
@@ -319,25 +322,25 @@ Promise.all([
 ])
 ```
 
-Results are merged client-side: a `Map<service_id, checkin_time>` is built from the attendance rows, then each service is classified as `attended | absent | upcoming` by comparing `service.date` against today's ISO date string.
+Results are merged client-side: a `Map<event_id, checkin_time>` is built from the attendance rows (referencing the `services` table), then each event is classified as `attended | absent | upcoming` by comparing `event.date` against today's ISO date string.
 
 **Computed stats displayed as four stat cards:**
-- **Attended** — count of past services where the member was present
-- **Total Services** — count of past services (excludes upcoming)
+- **Attended** — count of past events where the member was present
+- **Total Events** — count of past events (excludes upcoming)
 - **Attendance Rate** — `attended / total * 100`, colour-coded (green ≥75%, amber ≥50%, red <50%)
-- **Current Streak** — consecutive services attended counting backward from the most recent past service
+- **Current Streak** — consecutive events attended counting backward from the most recent past event
 
-**Recent trend** — last ≤10 past services rendered as coloured dots (oldest left → newest right): filled green = attended, white with red border = absent. Shown only when at least one past service exists.
+**Recent trend** — last ≤10 past events rendered as coloured dots (oldest left → newest right): filled green = attended, white with red border = absent. Shown only when at least one past event exists.
 
-**Service history table** — full list of all services (most recent first), each row showing: status dot, service type label, `Present / Absent / Upcoming` badge, formatted date, and check-in time if attended.
+**Event history table** — full list of all events (most recent first), each row showing: status dot, event type label, `Present / Absent / Upcoming` badge, formatted date, and check-in time if attended.
 
-### 7.8 AdminServiceDetail (`/admin/units/:unitId/services/:serviceId`)
+### 7.8 AdminEventDetail (`/admin/units/:unitId/events/:serviceId`)
 
-The attendance view for one service.
+The attendance view for one event.
 
 **Data sources:**
 - `useAdminDashboard(serviceId)` — calls `get_service_members_full` RPC AND queries the `attendance` table in parallel. The `checked_in` field from the RPC is **ignored** — it is re-derived from the `attendance` table to ensure consistency with realtime updates.
-- Inline `useEffect` for the service record itself (`services` table, `.single()`).
+- Inline `useEffect` for the event record itself (`services` table, `.single()`).
 
 **Realtime:** `useAdminDashboard` subscribes to `postgres_changes` on the `attendance` table filtered by `service_id`. New check-ins appear without a page refresh.
 
@@ -351,7 +354,7 @@ The attendance view for one service.
 | CSV | UTF-8 BOM (`\uFEFF`) so Excel opens without an encoding prompt; summary header block (title, generated date, total) above the data rows; all cells quoted |
 | RTF | Proper RTF table with `\trowd` / `\cellx` column width definitions; bold header row; blue title text; `\margl` margins for A4 printing |
 
-**QR Code:** Collapsed by default. The toggle button's text `Show`/`Hide` is in a `<span className="text-xs font-medium text-blue-600">`. The `id="service-qr"` canvas is used for both visibility checks and PNG download.
+**QR Code:** Collapsed by default. The toggle button's text `Show`/`Hide` is in a `<span className="text-xs font-medium text-blue-600">`. The `id="service-qr"` canvas is used for both visibility checks and PNG download. Users are prompted to "scan qr code to check in".
 
 ---
 
@@ -401,13 +404,13 @@ The RPC result shape (SQL and hook now aligned):
 { success: boolean, error?: string, name?: string }
 ```
 
-### `useServiceMembers(serviceId)` — `src/hooks/useChoristers.ts`
+### `useEventMembers(serviceId)` — `src/hooks/useChoristers.ts`
 
-Public. Calls `get_service_members` RPC. Returns `{ members: PublicMember[], loading, error }`.
+Public (internally `useServiceMembers`). Calls `get_service_members` RPC. Returns `{ members: PublicMember[], loading, error }`.
 
 ### `useOrganizations()` — `src/hooks/useAdminDashboard.ts`
 
-Fetches all orgs ordered by name. Returns `{ orgs, loading, createOrg, deleteOrg, refetch }`.
+Fetches all orgs ordered by name. Returns `{ orgs, loading, createOrg, updateOrg, deleteOrg, refetch }`. Now includes `userRole` for each organization.
 
 ### `useUnits(orgId)` — `src/hooks/useAdminDashboard.ts`
 
@@ -417,11 +420,11 @@ Fetches units for a given org. Returns `{ units, loading, createUnit, deleteUnit
 
 Fetches `unit_admins` rows for a unit. Email is displayed as `'—'` (the `auth.users` email is not directly joinable without service role). Returns `{ admins, loading, addAdmin, removeAdmin }`.
 
-### `useServices(unitId)` — `src/hooks/useAdminDashboard.ts`
+### `useEvents(unitId)` — `src/hooks/useAdminDashboard.ts`
 
-Fetches services for a unit, ordered `date DESC`. Returns `{ services, loading, createService, refetch }`.
+Fetches events (internally `services`) for a unit, ordered `date DESC`. Returns `{ events, loading, createEvent, refetch }`.
 
-Creating a service navigates immediately to the new service's detail page.
+Creating an event navigates immediately to the new event's detail page.
 
 ### `useAdminDashboard(serviceId)` — `src/hooks/useAdminDashboard.ts`
 
@@ -430,7 +433,7 @@ The most complex hook. Runs two parallel queries then merges:
 get_service_members_full  →  all active members with RPC-derived checked_in
 attendance table          →  actual check-in timestamps
 ```
-The `checked_in` field from the RPC is discarded. `checked_in` is re-derived from whether `attendedMap.has(m.id)`.
+The `checked_in` field from the RPC is discarded. `checked_in` is re-derived from the `attendedMap` (populated by the `attendance` table).
 
 Also sets up a Supabase Realtime channel for live updates. The channel is cleaned up on unmount.
 
@@ -446,7 +449,7 @@ All UI primitives are in `src/components/ui/`. They are small and local — not 
 
 **`Input`** — Wraps `<input>` with a `<label>`. The label is linked via `htmlFor` + `id` (auto-generated from the `label` prop). This means `page.getByLabel('Full name')` works in tests for `Input` fields.
 
-**`StatCard`** — Used in AdminServiceDetail and MemberDetail for attendance stats. Props: `label`, `value`, `color` (`gray | green | amber | red | blue`).
+**`StatCard`** — Used in AdminEventDetail and MemberDetail for attendance stats. Props: `label`, `value`, `color` (`gray | green | amber | red | blue`).
 
 **Inline `<label>` + `<select>` pairs** in UnitMembers use explicit `htmlFor`/`id` attributes (`member-status`) so `getByLabel('Status')` works in Playwright tests.
 
@@ -472,7 +475,7 @@ playwright.config.ts
 
 **Auth injection:** `asSuperAdmin(page)` and `asUnitAdmin(page)` use `page.addInitScript()` to inject a fake session into `localStorage` before the page loads, then mock `auth/v1/token*` for token refreshes.
 
-**Table mocks:** Simple helpers like `mockOrgs`, `mockMembers`, `mockServices`. Each just fulfils the matching URL pattern with canned data.
+**Table mocks:** Simple helpers like `mockOrgs`, `mockMembers`, `mockEvents`. Each just fulfils the matching URL pattern with canned data.
 
 **Smart mocks (`mockUnitsAll`, `mockServicesAll`, `mockMembersAll`):** These use an async route handler that inspects the URL to detect whether it's a single-record lookup vs a list query. They return the appropriate content type:
 - List: `application/json` + JSON array
@@ -488,8 +491,8 @@ playwright.config.ts
 
 **Fixed IDs in `helpers.ts`:**
 ```typescript
-IDS.service     // 'dddddddd-...-001' — upcoming service (date: 2026-03-10)
-IDS.servicePast // 'dddddddd-...-002' — past service    (date: 2026-03-05)
+IDS.service     // 'dddddddd-...-001' — upcoming event (date: 2026-03-10)
+IDS.servicePast // 'dddddddd-...-002' — past event    (date: 2026-03-05)
 IDS.member1     // Alice Johnson — active, Soprano, with phone
 IDS.member2     // Bob Smith    — active, Bass, no phone
 ```
@@ -499,8 +502,8 @@ IDS.member2     // Bob Smith    — active, Bass, no phone
 | File | Tests | What's covered |
 |---|---|---|
 | `admin-auth.spec.ts` | 9 | Login form, OTP submit, check-email screen, error, unauthenticated redirects, super admin redirect, unit admin redirect, sign out |
-| `admin-dashboard.spec.ts` | 61 | Super admin org list and CRUD, OrgDetail, unit admin redirect, unit picker, UnitDashboard, UnitMembers CRUD, MemberDetail (stats, badges, trend, back nav), member row navigation, AdminServiceDetail (tabs, QR, exports, realtime stats), edge cases |
-| `checkin.spec.ts` | 11 | No service, member list, search, section grouping, confirmation flow, success, already-checked-in, invalid service, error recovery |
+| `admin-dashboard.spec.ts` | 61 | Super admin org list, unit manager permissions, OrgDetail, UnitDashboard, UnitMembers CRUD, MemberDetail, AdminEventDetail (tabs, QR, exports, realtime stats), edge cases |
+| `checkin.spec.ts` | 11 | No event, member list, search, section grouping, confirmation flow, success, already-checked-in, invalid event, error recovery |
 
 ### Running Tests
 
@@ -594,10 +597,10 @@ Supabase JS v2 reads the `Content-Type` response header to decide whether to par
 Playwright's `page.route()` is a stack — each new handler is checked first. This means `beforeEach` handlers have lower priority than handlers added inside the test body. Design your test helpers accordingly: call "default" mocks first in `beforeEach`, and call "override" mocks last (or in the test body).
 
 **Why `NetworkFirst` (not `CacheFirst`) for the member list?**
-`CacheFirst` would serve a stale list indefinitely once cached — a new member added between Sunday services would be invisible until the cache expires. `NetworkFirst` with a 3-second timeout always tries to get fresh data; the cache is only the fallback. 7-day TTL covers the typical weekly service cycle.
+`CacheFirst` would serve a stale list indefinitely once cached — a new member added between Sunday events would be invisible until the cache expires. `NetworkFirst` with a 3-second timeout always tries to get fresh data; the cache is only the fallback. 7-day TTL covers the typical weekly event cycle.
 
 **Why merge attendance history client-side in MemberDetail instead of a SQL view or RPC?**
-Three separate queries (member, services, attendance) are already table-scanned at the row level by existing RLS policies. A dedicated RPC would require maintaining an additional SQL function. The client-side merge is O(n) where n = services count, which is small (typically < 200 for any unit). This keeps the DB schema minimal and the logic auditable in TypeScript.
+Three separate queries (member, events, attendance) are already table-scanned at the row level by existing RLS policies. A dedicated RPC would require maintaining an additional SQL function. The client-side merge is O(n) where n = services count, which is small (typically < 200 for any unit). This keeps the DB schema minimal and the logic auditable in TypeScript.
 
 **Why UTF-8 BOM in the CSV export?**
 Windows Excel detects encoding from the BOM byte sequence. Without it, any name containing a non-ASCII character (accented letters, common in Nigerian, Ghanaian, and European names) is rendered as mojibake. The BOM (`\uFEFF`) is three bytes prepended to the CSV and is ignored by every modern parser.
@@ -610,7 +613,7 @@ The following features are natural extensions that fit cleanly within the existi
 
 1. **Notifications on absence:** Send an SMS/WhatsApp to absent members with a phone number. Could be a Supabase Edge Function triggered after service closes.
 
-2. **Service close / lock:** A `closed_at` column on `services` that, when set, prevents new check-ins and shows a "service closed" message on the check-in page.
+2. **Event close / lock:** A `closed_at` column on `services` that, when set, prevents new check-ins and shows a "event closed" message on the check-in page.
 
 3. **Unit admin email display:** A Supabase Edge Function (`/functions/v1/admin-users`) that uses the service role key to look up user emails by ID, callable from `useUnitAdmins` after load.
 

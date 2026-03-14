@@ -23,9 +23,9 @@ A built-in notification engine monitors member birthdays, firing alerts to admin
 
 ### 3.3 Multi-Admin Governance
 The platform supports a sophisticated multi-admin hierarchy:
-- **Owners**: Can create organizations, manage global settings, and approve new admins.
-- **Member Admins**: Can discover existing organizations, request to join, and independently manage the specific units they create.
-- **Distributed Responsibility**: This model prevents administrative burnout by allowing owners to delegate unit-level management to specialized leaders.
+- **Owners**: Can create organizations, manage global settings, and have full CRUD authority over *all* units within their organization.
+- **Unit Managers (Creators)**: Admins who have full CRUD authority over the specific units they personally created.
+- **Member Admins**: Can discover organizations and view all units within them, but their management actions are restricted to units they own, preventing administrative burnout while maintaining strict data governance.
 
 ## 4. Technical Architecture
 
@@ -51,9 +51,10 @@ Rollcally is designed to feel premium and state-of-the-art.
 
 ### 5.1 Row Level Security (RLS)
 Security is baked into the database layer. RLS policies ensure that:
-- Admins can only see data belonging to their units.
-- Owners have full visibility over their organization but cannot interfere with other organizations.
-- Public check-in pages are strictly limited to necessary data (names and sections).
+- **Unit Managers** can only manage (CRUD) members and events within units they created.
+- **Owners** have full CRUD visibility over their entire organization, allowing for top-down oversight.
+- **Member Admins** can view (Select) data for any unit in their organization but cannot modify it unless they are the creator.
+- **Public check-in pages** are strictly limited to necessary data (names and sections).
 
 ### 5.2 Mandatory Security Governance
 Beyond RLS, Rollcally enforces strictly governed check-in protocols:
