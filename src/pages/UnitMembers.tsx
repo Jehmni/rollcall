@@ -92,9 +92,10 @@ function isBirthdayToday(birthday: string | null) {
 }
 
 function MemberRow({
-  member, onEdit, onDelete, onView,
+  member, canManage, onEdit, onDelete, onView,
 }: {
   member: Member
+  canManage: boolean
   onEdit: (m: Member) => void
   onDelete: (id: string) => void
   onView: () => void
@@ -123,21 +124,28 @@ function MemberRow({
         </div>
         {member.phone && <p className="text-xs text-gray-400 mt-0.5">{member.phone}</p>}
       </div>
-      <div className="flex items-center gap-1 pr-2 flex-shrink-0">
-        <button
-          onClick={e => { e.stopPropagation(); onEdit(member) }}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-300 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-        >
-          <Pencil className="h-3.5 w-3.5" />
-        </button>
-        <button
-          onClick={e => { e.stopPropagation(); onDelete(member.id) }}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-300 hover:bg-red-50 hover:text-red-500 transition-colors"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
-        <ChevronRight className="h-4 w-4 text-gray-200 group-hover:text-gray-400 transition-colors" />
-      </div>
+      {canManage && (
+        <div className="flex items-center gap-1 pr-2 flex-shrink-0">
+          <button
+            onClick={e => { e.stopPropagation(); onEdit(member) }}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-300 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={e => { e.stopPropagation(); onDelete(member.id) }}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-300 hover:bg-red-50 hover:text-red-500 transition-colors"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+          <ChevronRight className="h-4 w-4 text-gray-200 group-hover:text-gray-400 transition-colors" />
+        </div>
+      )}
+      {!canManage && (
+        <div className="flex items-center gap-1 pr-2 flex-shrink-0">
+          <ChevronRight className="h-4 w-4 text-gray-200 group-hover:text-gray-400 transition-colors" />
+        </div>
+      )}
     </div>
   )
 }
@@ -154,6 +162,8 @@ export default function UnitMembers() {
   const { unitId } = useParams<{ unitId: string }>()
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  const [isOwnerOrCreator, setIsOwnerOrCreator] = useState(false)
 
   const [unitName, setUnitName] = useState('')
   const [members, setMembers] = useState<Member[]>([])
@@ -221,9 +231,27 @@ export default function UnitMembers() {
 
   useEffect(() => {
     if (!unitId) return
-    supabase.from('units').select('name').eq('id', unitId).single().then(({ data }) => {
-      if (data) setUnitName(data.name)
-    })
+    supabase
+      .from('units')
+      .select('*, organization:organizations(*, organization_members(role, admin_id))')
+      .eq('id', unitId)
+      .single()
+      .then(async ({ data }) => {
+        if (data) {
+          setUnitName(data.name)
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            const org = data.organization as any
+            const members = org?.organization_members as any[]
+            const myMember = members?.find(m => m.admin_id === user.id)
+            const role = myMember?.role || 'member'
+            
+            // Check if super admin, org owner, or unit creator
+            const { data: isSuper } = await supabase.rpc('is_super_admin')
+            setIsOwnerOrCreator(isSuper || role === 'owner' || data.created_by_admin_id === user.id)
+          }
+        }
+      })
     fetchMembers(0, true)
   }, [unitId, fetchMembers])
 
@@ -415,12 +443,16 @@ export default function UnitMembers() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" size="sm" onClick={openImport}>
-            <Upload className="h-4 w-4" /> Import
-          </Button>
-          <Button size="sm" onClick={openCreate}>
-            <Plus className="h-4 w-4" /> Add
-          </Button>
+          {isOwnerOrCreator && (
+            <>
+              <Button variant="secondary" size="sm" onClick={openImport}>
+                <Upload className="h-4 w-4" /> Import
+              </Button>
+              <Button size="sm" onClick={openCreate}>
+                <Plus className="h-4 w-4" /> Add
+              </Button>
+            </>
+          )}
         </div>
       </header>
 
@@ -727,6 +759,7 @@ Bob Smith,,Bass,active,1985-11-20`}
                     <MemberRow
                       key={m.id}
                       member={m}
+                      canManage={isOwnerOrCreator}
                       onEdit={openEdit}
                       onDelete={handleDelete}
                       onView={() => navigate(`/admin/units/${unitId}/members/${m.id}`)}

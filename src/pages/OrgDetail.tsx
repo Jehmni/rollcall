@@ -12,11 +12,13 @@ import type { Unit } from '../types'
 
 function UnitCard({ 
   unit, 
+  canManage,
   onClick, 
   onDelete, 
   onEdit 
 }: { 
   unit: Unit; 
+  canManage: boolean;
   onClick: () => void; 
   onDelete: () => void;
   onEdit: () => void;
@@ -38,22 +40,24 @@ function UnitCard({
         </div>
         <ChevronRight className="h-5 w-5 text-gray-300 flex-shrink-0" />
       </button>
-      <div className="flex flex-col gap-1">
-        <button
-          onClick={onEdit}
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-          title="Edit Unit"
-        >
-          <Edit2 className="h-4 w-4" />
-        </button>
-        <button
-          onClick={onDelete}
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
-          title="Delete Unit"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
-      </div>
+      {canManage && (
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={onEdit}
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+            title="Edit Unit"
+          >
+            <Edit2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={onDelete}
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+            title="Delete Unit"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -61,13 +65,13 @@ function UnitCard({
 export default function OrgDetail() {
   const { orgId } = useParams<{ orgId: string }>()
   const navigate = useNavigate()
-  const { session } = useAuth()
+  const { session, isSuper } = useAuth()
   const { orgs, updateOrg, deleteOrg } = useAdminOrgs()
   const { units, loading, createUnit, updateUnit, deleteUnit } = useUnits(orgId ?? null)
   const { getOrgJoinRequests, respondToJoinRequest } = useOrganizations()
 
   const org = orgs.find(o => o.id === orgId)
-  const isOwner = org?.created_by_admin_id === session?.user?.id
+  const isOwner = isSuper || (org && (org as any).userRole === 'owner')
 
   const [activeTab, setActiveTab] = useState<'units' | 'requests'>('units')
   const [showCreate, setShowCreate] = useState(false)
@@ -329,6 +333,7 @@ export default function OrgDetail() {
                   <UnitCard
                     key={u.id}
                     unit={u}
+                    canManage={isOwner || u.created_by_admin_id === session?.user?.id}
                     onClick={() => navigate(`/admin/units/${u.id}`)}
                     onEdit={() => startEditUnit(u)}
                     onDelete={() => setConfirmDeleteUnit({ id: u.id, name: u.name })}

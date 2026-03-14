@@ -1,24 +1,33 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import type { DashboardMember, Organization, Service, ServiceType, Unit } from '../types'
+import type { DashboardMember, Organization, OrgRole, Service, ServiceType, Unit } from '../types'
 
 // ── Organizations ────────────────────────────────────────────────────────────
 
 export function useOrganizations() {
-  const [orgs, setOrgs] = useState<Organization[]>([])
+  const [orgs, setOrgs] = useState<(Organization & { userRole: OrgRole })[]>([])
   const [loading, setLoading] = useState(true)
 
   const fetch = useCallback(async () => {
-    // Fetch only organizations the user is a member of
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    // Fetch organizations where the current user is a member
     const { data } = await supabase
       .from('organizations')
       .select(`
         *,
-        organization_members!inner(admin_id)
+        organization_members!inner(role)
       `)
+      .eq('organization_members.admin_id', user.id)
       .order('name')
     
-    setOrgs(data ?? [])
+    const transformed = (data ?? []).map((o: any) => ({
+      ...o,
+      userRole: o.organization_members[0]?.role || 'member'
+    }))
+
+    setOrgs(transformed)
     setLoading(false)
   }, [])
 
@@ -28,7 +37,6 @@ export function useOrganizations() {
     const { data, error } = await supabase.from('organizations').insert({ name }).select().single()
     if (error) throw error
     
-    // The RLS policy/trigger should handle membership, but we refetch to be sure
     await fetch()
     return data
   }
@@ -36,7 +44,7 @@ export function useOrganizations() {
   async function updateOrg(id: string, name: string): Promise<Organization> {
     const { data, error } = await supabase.from('organizations').update({ name }).eq('id', id).select().single()
     if (error) throw error
-    setOrgs(prev => prev.map(o => o.id === id ? data : o).sort((a, b) => a.name.localeCompare(b.name)))
+    await fetch()
     return data
   }
 

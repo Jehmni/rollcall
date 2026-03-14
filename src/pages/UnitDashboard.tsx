@@ -8,7 +8,7 @@ import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { Card } from '../components/ui/Card'
 import { ConfirmDialog } from '../components/ui/Modal'
-import type { Service, ServiceType, Unit } from '../types'
+import type { Service, ServiceType, Unit, OrgRole } from '../types'
 import { NotificationBell } from '../components/NotificationBell'
 
 const EVENT_LABEL: Record<ServiceType, string> = {
@@ -62,7 +62,7 @@ function ServiceCard({ service, unitId, onClick }: { service: Service; unitId: s
 export default function UnitDashboard() {
   const { unitId } = useParams<{ unitId: string }>()
   const navigate = useNavigate()
-  const { isSuper, signOut } = useAuth()
+  const { isSuper, signOut, session } = useAuth()
   const { services, loading: servicesLoading, createService } = useServices(unitId ?? null)
   const { updateUnit, deleteUnit } = useUnits(null) // pass null because we don't need a list here
   const { admins, addAdmin, removeAdmin } = useUnitAdmins(isSuper ? unitId ?? null : null)
@@ -72,6 +72,8 @@ export default function UnitDashboard() {
   const [showCreate, setShowCreate] = useState(false)
   const [showAdmins, setShowAdmins] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [userRole, setUserRole] = useState<OrgRole>('member')
+  const [isOwnerOrCreator, setIsOwnerOrCreator] = useState(false)
   
   // Forms state
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0])
@@ -86,21 +88,27 @@ export default function UnitDashboard() {
   const [adminError, setAdminError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!unitId) return
+    if (!unitId || !session?.user?.id) return
     supabase
       .from('units')
-      .select('*, organization:organizations(name)')
+      .select('*, organization:organizations(*, organization_members!inner(role))')
       .eq('id', unitId)
+      .eq('organization.organization_members.admin_id', session.user.id)
       .single()
       .then(({ data }) => {
         if (data) {
           setUnit(data)
-          setOrgName((data.organization as { name: string } | null)?.name ?? '')
+          const org = data.organization as any
+          setOrgName(org?.name ?? '')
           setNewName(data.name)
           setNewDesc(data.description ?? '')
+          
+          const role = org?.organization_members?.[0]?.role || 'member'
+          setUserRole(role)
+          setIsOwnerOrCreator(isSuper || role === 'owner' || data.created_by_admin_id === session.user.id)
         }
       })
-  }, [unitId])
+  }, [unitId, session?.user?.id, isSuper])
 
 
   async function handleCreate(e: FormEvent) {
@@ -179,16 +187,23 @@ export default function UnitDashboard() {
         </button>
         <div className="flex-1 min-w-0">
           <h1 className="font-bold text-gray-900 truncate">{unit?.name ?? 'Unit'}</h1>
-          {orgName && <p className="text-xs text-blue-600 font-medium">{orgName}</p>}
+          <div className="flex items-center gap-2">
+            {orgName && <p className="text-xs text-blue-600 font-medium">{orgName}</p>}
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider bg-gray-100 px-1.5 py-0.5 rounded-md">
+              {userRole === 'owner' ? 'Org Owner' : isOwnerOrCreator ? 'Unit Manager' : 'View Only'}
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-1">
           {unitId && <NotificationBell unitId={unitId} />}
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/units/${unitId}/members`)} title="Manage Members">
+          <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/units/${unitId}/members`)} title="View Members">
             <Users className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => setShowSettings(!showSettings)} className={showSettings ? 'bg-gray-100' : ''} title="Unit Settings">
-            <Settings className="h-4 w-4" />
-          </Button>
+          {isOwnerOrCreator && (
+            <Button variant="ghost" size="sm" onClick={() => setShowSettings(!showSettings)} className={showSettings ? 'bg-gray-100' : ''} title="Unit Settings">
+              <Settings className="h-4 w-4" />
+            </Button>
+          )}
           {isSuper && (
             <Button variant="ghost" size="sm" onClick={() => setShowAdmins(v => !v)} className={showAdmins ? 'bg-gray-100' : ''} title="Unit Admins">
               <UserCog className="h-4 w-4" />
@@ -286,9 +301,11 @@ export default function UnitDashboard() {
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500">Events</h2>
-            <Button size="sm" onClick={() => setShowCreate(!showCreate)} className="shadow-lg shadow-blue-200/50">
-              <Plus className="h-4 w-4 mr-1.5" /> New Event
-            </Button>
+            {isOwnerOrCreator && (
+              <Button size="sm" onClick={() => setShowCreate(!showCreate)} className="shadow-lg shadow-blue-200/50">
+                <Plus className="h-4 w-4 mr-1.5" /> New Event
+              </Button>
+            )}
           </div>
 
           {showCreate && (

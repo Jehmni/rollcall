@@ -7,19 +7,25 @@ import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { Card } from '../components/ui/Card'
 import { ConfirmDialog } from '../components/ui/Modal'
-import type { Organization } from '../types'
+import type { Organization, OrgRole } from '../types'
 
 function OrgCard({ 
   org, 
+  userRole,
+  isSuper,
   onClick, 
   onDelete, 
   onRename 
 }: { 
   org: Organization; 
+  userRole: OrgRole;
+  isSuper: boolean;
   onClick: () => void; 
   onDelete: () => void;
   onRename: () => void;
 }) {
+  const canManage = isSuper || userRole === 'owner';
+
   return (
     <div className="flex items-center gap-2 group">
       <button
@@ -40,22 +46,24 @@ function OrgCard({
         <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-blue-500 transition-colors" />
       </button>
       
-      <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          onClick={onRename}
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-          title="Rename Organization"
-        >
-          <Edit2 className="h-4 w-4" />
-        </button>
-        <button
-          onClick={onDelete}
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
-          title="Delete Organization"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
-      </div>
+      {canManage && (
+        <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={onRename}
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+            title="Rename Organization"
+          >
+            <Edit2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={onDelete}
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+            title="Delete Organization"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -228,6 +236,8 @@ export default function AdminDashboard() {
                 <OrgCard 
                   key={o.id} 
                   org={o} 
+                  userRole={o.userRole}
+                  isSuper={isSuper}
                   onClick={() => navigate(`/admin/orgs/${o.id}`)}
                   onDelete={() => setConfirmDelete({ id: o.id, name: o.name })}
                   onRename={() => startRename(o)}
