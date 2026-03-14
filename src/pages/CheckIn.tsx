@@ -101,7 +101,7 @@ export default function CheckIn() {
           <div>
             <h1 className="text-lg font-bold text-gray-900 leading-tight">Rollcally</h1>
             <p className="text-xs text-gray-400">
-              {step === 'welcome' ? 'Welcome back!' : step === 'list' ? 'Tap your name to check in' : step === 'confirm' ? 'Confirm your identity' : ''}
+              {step === 'welcome' ? 'Welcome back!' : step === 'list' ? 'Scan QR code to check in' : step === 'confirm' ? 'Confirm your identity' : ''}
             </p>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function CheckIn() {
             <div>
               <h2 className="font-semibold text-gray-900">No active service</h2>
               <p className="mt-1 text-sm text-gray-500">
-                This QR code is not linked to a service. Ask your leader for a fresh code.
+                This QR code is not linked to a service. Ask your administrator for a fresh code.
               </p>
             </div>
           </div>
