@@ -152,10 +152,11 @@ export default function MemberDetail() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Header */}
-      <header className="bg-white px-4 py-3 shadow-sm flex items-center gap-3">
+      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-gray-100">
         <button
           onClick={() => navigate(`/admin/units/${unitId}/members`)}
-          className="flex items-center justify-center rounded-lg p-1.5 hover:bg-gray-100"
+          className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
+          title="Back to Members"
         >
           <ArrowLeft className="h-5 w-5 text-gray-600" />
         </button>

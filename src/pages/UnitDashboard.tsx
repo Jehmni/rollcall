@@ -62,7 +62,7 @@ function ServiceCard({ service, unitId, onClick }: { service: Service; unitId: s
 export default function UnitDashboard() {
   const { unitId } = useParams<{ unitId: string }>()
   const navigate = useNavigate()
-  const { isSuper, adminUnits, signOut } = useAuth()
+  const { isSuper, signOut } = useAuth()
   const { services, loading: servicesLoading, createService } = useServices(unitId ?? null)
   const { updateUnit, deleteUnit } = useUnits(null) // pass null because we don't need a list here
   const { admins, addAdmin, removeAdmin } = useUnitAdmins(isSuper ? unitId ?? null : null)
@@ -102,7 +102,6 @@ export default function UnitDashboard() {
       })
   }, [unitId])
 
-  const canGoBack = isSuper || adminUnits.length > 1
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault()
@@ -171,14 +170,13 @@ export default function UnitDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-gray-50 to-gray-50">
       <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-gray-100">
-        {canGoBack && (
-          <button
-            onClick={() => navigate(isSuper && unit ? `/admin/orgs/${unit.org_id}` : '/admin')}
-            className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5 text-gray-600" />
-          </button>
-        )}
+        <button
+          onClick={() => navigate(isSuper && unit ? `/admin/orgs/${unit.org_id}` : '/admin')}
+          className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
+          title="Back"
+        >
+          <ArrowLeft className="h-5 w-5 text-gray-600" />
+        </button>
         <div className="flex-1 min-w-0">
           <h1 className="font-bold text-gray-900 truncate">{unit?.name ?? 'Unit'}</h1>
           {orgName && <p className="text-xs text-blue-600 font-medium">{orgName}</p>}

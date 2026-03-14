@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { CheckCircle, Clock, AlertCircle, Users, Search, ArrowLeft, ShieldCheck, QrCode } from 'lucide-react'
 import { useAttendance } from '../hooks/useAttendance'
 import { useServiceMembers, useMemberById, type PublicMember } from '../hooks/useChoristers'
@@ -10,6 +10,7 @@ type Step = 'welcome' | 'list' | 'confirm' | 'done'
 
 export default function CheckIn() {
   const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
   const [step, setStep] = useState<Step>('list')
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<PublicMember | null>(null)
@@ -86,10 +87,10 @@ export default function CheckIn() {
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-blue-50 to-white">
       {/* Header */}
       <header className="flex items-center gap-3 px-4 pt-10 pb-4">
-        {step === 'confirm' && (
+        {(step === 'confirm' || step === 'list' || step === 'welcome') && (
           <button
-            onClick={handleBack}
-            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl hover:bg-blue-100"
+            onClick={step === 'confirm' ? handleBack : () => navigate('/')}
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl hover:bg-blue-100 transition-colors"
           >
             <ArrowLeft className="h-5 w-5 text-blue-700" />
           </button>

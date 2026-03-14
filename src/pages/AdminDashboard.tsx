@@ -1,6 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, Plus, ChevronRight, Building2, Users, Trash2, Edit2 } from 'lucide-react'
+import { LogOut, Plus, ChevronRight, Building2, Users, Trash2, Edit2, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useOrganizations } from '../hooks/useAdminDashboard'
 import { Button } from '../components/ui/Button'
@@ -131,15 +131,24 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-gray-50 to-gray-50">
-      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center justify-between sticky top-0 z-20 border-b border-gray-100">
-        <div className="flex items-center gap-2">
+      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-gray-100">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
+          title="Back to Landing"
+        >
+          <ArrowLeft className="h-5 w-5 text-gray-600" />
+        </button>
+        <div className="flex flex-1 items-center gap-2">
           <Building2 className="h-5 w-5 text-blue-700" />
           <span className="font-semibold text-gray-900">Rollcally</span>
           {isSuper && (
             <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">Super Admin</span>
           )}
         </div>
-        <Button variant="ghost" size="sm" onClick={signOut}><LogOut className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="sm" onClick={signOut} title="Sign Out">
+          <LogOut className="h-4 w-4" />
+        </Button>
       </header>
 
       <div className="mx-auto max-w-2xl px-4 py-8 flex flex-col gap-6 relative">

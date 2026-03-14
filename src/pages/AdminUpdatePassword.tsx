@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Save, CheckCircle2, ShieldAlert } from 'lucide-react'
+import { Save, CheckCircle2, ShieldAlert, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
@@ -57,6 +57,16 @@ export default function AdminUpdatePassword() {
       <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
       <div className="relative w-full max-w-md">
+        <button
+          onClick={() => navigate('/admin/login')}
+          className="absolute -top-12 left-0 flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-blue-600 transition-colors group"
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/50 backdrop-blur-sm ring-1 ring-gray-200 group-hover:ring-blue-200 group-hover:bg-blue-50">
+            <ArrowLeft className="h-4 w-4" />
+          </div>
+          Back to Login
+        </button>
+
         <div className="mb-8 flex flex-col items-center gap-4 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-700 shadow-xl shadow-blue-200 ring-4 ring-blue-50">
             <Save className="h-8 w-8 text-white" />

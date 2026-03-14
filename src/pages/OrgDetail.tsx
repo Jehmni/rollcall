@@ -179,7 +179,11 @@ export default function OrgDetail() {
   return (
     <div className="min-h-screen bg-gray-50 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-gray-50 to-gray-50">
       <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-gray-100">
-        <button onClick={() => navigate('/admin')} className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors">
+        <button
+          onClick={() => navigate('/admin')}
+          className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
+          title="Back to Dashboard"
+        >
           <ArrowLeft className="h-5 w-5 text-gray-600" />
         </button>
         <div className="flex-1 min-w-0">

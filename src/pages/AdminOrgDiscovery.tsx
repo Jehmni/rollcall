@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { useOrganizations } from '../hooks/useOrganizations'
 import type { Organization, JoinRequest } from '../types'
 
 export default function AdminOrgDiscovery() {
+  const navigate = useNavigate()
   const { 
     loading, 
     error, 
@@ -51,13 +53,22 @@ export default function AdminOrgDiscovery() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Discover Organizations</h1>
-        <Link to="/admin" className="text-indigo-600 hover:text-indigo-800 font-medium">
-          &larr; Back to Dashboard
-        </Link>
-      </div>
+    <div className="min-h-screen bg-gray-50 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-gray-50 to-gray-50">
+      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-gray-100">
+        <button
+          onClick={() => navigate('/admin')}
+          className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
+          title="Back to Dashboard"
+        >
+          <ArrowLeft className="h-5 w-5 text-gray-600" />
+        </button>
+        <div className="flex-1 min-w-0">
+          <h1 className="font-bold text-gray-900 truncate">Find an Organization</h1>
+          <p className="text-xs text-blue-600 font-medium">Search for your group to request access</p>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-2xl px-4 py-8 flex flex-col gap-8">
 
       <form onSubmit={handleSearch} className="mb-10">
         <div className="flex gap-4">
@@ -157,6 +168,7 @@ export default function AdminOrgDiscovery() {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }
