@@ -285,7 +285,6 @@ export default function CheckIn() {
             </div>
           </div>
         )}
-}
 
         {/* Result states */}
          {!noService && step === 'done' && (
