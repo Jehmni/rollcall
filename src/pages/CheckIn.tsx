@@ -19,11 +19,11 @@ export default function CheckIn() {
   const storedMemberId = localStorage.getItem('rollcally_member_id')
   const { member: recognizedMember } = useMemberById(storedMemberId)
 
-  const paramServiceId = searchParams.get('service_id')
-  const serviceId = paramServiceId ?? sessionStorage.getItem('pending_service_id')
+  const paramServiceId = searchParams.get('event_id')
+  const serviceId = paramServiceId ?? sessionStorage.getItem('pending_event_id')
 
   useEffect(() => {
-    if (paramServiceId) sessionStorage.setItem('pending_service_id', paramServiceId)
+    if (paramServiceId) sessionStorage.setItem('pending_event_id', paramServiceId)
   }, [paramServiceId])
 
   useEffect(() => {
@@ -74,10 +74,10 @@ export default function CheckIn() {
 
   function handleScan(scannedServiceId: string) {
     const params = new URLSearchParams(searchParams)
-    params.set('service_id', scannedServiceId)
+    params.set('event_id', scannedServiceId)
     window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
     setShowScanner(false)
-    window.location.reload() // Reload to catch new service_id in hooks
+    window.location.reload() // Reload to catch new event_id in hooks
   }
 
   const noService = !serviceId
@@ -122,9 +122,9 @@ export default function CheckIn() {
           <div className="mt-8 flex flex-col items-center gap-4 rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-100">
             <AlertCircle className="h-12 w-12 text-amber-500" />
             <div>
-              <h2 className="font-semibold text-gray-900">No active service</h2>
+              <h2 className="font-semibold text-gray-900">No active event</h2>
               <p className="mt-1 text-sm text-gray-500">
-                This QR code is not linked to a service. Ask your administrator for a fresh code.
+                This QR code is not linked to an event. Ask your administrator for a fresh code.
               </p>
             </div>
           </div>
@@ -138,7 +138,7 @@ export default function CheckIn() {
                   {selected.name.charAt(0)}
                 </div>
                 <h2 className="mt-4 text-2xl font-bold text-gray-900">Welcome back, {selected.name.split(' ')[0]}!</h2>
-                <p className="text-gray-500 mt-1">Ready for today&apos;s service?</p>
+                <p className="text-gray-500 mt-1">Ready for today&apos;s event?</p>
              </div>
              
              <div className="flex flex-col gap-3">
@@ -290,7 +290,7 @@ export default function CheckIn() {
                       Welcome, <span className="font-semibold text-gray-900">{checkedInName}</span>
                     </p>
                   )}
-                  <p className="mt-2 text-sm text-gray-400">Attendance recorded. Enjoy the service.</p>
+                  <p className="mt-2 text-sm text-gray-400">Attendance recorded. Enjoy the event.</p>
                 </div>
               </div>
             )}

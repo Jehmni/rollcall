@@ -37,7 +37,7 @@ export default function App() {
           <Route path="/admin/units/:unitId" element={<AdminRoute><UnitDashboard /></AdminRoute>} />
           <Route path="/admin/units/:unitId/members" element={<AdminRoute><UnitMembers /></AdminRoute>} />
           <Route path="/admin/units/:unitId/members/:memberId" element={<AdminRoute><MemberDetail /></AdminRoute>} />
-          <Route path="/admin/units/:unitId/services/:serviceId" element={<AdminRoute><AdminServiceDetail /></AdminRoute>} />
+          <Route path="/admin/units/:unitId/events/:serviceId" element={<AdminRoute><AdminServiceDetail /></AdminRoute>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

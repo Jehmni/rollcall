@@ -77,7 +77,7 @@ export function useAttendance(serviceId: string | null) {
         case 'invalid_service':    setStatus('invalid_service'); break
         case 'location_required':  setStatus('error'); setErrorMessage('Location access is required to check in.'); break
         case 'too_far':            setStatus('error'); setErrorMessage(`You are too far from the venue (${result.distance}m).`); break
-        case 'device_locked':      setStatus('error'); setErrorMessage('This device is already linked to another member for this service.'); break
+        case 'device_locked':      setStatus('error'); setErrorMessage('This device is already linked to another member for this event.'); break
         default:
           setStatus('error')
           setErrorMessage(result.error ?? 'Something went wrong')

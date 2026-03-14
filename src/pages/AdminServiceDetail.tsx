@@ -8,9 +8,9 @@ import { StatCard } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import type { DashboardMember, Service } from '../types'
 
-const SERVICE_LABEL: Record<string, string> = {
-  rehearsal: 'Rehearsal',
-  sunday_service: 'Sunday Service',
+const EVENT_LABEL: Record<string, string> = {
+  rehearsal: 'Regular Meeting',
+  sunday_service: 'Main Event',
 }
 
 function formatDate(dateStr: string) {
@@ -131,7 +131,7 @@ export default function AdminServiceDetail() {
 
   const { present, absent, total, loading, loadingMore, hasMore, loadMore, refetch } = useAdminDashboard(serviceId ?? null)
   const attendanceRate = total > 0 ? Math.round((present.length / total) * 100) : 0
-  const qrUrl = serviceId ? `${window.location.origin}/checkin?service_id=${serviceId}` : ''
+  const qrUrl = serviceId ? `${window.location.origin}/checkin?event_id=${serviceId}` : ''
 
   useEffect(() => {
     if (!serviceId) return
@@ -161,9 +161,9 @@ export default function AdminServiceDetail() {
 
   const grouped = groupBySection(displayMembers)
 
-  const serviceLabel = service
-    ? `${SERVICE_LABEL[service.service_type]} ${service.date}`
-    : 'service'
+  const eventLabel = service
+    ? `${EVENT_LABEL[service.service_type]} ${service.date}`
+    : 'event'
 
   if (serviceLoading) {
     return (
@@ -176,7 +176,7 @@ export default function AdminServiceDetail() {
   if (!service) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
-        <p className="text-gray-600">Service not found.</p>
+        <p className="text-gray-600">Event not found.</p>
         <Button variant="secondary" onClick={() => navigate(`/admin/units/${unitId}`)}>Back to unit</Button>
       </div>
     )
@@ -194,7 +194,7 @@ export default function AdminServiceDetail() {
         </button>
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-gray-900 truncate">
-            {SERVICE_LABEL[service.service_type]}
+            {EVENT_LABEL[service.service_type]}
           </p>
           <p className="text-xs text-gray-400">{formatDate(service.date)}</p>
         </div>
@@ -277,21 +277,21 @@ export default function AdminServiceDetail() {
             <div className="mb-4 flex gap-2 flex-wrap">
               <span className="text-xs text-gray-400 self-center mr-1">Export absent list:</span>
               <button
-                onClick={() => exportTXT(absent, serviceLabel)}
+                onClick={() => exportTXT(absent, eventLabel)}
                 className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
               >
                 <FileText className="h-3.5 w-3.5" />
                 TXT
               </button>
               <button
-                onClick={() => exportCSV(absent, serviceLabel)}
+                onClick={() => exportCSV(absent, eventLabel)}
                 className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
               >
                 <FileSpreadsheet className="h-3.5 w-3.5" />
                 Excel (CSV)
               </button>
               <button
-                onClick={() => exportRTF(absent, serviceLabel)}
+                onClick={() => exportRTF(absent, eventLabel)}
                 className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
               >
                 <FileText className="h-3.5 w-3.5" />

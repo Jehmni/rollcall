@@ -41,22 +41,22 @@ Once your Unit is ready, it’s time to add your people.
 
 ---
 
-## 4. The Main Event: Services & Attendance
+## 4. The Main Event: Events & Attendance
 The heart of Rollcally is tracking who shows up.
 
-### Use Case: Running a Service
-1. **Create a Service**: Give it a name (e.g., "Sunday Service" or "Weekly Rehearsal").
-2. **The Signature Check-in Link**: Rollcally generates a unique link for every service. 
+### Use Case: Running a Event
+1. **Create a Event**: Give it a name (e.g., "Sunday Event" or "Weekly Rehearsal").
+2. **The Signature Check-in Link**: Rollcally generates a unique link for every Event. 
 3. **Share or Scan**: You can share this link in your WhatsApp group, post it on social media, or display it as a QR code at your venue.
 
 ### Use Case: The Smart Member Experience (Check-in)
 Rollcally is designed for speed. The system remembers your members so they don't have to search every time.
 * **One-Tap Check-in**: For returning members, the system recognizes their device and greets them with a "Welcome Back" screen. They simply tap "I'm Here" to finish.
-* **Integrated QR Scanner**: Already on the app but need to switch services? Tap the camera icon in the header to scan any Rollcally QR code instantly.
+* **Integrated QR Scanner**: Already on the app but need to switch Events? Tap the camera icon in the header to scan any Rollcally QR code instantly.
 * **Native Scanning**: Scanning a Rollcally QR from your phone's camera will prompt you to open the app directly to your attendance page—no browser needed.
 * **Section Filtering**: For large groups (like a 100-person group), members can tap their section (e.g., "Group A") to instantly filter the list and find their name.
 * **Security & Honesty**:
-    * **Device Locking**: To keep records honest, each phone is linked to one member for that service. One person cannot check in for their friends using the same phone.
+    * **Device Locking**: To keep records honest, each phone is linked to one member for that Event. One person cannot check in for their friends using the same phone.
     * **Location Check**: Members must be at the venue to check in. If they are too far away, the system will politely ask them to try again once they arrive.
 * **Real-time Updates**: On your Admin Dashboard, the headcount updates live. You see exactly who is in the room as it happens.
 
@@ -75,9 +75,9 @@ Rollcally isn't just about data; it's about people.
 1. **Admin** sets up or joins an **Organization**.
 2. **Units** are created for different departments.
 3. **Members** are added to these Units.
-4. **Services** are scheduled when events happen.
+4. **Events** are scheduled when events happen.
 5. **Check-in Links** are shared, and **Smart Check-in** recognizes members for one-tap attendance.
-6. **QR Scanning** (Native or In-App) provides instant access to service events.
+6. **QR Scanning** (Native or In-App) provides instant access to Event events.
 7. **Attendance** is tracked live with **Security Checks** (Location/Device) to ensure accuracy.
 7. **Birthdays** are celebrated automatically as they arise.
 

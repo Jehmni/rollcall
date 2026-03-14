@@ -18,7 +18,7 @@ export default function Landing() {
           </div>
           <div>
             <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-6xl">
-              Rollcall
+              Rollcally
             </h1>
             <p className="mt-4 text-lg text-gray-500 max-w-lg mx-auto">
               Simple, secure, and smart attendance tracking for your organization.
@@ -37,7 +37,7 @@ export default function Landing() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Member Check-in</h2>
             <p className="mt-2 text-gray-500 leading-relaxed">
-              Scan a QR code or find your name to record your attendance for the active service.
+              Scan a QR code or find your name to record your attendance for the active event.
             </p>
             <div className="mt-8 flex items-center text-sm font-semibold text-blue-700">
               Start Check-in <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -54,7 +54,7 @@ export default function Landing() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Admin Portal</h2>
             <p className="mt-2 text-gray-500 leading-relaxed">
-              Manage members, create new services, view reports, and generate QR codes for check-in.
+              Manage members, create new events, view reports, and generate QR codes for check-in.
             </p>
             <div className="mt-8 flex items-center text-sm font-semibold text-blue-700">
               Log in to Dashboard <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />

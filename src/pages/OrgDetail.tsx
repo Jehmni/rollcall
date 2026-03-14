@@ -399,7 +399,7 @@ export default function OrgDetail() {
           onClose={() => setConfirmDeleteUnit(null)}
           onConfirm={handleDeleteUnit}
           title="Delete Unit"
-          description={`Are you sure you want to delete "${confirmDeleteUnit?.name}"? All services and attendance data for this unit will be lost.`}
+          description={`Are you sure you want to delete "${confirmDeleteUnit?.name}"? All events and attendance data for this unit will be lost.`}
           confirmText="Delete Unit"
           variant="danger"
           isLoading={isUpdating}

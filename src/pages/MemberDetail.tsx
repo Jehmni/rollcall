@@ -4,9 +4,9 @@ import { ArrowLeft, Phone, Cake } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { Member, ServiceType } from '../types'
 
-const SERVICE_LABEL: Record<ServiceType, string> = {
-  rehearsal: 'Rehearsal',
-  sunday_service: 'Sunday Service',
+const EVENT_LABEL: Record<ServiceType, string> = {
+  rehearsal: 'Regular Meeting',
+  sunday_service: 'Main Event',
 }
 
 function formatDate(dateStr: string) {
@@ -201,7 +201,7 @@ export default function MemberDetail() {
         {/* ── Stat cards ──────────────────────────────────────────────────── */}
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard label="Attended" value={attendedCount} color="gray" />
-          <StatCard label="Total Services" value={pastRecords.length} color="gray" />
+          <StatCard label="Total Events" value={pastRecords.length} color="gray" />
           <StatCard label="Attendance Rate" value={`${rate}%`} color={rateColor} />
           <StatCard label="Current Streak" value={streak} color="blue" />
         </section>
@@ -210,14 +210,14 @@ export default function MemberDetail() {
         {recentTrend.length > 0 && (
           <section className="rounded-2xl bg-white p-5 ring-1 ring-gray-100">
             <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
-              Recent trend · last {recentTrend.length} service{recentTrend.length !== 1 ? 's' : ''}
+              Recent trend · last {recentTrend.length} event{recentTrend.length !== 1 ? 's' : ''}
             </h2>
 
             <div className="flex items-center gap-1.5 flex-wrap">
               {recentTrend.map(r => (
                 <div
                   key={r.serviceId}
-                  title={`${SERVICE_LABEL[r.serviceType]} · ${r.date}`}
+                  title={`${EVENT_LABEL[r.serviceType]} · ${r.date}`}
                   className={`h-5 w-5 rounded-full border-2 flex-shrink-0 transition-colors ${r.status === 'attended'
                       ? 'bg-green-500 border-green-500'
                       : 'bg-white border-red-300'
@@ -240,15 +240,15 @@ export default function MemberDetail() {
           </section>
         )}
 
-        {/* ── Service history ───────────────────────────────────────────────── */}
+        {/* ── Event history ───────────────────────────────────────────────── */}
         <section>
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
-            Service History
+            Event History
           </h2>
 
           {records.length === 0 ? (
             <div className="rounded-2xl bg-white p-10 text-center ring-1 ring-gray-100">
-              <p className="text-sm text-gray-500">No services found for this unit.</p>
+              <p className="text-sm text-gray-500">No events found for this unit.</p>
             </div>
           ) : (
             <div className="rounded-2xl bg-white ring-1 ring-gray-100 overflow-hidden">
@@ -271,7 +271,7 @@ export default function MemberDetail() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-medium text-gray-900">
-                        {SERVICE_LABEL[r.serviceType]}
+                        {EVENT_LABEL[r.serviceType]}
                       </p>
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${r.status === 'attended'

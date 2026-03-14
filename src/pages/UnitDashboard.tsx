@@ -11,9 +11,9 @@ import { ConfirmDialog } from '../components/ui/Modal'
 import type { Service, ServiceType, Unit } from '../types'
 import { NotificationBell } from '../components/NotificationBell'
 
-const SERVICE_LABEL: Record<ServiceType, string> = {
-  rehearsal: 'Rehearsal',
-  sunday_service: 'Sunday Service',
+const EVENT_LABEL: Record<ServiceType, string> = {
+  rehearsal: 'Regular Meeting',
+  sunday_service: 'Main Event',
 }
 
 function serviceStatus(dateStr: string): 'today' | 'upcoming' | 'past' {
@@ -48,7 +48,7 @@ function ServiceCard({ service, unitId, onClick }: { service: Service; unitId: s
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold text-gray-900">{SERVICE_LABEL[service.service_type]}</p>
+            <p className="text-sm font-semibold text-gray-900">{EVENT_LABEL[service.service_type]}</p>
             <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusStyle}`}>{statusLabel}</span>
           </div>
           <p className="text-xs text-gray-400 mt-0.5">{formatDate(service.date)}</p>
@@ -111,10 +111,10 @@ export default function UnitDashboard() {
     try {
       const svc = await createService(newDate, newType)
       setShowCreate(false)
-      navigate(`/admin/units/${unitId}/services/${svc.id}`)
+      navigate(`/admin/units/${unitId}/events/${svc.id}`)
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      setError(msg.includes('unique') ? 'A service already exists for that date and type.' : msg)
+      setError(msg.includes('unique') ? 'An event already exists for that date and type.' : msg)
     } finally {
       setIsUpdating(false)
     }
@@ -287,9 +287,9 @@ export default function UnitDashboard() {
         {/* Create service */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500">Services</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500">Events</h2>
             <Button size="sm" onClick={() => setShowCreate(!showCreate)} className="shadow-lg shadow-blue-200/50">
-              <Plus className="h-4 w-4 mr-1.5" /> New Service
+              <Plus className="h-4 w-4 mr-1.5" /> New Event
             </Button>
           </div>
 
@@ -300,7 +300,7 @@ export default function UnitDashboard() {
                   <CalendarDays className="h-5 w-5 text-blue-700" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Schedule Service</h3>
+                  <h3 className="font-semibold text-gray-900">Schedule Event</h3>
                   <p className="text-xs text-gray-500">Set a date and type for your next gathering.</p>
                 </div>
               </div>
@@ -308,14 +308,14 @@ export default function UnitDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input label="Date" type="date" value={newDate} onChange={e => setNewDate(e.target.value)} required />
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700">Service Type</label>
+                  <label className="text-sm font-semibold text-gray-700">Event Type</label>
                   <select
                     className="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium h-[50px]"
                     value={newType}
                     onChange={e => setNewType(e.target.value as ServiceType)}
                   >
-                    <option value="rehearsal">Rehearsal</option>
-                    <option value="sunday_service">Sunday Service</option>
+                    <option value="rehearsal">Regular Meeting</option>
+                    <option value="sunday_service">Main Event</option>
                   </select>
                 </div>
               </div>
@@ -336,12 +336,12 @@ export default function UnitDashboard() {
             <Card className="rounded-3xl bg-white p-12 text-center shadow-xl shadow-gray-200/50 border border-gray-50 overflow-hidden relative">
                <div className="absolute -top-10 -right-10 h-40 w-40 bg-blue-50 rounded-full opacity-50 blur-3xl"></div>
               <CalendarDays className="mx-auto mb-6 h-16 w-16 text-blue-100" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">No services scheduled</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">No events scheduled</h3>
               <p className="text-gray-500 mb-8 max-w-sm mx-auto">
-                Create your first service to generate a check-in QR code and track attendance.
+                Create your first event to generate a check-in QR code and track attendance.
               </p>
               <Button onClick={() => setShowCreate(true)} className="px-8 shadow-xl shadow-blue-100">
-                Setup your first Service
+                Setup your first Event
               </Button>
             </Card>
           ) : (
@@ -350,7 +350,7 @@ export default function UnitDashboard() {
                 <div className="flex flex-col gap-3">
                   <p className="text-xs font-bold uppercase tracking-widest text-gray-400 ml-1">Current &amp; Coming</p>
                   {upcoming.map(s => (
-                    <ServiceCard key={s.id} service={s} unitId={unitId!} onClick={() => navigate(`/admin/units/${unitId}/services/${s.id}`)} />
+                    <ServiceCard key={s.id} service={s} unitId={unitId!} onClick={() => navigate(`/admin/units/${unitId}/events/${s.id}`)} />
                   ))}
                 </div>
               )}
@@ -358,7 +358,7 @@ export default function UnitDashboard() {
                 <div className="flex flex-col gap-3 opacity-80">
                   <p className="text-xs font-bold uppercase tracking-widest text-gray-400 ml-1">History</p>
                   {past.map(s => (
-                    <ServiceCard key={s.id} service={s} unitId={unitId!} onClick={() => navigate(`/admin/units/${unitId}/services/${s.id}`)} />
+                    <ServiceCard key={s.id} service={s} unitId={unitId!} onClick={() => navigate(`/admin/units/${unitId}/events/${s.id}`)} />
                   ))}
                 </div>
               )}
@@ -371,7 +371,7 @@ export default function UnitDashboard() {
           onClose={() => setConfirmDelete(false)}
           onConfirm={handleDeleteUnit}
           title="Delete Unit"
-          description={`Are you sure you want to delete "${unit?.name}"? All services and attendance data will be permanently removed.`}
+          description={`Are you sure you want to delete "${unit?.name}"? All events and attendance data will be permanently removed.`}
           confirmText="Delete Unit"
           variant="danger"
           isLoading={isUpdating}

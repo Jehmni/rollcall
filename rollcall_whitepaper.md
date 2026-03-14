@@ -57,7 +57,7 @@ Security is baked into the database layer. RLS policies ensure that:
 
 ### 5.2 Mandatory Security Governance
 Beyond RLS, Rollcally enforces strictly governed check-in protocols:
-- **Device Locking**: Prevents attendance fraud by strictly associating one device with one member per service.
+- **Device Locking**: Prevents attendance fraud by strictly associating one device with one member per Event.
 - **Geofencing (Location Verification)**: Enforces physical presence by rejecting check-ins from devices outside the configured venue radius.
 - **Join Request Workflow**: Access to organization management is gated by a multi-step request-and-approval system to prevent unauthorized administration.
 
