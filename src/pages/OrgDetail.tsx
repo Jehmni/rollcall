@@ -396,7 +396,7 @@ export default function OrgDetail() {
                          <ShieldCheck className="h-7 w-7" />
                       </div>
                       <div>
-                        <p className="text-lg font-bold text-brand-text uppercase italic tracking-tight">{req.admin?.email}</p>
+                        <p className="text-lg font-bold text-brand-text uppercase italic tracking-tight">{req.admin_email || req.admin?.email || 'Unknown Protocol'}</p>
                         <p className="text-[10px] font-black uppercase tracking-widest text-brand-slate opacity-40 mt-1">
                           Requested {new Date(req.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                         </p>

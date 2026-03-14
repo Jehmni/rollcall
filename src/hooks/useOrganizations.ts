@@ -68,19 +68,22 @@ export function useOrganizations() {
 
   const getOrgJoinRequests = useCallback(async (orgId: string) => {
     try {
+      // Use the RPC for secure server-side join to auth.users
       const { data, error: err } = await supabase
-        .from('join_requests')
-        .select(`
-          *,
-          admin:admin_id (
-            email,
-            user_metadata
-          )
-        `)
-        .eq('organization_id', orgId)
-        .eq('status', 'pending')
+        .rpc('get_org_join_requests', { p_org_id: orgId })
       
-      if (err) throw err
+      if (err) {
+        // Fallback to basic fetch if RPC doesn't exist yet (prevents crash)
+        if (err.code === 'PGRST103') {
+           const { data: fallback } = await supabase
+            .from('join_requests')
+            .select('*')
+            .eq('organization_id', orgId)
+            .eq('status', 'pending')
+           return fallback || []
+        }
+        throw err
+      }
       return data
     } catch (err) {
       console.error('Error fetching org join requests:', err)
