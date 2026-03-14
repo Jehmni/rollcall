@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext'
 import { useOrganizations } from '../hooks/useAdminDashboard'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
-import { Card } from '../components/ui/Card'
 import { ConfirmDialog } from '../components/ui/Modal'
 import type { Organization, OrgRole } from '../types'
 
@@ -177,7 +176,7 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <div className="mx-auto max-max-w-2xl px-4 py-8 flex flex-col gap-6 relative">
+      <div className="mx-auto max-w-2xl px-4 py-8 flex flex-col gap-6 relative">
         <section className="relative z-10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
             <div>
@@ -240,17 +239,17 @@ export default function AdminDashboard() {
               <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
             </div>
           ) : orgs.length === 0 ? (
-            <Card className="rounded-3xl bg-white p-12 text-center border-brand-border overflow-hidden relative">
-              <div className="absolute -top-10 -right-10 h-40 w-40 bg-brand-primary/5 rounded-full opacity-50 blur-3xl"></div>
-              <Building2 className="mx-auto mb-6 h-16 w-16 text-brand-primary/10" />
-              <h3 className="text-xl font-bold text-brand-text mb-2">Welcome to Rollcally</h3>
-              <p className="text-brand-slate mb-8 max-w-sm mx-auto">
-                Ready to start tracking? Create your first organization to begin managing units and take attendance.
-              </p>
-              <Button onClick={() => setShowCreate(true)} className="px-8 shadow-xl shadow-brand-primary/20">
-                Setup your first Organization
-              </Button>
-            </Card>
+            <div className="rounded-[2.5rem] bg-white p-20 text-center border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] relative overflow-hidden group">
+               <div className="absolute -top-10 -right-10 h-40 w-40 bg-brand-primary/5 rounded-full opacity-50 blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+               <Building2 className="mx-auto mb-6 h-20 w-20 text-brand-primary/10 group-hover:text-brand-primary/20 transition-colors" />
+               <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">Welcome to Rollcally</h3>
+               <p className="text-sm font-medium text-brand-slate opacity-40 mb-10 max-w-sm mx-auto mt-3">
+                 Ready to start tracking? Launch your first organization to begin managing units and take attendance.
+               </p>
+               <Button onClick={() => setShowCreate(true)} className="px-12 py-6 shadow-2xl shadow-brand-primary/30 rounded-2xl text-xs font-black uppercase tracking-widest">
+                 Setup first Organization
+               </Button>
+            </div>
           ) : (
             <div className="flex flex-col gap-3">
               {orgs.map(o => (
@@ -279,31 +278,34 @@ export default function AdminDashboard() {
           isLoading={isUpdating}
         />
 
-        {!isSuper && adminUnits.length > 0 && (
-          <section className="mt-4">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-brand-slate mb-4">Direct Unit Access</h2>
-            <div className="grid gap-3">
+          <section className="mt-8">
+            <div className="flex items-center gap-4 mb-8 px-4">
+               <div className="h-px flex-1 bg-brand-border/50"></div>
+               <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-slate opacity-40">Direct Unit Access</h2>
+               <div className="h-px flex-1 bg-brand-border/50"></div>
+            </div>
+            <div className="flex flex-col gap-3">
               {adminUnits.map(u => (
                 <button
                   key={u.id}
                   onClick={() => navigate(`/admin/units/${u.id}`)}
-                  className="group w-full flex items-center justify-between rounded-2xl bg-white px-5 py-4 shadow-sm border border-brand-border hover:border-brand-primary/30 hover:shadow-md transition-all text-left"
+                  className="group w-full flex items-center justify-between rounded-[2rem] bg-white px-8 py-6 shadow-lg shadow-brand-primary/[0.02] border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 transition-all text-left overflow-hidden relative"
                 >
-                   <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-primary/5 text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-colors">
-                      <Users className="h-5 w-5" />
+                   <div className="absolute top-0 right-0 -mt-8 -mr-8 h-24 w-24 bg-brand-primary/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                   <div className="flex items-center gap-5 relative z-10">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-primary/5 text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 shadow-inner group-hover:rotate-3">
+                      <Users className="h-7 w-7" />
                     </div>
                     <div>
-                      <p className="font-bold text-brand-text">{u.name}</p>
-                      <p className="text-xs text-brand-slate">{u.organization.name}</p>
+                      <p className="text-lg font-bold text-brand-text uppercase italic tracking-tight">{u.name}</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-brand-slate opacity-40 mt-1">{u.organization.name}</p>
                     </div>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-brand-slate/40 group-hover:text-brand-primary transform group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="h-6 w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </button>
               ))}
             </div>
           </section>
-        )}
       </div>
     </div>
   )

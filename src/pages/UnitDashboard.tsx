@@ -384,17 +384,17 @@ export default function UnitDashboard() {
               <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
             </div>
           ) : services.length === 0 ? (
-            <Card className="rounded-3xl bg-white p-12 text-center border-brand-border overflow-hidden relative">
-               <div className="absolute -top-10 -right-10 h-40 w-40 bg-brand-primary/5 rounded-full opacity-50 blur-3xl"></div>
-              <CalendarDays className="mx-auto mb-6 h-16 w-16 text-brand-primary/10" />
-              <h3 className="text-xl font-bold text-brand-text mb-2">No events scheduled</h3>
-              <p className="text-brand-slate mb-8 max-w-sm mx-auto">
-                Create your first event to generate a check-in QR code and track attendance.
-              </p>
-              <Button onClick={() => setShowCreate(true)} className="px-8 shadow-xl shadow-brand-primary/20">
-                Setup your first Event
-              </Button>
-            </Card>
+            <div className="rounded-[2.5rem] bg-white p-20 text-center border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] relative overflow-hidden group">
+               <div className="absolute -top-10 -right-10 h-40 w-40 bg-brand-primary/5 rounded-full opacity-50 blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+               <CalendarDays className="mx-auto mb-6 h-20 w-20 text-brand-primary/10 group-hover:text-brand-primary/20 transition-colors" />
+               <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">No Events Scheduled</h3>
+               <p className="text-sm font-medium text-brand-slate opacity-40 mb-10 max-w-sm mx-auto mt-3">
+                 The calendar is currently clear. Setup your first event to generate a check-in QR code and track attendance.
+               </p>
+               <Button onClick={() => setShowCreate(true)} className="px-12 py-6 shadow-2xl shadow-brand-primary/30 rounded-2xl text-xs font-black uppercase tracking-widest">
+                 Setup first Event
+               </Button>
+            </div>
           ) : (
             <div className="flex flex-col gap-12">
               {upcoming.length > 0 && (

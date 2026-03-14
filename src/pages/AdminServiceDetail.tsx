@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Phone, QrCode, ArrowLeft, RefreshCw, Download, FileText, FileSpreadsheet } from 'lucide-react'
+import { Phone, QrCode, ArrowLeft, RefreshCw, Download, FileText, FileSpreadsheet, CheckCircle2 } from 'lucide-react'
 import { QRCodeCanvas } from 'qrcode.react'
 import { supabase } from '../lib/supabase'
 import { useAdminDashboard } from '../hooks/useAdminDashboard'
@@ -413,19 +413,27 @@ export default function AdminServiceDetail() {
 
         {/* Quick contact list for absent */}
         {tab === 'absent' && absent.filter(m => m.phone).length > 0 && (
-          <section className="rounded-2xl bg-amber-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 mb-2">
-              Quick contact list
-            </p>
-            <div className="flex flex-col gap-1">
-               {absent.filter(m => m.phone).map(m => (
+          <section className="mt-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+             <div className="flex items-center gap-4 mb-8 px-4">
+               <div className="h-px flex-1 bg-brand-border/50"></div>
+               <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-slate opacity-40">Rapid Response Log</h2>
+               <div className="h-px flex-1 bg-brand-border/50"></div>
+            </div>
+            <div className="rounded-[2.5rem] bg-white border border-brand-border/50 overflow-hidden shadow-2xl shadow-brand-primary/[0.02]">
+               {absent.filter(m => m.phone).map((m, i, arr) => (
                 <a
                   key={m.id}
                   href={`tel:${m.phone}`}
-                  className="flex items-center justify-between rounded-lg px-2 py-1.5 hover:bg-amber-100 transition-colors"
+                  className={`flex items-center justify-between px-8 py-5 group hover:bg-brand-primary/[0.02] transition-all ${i < arr.length - 1 ? 'border-b border-brand-border/30' : ''}`}
                 >
-                  <span className="text-sm font-medium text-brand-text">{m.name}</span>
-                  <span className="text-sm font-bold text-brand-primary">{m.phone}</span>
+                  <div className="flex items-center gap-4">
+                    <div className="h-2 w-2 rounded-full bg-brand-primary/20 group-hover:bg-brand-primary group-hover:animate-pulse transition-all"></div>
+                    <span className="text-lg font-bold text-brand-text uppercase italic tracking-tight group-hover:text-brand-primary transition-colors">{m.name}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-black text-brand-primary opacity-40 group-hover:opacity-100 transition-all uppercase tracking-widest">{m.phone}</span>
+                    <Phone className="h-4 w-4 text-brand-primary opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-110" />
+                  </div>
                 </a>
               ))}
             </div>
