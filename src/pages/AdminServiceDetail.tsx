@@ -4,7 +4,6 @@ import { Phone, QrCode, ArrowLeft, RefreshCw, Download, FileText, FileSpreadshee
 import { QRCodeCanvas } from 'qrcode.react'
 import { supabase } from '../lib/supabase'
 import { useAdminDashboard } from '../hooks/useAdminDashboard'
-import { StatCard } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import type { DashboardMember, Service } from '../types'
 
@@ -185,117 +184,144 @@ export default function AdminServiceDetail() {
   return (
     <div className="min-h-screen bg-brand-secondary">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-brand-border">
-        <button
-          onClick={() => navigate(`/admin/units/${unitId}`)}
-          className="flex items-center justify-center rounded-xl p-2 hover:bg-brand-secondary transition-colors"
-          title="Back to Unit"
-        >
-          <ArrowLeft className="h-5 w-5 text-brand-slate" />
-        </button>
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-brand-text truncate">
-            {EVENT_LABEL[service.service_type]}
-          </p>
-          <p className="text-xs text-brand-slate">{formatDate(service.date)}</p>
+      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
+        
+        <div className="flex items-center justify-between relative z-10 w-full">
+          <button
+            onClick={() => navigate(`/admin/units/${unitId}`)}
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+            title="Back to Unit"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+          
+          <div className="flex flex-col items-center flex-1 overflow-hidden px-4 text-center">
+             <h1 className="text-3xl font-black tracking-tighter italic truncate w-full uppercase">
+               {EVENT_LABEL[service.service_type]}
+             </h1>
+             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mt-1">
+               {formatDate(service.date)}
+             </p>
+          </div>
+
+          <button
+            onClick={refetch}
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+            title="Refresh Data"
+          >
+            <RefreshCw className="h-6 w-6" />
+          </button>
         </div>
-        <Button variant="ghost" size="sm" onClick={refetch}>
-          <RefreshCw className="h-4 w-4" />
-        </Button>
       </header>
 
       <div className="mx-auto max-w-2xl px-4 py-6 flex flex-col gap-6">
 
          {/* QR Code section */}
-        <section className="rounded-2xl bg-white border border-brand-border overflow-hidden shadow-sm">
+        <section className="rounded-[2rem] bg-white border border-brand-border/50 overflow-hidden shadow-2xl shadow-brand-primary/[0.02]">
           <button
             onClick={() => setShowQR(v => !v)}
-            className="w-full flex items-center justify-between px-5 py-4 hover:bg-brand-secondary transition-colors"
+            className="w-full flex items-center justify-between px-8 py-6 hover:bg-brand-primary/[0.02] transition-colors"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary/5">
-                <QrCode className="h-5 w-5 text-brand-primary" />
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-primary/5">
+                <QrCode className="h-6 w-6 text-brand-primary" />
               </div>
               <div className="text-left">
-                <p className="text-sm font-bold text-brand-text">QR Code</p>
-                <p className="text-xs text-brand-slate">Tap to {showQR ? 'hide' : 'show or print'}</p>
+                <p className="text-lg font-black text-brand-text italic uppercase tracking-tighter">Attendance QR</p>
+                <p className="text-xs font-medium text-brand-slate opacity-40">Scan to check in instantly</p>
               </div>
             </div>
-            <span className="text-xs font-bold text-brand-primary uppercase tracking-wider">{showQR ? 'Hide' : 'Show'}</span>
+            <div className={`h-8 px-4 rounded-full flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all ${showQR ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'bg-brand-secondary text-brand-primary border border-brand-primary/10'}`}>
+              {showQR ? 'Hide Panel' : 'Expand'}
+            </div>
           </button>
 
            {showQR && (
-            <div className="border-t border-brand-border px-5 py-5 flex flex-col items-center gap-4 bg-brand-secondary/30">
-              <QRCodeCanvas
-                id="service-qr"
-                value={qrUrl}
-                size={240}
-                includeMargin
-                level="H"
-              />
-              <p className="text-xs text-brand-slate text-center break-all max-w-xs">{qrUrl}</p>
-              <Button variant="secondary" size="sm" onClick={downloadQR} className="shadow-sm">
-                <Download className="h-4 w-4" />
-                Download PNG
+            <div className="border-t border-brand-border/30 px-8 py-8 flex flex-col items-center gap-6 bg-brand-secondary/30 animate-in fade-in zoom-in-95 duration-500">
+              <div className="p-4 bg-white rounded-[2.5rem] shadow-2xl shadow-brand-primary/10 border border-brand-border/50">
+                <QRCodeCanvas
+                  id="service-qr"
+                  value={qrUrl}
+                  size={240}
+                  includeMargin
+                  level="H"
+                />
+              </div>
+              <p className="text-[10px] font-medium text-brand-slate opacity-40 text-center break-all max-w-xs">{qrUrl}</p>
+              <Button variant="secondary" onClick={downloadQR} className="px-8 py-6 bg-white border-brand-border/50 shadow-xl shadow-brand-primary/[0.02] rounded-2xl hover:scale-105 active:scale-95 transition-all text-xs font-black uppercase tracking-widest gap-3">
+                <Download className="h-5 w-5" />
+                Prepare for Printing
               </Button>
-              <p className="text-xs text-brand-slate/60 text-center font-medium">Display on a screen or print for members to scan</p>
             </div>
           )}
         </section>
 
         {/* Stats */}
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatCard label="Total Members" value={total} color="gray" />
-          <StatCard label="Present" value={present.length} color="green" />
-          <StatCard label="Absent" value={absent.length} color="red" />
-          <StatCard label="Attendance Rate" value={`${attendanceRate}%`} color="blue" />
+          <div className="rounded-2xl bg-white p-6 border border-brand-border/50 text-center shadow-lg shadow-brand-primary/[0.02]">
+             <p className="text-3xl font-black tracking-tighter italic text-brand-text">{total}</p>
+             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">Total</p>
+          </div>
+          <div className="rounded-2xl bg-white p-6 border border-brand-border/50 text-center shadow-lg shadow-brand-primary/[0.02]">
+             <p className="text-3xl font-black tracking-tighter italic text-green-600">{present.length}</p>
+             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">Present</p>
+          </div>
+          <div className="rounded-2xl bg-white p-6 border border-brand-border/50 text-center shadow-lg shadow-brand-primary/[0.02]">
+             <p className="text-3xl font-black tracking-tighter italic text-red-500">{absent.length}</p>
+             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">Absent</p>
+          </div>
+          <div className="rounded-2xl bg-white p-6 border border-brand-border/50 text-center shadow-lg shadow-brand-primary/[0.02]">
+             <p className="text-3xl font-black tracking-tighter italic text-brand-primary">{attendanceRate}%</p>
+             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">Rate</p>
+          </div>
         </section>
 
         {/* Tabs */}
          <section>
-          <div className="mb-4 flex rounded-xl bg-brand-primary/5 p-1 border border-brand-primary/5">
+          <div className="mb-6 flex rounded-2xl bg-brand-primary/[0.03] p-1.5 border border-brand-primary/5">
             {(['absent', 'present', 'all'] as const).map(t => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
-                className={`flex-1 rounded-lg py-2 text-xs font-bold uppercase tracking-wider transition-all ${
+                className={`flex-1 rounded-xl py-3 text-[10px] font-black uppercase tracking-widest transition-all ${
                   tab === t
-                    ? 'bg-white text-brand-primary shadow-sm border border-brand-primary/10'
-                    : 'text-brand-slate/60 hover:text-brand-primary'
+                    ? 'bg-white text-brand-primary shadow-xl shadow-brand-primary/[0.05] border border-brand-primary/10'
+                    : 'text-brand-slate/40 hover:text-brand-primary/60'
                 }`}
               >
                 {t === 'absent'
-                  ? `Absent (${absent.length})`
+                  ? `AWOL (${absent.length})`
                   : t === 'present'
-                  ? `Present (${present.length})`
-                  : `All (${total})`}
+                  ? `Duty (${present.length})`
+                  : `Total (${total})`}
               </button>
             ))}
           </div>
    {/* Export buttons — shown when viewing absent list */}
           {tab === 'absent' && absent.length > 0 && (
-            <div className="mb-4 flex gap-2 flex-wrap items-center">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-slate/60 mr-1">Export absent list:</span>
+            <div className="mb-8 flex gap-3 flex-wrap items-center animate-in fade-in slide-in-from-left-4 duration-500">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-text mr-2">Personnel Report:</span>
               <button
                 onClick={() => exportTXT(absent, eventLabel)}
-                className="flex items-center gap-1.5 rounded-lg border border-brand-border bg-white px-3 py-1.5 text-xs font-bold text-brand-slate hover:bg-brand-secondary transition-colors"
+                className="flex items-center gap-2.5 rounded-xl border border-brand-border/50 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-slate hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all active:scale-95 shadow-sm"
               >
-                <FileText className="h-3.5 w-3.5" />
+                <FileText className="h-4 w-4" />
                 TXT
               </button>
               <button
                 onClick={() => exportCSV(absent, eventLabel)}
-                className="flex items-center gap-1.5 rounded-lg border border-brand-border bg-white px-3 py-1.5 text-xs font-bold text-brand-slate hover:bg-brand-secondary transition-colors"
+                className="flex items-center gap-2.5 rounded-xl border border-brand-border/50 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-slate hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all active:scale-95 shadow-sm"
               >
-                <FileSpreadsheet className="h-3.5 w-3.5" />
-                Excel (CSV)
+                <FileSpreadsheet className="h-4 w-4" />
+                Excel
               </button>
               <button
                 onClick={() => exportRTF(absent, eventLabel)}
-                className="flex items-center gap-1.5 rounded-lg border border-brand-border bg-white px-3 py-1.5 text-xs font-bold text-brand-slate hover:bg-brand-secondary transition-colors"
+                className="flex items-center gap-2.5 rounded-xl border border-brand-border/50 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-slate hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all active:scale-95 shadow-sm"
               >
-                <FileText className="h-3.5 w-3.5" />
-                Word (RTF)
+                <FileText className="h-4 w-4" />
+                RTF
               </button>
             </div>
           )}
@@ -303,57 +329,63 @@ export default function AdminServiceDetail() {
 
         <section>
           {loading ? (
-            <div className="flex justify-center py-10">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
+            <div className="flex justify-center py-20">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
             </div>
            ) : displayMembers.length === 0 ? (
-            <p className="py-8 text-center text-sm text-brand-slate">
-              {tab === 'absent' ? 'All members have checked in!' : 'No members to show.'}
-            </p>
+            <div className="rounded-[2.5rem] bg-white p-20 text-center border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02]">
+               <CheckCircle2 className="h-20 w-20 text-green-500/10 mx-auto mb-6" />
+               <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">Mission Clear</h3>
+               <p className="text-sm font-medium text-brand-slate opacity-40 mt-3">
+                 {tab === 'absent' ? 'Every member of the unit has been accounted for.' : 'No personnel records found for this query.'}
+               </p>
+            </div>
           ) : (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-8">
               {Object.entries(grouped).map(([section, members]) => (
-                <div key={section}>
-                  {section && (
-                    <h3 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-brand-slate/60 px-1">
-                      {section}
+                <div key={section} className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  <div className="flex items-center gap-3 mb-4 px-2">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40">
+                      {section || 'General'}
                     </h3>
-                  )}
-                  <div className="rounded-2xl bg-white border border-brand-border overflow-hidden shadow-sm">
+                    <div className="h-px flex-1 bg-brand-border/30"></div>
+                  </div>
+                  <div className="rounded-[2rem] bg-white border border-brand-border/50 overflow-hidden shadow-2xl shadow-brand-primary/[0.02]">
                     {members.map((m, i) => (
                       <div
                         key={m.id}
-                        className={`flex items-center justify-between px-4 py-3 ${
-                          i < members.length - 1 ? 'border-b border-gray-50' : ''
+                        className={`flex items-center justify-between px-8 py-5 group hover:bg-brand-primary/[0.02] transition-all ${
+                          i < members.length - 1 ? 'border-b border-brand-border/30' : ''
                         }`}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-6">
                           <div
-                            className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${
-                              m.checked_in ? 'bg-green-500' : 'bg-red-400'
+                            className={`h-4 w-4 rounded-full flex-shrink-0 shadow-lg ${
+                              m.checked_in 
+                                ? 'bg-green-500 ring-4 ring-green-500/10' 
+                                : 'bg-red-400 ring-4 ring-red-400/10'
                             }`}
                           />
                            <div>
-                            <p className="text-sm font-bold text-brand-text">{m.name}</p>
+                            <p className="text-lg font-bold text-brand-text uppercase tracking-tight italic group-hover:text-brand-primary transition-colors">{m.name}</p>
                             {m.checkin_time ? (
-                              <p className="text-xs text-brand-primary font-medium">
-                                Checked in at{' '}
-                                {new Date(m.checkin_time).toLocaleTimeString([], {
+                              <p className="text-[10px] font-black uppercase tracking-widest text-brand-primary mt-1">
+                                Secure Check-in · {new Date(m.checkin_time).toLocaleTimeString([], {
                                   hour: '2-digit',
                                   minute: '2-digit',
                                 })}
                               </p>
                             ) : (
-                              <p className="text-xs text-brand-slate">{m.phone ?? 'No phone'}</p>
+                              <p className="text-[10px] font-black uppercase tracking-widest text-brand-slate opacity-30 mt-1">{m.phone || 'No Contact Listed'}</p>
                             )}
                           </div>
                         </div>
                          {m.phone && !m.checked_in && (
                           <a
                             href={`tel:${m.phone}`}
-                            className="flex items-center gap-1.5 rounded-lg bg-brand-primary/5 px-3 py-1.5 text-xs font-bold text-brand-primary hover:bg-brand-primary/10 transition-all border border-brand-primary/10"
+                            className="flex items-center gap-3 rounded-xl bg-brand-primary text-white px-5 py-3 text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-brand-primary/20"
                           >
-                            <Phone className="h-3.5 w-3.5" />
+                            <Phone className="h-4 w-4" />
                             Call
                           </a>
                         )}
@@ -369,9 +401,9 @@ export default function AdminServiceDetail() {
                     variant="secondary" 
                     onClick={loadMore} 
                     loading={loadingMore}
-                    className="w-full sm:w-auto"
+                    className="w-full h-14 rounded-2xl bg-white border-brand-border/50 text-brand-text font-black uppercase tracking-widest shadow-xl shadow-brand-primary/[0.02] hover:scale-[1.02] transition-all"
                   >
-                    Load More Members
+                    Load More Personnel
                   </Button>
                 </div>
               )}

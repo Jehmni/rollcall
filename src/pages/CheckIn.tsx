@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { CheckCircle, Clock, AlertCircle, Users, Search, Settings, LayoutDashboard, Calendar, Cake } from 'lucide-react'
-import { TallyCount } from '../components/TallyCount'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import { CheckCircle, Clock, AlertCircle, Search, ArrowLeft, ShieldCheck, QrCode } from 'lucide-react'
 import { useAttendance } from '../hooks/useAttendance'
-import { useServiceMembers, useMemberById, useEventBranding, type PublicMember } from '../hooks/useChoristers'
+import { useServiceMembers, useMemberById, type PublicMember } from '../hooks/useChoristers'
 import { Button } from '../components/ui/Button'
 import { QRScanner } from '../components/QRScanner'
 
@@ -11,6 +10,7 @@ type Step = 'welcome' | 'list' | 'confirm' | 'done'
 
 export default function CheckIn() {
   const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
   const [step, setStep] = useState<Step>('list')
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<PublicMember | null>(null)
@@ -36,7 +36,6 @@ export default function CheckIn() {
 
   const { members, loading: listLoading, error: listError } = useServiceMembers(serviceId, query)
   const { status, checkedInName, errorMessage, checkIn, reset } = useAttendance(serviceId)
-  const { orgName } = useEventBranding(serviceId)
 
   const filtered = members
 
@@ -86,22 +85,44 @@ export default function CheckIn() {
 
   return (
     <div className="flex min-h-screen flex-col bg-brand-secondary">
-      {/* High-Contrast Header */}
-      <header className="bg-brand-primary px-6 pt-12 pb-8 rounded-b-[2rem] shadow-xl shadow-brand-primary/20 relative z-10">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex flex-col">
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">Rollcally</h1>
-            <p className="text-xs font-bold text-white/50 uppercase tracking-[0.2em] mt-1">
-              {orgName}
-            </p>
+      {/* Header */}
+      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
+        {/* Abstract background glow */}
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
+        
+        <div className="flex items-center justify-between relative z-10 w-full">
+          {(step === 'confirm' || step === 'list' || step === 'welcome') && (
+            <button
+              onClick={step === 'confirm' ? handleBack : () => navigate('/')}
+              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+            >
+              <ArrowLeft className="h-6 w-6" />
+            </button>
+          )}
+          <div className="flex flex-col items-center flex-1">
+             <h1 className="text-3xl font-black tracking-tighter italic">Rollcally</h1>
+             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mt-1">Smart Entry</p>
           </div>
-          <button className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors text-white">
-            <Settings className="h-5 w-5" />
+          <button
+            onClick={() => setShowScanner(true)}
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-md transition-all active:scale-95"
+            title="Scan QR Code"
+          >
+            <QrCode className="h-6 w-6 text-white" />
           </button>
+        </div>
+
+        <div className="text-center relative z-10 mt-4 animate-in fade-in slide-in-from-top-4 duration-700">
+           <h2 className="text-2xl font-black leading-tight">
+             {step === 'welcome' ? 'Welcome Back' : step === 'list' ? 'Check In' : step === 'confirm' ? 'Is this you?' : 'Success!'}
+           </h2>
+           <p className="mt-2 text-sm font-medium text-white/60">
+             {step === 'welcome' ? 'Ready for today&apos;s session?' : step === 'list' ? 'Find your name below' : step === 'confirm' ? 'Please verify your identity' : 'Attendance recorded'}
+           </p>
         </div>
       </header>
 
-      <div className="flex-1 px-4 -mt-4 pb-24 relative z-20">
+      <div className="flex-1 px-4 pb-8">
 
         {/* No service */}
         {noService && (
@@ -116,68 +137,59 @@ export default function CheckIn() {
           </div>
         )}
 
+        {/* Welcome Back Flow */}
         {!noService && step === 'welcome' && selected && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl shadow-brand-primary/10 border border-brand-border flex flex-col items-center text-center">
-              <div className="flex items-start justify-between w-full mb-8">
-                <div className="text-left">
-                  <h2 className="text-4xl font-black text-brand-text leading-[1.1] tracking-tight">
-                    Welcome<br />Back,<br />{selected.name.split(' ')[0]}!
-                  </h2>
+          <div className="mt-12 flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+             <div className="text-center">
+                <div className="group relative mx-auto mb-8 inline-block">
+                  <div className="absolute inset-0 bg-brand-primary blur-2xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                  <div className="relative flex h-32 w-32 items-center justify-center rounded-[2.5rem] bg-white border border-brand-border shadow-2xl text-5xl font-black text-brand-primary">
+                    {selected.name.charAt(0)}
+                  </div>
                 </div>
-                <TallyCount count={5} className="mt-2" />
-              </div>
+                <h2 className="text-4xl font-black text-brand-text leading-tight uppercase tracking-tighter">Hi, {selected.name.split(' ')[0]}!</h2>
+                <p className="text-brand-slate mt-3 text-lg font-medium opacity-60">Glad to see you again.</p>
+             </div>
               
-              <Button 
-                size="xl" 
-                onClick={handleConfirm} 
-                className="w-full py-8 text-xl font-black tracking-widest uppercase rounded-[2rem] shadow-2xl shadow-brand-primary/30 transition-transform active:scale-95 bg-brand-primary hover:bg-brand-primary/90"
-              >
-                I&apos;m Here
-              </Button>
-
-              {/* Birthday Prompt Mockup */}
-              <div className="mt-8 bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-3 shadow-sm w-full">
-                <div className="p-2 bg-brand-gold/10 rounded-lg">
-                  <Cake className="h-5 w-5 text-brand-gold" />
-                </div>
-                <p className="text-sm font-bold text-brand-text">Birthday tomorrow! Tap to share?</p>
-              </div>
-
-              <button 
-                onClick={handleStartLinking}
-                className="mt-8 text-xs font-bold uppercase tracking-widest text-brand-slate hover:text-brand-primary transition-colors"
-              >
-                Not {selected.name}? Tap here to change
-              </button>
-            </div>
+             <div className="flex flex-col gap-4 max-w-sm mx-auto w-full">
+                <Button size="xl" onClick={handleConfirm} className="w-full py-10 text-xl font-black uppercase tracking-[0.2em] shadow-2xl shadow-brand-primary/30 rounded-[2rem]">
+                  I&apos;m Here
+                </Button>
+                <button 
+                  onClick={handleStartLinking}
+                  className="text-xs font-bold uppercase tracking-[0.2em] text-brand-slate hover:text-brand-primary transition-colors py-4 opacity-40 hover:opacity-100"
+                >
+                  Not you? Change Profile
+                </button>
+             </div>
           </div>
         )}
 
         {/* Member list */}
         {!noService && step === 'list' && (
-          <div className="flex flex-col gap-4 animate-in fade-in duration-300">
+          <div className="flex flex-col gap-6 animate-in fade-in duration-500">
             {/* Search and Filters */}
-            <div className="flex flex-col gap-3">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <div className="flex flex-col gap-5 pt-8">
+              <div className="relative group">
+                <div className="absolute inset-0 bg-brand-primary/5 rounded-2xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
+                <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-brand-slate opacity-30 group-focus-within:opacity-100 transition-opacity" />
                 <input
-                type="search"
-                placeholder="Search your name…"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                className="w-full rounded-xl border border-brand-border bg-white py-2.5 pl-9 pr-4 text-sm shadow-sm focus:border-brand-primary/50 focus:outline-none focus:ring-4 focus:ring-brand-primary/5 placeholder:text-brand-slate/40"
-                autoFocus
-              />
+                  type="search"
+                  placeholder="Find your name…"
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  className="w-full rounded-2xl border border-brand-border/50 bg-white py-5 pl-14 pr-6 text-lg font-medium shadow-sm transition-all focus:border-brand-primary/50 focus:outline-none focus:ring-8 focus:ring-brand-primary/5 placeholder:text-brand-slate/30"
+                  autoFocus
+                />
               </div>
 
               {/* Section Filters */}
               {Object.keys(grouped).length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-1">
                   <button
                     onClick={() => setActiveSection(null)}
-                    className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                      !activeSection ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'bg-white text-brand-slate hover:bg-brand-secondary border border-brand-border'
+                    className={`whitespace-nowrap rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${
+                      !activeSection ? 'bg-brand-primary text-white border-brand-primary shadow-xl shadow-brand-primary/20 scale-105' : 'bg-white text-brand-slate hover:bg-brand-secondary border-brand-border opacity-60'
                     }`}
                   >
                     All Sections
@@ -186,8 +198,8 @@ export default function CheckIn() {
                     <button
                       key={s}
                       onClick={() => setActiveSection(s)}
-                      className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                        activeSection === s ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'bg-white text-brand-slate hover:bg-brand-secondary border border-brand-border'
+                      className={`whitespace-nowrap rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${
+                        activeSection === s ? 'bg-brand-primary text-white border-brand-primary shadow-xl shadow-brand-primary/20 scale-105' : 'bg-white text-brand-slate hover:bg-brand-secondary border-brand-border opacity-60'
                       }`}
                     >
                       {s}
@@ -223,11 +235,11 @@ export default function CheckIn() {
                        <button
                         key={m.id}
                         onClick={() => handleSelect(m)}
-                        className="flex min-h-[3.5rem] items-center justify-between rounded-xl bg-white px-5 py-4 shadow-sm border border-brand-border hover:border-brand-primary/30 hover:shadow-md active:scale-[0.99] transition-all text-left"
+                        className="group flex min-h-[4.5rem] items-center justify-between rounded-3xl bg-white px-8 py-6 shadow-sm border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all text-left"
                       >
-                        <span className="text-base font-medium text-brand-text">{m.name}</span>
+                        <span className="text-lg font-bold text-brand-text tracking-tight uppercase italic">{m.name}</span>
                         {m.section && !activeSection && (
-                          <span className="ml-3 flex-shrink-0 rounded-full bg-brand-primary/5 px-2.5 py-1 text-xs font-semibold text-brand-primary">
+                          <span className="ml-4 flex-shrink-0 rounded-xl bg-brand-primary/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary border border-brand-primary/10">
                             {m.section}
                           </span>
                         )}
@@ -242,84 +254,102 @@ export default function CheckIn() {
 
         {/* Confirmation */}
          {!noService && step === 'confirm' && selected && status === 'idle' && (
-          <div className="mt-4 flex flex-col gap-4">
-            <div className="rounded-2xl bg-white p-6 shadow-sm border border-brand-border">
-              <p className="mb-4 text-sm text-brand-slate">Is this you?</p>
-              <div className="mb-6 flex items-center gap-4">
-                <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-brand-primary/5 text-xl font-bold text-brand-primary border border-brand-primary/10">
-                  {selected.name.charAt(0)}
+          <div className="mt-12 flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <div className="text-center">
+               <div className="group relative mx-auto mb-8 inline-block">
+                  <div className="absolute inset-0 bg-brand-primary blur-2xl opacity-10"></div>
+                  <div className="relative flex h-32 w-32 items-center justify-center rounded-[2.5rem] bg-white border border-brand-border shadow-2xl text-5xl font-black text-brand-primary">
+                    {selected.name.charAt(0)}
+                  </div>
                 </div>
-                <div>
-                  <p className="text-lg font-bold text-brand-text">{selected.name}</p>
-                  {selected.section && (
-                    <p className="mt-0.5 text-sm font-medium text-brand-primary">{selected.section}</p>
-                  )}
+                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-slate opacity-40 mb-3">Identity Verification</h3>
+                <h2 className="text-3xl font-black text-brand-text uppercase tracking-tighter italic">Is this you?</h2>
+                <div className="mt-6 inline-block bg-brand-primary/5 px-6 py-3 rounded-2xl border border-brand-primary/10">
+                   <p className="text-xl font-bold text-brand-primary uppercase italic">{selected.name}</p>
+                   {selected.section && (
+                     <p className="text-[10px] font-black uppercase tracking-widest text-brand-slate opacity-40 mt-1">{selected.section} Node</p>
+                   )}
                 </div>
-              </div>
-              <div className="flex flex-col gap-2">
-                <Button size="lg" onClick={handleConfirm} className="w-full">
-                  Yes, check me in
-                </Button>
-                <Button variant="ghost" size="lg" onClick={handleBack} className="w-full">
-                  No, go back
-                </Button>
-              </div>
+            </div>
+
+            <div className="flex flex-col gap-4 max-w-sm mx-auto w-full">
+              <Button size="xl" onClick={handleConfirm} className="w-full h-20 text-lg font-black uppercase tracking-[0.2em] shadow-2xl shadow-brand-primary/30 rounded-2xl">
+                Confirmed
+              </Button>
+              <button 
+                onClick={handleBack}
+                className="text-xs font-black uppercase tracking-[0.3em] text-brand-slate opacity-40 hover:opacity-100 hover:text-brand-primary transition-all py-4"
+              >
+                Abort & Return
+              </button>
             </div>
           </div>
         )}
+}
 
         {/* Result states */}
          {!noService && step === 'done' && (
-          <div className="mt-4 rounded-2xl bg-white p-8 shadow-sm border border-brand-border">
-
+          <div className="mt-12 animate-in zoom-in-95 fade-in duration-500">
             {status === 'loading' && (
-              <div className="flex flex-col items-center gap-3 py-4">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
-                <p className="text-sm text-brand-slate">Recording attendance…</p>
+              <div className="flex flex-col items-center gap-6 py-12 rounded-[3rem] bg-white shadow-sm border border-brand-border">
+                <div className="h-14 w-14 animate-spin rounded-full border-[6px] border-brand-primary border-t-transparent" />
+                <p className="text-sm font-bold uppercase tracking-[0.3em] text-brand-slate opacity-40">Recording...</p>
               </div>
             )}
 
              {status === 'success' && (
-              <div className="flex flex-col items-center gap-4 text-center">
-                <CheckCircle className="h-16 w-16 text-green-500" />
+              <div className="flex flex-col items-center gap-10 text-center py-16 rounded-[4rem] bg-white shadow-2xl shadow-brand-primary/10 border border-brand-border animate-in slide-in-from-bottom-10 duration-1000">
+                <div className="relative">
+                   <div className="absolute inset-0 bg-green-500 blur-2xl opacity-20 animate-pulse"></div>
+                   <div className="relative flex h-24 w-24 items-center justify-center rounded-[2rem] bg-green-500 shadow-2xl shadow-green-500/40">
+                      <CheckCircle className="h-12 w-12 text-white" />
+                   </div>
+                </div>
                 <div>
-                  <h2 className="text-xl font-bold text-brand-text">You&apos;re in!</h2>
+                  <h2 className="text-4xl font-black text-brand-text uppercase tracking-tighter italic">Success!</h2>
                   {checkedInName && (
-                    <p className="mt-1 text-base text-brand-slate">
-                      Welcome, <span className="font-semibold text-brand-text">{checkedInName}</span>
+                    <p className="mt-4 text-xl text-brand-slate font-medium">
+                      Welcome, <span className="font-black text-brand-text">{checkedInName}</span>
                     </p>
                   )}
-                  <p className="mt-2 text-sm text-brand-slate/60">Attendance recorded. Enjoy the event.</p>
+                  <p className="mt-6 text-sm font-bold uppercase tracking-[0.2em] text-brand-primary opacity-60">Session Recorded</p>
+                </div>
+                <div className="pt-8 w-full border-t border-brand-border/50 max-w-[200px]">
+                   <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 hover:opacity-100">
+                     Finish
+                   </Button>
                 </div>
               </div>
             )}
 
              {status === 'already_checked_in' && (
-              <div className="flex flex-col items-center gap-4 text-center">
-                <Clock className="h-14 w-14 text-brand-primary" />
-                <div>
-                  <h2 className="text-lg font-semibold text-brand-text">Already checked in</h2>
-                  {checkedInName && (
-                    <p className="mt-1 text-sm text-brand-slate">
-                      <span className="font-medium text-brand-text">{checkedInName}</span>, your attendance is already recorded.
-                    </p>
-                  )}
+              <div className="flex flex-col items-center gap-10 text-center py-16 rounded-[4rem] bg-white shadow-sm border border-brand-border">
+                <div className="relative flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-brand-primary/5 text-brand-primary border border-brand-primary/10">
+                  <Clock className="h-10 w-10 opacity-40" />
                 </div>
-                <button onClick={handleBack} className="text-sm text-brand-primary hover:underline">
-                  Go back
+                <div>
+                  <h2 className="text-2xl font-black text-brand-text uppercase tracking-tighter">Already In</h2>
+                  <p className="mt-3 text-brand-slate font-medium opacity-60 max-w-xs mx-auto">
+                    You have already recorded your attendance for this session.
+                  </p>
+                </div>
+                <button onClick={handleBack} className="text-xs font-black uppercase tracking-[0.3em] text-brand-primary hover:underline underline-offset-8">
+                  Go Back
                 </button>
               </div>
             )}
 
              {(status === 'not_found' || status === 'invalid_service' || status === 'error') && (
-              <div className="flex flex-col items-center gap-4 text-center">
-                <AlertCircle className="h-14 w-14 text-red-500" />
-                <div>
-                  <h2 className="text-lg font-semibold text-brand-text">Something went wrong</h2>
-                  <p className="mt-1 text-sm text-red-600">{errorMessage ?? 'Please try again.'}</p>
+              <div className="flex flex-col items-center gap-8 text-center py-16 rounded-[3rem] bg-red-50/50 border border-red-100">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500 shadow-xl shadow-red-500/40">
+                  <AlertCircle className="h-8 w-8 text-white" />
                 </div>
-                <button onClick={handleBack} className="text-sm text-brand-primary hover:underline">
-                  Try again
+                <div>
+                  <h2 className="text-xl font-black text-red-900 uppercase tracking-tight">Something Went Wrong</h2>
+                  <p className="mt-2 text-sm text-red-600 font-medium px-6">{errorMessage ?? 'Please try again or see an admin.'}</p>
+                </div>
+                <button onClick={handleBack} className="text-xs font-black uppercase tracking-[0.3em] text-brand-primary">
+                  Try Again
                 </button>
               </div>
             )}
@@ -327,28 +357,16 @@ export default function CheckIn() {
         )}
       </div>
 
-      {/* Styled Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-brand-border px-6 py-4 flex items-center justify-between shadow-[0_-4px_20px_0_rgba(0,0,0,0.05)] z-30">
-        <button className="flex flex-col items-center gap-1 group">
-          <LayoutDashboard className="h-6 w-6 text-brand-slate group-hover:text-brand-primary transition-colors" />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-brand-slate group-hover:text-brand-primary">Dashboard</span>
+      {/* Admin Link Footer */}
+       <footer className="mt-auto px-4 py-6 text-center">
+        <button
+          onClick={() => window.location.href = '/admin'}
+          className="inline-flex items-center gap-2 text-xs font-medium text-brand-slate hover:text-brand-primary transition-colors"
+        >
+          <ShieldCheck className="h-3.5 w-3.5" />
+          Admin Portal
         </button>
-        <button className="flex flex-col items-center gap-1 group">
-          <div className="relative">
-            <Users className="h-6 w-6 text-brand-primary" />
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-primary rounded-full"></div>
-          </div>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary">Members</span>
-        </button>
-        <button className="flex flex-col items-center gap-1 group">
-          <Calendar className="h-6 w-6 text-brand-slate group-hover:text-brand-primary transition-colors" />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-brand-slate group-hover:text-brand-primary">Services</span>
-        </button>
-        <button className="flex flex-col items-center gap-1 group">
-          <Settings className="h-6 w-6 text-brand-slate group-hover:text-brand-primary transition-colors" />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-brand-slate group-hover:text-brand-primary">Settings</span>
-        </button>
-      </nav>
+      </footer>
 
       {showScanner && (
         <QRScanner 

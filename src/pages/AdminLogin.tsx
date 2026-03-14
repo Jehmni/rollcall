@@ -50,55 +50,45 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-brand-secondary px-4 relative overflow-hidden">
-      <div className="absolute top-0 -left-6 w-96 h-96 bg-brand-primary/5 rounded-full blur-3xl -z-10 animate-blob"></div>
-      <div className="absolute bottom-0 -right-6 w-96 h-96 bg-brand-primary/5 rounded-full blur-3xl -z-10 animate-blob animation-delay-2000"></div>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-brand-secondary px-4 relative overflow-hidden font-inter">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 -left-10 w-[500px] h-[500px] bg-brand-primary/5 rounded-full blur-[120px] -z-10 animate-pulse"></div>
+      <div className="absolute bottom-0 -right-10 w-[500px] h-[500px] bg-brand-primary/5 rounded-full blur-[120px] -z-10 animate-pulse delay-700"></div>
 
       <div className="relative w-full max-w-md">
-        <Link
-          to="/"
-          className="absolute -top-12 left-0 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-brand-slate hover:text-brand-primary transition-colors group"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-brand-border group-hover:border-brand-primary/30 group-hover:bg-brand-primary/5 transition-all">
-            <ArrowLeft className="h-4 w-4" />
-          </div>
-          Back to Home
-        </Link>
-
-        <div className="mb-8 flex flex-col items-center gap-4 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-primary shadow-2xl shadow-brand-primary/40 ring-4 ring-white">
-            <Users className="h-8 w-8 text-white" />
+        <header className="mb-12 flex flex-col items-center gap-6 text-center animate-in fade-in slide-in-from-top-10 duration-1000">
+          <div className="group relative">
+            <div className="absolute inset-0 bg-brand-primary blur-2xl opacity-20 transition-opacity duration-500"></div>
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-brand-primary shadow-2xl shadow-brand-primary/40 ring-1 ring-white/20">
+              <Users className="h-10 w-10 text-white" />
+            </div>
           </div>
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-brand-text">
-              Admin Portal
-            </h1>
-            <p className="mt-2 text-sm text-brand-slate font-medium">
-              Manage your organization and track attendance.
-            </p>
+            <h1 className="text-4xl font-black tracking-tighter text-brand-text italic">Admin Portal</h1>
+            <p className="mt-2 text-sm text-brand-slate font-bold uppercase tracking-[0.2em] opacity-40">Rollcally Command Center</p>
           </div>
-        </div>
+        </header>
 
-        <Card className="shadow-2xl shadow-blue-100/50 bg-white/80 backdrop-blur-sm border-white/50">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <Card className="p-10 border-brand-border/50 bg-white/80 backdrop-blur-xl shadow-2xl shadow-brand-primary/10 rounded-[3rem] animate-in fade-in zoom-in-95 duration-500 delay-300">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             {successMessage && (
-              <div className="rounded-xl bg-green-50/80 backdrop-blur-sm p-4 text-sm text-green-700 border border-green-100 flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+              <div className="rounded-2xl bg-green-50/80 backdrop-blur-sm p-4 text-xs font-bold uppercase tracking-wider text-green-700 border border-green-100 flex items-center gap-2 animate-in fade-in slide-in-from-top-4">
                 <CheckCircle2 className="h-4 w-4" />
                 {successMessage}
               </div>
             )}
 
             {error && (
-              <div className="rounded-xl bg-red-50/80 backdrop-blur-sm p-4 text-sm text-red-600 border border-red-100 animate-in fade-in slide-in-from-top-1">
+              <div className="rounded-2xl bg-red-50 p-4 text-xs font-bold uppercase tracking-wider text-red-600 border border-red-100 animate-in shake duration-500">
                 {error}
               </div>
             )}
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <Input
-                label="Email address"
+                label="Administrator Email"
                 type="email"
-                placeholder="admin@example.com"
+                placeholder="admin@rollcally.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -106,14 +96,14 @@ export default function AdminLogin() {
                 autoFocus
               />
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="block text-sm font-medium text-gray-700">Password</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-brand-slate opacity-60">Password</label>
                   <Link 
                     to="/admin/forgot-password" 
-                    className="text-xs font-bold uppercase tracking-wider text-brand-primary hover:text-brand-primary/80"
+                    className="text-xs font-bold uppercase tracking-wider text-brand-primary hover:text-brand-primary/80 transition-colors"
                   >
-                    Forgot password?
+                    Forgot?
                   </Link>
                 </div>
                 <Input
@@ -127,22 +117,25 @@ export default function AdminLogin() {
               </div>
             </div>
 
-            <Button type="submit" size="lg" loading={loading} className="w-full mt-2 ring-offset-white">
-              Sign in <ArrowRight className="ml-2 h-4 w-4" />
+            <Button type="submit" size="lg" loading={loading} className="w-full h-14 text-sm font-bold uppercase tracking-[0.2em] shadow-lg shadow-brand-primary/20 mt-2">
+              Sign in <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
 
-            <div className="mt-2 text-center text-sm text-gray-500">
-              Don't have an account?{' '}
-              <Link to="/admin/signup" className="font-bold text-brand-primary hover:text-brand-primary/80 underline-offset-4 hover:underline uppercase tracking-wider text-xs">
-                Create a new organization
+            <div className="pt-8 mt-4 border-t border-brand-border text-center">
+              <p className="text-xs text-brand-slate font-medium opacity-60">New organization?</p>
+              <Link to="/admin/signup" className="mt-2 inline-block font-black text-xs uppercase tracking-[0.3em] text-brand-primary hover:underline underline-offset-8">
+                Request Access
               </Link>
             </div>
           </form>
         </Card>
 
-        <div className="mt-8 flex items-center justify-center">
-          <Link to="/checkin" className="text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors">
-            Go to Check-in
+        <div className="mt-12 flex items-center justify-between text-xs font-bold uppercase tracking-[0.2em] text-brand-slate opacity-40">
+          <Link to="/" className="hover:text-brand-primary transition-colors flex items-center gap-2">
+            <ArrowLeft className="h-4 w-4" /> Home
+          </Link>
+          <Link to="/checkin" className="hover:text-brand-primary transition-colors underline underline-offset-4">
+            Member Check-in
           </Link>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Phone, Cake } from 'lucide-react'
+import { ArrowLeft, Phone, Cake, Users } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { Member, ServiceType } from '../types'
 
@@ -44,7 +44,7 @@ function StatCard({
   label, value, color = 'gray',
 }: { label: string; value: string | number; color?: 'gray' | 'green' | 'amber' | 'red' | 'blue' }) {
   const valueClass = {
-    gray: 'text-brand-slate',
+    gray: 'text-brand-text',
     green: 'text-green-600',
     amber: 'text-brand-gold',
     red: 'text-red-500',
@@ -52,9 +52,10 @@ function StatCard({
   }[color]
 
   return (
-    <div className="rounded-2xl bg-white p-4 border border-brand-border text-center shadow-sm">
-      <p className={`text-2xl font-bold ${valueClass}`}>{value}</p>
-      <p className="mt-1 text-xs text-brand-slate uppercase tracking-wider font-medium opacity-60 leading-tight">{label}</p>
+    <div className="rounded-[1.5rem] bg-white p-6 border border-brand-border/50 text-center shadow-xl shadow-brand-primary/[0.02] hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 group">
+      <p className={`text-4xl font-black tracking-tighter italic ${valueClass} group-hover:scale-110 transition-transform duration-500`}>{value}</p>
+      <div className="h-px w-8 bg-brand-border/30 mx-auto my-3"></div>
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 leading-tight">{label}</p>
     </div>
   )
 }
@@ -152,46 +153,51 @@ export default function MemberDetail() {
     <div className="min-h-screen bg-brand-secondary">
 
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-brand-border">
-        <button
-          onClick={() => navigate(`/admin/units/${unitId}/members`)}
-          className="flex items-center justify-center rounded-xl p-2 hover:bg-brand-secondary transition-colors"
-          title="Back to Members"
-        >
-          <ArrowLeft className="h-5 w-5 text-brand-slate" />
-        </button>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="font-bold text-brand-text truncate">{member.name}</p>
-            {member.section && (
-              <span className="rounded-full bg-brand-primary/5 px-2.5 py-1 text-xs font-semibold text-brand-primary flex-shrink-0">
-                {member.section}
-              </span>
-            )}
-            {member.status === 'inactive' && (
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-400 flex-shrink-0">
-                Inactive
-              </span>
-            )}
+      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
+        
+        <div className="flex items-center justify-between relative z-10 w-full">
+          <button
+            onClick={() => navigate(`/admin/units/${unitId}/members`)}
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+            title="Back to Roster"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+          
+          <div className="flex flex-col items-center flex-1 overflow-hidden px-4 text-center">
+             <h1 className="text-3xl font-black tracking-tighter italic truncate w-full">{member.name}</h1>
+             <div className="flex items-center gap-2 mt-1">
+                {member.section && (
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] bg-white/10 px-3 py-0.5 rounded-full border border-white/10">
+                    {member.section}
+                  </span>
+                )}
+                {member.status === 'inactive' && (
+                  <span className="text-[8px] font-black uppercase tracking-widest text-white/40">Retired</span>
+                )}
+             </div>
           </div>
+
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white/20">
+            <Users className="h-6 w-6" />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-3 relative z-10">
           {member.phone && (
             <a
               href={`tel:${member.phone}`}
-              className="mt-0.5 flex items-center gap-1 text-xs text-brand-primary font-medium hover:underline w-fit"
+              className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white text-brand-primary shadow-xl shadow-brand-primary/20 border border-white font-black text-[10px] uppercase tracking-[0.2em] hover:scale-105 transition-all active:scale-95"
             >
-              <Phone className="h-3 w-3" />
-              {member.phone}
+              <Phone className="h-4 w-4" /> {member.phone}
             </a>
           )}
           {member.birthday && (
-            <div className="mt-1 flex items-center gap-1 text-xs text-brand-slate">
-              <Cake className="h-3 w-3" />
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl border font-black text-[10px] uppercase tracking-[0.2em] transition-all ${isBirthday(member.birthday) ? 'bg-pink-600 border-pink-500 text-white shadow-xl shadow-pink-500/20' : 'bg-white/10 border-white/10 text-white'}`}>
+              <Cake className="h-4 w-4" /> 
               {formatDate(member.birthday)}
-              {isBirthday(member.birthday) && (
-                <span className="ml-1 rounded-full bg-pink-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-pink-600">
-                  Birthday! 🎂
-                </span>
-              )}
+              {isBirthday(member.birthday) && <span className="ml-2">🎂 Anniversary</span>}
             </div>
           )}
         </div>
@@ -209,93 +215,101 @@ export default function MemberDetail() {
 
         {/* ── Recent trend ─────────────────────────────────────────────────── */}
         {recentTrend.length > 0 && (
-          <section className="rounded-2xl bg-white p-5 border border-brand-border shadow-sm">
-            <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-slate/60">
-              Recent trend · last {recentTrend.length} event{recentTrend.length !== 1 ? 's' : ''}
-            </h2>
+          <section className="rounded-[2.5rem] bg-white p-10 border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] relative overflow-hidden">
+            <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40 mb-6">
+                Activity Score · Last {recentTrend.length} Events
+              </h2>
 
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {recentTrend.map(r => (
-                <div
-                  key={r.serviceId}
-                  title={`${EVENT_LABEL[r.serviceType]} · ${r.date}`}
-                  className={`h-5 w-5 rounded-full border-2 flex-shrink-0 transition-colors ${r.status === 'attended'
-                      ? 'bg-green-500 border-green-500'
-                      : 'bg-white border-red-300'
-                    }`}
-                />
-              ))}
-              <p className="ml-1 text-xs text-gray-300">← older · newer →</p>
-            </div>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                {recentTrend.map(r => (
+                  <div
+                    key={r.serviceId}
+                    title={`${EVENT_LABEL[r.serviceType]} · ${r.date}`}
+                    className={`h-7 w-7 rounded-lg border-2 flex-shrink-0 transition-all hover:scale-125 hover:rotate-6 cursor-help ${r.status === 'attended'
+                        ? 'bg-green-500 border-green-500 shadow-md shadow-green-500/20'
+                        : 'bg-white border-brand-border/50'
+                      }`}
+                  />
+                ))}
+                <p className="ml-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-20 italic">Timeline</p>
+              </div>
 
-            <div className="mt-3 flex items-center gap-4">
-              <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full bg-green-500 shadow-sm" />
-                <span className="text-xs font-medium text-brand-slate">Present</span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full border border-red-300 bg-white shadow-sm" />
-                <span className="text-xs font-medium text-brand-slate">Absent</span>
-              </span>
+              <div className="mt-8 flex items-center gap-6">
+                <span className="flex items-center gap-2.5">
+                  <span className="h-3 w-3 rounded-md bg-green-500 shadow-sm" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.1em] text-brand-text">Check-in</span>
+                </span>
+                <span className="flex items-center gap-2.5">
+                  <span className="h-3 w-3 rounded-md border-2 border-brand-border/50 bg-white" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.1em] text-brand-slate opacity-40">Missed</span>
+                </span>
+              </div>
             </div>
           </section>
         )}
 
         {/* ── Event history ───────────────────────────────────────────────── */}
-        <section>
-          <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-slate/60">
-            Event History
-          </h2>
+        <section className="animate-in fade-in slide-in-from-bottom-6 duration-700">
+           <div className="flex items-center gap-3 mb-6 px-2">
+             <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40">
+               Historical Log
+             </h2>
+             <div className="h-px flex-1 bg-brand-border/30"></div>
+          </div>
 
           {records.length === 0 ? (
-            <div className="rounded-2xl bg-white p-10 text-center border border-brand-border">
-              <p className="text-sm text-brand-slate">No events found for this unit.</p>
+            <div className="rounded-[2.5rem] bg-white p-16 text-center border border-brand-border/50 shadow-xl shadow-brand-primary/[0.02]">
+               <Users className="h-16 w-16 text-brand-primary/5 mx-auto mb-6" />
+               <h3 className="text-xl font-black text-brand-text uppercase tracking-tighter italic">No History Found</h3>
+               <p className="text-sm font-medium text-brand-slate opacity-40 mt-2">This member hasn't participated in any events yet.</p>
             </div>
           ) : (
-            <div className="rounded-2xl bg-white border border-brand-border overflow-hidden shadow-sm">
+            <div className="rounded-[2rem] bg-white border border-brand-border/50 overflow-hidden shadow-2xl shadow-brand-primary/[0.02]">
               {records.map((r, i) => (
                 <div
                   key={r.serviceId}
-                  className={`flex items-center gap-3 px-4 py-3 ${i < records.length - 1 ? 'border-b border-gray-50' : ''
+                  className={`flex items-center gap-6 px-8 py-6 group hover:bg-brand-primary/[0.02] transition-colors ${i < records.length - 1 ? 'border-b border-brand-border/30' : ''
                     }`}
                 >
-                  {/* Status dot */}
                   <div
-                    className={`h-2.5 w-2.5 rounded-full flex-shrink-0 shadow-sm ${r.status === 'attended'
-                        ? 'bg-green-500'
+                    className={`h-4 w-4 rounded-full flex-shrink-0 shadow-lg ${r.status === 'attended'
+                        ? 'bg-green-500 ring-4 ring-green-500/10'
                         : r.status === 'absent'
-                          ? 'bg-red-400'
-                          : 'bg-brand-secondary'
+                          ? 'bg-red-400 ring-4 ring-red-400/10'
+                          : 'bg-brand-secondary border border-brand-border/50'
                       }`}
                   />
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-medium text-gray-900">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <p className="text-lg font-bold text-brand-text uppercase tracking-tight italic group-hover:text-brand-primary transition-colors">
                         {EVENT_LABEL[r.serviceType]}
                       </p>
                       <span
-                        className={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${r.status === 'attended'
-                            ? 'bg-green-50 text-green-700'
+                        className={`rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest border ${r.status === 'attended'
+                            ? 'bg-green-50 text-green-700 border-green-100'
                             : r.status === 'absent'
-                              ? 'bg-red-50 text-red-600'
-                              : 'bg-brand-secondary text-brand-slate'
+                              ? 'bg-red-50 text-red-600 border-red-100'
+                              : 'bg-brand-secondary text-brand-slate border-brand-border/50'
                           }`}
                       >
                         {r.status === 'attended'
-                          ? 'Present'
+                          ? 'Duty Fulfilled'
                           : r.status === 'absent'
-                            ? 'Absent'
-                            : 'Upcoming'}
+                            ? 'Missed Action'
+                            : 'On Orders'}
                       </span>
                     </div>
-                    <p className="mt-0.5 text-xs text-gray-400">{formatDate(r.date)}</p>
+                    <p className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-30">{formatDate(r.date)}</p>
                   </div>
 
                   {r.checkinTime && (
-                    <p className="flex-shrink-0 text-xs text-gray-400">
-                      {formatTime(r.checkinTime)}
-                    </p>
+                    <div className="flex flex-col items-end flex-shrink-0">
+                       <p className="text-xs font-black text-brand-text">{formatTime(r.checkinTime)}</p>
+                       <p className="text-[10px] font-bold text-brand-slate opacity-20 uppercase tracking-widest">Logged</p>
+                    </div>
                   )}
                 </div>
               ))}

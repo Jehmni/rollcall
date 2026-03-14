@@ -77,16 +77,16 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
       <div className="relative w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-primary/5">
-              <Camera className="h-4 w-4 text-brand-primary" />
+        <div className="flex items-center justify-between bg-brand-primary px-6 py-5 text-white">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm border border-white/20">
+              <Camera className="h-5 w-5 text-white" />
             </div>
-            <h3 className="font-bold text-gray-900">Scan Service QR</h3>
+            <h3 className="text-lg font-bold tracking-tight">Scan Service QR</h3>
           </div>
           <button
             onClick={onClose}
-            className="rounded-full bg-gray-50 p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+            className="rounded-xl bg-white/10 p-2 text-white hover:bg-white/20 transition-colors border border-white/10"
           >
             <X className="h-5 w-5" />
           </button>

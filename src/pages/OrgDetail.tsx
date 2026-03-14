@@ -1,6 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, ChevronRight, Users, Trash2, Settings, Edit2, X } from 'lucide-react'
+import { ArrowLeft, Plus, ChevronRight, Users, Trash2, Settings, Edit2, X, ShieldCheck } from 'lucide-react'
 import { useUnits, useOrganizations as useAdminOrgs } from '../hooks/useAdminDashboard'
 import { useOrganizations } from '../hooks/useOrganizations'
 import { useAuth } from '../contexts/AuthContext'
@@ -18,41 +18,46 @@ function UnitCard({
   onEdit 
 }: { 
   unit: Unit; 
-  canManage: boolean;
+  canManage: boolean; 
   onClick: () => void; 
   onDelete: () => void;
   onEdit: () => void;
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-4 group animate-in slide-in-from-left-4 duration-500">
       <button
         onClick={onClick}
-        className="flex-1 flex items-center justify-between rounded-2xl bg-white px-4 py-4 border border-brand-border hover:border-brand-primary/30 hover:shadow-md transition-all text-left"
+        className="flex-1 flex items-center justify-between rounded-[2.5rem] bg-white px-10 py-8 border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.99] transition-all text-left group/card overflow-hidden relative"
       >
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-primary/5 text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-colors">
-            <Users className="h-5 w-5" />
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl group-hover/card:scale-150 transition-transform duration-700"></div>
+        
+        <div className="flex items-center gap-6 relative z-10">
+          <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-brand-primary/5 group-hover/card:bg-brand-primary group-hover/card:-rotate-3 transition-all duration-500 relative">
+            <Users className="h-8 w-8 text-brand-primary group-hover/card:text-white transition-colors" />
           </div>
           <div>
-            <p className="text-sm font-bold text-brand-text">{unit.name}</p>
-            {unit.description && <p className="text-xs text-brand-slate">{unit.description}</p>}
+            <p className="text-xl font-bold text-brand-text tracking-tighter uppercase italic group-hover/card:text-brand-primary transition-colors">{unit.name}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1 truncate max-w-[150px] sm:max-w-xs">
+              {unit.description || 'Access Unit Command'}
+            </p>
           </div>
         </div>
-        <ChevronRight className="h-5 w-5 text-brand-slate/40 flex-shrink-0 group-hover:text-brand-primary transition-colors" />
+        <ChevronRight className="h-6 w-6 text-brand-slate opacity-20 group-hover/card:text-brand-primary group-hover/card:opacity-100 group-hover/card:translate-x-1 transition-all relative z-10" />
       </button>
+      
       {canManage && (
-        <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
           <button
-            onClick={onEdit}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-brand-slate/40 hover:bg-brand-primary/5 hover:text-brand-primary transition-colors"
-            title="Edit Unit"
+            onClick={(e) => { e.stopPropagation(); onEdit(); }}
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-brand-border/50 text-brand-slate hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all active:scale-90 shadow-sm"
+            title="Edit Identity"
           >
             <Edit2 className="h-4 w-4" />
           </button>
           <button
-            onClick={onDelete}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-brand-slate/40 hover:bg-red-50 hover:text-red-500 transition-colors"
-            title="Delete Unit"
+            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-brand-border/50 text-red-300 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all active:scale-90 shadow-sm"
+            title="Decommission"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -182,46 +187,59 @@ export default function OrgDetail() {
 
   return (
     <div className="min-h-screen bg-brand-secondary">
-      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-brand-border">
-        <button
-          onClick={() => navigate('/admin')}
-          className="flex items-center justify-center rounded-xl p-2 hover:bg-brand-secondary transition-colors"
-          title="Back to Dashboard"
-        >
-          <ArrowLeft className="h-5 w-5 text-brand-slate" />
-        </button>
-        <div className="flex-1 min-w-0">
-          <h1 className="font-bold text-brand-text truncate">{org?.name ?? 'Organization'}</h1>
-          <p className="text-xs text-brand-primary font-bold uppercase tracking-wider">
-            {isOwner ? 'Organization Owner' : 'Member Admin'}
-          </p>
+      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
+        {/* Abstract background glow */}
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
+        
+        <div className="flex items-center justify-between relative z-10 w-full">
+          <button
+            onClick={() => navigate('/admin')}
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+          <div className="flex flex-col items-center flex-1 overflow-hidden px-4">
+             <h1 className="text-3xl font-black tracking-tighter italic truncate w-full text-center">{org?.name ?? 'Hub'}</h1>
+             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mt-1">Control Center</p>
+          </div>
+          {isOwner && (
+            <button
+               onClick={() => setShowSettings(!showSettings)}
+               className={`flex h-12 w-12 items-center justify-center rounded-2xl border transition-all active:scale-95 ${showSettings ? 'bg-white text-brand-primary border-white' : 'bg-white/10 border-white/10 text-white hover:bg-white/20'}`}
+            >
+              <Settings className="h-6 w-6" />
+            </button>
+          )}
         </div>
-        {isOwner && (
-          <Button variant="ghost" size="sm" onClick={() => setShowSettings(!showSettings)} className={showSettings ? 'bg-brand-primary/5' : ''}>
-            <Settings className="h-4 w-4" />
-          </Button>
-        )}
+
+        <div className="text-center relative z-10 mt-4 animate-in fade-in slide-in-from-top-4 duration-700">
+           <h2 className="text-2xl font-black leading-tight uppercase tracking-tight">Organization Detail</h2>
+           <p className="mt-2 text-sm font-medium text-white/60">
+             {isOwner ? 'Full Administrative Oversight' : 'Standard Access Control'}
+           </p>
+        </div>
       </header>
 
       <div className="mx-auto max-w-2xl px-4 py-8 flex flex-col gap-8">
                 {isOwner && (
-          <div className="flex p-1 bg-brand-primary/5 rounded-xl max-w-sm border border-brand-primary/5">
+          <div className="flex p-2 bg-brand-primary/5 rounded-[2rem] max-w-sm mx-auto border border-brand-primary/5 shadow-inner">
             <button
               onClick={() => setActiveTab('units')}
-              className={`flex-1 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === 'units' ? 'bg-white text-brand-primary shadow-sm border border-brand-primary/10' : 'text-brand-slate/60 hover:text-brand-primary'
+              className={`flex-1 px-6 py-3 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
+                activeTab === 'units' ? 'bg-white text-brand-primary shadow-xl shadow-brand-primary/10 scale-105' : 'text-brand-slate/40 hover:text-brand-primary'
               }`}
             >
               Units
             </button>
             <button
               onClick={() => setActiveTab('requests')}
-              className={`flex-1 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === 'requests' ? 'bg-white text-brand-primary shadow-sm border border-brand-primary/10' : 'text-brand-slate/60 hover:text-brand-primary'
+              className={`flex-1 px-6 py-3 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all relative ${
+                activeTab === 'requests' ? 'bg-white text-brand-primary shadow-xl shadow-brand-primary/10 scale-105' : 'text-brand-slate/40 hover:text-brand-primary'
               }`}
             >
-              Join Requests {joinRequests.length > 0 && (
-                <span className="ml-1 px-2 py-0.5 bg-brand-primary text-white rounded-full text-[10px]">
+              Requests
+              {joinRequests.length > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center bg-brand-gold text-white rounded-full text-[8px] font-black ring-4 ring-brand-secondary">
                   {joinRequests.length}
                 </span>
               )}
@@ -265,49 +283,59 @@ export default function OrgDetail() {
 
         {activeTab === 'units' ? (
           <section>
-             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-brand-slate">Units</h2>
-              <Button size="sm" onClick={() => { setShowCreate(!showCreate); setEditingUnit(null); setNewName(''); setNewDesc('') }} className="shadow-lg shadow-brand-primary/20">
-                <Plus className="h-4 w-4 mr-1.5" /> New Unit
-              </Button>
+             <div className="flex items-center justify-between mb-8">
+                <div>
+                   <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40">Section</h2>
+                   <p className="text-2xl font-black text-brand-text tracking-tight uppercase italic mt-1">Active Units</p>
+                </div>
+                <Button size="lg" onClick={() => { setShowCreate(!showCreate); setEditingUnit(null); setNewName(''); setNewDesc('') }} className="shadow-2xl shadow-brand-primary/30 rounded-2xl text-xs font-black uppercase tracking-[0.1em]">
+                  <Plus className="h-5 w-5 mr-3" /> New Unit
+                </Button>
             </div>
 
              {(showCreate || editingUnit) && (
-              <form onSubmit={editingUnit ? handleUpdateUnit : handleCreate} className="mb-8 rounded-2xl bg-white p-6 shadow-xl shadow-brand-primary/5 border border-brand-border flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
-                <div className="flex items-center gap-3 mb-1">
-                  <div className="p-2 bg-brand-primary/5 rounded-lg">
-                    {editingUnit ? <Edit2 className="h-5 w-5 text-brand-primary" /> : <Plus className="h-5 w-5 text-brand-primary" />}
+              <div className="mb-10 rounded-[2.5rem] bg-white p-10 shadow-2xl shadow-brand-primary/5 border border-brand-border/50 animate-in fade-in slide-in-from-top-6 duration-700 relative overflow-hidden">
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl"></div>
+                <form onSubmit={editingUnit ? handleUpdateUnit : handleCreate} className="flex flex-col gap-8 relative z-10">
+                  <div className="flex items-center gap-6">
+                    <div className="h-16 w-16 bg-brand-primary shadow-xl shadow-brand-primary/20 rounded-3xl flex items-center justify-center text-white">
+                      {editingUnit ? <Edit2 className="h-8 w-8" /> : <Plus className="h-8 w-8" />}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">{editingUnit ? 'Edit Unit' : 'Launch Unit'}</h3>
+                      <p className="text-sm font-medium text-brand-slate opacity-40">
+                         {editingUnit ? 'Refine group details' : 'Deploy a new organizational node'}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-brand-text">{editingUnit ? 'Edit Unit' : 'Create New Unit'}</h3>
-                    <p className="text-brand-slate text-sm">
-                      Distribute responsibility by creating units you manage.
-                    </p>
-                  </div>
-                </div>
 
-                <Input
-                  label="Unit Name"
-                  placeholder="e.g. Volunteers, Teams, Classes"
-                  value={newName}
-                  onChange={e => setNewName(e.target.value)}
-                  error={error ?? undefined}
-                  required
-                  autoFocus
-                />
-                <Input
-                  label="Description (optional)"
-                  placeholder="What is this unit for?"
-                  value={newDesc}
-                  onChange={e => setNewDesc(e.target.value)}
-                />
-                <div className="flex gap-2 justify-end pt-2">
-                  <Button variant="secondary" size="sm" type="button" onClick={() => { setShowCreate(false); setEditingUnit(null) }}>Cancel</Button>
-                  <Button size="sm" type="submit" loading={isUpdating}>
-                    {editingUnit ? 'Save Changes' : 'Create Unit'}
-                  </Button>
-                </div>
-              </form>
+                  <div className="space-y-6">
+                    <Input
+                      label="Unit Identity"
+                      placeholder="e.g. Volunteers, Lead Team..."
+                      value={newName}
+                      onChange={e => setNewName(e.target.value)}
+                      error={error ?? undefined}
+                      required
+                      autoFocus
+                      className="text-lg"
+                    />
+                    <Input
+                      label="Objective / Description"
+                      placeholder="Define the purpose of this group..."
+                      value={newDesc}
+                      onChange={e => setNewDesc(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="flex gap-4 justify-end pt-4">
+                    <Button variant="ghost" size="lg" type="button" onClick={() => { setShowCreate(false); setEditingUnit(null) }} className="text-xs font-black uppercase tracking-[0.2em] opacity-40">Cancel</Button>
+                    <Button size="lg" type="submit" loading={isUpdating} className="px-10 shadow-xl shadow-brand-primary/20 text-xs font-black uppercase tracking-[0.2em] rounded-2xl">
+                      {editingUnit ? 'Update Unit' : 'Create Unit'}
+                    </Button>
+                  </div>
+                </form>
+              </div>
             )}
 
              {loading ? (
@@ -347,42 +375,51 @@ export default function OrgDetail() {
               <h2 className="text-sm font-bold uppercase tracking-wider text-brand-slate">Pending Join Requests</h2>
             </div>
             
-            {loadingRequests ? (
-              <div className="flex justify-center py-10">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
+             {loadingRequests ? (
+              <div className="flex justify-center py-20">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
               </div>
              ) : joinRequests.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-brand-border text-brand-slate italic">
-                No pending requests to join this organization.
+              <div className="rounded-[2.5rem] bg-white p-20 text-center border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02]">
+                 <Users className="h-20 w-20 text-brand-primary/10 mx-auto mb-6" />
+                 <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">Silent Comms</h3>
+                 <p className="text-sm font-medium text-brand-slate opacity-40 mt-3">
+                   No pending requests to join this organization.
+                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 {joinRequests.map(req => (
-                  <div key={req.id} className="p-5 bg-white rounded-2xl border border-brand-border shadow-sm flex justify-between items-center group hover:border-brand-primary/30 transition-all">
-                    <div>
-                      <p className="font-bold text-brand-text">{req.admin?.email}</p>
-                      <p className="text-xs text-brand-slate">Requested {new Date(req.created_at).toLocaleDateString()}</p>
+                  <div key={req.id} className="p-8 bg-white rounded-[2rem] border border-brand-border/50 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 group hover:border-brand-primary/30 hover:shadow-2xl transition-all animate-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex items-center gap-5">
+                      <div className="h-14 w-14 bg-brand-primary/5 rounded-2xl flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all">
+                         <ShieldCheck className="h-7 w-7" />
+                      </div>
+                      <div>
+                        <p className="text-lg font-bold text-brand-text uppercase italic tracking-tight">{req.admin?.email}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-brand-slate opacity-40 mt-1">
+                          Requested {new Date(req.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-3 w-full sm:w-auto">
                       <Button
-                        size="sm"
-                        variant="secondary"
                         onClick={async () => {
                           await respondToJoinRequest(req.id, 'rejected')
                           setJoinRequests(prev => prev.filter(r => r.id !== req.id))
                         }}
-                        className="text-red-600 hover:bg-red-50"
+                        className="flex-1 sm:flex-none h-12 rounded-xl bg-white border-brand-border/50 text-red-500 hover:bg-red-50 text-[10px] font-black uppercase tracking-widest"
                       >
-                        Reject
+                        Decline
                       </Button>
                       <Button
-                        size="sm"
                         onClick={async () => {
                           await respondToJoinRequest(req.id, 'approved')
                           setJoinRequests(prev => prev.filter(r => r.id !== req.id))
                         }}
+                        className="flex-1 sm:flex-none h-12 rounded-xl bg-brand-primary text-white text-[10px] font-black uppercase tracking-widest px-8 shadow-lg shadow-brand-primary/20"
                       >
-                        Accept
+                        Authorize
                       </Button>
                     </div>
                   </div>

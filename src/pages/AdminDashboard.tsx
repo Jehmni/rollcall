@@ -27,38 +27,46 @@ function OrgCard({
   const canManage = isSuper || userRole === 'owner';
 
   return (
-    <div className="flex items-center gap-2 group">
+    <div className="flex items-center gap-3 group animate-in slide-in-from-left-4 duration-500">
       <button
         onClick={onClick}
-        className="flex-1 flex items-center justify-between rounded-2xl bg-white px-4 py-4 border border-brand-border hover:border-brand-primary/30 hover:shadow-md transition-all text-left"
+        className="flex-1 flex items-center justify-between rounded-[2rem] bg-white px-8 py-7 border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.99] transition-all text-left"
       >
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-primary/5 group-hover:bg-brand-primary transition-colors">
-            <Building2 className="h-5 w-5 text-brand-primary group-hover:text-white transition-colors" />
+        <div className="flex items-center gap-5">
+          <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-brand-primary/5 group-hover:bg-brand-primary group-hover:rotate-3 transition-all duration-500 relative overflow-hidden">
+            <div className="absolute inset-0 bg-brand-primary opacity-0 group-hover:opacity-10 scale-150 blur-xl transition-opacity"></div>
+            <Building2 className="h-8 w-8 text-brand-primary group-hover:text-white transition-colors relative z-10" />
           </div>
           <div>
-            <p className="text-sm font-bold text-brand-text">{org.name}</p>
-            <p className="text-xs text-brand-slate">
-              {new Date(org.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+            <p className="text-xl font-bold text-brand-text tracking-tight uppercase italic">{org.name}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">
+              Established {new Date(org.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
             </p>
           </div>
         </div>
-        <ChevronRight className="h-5 w-5 text-brand-slate/40 group-hover:text-brand-primary transition-colors" />
+        <div className="flex items-center gap-4">
+           {userRole === 'owner' && (
+             <span className="hidden sm:inline-block rounded-full bg-brand-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-brand-primary border border-brand-primary/10">
+               Owner
+             </span>
+           )}
+           <ChevronRight className="h-6 w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:opacity-100 transition-all" />
+        </div>
       </button>
       
       {canManage && (
-        <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
           <button
-            onClick={onRename}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-brand-slate hover:bg-brand-primary/5 hover:text-brand-primary transition-colors"
-            title="Rename Organization"
+            onClick={(e) => { e.stopPropagation(); onRename(); }}
+            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white border border-brand-border text-brand-slate hover:bg-brand-primary/5 hover:text-brand-primary hover:border-brand-primary/20 shadow-sm transition-all active:scale-90"
+            title="Rename"
           >
             <Edit2 className="h-4 w-4" />
           </button>
           <button
-            onClick={onDelete}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
-            title="Delete Organization"
+            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white border border-brand-border text-gray-300 hover:bg-red-50 hover:text-red-500 hover:border-red-200 shadow-sm transition-all active:scale-90"
+            title="Delete"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -139,74 +147,92 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-brand-secondary">
-      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-brand-border">
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center justify-center rounded-xl p-2 hover:bg-brand-secondary transition-colors"
-          title="Back to Landing"
-        >
-          <ArrowLeft className="h-5 w-5 text-brand-slate" />
-        </button>
-        <div className="flex flex-1 items-center gap-2">
-          <Building2 className="h-5 w-5 text-brand-primary" />
-          <span className="font-bold text-brand-text">Rollcally</span>
-          {isSuper && (
-            <span className="rounded-full bg-brand-primary/5 px-2 py-0.5 text-xs font-bold text-brand-primary border border-brand-primary/10">Super Admin</span>
-          )}
+      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
+        {/* Abstract background glow */}
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
+        
+        <div className="flex items-center justify-between relative z-10 w-full">
+          <button
+            onClick={() => navigate('/')}
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+          <div className="flex flex-col items-center flex-1">
+             <h1 className="text-3xl font-black tracking-tighter italic">Rollcally Admin</h1>
+             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mt-1">Management Hub</p>
+          </div>
+          <Button variant="ghost" size="sm" onClick={signOut} title="Sign Out" className="text-white hover:bg-white/10 h-12 w-12 rounded-2xl border border-white/10">
+            <LogOut className="h-5 w-5" />
+          </Button>
         </div>
-        <Button variant="ghost" size="sm" onClick={signOut} title="Sign Out">
-          <LogOut className="h-4 w-4" />
-        </Button>
+
+        <div className="text-center relative z-10 mt-4 animate-in fade-in slide-in-from-top-4 duration-700">
+           <h2 className="text-2xl font-black leading-tight">
+             {isSuper ? 'System Overview' : 'My Organizations'}
+           </h2>
+           <p className="mt-2 text-sm font-medium text-white/60">
+             {isSuper ? 'Controlling all active entities' : 'Manage your attendance groups'}
+           </p>
+        </div>
       </header>
 
       <div className="mx-auto max-max-w-2xl px-4 py-8 flex flex-col gap-6 relative">
         <section className="relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-brand-slate">
-              {isSuper ? 'All Organizations' : 'Your Organizations'}
-            </h2>
-            <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
+            <div>
+              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40">
+                Dashboard
+              </h2>
+              <p className="text-2xl font-black text-brand-text tracking-tight uppercase italic mt-1">Directory</p>
+            </div>
+            <div className="flex gap-3 w-full sm:w-auto">
               <Button 
                 variant="secondary" 
-                size="sm" 
+                size="lg" 
                 onClick={() => navigate('/admin/discover')}
+                className="flex-1 sm:flex-none border-brand-border/50 text-xs font-bold uppercase tracking-[0.1em] rounded-2xl"
               >
-                Find an Organization
+                Explore
               </Button>
-              <Button size="sm" onClick={() => { setShowCreate(!showCreate); setEditingOrg(null); setNewName('') }} className="shadow-lg shadow-brand-primary/20">
-                <Plus className="h-4 w-4 mr-1.5" /> New Organization
+              <Button size="lg" onClick={() => { setShowCreate(!showCreate); setEditingOrg(null); setNewName('') }} className="flex-1 sm:flex-none shadow-2xl shadow-brand-primary/30 rounded-2xl text-xs font-bold uppercase tracking-[0.1em]">
+                <Plus className="h-5 w-5 mr-3" /> New
               </Button>
             </div>
           </div>
           {(showCreate || editingOrg) && (
-            <form onSubmit={editingOrg ? handleUpdate : handleCreate} className="mb-6 rounded-2xl bg-white p-6 shadow-xl shadow-brand-primary/5 border border-brand-border flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
-              <div className="flex items-center gap-3 mb-1">
-                <div className="p-2 bg-brand-primary/5 rounded-lg">
-                  {editingOrg ? <Edit2 className="h-5 w-5 text-brand-primary" /> : <Building2 className="h-5 w-5 text-brand-primary" />}
+            <div className="mb-10 rounded-[2.5rem] bg-white p-10 shadow-2xl shadow-brand-primary/5 border border-brand-border/50 animate-in fade-in slide-in-from-top-6 duration-700 relative overflow-hidden">
+               <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl"></div>
+              <form onSubmit={editingOrg ? handleUpdate : handleCreate} className="flex flex-col gap-8 relative z-10">
+                <div className="flex items-center gap-6">
+                  <div className="h-16 w-16 bg-brand-primary shadow-xl shadow-brand-primary/20 rounded-3xl flex items-center justify-center text-white">
+                    {editingOrg ? <Edit2 className="h-8 w-8" /> : <Plus className="h-8 w-8" />}
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">{editingOrg ? 'Rename' : 'Launch New'}</h3>
+                    <p className="text-sm font-medium text-brand-slate opacity-40">
+                      {editingOrg ? 'Update organization details' : 'Create a fresh attendance hub'}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-brand-text">{editingOrg ? 'Rename Organization' : 'Start a New Organization'}</h3>
-                  <p className="text-xs text-brand-slate">
-                    {editingOrg ? 'Update the name of your organization.' : 'Choose a name for your group, team, or organization.'}
-                  </p>
+                <Input
+                  label="Name of Organization"
+                  placeholder="e.g. Metro Parish, Sports Club..."
+                  value={newName}
+                  onChange={e => setNewName(e.target.value)}
+                  error={error ?? undefined}
+                  required
+                  autoFocus
+                  className="text-lg py-6"
+                />
+                <div className="flex gap-4 justify-end">
+                  <Button variant="ghost" size="lg" type="button" onClick={() => { setShowCreate(false); setEditingOrg(null) }} className="text-xs font-black uppercase tracking-[0.2em] opacity-40">Cancel</Button>
+                  <Button size="lg" type="submit" loading={isUpdating} className="px-10 shadow-xl shadow-brand-primary/20 text-xs font-black uppercase tracking-[0.2em] rounded-2xl">
+                    {editingOrg ? 'Update Hub' : 'Create Hub'}
+                  </Button>
                 </div>
-              </div>
-              <Input
-                label="Organization Name"
-                placeholder="e.g. Community Group, Sports Team, or Church"
-                value={newName}
-                onChange={e => setNewName(e.target.value)}
-                error={error ?? undefined}
-                required
-                autoFocus
-              />
-              <div className="flex gap-2 justify-end pt-2">
-                <Button variant="secondary" size="sm" type="button" onClick={() => { setShowCreate(false); setEditingOrg(null) }}>Cancel</Button>
-                <Button size="sm" type="submit" loading={isUpdating}>
-                  {editingOrg ? 'Update Name' : 'Create Organization'}
-                </Button>
-              </div>
-            </form>
+              </form>
+            </div>
           )}
 
           {loading ? (
