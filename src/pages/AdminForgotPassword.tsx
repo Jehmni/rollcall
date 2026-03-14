@@ -31,30 +31,32 @@ export default function AdminForgotPassword() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-100 via-white to-white px-4 py-12 overflow-hidden relative">
-      {/* Animated Background Blobs */}
-      <div className="absolute top-0 -left-4 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-brand-secondary px-4 relative overflow-hidden">
+      <div className="absolute top-0 -left-6 w-96 h-96 bg-brand-primary/5 rounded-full blur-3xl -z-10 animate-blob"></div>
+      <div className="absolute bottom-0 -right-6 w-96 h-96 bg-brand-primary/5 rounded-full blur-3xl -z-10 animate-blob animation-delay-2000"></div>
 
       <div className="relative w-full max-w-md">
-        <button
-          onClick={() => window.location.href = '/admin/login'}
-          className="absolute -top-12 left-0 flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-blue-600 transition-colors group"
+        <Link
+          to="/admin/login"
+          className="absolute -top-12 left-0 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-brand-slate hover:text-brand-primary transition-colors group"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/50 backdrop-blur-sm ring-1 ring-gray-200 group-hover:ring-blue-200 group-hover:bg-blue-50">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-brand-border group-hover:border-brand-primary/30 group-hover:bg-brand-primary/5">
             <ArrowLeft className="h-4 w-4" />
           </div>
           Back to Login
-        </button>
+        </Link>
 
         <div className="mb-8 flex flex-col items-center gap-4 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-700 shadow-xl shadow-blue-200 ring-4 ring-blue-50">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-primary shadow-2xl shadow-brand-primary/40 ring-4 ring-white">
             <KeyRound className="h-8 w-8 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Reset Password</h1>
-            <p className="mt-2 text-gray-500 text-sm">Enter your email and we'll send you a reset link</p>
+            <h1 className="text-3xl font-extrabold tracking-tight text-brand-text">
+              Forgot Password
+            </h1>
+            <p className="mt-2 text-sm text-brand-slate font-medium">
+              Enter your email to receive a password reset link.
+            </p>
           </div>
         </div>
 
@@ -75,9 +77,10 @@ export default function AdminForgotPassword() {
                 <Button variant="secondary" onClick={() => setSuccess(false)}>
                   Try another email
                 </Button>
-                <Link to="/admin/login" className="flex items-center justify-center text-sm font-semibold text-blue-700 hover:text-blue-800">
-                  <ArrowLeft className="mr-2 h-4 w-4" /> Back to login
-                </Link>
+              <Link to="/admin/login" className="flex items-center justify-center text-sm font-bold uppercase tracking-wider text-brand-primary hover:text-brand-primary/80">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Login
+              </Link>
               </div>
             </div>
           ) : (

@@ -79,8 +79,8 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
-              <Camera className="h-4 w-4 text-blue-700" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-primary/5">
+              <Camera className="h-4 w-4 text-brand-primary" />
             </div>
             <h3 className="font-bold text-gray-900">Scan Service QR</h3>
           </div>
@@ -112,7 +112,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                     </p>
                     <Button 
                       variant="primary" 
-                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      className="w-full bg-brand-primary hover:bg-brand-primary/90"
                       onClick={() => startScanner()}
                     >
                       Try Again
@@ -120,14 +120,16 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                   </>
                 ) : permissionState === 'requesting' ? (
                   <>
-                    <Loader2 className="mb-4 h-12 w-12 animate-spin text-blue-500" />
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-primary/5">
+                      <Loader2 className="h-12 w-12 animate-spin text-brand-primary" />
+                    </div>
                     <p className="font-bold text-white">Requesting Permission...</p>
                     <p className="text-sm text-gray-400">Please tap "Allow" when the prompt appears</p>
                   </>
                 ) : (
                   <>
-                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500/10">
-                      <Camera className="h-8 w-8 text-blue-500" />
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-primary/5">
+                      <Camera className="h-8 w-8 text-brand-primary" />
                     </div>
                     <p className="mb-2 font-bold text-white">Camera Access Required</p>
                     <p className="mb-6 text-sm text-gray-400">
@@ -135,7 +137,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                     </p>
                     <Button 
                       variant="primary" 
-                      className="w-full bg-blue-600 shadow-lg shadow-blue-500/20"
+                      className="w-full bg-brand-primary shadow-lg shadow-brand-primary/20"
                       onClick={() => startScanner()}
                     >
                       Enable Camera

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100 ${className}`}>
+    <div className={`rounded-2xl bg-white p-6 shadow-sm border border-brand-border ${className}`}>
       {children}
     </div>
   )
@@ -18,10 +18,10 @@ export function StatCard({
   color?: 'blue' | 'green' | 'red' | 'gray'
 }) {
   const colors = {
-    blue: 'bg-blue-50 text-blue-700',
+    blue: 'bg-brand-primary/5 text-brand-primary',
     green: 'bg-green-50 text-green-700',
     red: 'bg-red-50 text-red-700',
-    gray: 'bg-gray-50 text-gray-700',
+    gray: 'bg-brand-secondary text-brand-slate',
   }
   return (
     <div className={`rounded-2xl p-5 ${colors[color]}`}>

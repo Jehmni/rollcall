@@ -53,18 +53,18 @@ export default function AdminOrgDiscovery() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-gray-50 to-gray-50">
-      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-gray-100">
+    <div className="min-h-screen bg-brand-secondary">
+      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-brand-border">
         <button
           onClick={() => navigate('/admin')}
-          className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-center rounded-xl p-2 hover:bg-brand-secondary transition-colors"
           title="Back to Dashboard"
         >
-          <ArrowLeft className="h-5 w-5 text-gray-600" />
+          <ArrowLeft className="h-5 w-5 text-brand-slate" />
         </button>
         <div className="flex-1 min-w-0">
-          <h1 className="font-bold text-gray-900 truncate">Find an Organization</h1>
-          <p className="text-xs text-blue-600 font-medium">Search for your group to request access</p>
+          <h1 className="font-bold text-brand-text truncate">Find an Organization</h1>
+          <p className="text-xs text-brand-primary font-bold uppercase tracking-wider">Search for your group to request access</p>
         </div>
       </header>
 
@@ -77,12 +77,12 @@ export default function AdminOrgDiscovery() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by organization name (e.g. St Peter's)"
-            className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-indigo-500 focus:ring-0 transition-all outline-none"
+            className="flex-1 px-4 py-3 rounded-xl border border-brand-border bg-white focus:border-brand-primary/50 focus:ring-4 focus:ring-brand-primary/5 transition-all outline-none placeholder:text-brand-slate/40 text-brand-text"
           />
           <button
             type="submit"
             disabled={loading}
-            className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-all disabled:opacity-50"
+            className="px-8 py-3 bg-brand-primary text-white rounded-xl font-bold hover:bg-brand-primary/90 transition-all disabled:opacity-50 shadow-lg shadow-brand-primary/20"
           >
             {loading ? 'Searching...' : 'Search'}
           </button>
@@ -102,30 +102,30 @@ export default function AdminOrgDiscovery() {
             const isRequested = requestedIds.has(org.id)
 
             return (
-              <div key={org.id} className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center group hover:border-indigo-100 transition-all">
+               <div key={org.id} className="p-6 bg-white rounded-2xl border border-brand-border shadow-sm flex justify-between items-center group hover:border-brand-primary/30 transition-all">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                  <h3 className="text-xl font-bold text-brand-text group-hover:text-brand-primary transition-colors">
                     {org.name}
                   </h3>
-                  <p className="text-gray-500 text-sm mt-1">
+                  <p className="text-brand-slate text-sm mt-1">
                     System ID: {org.id.split('-')[0]}...
                   </p>
                 </div>
                 
                 <div>
                   {status === 'pending' ? (
-                    <span className="px-4 py-2 bg-amber-50 text-amber-700 rounded-full text-sm font-medium border border-amber-100">
+                    <span className="px-4 py-2 bg-brand-gold/5 text-brand-gold rounded-full text-xs font-bold uppercase tracking-wider border border-brand-gold/20">
                       Pending Approval
                     </span>
                   ) : status === 'approved' ? (
-                    <span className="px-4 py-2 bg-green-50 text-green-700 rounded-full text-sm font-medium border border-green-100">
+                    <span className="px-4 py-2 bg-green-50 text-green-700 rounded-full text-xs font-bold uppercase tracking-wider border border-green-100">
                       Member
                     </span>
                   ) : (
                     <button
                       onClick={() => handleJoin(org.id)}
                       disabled={isRequested || loading}
-                      className="px-6 py-2 bg-indigo-50 text-indigo-600 rounded-lg font-semibold hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-50 border border-indigo-100"
+                      className="px-6 py-2 bg-brand-primary text-white rounded-lg font-bold uppercase tracking-wider hover:bg-brand-primary/90 transition-all disabled:opacity-50 shadow-lg shadow-brand-primary/20"
                     >
                       {isRequested ? 'Request Sent' : 'Request to Join'}
                     </button>
@@ -145,20 +145,20 @@ export default function AdminOrgDiscovery() {
         )}
       </div>
 
-      {myRequests.length > 0 && (
+       {myRequests.length > 0 && (
         <div className="mt-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Recent Requests</h2>
-          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-brand-slate mb-6">Your Recent Requests</h2>
+          <div className="bg-white rounded-2xl p-6 border border-brand-border shadow-sm">
             <div className="space-y-4">
               {myRequests.map((req) => (
                 <div key={req.id} className="flex justify-between items-center text-sm">
-                  <span className="font-semibold text-gray-700">
+                  <span className="font-bold text-brand-text">
                     {req.organization?.name || 'Loading organization...'}
                   </span>
-                  <span className={`capitalize px-3 py-1 rounded-full text-xs font-bold ${
+                  <span className={`capitalize px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                     req.status === 'approved' ? 'bg-green-100 text-green-700' :
                     req.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                    'bg-amber-100 text-amber-700'
+                    'bg-brand-primary/5 text-brand-primary'
                   }`}>
                     {req.status}
                   </span>

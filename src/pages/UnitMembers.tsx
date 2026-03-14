@@ -109,7 +109,7 @@ function MemberRow({
         <div className="flex items-center gap-2">
           <p className="text-sm font-medium text-gray-900 truncate">{member.name}</p>
           {member.section && (
-            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
+            <span className="rounded-full bg-brand-primary/5 px-2.5 py-1 text-xs font-semibold text-brand-primary">
               {member.section}
             </span>
           )}
@@ -128,17 +128,17 @@ function MemberRow({
         <div className="flex items-center gap-1 pr-2 flex-shrink-0">
           <button
             onClick={e => { e.stopPropagation(); onEdit(member) }}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-300 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-brand-slate/40 hover:bg-brand-primary/5 hover:text-brand-primary transition-colors"
           >
             <Pencil className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={e => { e.stopPropagation(); onDelete(member.id) }}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-300 hover:bg-red-50 hover:text-red-500 transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-brand-slate/40 hover:bg-red-50 hover:text-red-500 transition-colors"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
-          <ChevronRight className="h-4 w-4 text-gray-200 group-hover:text-gray-400 transition-colors" />
+          <ChevronRight className="h-4 w-4 text-brand-slate/20 group-hover:text-brand-slate transition-colors" />
         </div>
       )}
       {!canManage && (
@@ -418,7 +418,7 @@ export default function UnitMembers() {
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-brand-secondary">
       {/* Hidden file input for CSV */}
       <input
         ref={fileInputRef}
@@ -428,7 +428,7 @@ export default function UnitMembers() {
         onChange={handleFileChange}
       />
 
-      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-gray-100">
+      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-brand-border">
         <button
           onClick={() => navigate(`/admin/units/${unitId}`)}
           className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
@@ -437,8 +437,8 @@ export default function UnitMembers() {
           <ArrowLeft className="h-5 w-5 text-gray-600" />
         </button>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 truncate">{unitName}</p>
-          <p className="text-xs text-gray-400">
+          <p className="font-bold text-brand-text truncate">{unitName}</p>
+          <p className="text-xs text-brand-slate">
             Members ({members.filter(m => m.status === 'active').length} active)
           </p>
         </div>
@@ -462,7 +462,7 @@ export default function UnitMembers() {
         {panel === 'add' && (
           <form
             onSubmit={handleSave}
-            className="rounded-2xl bg-white p-5 ring-1 ring-gray-200 flex flex-col gap-4"
+            className="rounded-2xl bg-white p-5 border border-brand-border flex flex-col gap-4 shadow-xl shadow-brand-primary/5 animate-in fade-in slide-in-from-top-4 duration-300"
           >
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-gray-900">
@@ -505,9 +505,9 @@ export default function UnitMembers() {
                 <label htmlFor="member-status" className="text-sm font-medium text-gray-700">
                   Status
                 </label>
-                <select
+                 <select
                   id="member-status"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-brand-border bg-brand-secondary px-3 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-brand-primary/5 transition-all text-brand-text"
                   value={form.status}
                   onChange={e => setForm(f => ({ ...f, status: e.target.value as MemberStatus }))}
                 >
@@ -537,9 +537,9 @@ export default function UnitMembers() {
           </form>
         )}
 
-        {/* ── CSV import panel ─────────────────────────────────────────────── */}
+         {/* ── CSV import panel ─────────────────────────────────────────────── */}
         {panel === 'import' && (
-          <div className="rounded-2xl bg-white p-5 ring-1 ring-gray-200 flex flex-col gap-4">
+          <div className="rounded-2xl bg-white p-5 border border-brand-border flex flex-col gap-4 shadow-xl shadow-brand-slate/5 animate-in fade-in slide-in-from-top-4 duration-300">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-gray-900">Import from CSV</h3>
@@ -610,7 +610,7 @@ export default function UnitMembers() {
                   )}
                 </div>
 
-                <div className="overflow-x-auto rounded-xl ring-1 ring-gray-100">
+                 <div className="overflow-x-auto rounded-xl border border-brand-border">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">
@@ -720,21 +720,21 @@ Bob Smith,,Bass,active,1985-11-20`}
         )}
 
         {/* ── Search ──────────────────────────────────────────────────────── */}
-        <input
+         <input
           type="search"
           placeholder="Search members…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm shadow-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+          className="w-full rounded-xl border border-brand-border bg-white px-4 py-2.5 text-sm shadow-sm focus:border-brand-primary/50 focus:outline-none focus:ring-4 focus:ring-brand-primary/5 placeholder:text-brand-slate/40"
         />
 
         {/* ── Member list ─────────────────────────────────────────────────── */}
-        {loading ? (
+         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-700 border-t-transparent" />
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="rounded-2xl bg-white p-10 text-center ring-1 ring-gray-100">
+         ) : filtered.length === 0 ? (
+          <div className="rounded-2xl bg-white p-10 text-center border border-brand-border">
             <Users className="mx-auto mb-3 h-10 w-10 text-gray-200" />
             <p className="font-medium text-gray-600">
               {search ? 'No members match your search' : 'No members yet'}
@@ -750,11 +750,11 @@ Bob Smith,,Bass,active,1985-11-20`}
             {Object.entries(grouped).map(([section, sectionMembers]) => (
               <div key={section}>
                 {section && (
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400 px-1">
+                   <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-slate px-1">
                     {section}
                   </p>
                 )}
-                <div className="rounded-2xl bg-white ring-1 ring-gray-100 overflow-hidden">
+                <div className="rounded-2xl bg-white border border-brand-border overflow-hidden shadow-sm">
                   {sectionMembers.map(m => (
                     <MemberRow
                       key={m.id}

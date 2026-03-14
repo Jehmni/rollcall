@@ -17,10 +17,10 @@ export function Input({ label, error, className = '', id, ...props }: InputProps
       <input
         id={inputId}
         className={`
-          w-full rounded-lg border px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-          disabled:bg-gray-50 disabled:text-gray-500
-          ${error ? 'border-red-400 bg-red-50' : 'border-gray-300 bg-white'}
+          w-full rounded-lg border px-3 py-2.5 text-sm text-brand-text placeholder-brand-slate/50
+          focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary
+          disabled:bg-brand-secondary disabled:text-brand-slate
+          ${error ? 'border-red-400 bg-red-50' : 'border-brand-border bg-white'}
           ${className}
         `}
         {...props}

@@ -11,14 +11,14 @@ Everything in Rollcally starts with an **Organization** (this could be your comm
 If you are the primary leader, you'll start by creating your Organization. 
 1. **Register**: Sign up as an administrator.
 2. **Setup**: Name your organization (e.g., "St. Peter’s Bolton").
-3. **The Dashboard**: Once created, you have the "Master Key" to the organization. You can manage everything, including all units, settings, and deletion, regardless of who created them.
+3. **The Dashboard**: Once created, you have the "Master Key" to the organization. You have full CRUD authority over all units, members, and settings within the organization, even if they were created by other admins.
 
 ### Use Case B: For Joining an Existing Organization
 If your church/club already uses Rollcally:
 1. **Discover**: Search for your organization's name in the "Discover" section.
 2. **Request to Join**: Send a request to the owner to be added as an admin.
 3. **Approval**: Once the owner approves you, you’ll see the organization's units on your dashboard.
-4. **Permissions**: As an admin (Member), you can create your own units and manage them. However, you will have "View Only" access to units created by others unless you are the Organization Owner.
+4. **Permissions**: As an admin (Member), you can create your own units and manage them. However, you will have "View Only" access to units created by others unless you are the Organization Owner, who maintains full oversight.
 
 ---
 
@@ -28,7 +28,7 @@ Organizations are big, so Rollcally breaks them down into **Units**.
 
 ### Use Case: Managing a Unit
 As an admin, you can create a Unit to manage your specific department.
-* **Distributed Responsibility**: If you create a unit, *you* are responsible for it. The organization owner has full oversight and can edit or delete it, but other admins in the organization can only view your unit's data without making changes. This ensures data integrity and prevents unauthorized modifications.
+* **Distributed Responsibility**: If you create a unit, *you* are responsible for it. The Organization Owner has full oversight and can edit or delete it, but other admins in the organization can only view your unit's data without making changes. This ensures data integrity and prevents unauthorized modifications.
 
 ---
 

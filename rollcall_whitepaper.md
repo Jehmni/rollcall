@@ -23,7 +23,7 @@ A built-in notification engine monitors member birthdays, firing alerts to admin
 
 ### 3.3 Multi-Admin Governance
 The platform supports a sophisticated multi-admin hierarchy:
-- **Owners**: Can create organizations, manage global settings, and have full CRUD authority over *all* units within their organization.
+- **Owners**: Can create organizations, manage global settings, and have full CRUD authority over *all* units within their organization, regardless of who created them.
 - **Unit Managers (Creators)**: Admins who have full CRUD authority over the specific units they personally created.
 - **Member Admins**: Can discover organizations and view all units within them, but their management actions are restricted to units they own, preventing administrative burnout while maintaining strict data governance.
 
@@ -43,8 +43,10 @@ The frontend is a high-performance **React** application built with **Vite**.
 
 ### 4.3 Visual Identity & User Experience
 Rollcally is designed to feel premium and state-of-the-art. 
-- **Aesthetic Direction**: Obsidian blacks, metallic golds, and deep indigo gradients create a sophisticated visual profile.
-- **Micro-Interactions**: Subtle hover effects and layout transitions provide immediate feedback, making the interface feel alive and responsive.
+- **90/10 Design Principle**: Adheres to a strict "90/10" rule—90% clean white space for readability and 10% high-impact brand color (#1F3A8A) for identity and active elements.
+- **Aesthetic Direction**: Pure white backgrounds, subtle Cool Slate Grey (#F8FAFC) secondary fields, and deep royal blue accents create a professional, high-contrast profile.
+- **Modern Typography**: Utilizes the **Inter** font family for maximum legibility and a premium, contemporary feel.
+- **Micro-Interactions**: Subtle hover effects, smooth transitions, and refined shadows provide immediate feedback, making the interface feel alive and responsive.
 - **Mobile-First Design**: The interface adapts fluidly to mobile devices, ensuring that church leaders and administrators can manage their communities on the go.
 
 ## 5. Security & Privacy

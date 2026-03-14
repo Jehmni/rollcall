@@ -8,10 +8,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  primary: 'bg-blue-700 text-white hover:bg-blue-800 active:bg-blue-900 disabled:bg-blue-300',
-  secondary: 'bg-white text-blue-700 border border-blue-700 hover:bg-blue-50 disabled:opacity-50',
+  primary: 'bg-brand-primary text-white hover:opacity-90 active:scale-[0.98] disabled:bg-brand-slate/50',
+  secondary: 'bg-white text-brand-primary border border-brand-border hover:bg-brand-secondary disabled:opacity-50',
   danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300',
-  ghost: 'text-gray-600 hover:bg-gray-100 disabled:opacity-50',
+  ghost: 'text-brand-slate hover:bg-brand-secondary disabled:opacity-50',
 }
 
 const sizes = {

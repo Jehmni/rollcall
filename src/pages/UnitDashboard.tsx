@@ -30,17 +30,17 @@ function formatDate(dateStr: string) {
 
 function ServiceCard({ service, unitId, onClick }: { service: Service; unitId: string; onClick: () => void }) {
   const status = serviceStatus(service.date)
-  const statusStyle = { today: 'bg-blue-100 text-blue-700', upcoming: 'bg-green-100 text-green-700', past: 'bg-gray-100 text-gray-500' }[status]
+  const statusStyle = { today: 'bg-brand-primary/10 text-brand-primary', upcoming: 'bg-green-100 text-green-700', past: 'bg-brand-secondary text-brand-slate' }[status]
   const statusLabel = { today: 'Today', upcoming: 'Upcoming', past: 'Past' }[status]
-  const iconBg = { today: 'bg-blue-700', upcoming: 'bg-green-600', past: 'bg-gray-200' }[status]
-  const iconColor = status === 'past' ? 'text-gray-400' : 'text-white'
+  const iconBg = { today: 'bg-brand-primary', upcoming: 'bg-green-600', past: 'bg-brand-secondary' }[status]
+  const iconColor = status === 'past' ? 'text-brand-slate' : 'text-white'
 
   void unitId // used by parent for navigation
 
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between rounded-2xl bg-white px-4 py-4 ring-1 ring-gray-100 hover:ring-blue-200 hover:shadow-sm transition-all text-left"
+      className="w-full flex items-center justify-between rounded-2xl bg-white px-4 py-4 border border-brand-border hover:border-brand-primary/30 hover:shadow-md transition-all text-left"
     >
       <div className="flex items-center gap-3">
         <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
@@ -48,10 +48,10 @@ function ServiceCard({ service, unitId, onClick }: { service: Service; unitId: s
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold text-gray-900">{EVENT_LABEL[service.service_type]}</p>
+            <p className="text-sm font-semibold text-brand-text">{EVENT_LABEL[service.service_type]}</p>
             <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusStyle}`}>{statusLabel}</span>
           </div>
-          <p className="text-xs text-gray-400 mt-0.5">{formatDate(service.date)}</p>
+          <p className="text-xs text-brand-slate/60 mt-0.5">{formatDate(service.date)}</p>
         </div>
       </div>
       <ChevronRight className="h-5 w-5 text-gray-300 flex-shrink-0" />
@@ -176,8 +176,8 @@ export default function UnitDashboard() {
   const past = services.filter(s => s.date < today)
 
   return (
-    <div className="min-h-screen bg-gray-50 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-gray-50 to-gray-50">
-      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-gray-100">
+    <div className="min-h-screen bg-brand-secondary">
+      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-brand-border">
         <button
           onClick={() => navigate(isSuper && unit ? `/admin/orgs/${unit.org_id}` : '/admin')}
           className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
@@ -186,10 +186,10 @@ export default function UnitDashboard() {
           <ArrowLeft className="h-5 w-5 text-gray-600" />
         </button>
         <div className="flex-1 min-w-0">
-          <h1 className="font-bold text-gray-900 truncate">{unit?.name ?? 'Unit'}</h1>
+          <h1 className="font-bold text-brand-text truncate">{unit?.name ?? 'Unit'}</h1>
           <div className="flex items-center gap-2">
-            {orgName && <p className="text-xs text-blue-600 font-medium">{orgName}</p>}
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider bg-gray-100 px-1.5 py-0.5 rounded-md">
+            {orgName && <p className="text-xs text-brand-primary font-medium">{orgName}</p>}
+            <span className="text-[10px] text-brand-slate uppercase tracking-wider bg-brand-secondary px-1.5 py-0.5 rounded-md border border-brand-border">
               {userRole === 'owner' ? 'Org Owner' : isOwnerOrCreator ? 'Unit Manager' : 'View Only'}
             </span>
           </div>
@@ -200,12 +200,12 @@ export default function UnitDashboard() {
             <Users className="h-4 w-4" />
           </Button>
           {isOwnerOrCreator && (
-            <Button variant="ghost" size="sm" onClick={() => setShowSettings(!showSettings)} className={showSettings ? 'bg-gray-100' : ''} title="Unit Settings">
+            <Button variant="ghost" size="sm" onClick={() => setShowSettings(!showSettings)} className={showSettings ? 'bg-brand-secondary' : ''} title="Unit Settings">
               <Settings className="h-4 w-4" />
             </Button>
           )}
           {isSuper && (
-            <Button variant="ghost" size="sm" onClick={() => setShowAdmins(v => !v)} className={showAdmins ? 'bg-gray-100' : ''} title="Unit Admins">
+            <Button variant="ghost" size="sm" onClick={() => setShowAdmins(v => !v)} className={showAdmins ? 'bg-brand-secondary' : ''} title="Unit Admins">
               <UserCog className="h-4 w-4" />
             </Button>
           )}
@@ -219,12 +219,12 @@ export default function UnitDashboard() {
 
         {showSettings && (
           <section className="animate-in fade-in slide-in-from-top-4 duration-300">
-             <Card className="p-6 border-blue-100 bg-white shadow-xl shadow-blue-100/20">
+             <Card className="p-6 border-brand-primary/10 bg-white shadow-xl shadow-brand-primary/5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-blue-600" /> Unit Settings
+                <h2 className="text-lg font-bold text-brand-text flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-brand-primary" /> Unit Settings
                 </h2>
-                <button onClick={() => setShowSettings(false)} className="text-gray-400 hover:text-gray-600">
+                <button onClick={() => setShowSettings(false)} className="text-brand-slate hover:text-brand-text">
                   <X className="h-5 w-5" />
                 </button>
               </div>
@@ -260,9 +260,9 @@ export default function UnitDashboard() {
         {/* Unit admins panel (super admin only) */}
         {isSuper && showAdmins && (
           <section className="animate-in fade-in slide-in-from-top-4 duration-300">
-            <Card className="p-6 border-gray-100 bg-white shadow-xl shadow-gray-200/30">
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
-                <UserCog className="h-5 w-5 text-gray-500" /> Managed Unit Admins
+            <Card className="p-6 border-brand-border bg-white shadow-xl shadow-brand-slate/5">
+              <h3 className="text-lg font-bold text-brand-text flex items-center gap-2 mb-4">
+                <UserCog className="h-5 w-5 text-brand-slate" /> Managed Unit Admins
               </h3>
               <form onSubmit={handleAddAdmin} className="flex gap-2 mb-4">
                 <Input
@@ -300,7 +300,7 @@ export default function UnitDashboard() {
         {/* Create service */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500">Events</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-brand-slate">Events</h2>
             {isOwnerOrCreator && (
               <Button size="sm" onClick={() => setShowCreate(!showCreate)} className="shadow-lg shadow-blue-200/50">
                 <Plus className="h-4 w-4 mr-1.5" /> New Event
@@ -309,23 +309,23 @@ export default function UnitDashboard() {
           </div>
 
           {showCreate && (
-            <form onSubmit={handleCreate} className="mb-8 rounded-2xl bg-white p-6 shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+            <form onSubmit={handleCreate} className="mb-8 rounded-2xl bg-white p-6 shadow-xl shadow-brand-primary/5 border border-brand-border flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
               <div className="flex items-center gap-3 mb-1">
-                <div className="p-2 bg-blue-50 rounded-lg">
-                  <CalendarDays className="h-5 w-5 text-blue-700" />
+                <div className="p-2 bg-brand-primary/5 rounded-lg">
+                  <CalendarDays className="h-5 w-5 text-brand-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Schedule Event</h3>
-                  <p className="text-xs text-gray-500">Set a date and type for your next gathering.</p>
+                  <h3 className="font-semibold text-brand-text">Schedule Event</h3>
+                  <p className="text-xs text-brand-slate">Set a date and type for your next gathering.</p>
                 </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input label="Date" type="date" value={newDate} onChange={e => setNewDate(e.target.value)} required />
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700">Event Type</label>
+                  <label className="text-sm font-semibold text-brand-text">Event Type</label>
                   <select
-                    className="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium h-[50px]"
+                    className="w-full rounded-xl border border-brand-border bg-brand-secondary px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-brand-primary/5 transition-all font-medium h-[50px] text-brand-text"
                     value={newType}
                     onChange={e => setNewType(e.target.value as ServiceType)}
                   >
@@ -345,17 +345,17 @@ export default function UnitDashboard() {
           {/* Service list */}
           {servicesLoading ? (
             <div className="flex justify-center py-20">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-700 border-t-transparent" />
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
             </div>
           ) : services.length === 0 ? (
-            <Card className="rounded-3xl bg-white p-12 text-center shadow-xl shadow-gray-200/50 border border-gray-50 overflow-hidden relative">
-               <div className="absolute -top-10 -right-10 h-40 w-40 bg-blue-50 rounded-full opacity-50 blur-3xl"></div>
-              <CalendarDays className="mx-auto mb-6 h-16 w-16 text-blue-100" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">No events scheduled</h3>
-              <p className="text-gray-500 mb-8 max-w-sm mx-auto">
+            <Card className="rounded-3xl bg-white p-12 text-center border-brand-border overflow-hidden relative">
+               <div className="absolute -top-10 -right-10 h-40 w-40 bg-brand-primary/5 rounded-full opacity-50 blur-3xl"></div>
+              <CalendarDays className="mx-auto mb-6 h-16 w-16 text-brand-primary/10" />
+              <h3 className="text-xl font-bold text-brand-text mb-2">No events scheduled</h3>
+              <p className="text-brand-slate mb-8 max-w-sm mx-auto">
                 Create your first event to generate a check-in QR code and track attendance.
               </p>
-              <Button onClick={() => setShowCreate(true)} className="px-8 shadow-xl shadow-blue-100">
+              <Button onClick={() => setShowCreate(true)} className="px-8 shadow-xl shadow-brand-primary/20">
                 Setup your first Event
               </Button>
             </Card>
@@ -371,7 +371,7 @@ export default function UnitDashboard() {
               )}
               {past.length > 0 && (
                 <div className="flex flex-col gap-3 opacity-80">
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 ml-1">History</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-brand-slate ml-1">History</p>
                   {past.map(s => (
                     <ServiceCard key={s.id} service={s} unitId={unitId!} onClick={() => navigate(`/admin/units/${unitId}/events/${s.id}`)} />
                   ))}

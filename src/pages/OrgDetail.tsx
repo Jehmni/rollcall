@@ -27,31 +27,31 @@ function UnitCard({
     <div className="flex items-center gap-2">
       <button
         onClick={onClick}
-        className="flex-1 flex items-center justify-between rounded-2xl bg-white px-4 py-4 ring-1 ring-gray-100 hover:ring-blue-200 hover:shadow-sm transition-all text-left"
+        className="flex-1 flex items-center justify-between rounded-2xl bg-white px-4 py-4 border border-brand-border hover:border-brand-primary/30 hover:shadow-md transition-all text-left"
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-primary/5 text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-colors">
             <Users className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-900">{unit.name}</p>
-            {unit.description && <p className="text-xs text-gray-400">{unit.description}</p>}
+            <p className="text-sm font-bold text-brand-text">{unit.name}</p>
+            {unit.description && <p className="text-xs text-brand-slate">{unit.description}</p>}
           </div>
         </div>
-        <ChevronRight className="h-5 w-5 text-gray-300 flex-shrink-0" />
+        <ChevronRight className="h-5 w-5 text-brand-slate/40 flex-shrink-0 group-hover:text-brand-primary transition-colors" />
       </button>
       {canManage && (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={onEdit}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-brand-slate/40 hover:bg-brand-primary/5 hover:text-brand-primary transition-colors"
             title="Edit Unit"
           >
             <Edit2 className="h-4 w-4" />
           </button>
           <button
             onClick={onDelete}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-brand-slate/40 hover:bg-red-50 hover:text-red-500 transition-colors"
             title="Delete Unit"
           >
             <Trash2 className="h-4 w-4" />
@@ -181,48 +181,47 @@ export default function OrgDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-gray-50 to-gray-50">
-      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-gray-100">
+    <div className="min-h-screen bg-brand-secondary">
+      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-brand-border">
         <button
           onClick={() => navigate('/admin')}
-          className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-center rounded-xl p-2 hover:bg-brand-secondary transition-colors"
           title="Back to Dashboard"
         >
-          <ArrowLeft className="h-5 w-5 text-gray-600" />
+          <ArrowLeft className="h-5 w-5 text-brand-slate" />
         </button>
         <div className="flex-1 min-w-0">
-          <h1 className="font-bold text-gray-900 truncate">{org?.name ?? 'Organization'}</h1>
-          <p className="text-xs text-blue-600 font-medium">
+          <h1 className="font-bold text-brand-text truncate">{org?.name ?? 'Organization'}</h1>
+          <p className="text-xs text-brand-primary font-bold uppercase tracking-wider">
             {isOwner ? 'Organization Owner' : 'Member Admin'}
           </p>
         </div>
         {isOwner && (
-          <Button variant="ghost" size="sm" onClick={() => setShowSettings(!showSettings)} className={showSettings ? 'bg-gray-100' : ''}>
+          <Button variant="ghost" size="sm" onClick={() => setShowSettings(!showSettings)} className={showSettings ? 'bg-brand-primary/5' : ''}>
             <Settings className="h-4 w-4" />
           </Button>
         )}
       </header>
 
       <div className="mx-auto max-w-2xl px-4 py-8 flex flex-col gap-8">
-        
-        {isOwner && (
-          <div className="flex p-1 bg-gray-100 rounded-xl max-w-sm">
+                {isOwner && (
+          <div className="flex p-1 bg-brand-primary/5 rounded-xl max-w-sm border border-brand-primary/5">
             <button
               onClick={() => setActiveTab('units')}
-              className={`flex-1 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                activeTab === 'units' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              className={`flex-1 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === 'units' ? 'bg-white text-brand-primary shadow-sm border border-brand-primary/10' : 'text-brand-slate/60 hover:text-brand-primary'
               }`}
             >
               Units
             </button>
             <button
               onClick={() => setActiveTab('requests')}
-              className={`flex-1 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                activeTab === 'requests' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              className={`flex-1 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === 'requests' ? 'bg-white text-brand-primary shadow-sm border border-brand-primary/10' : 'text-brand-slate/60 hover:text-brand-primary'
               }`}
             >
               Join Requests {joinRequests.length > 0 && (
-                <span className="ml-1 px-2 py-0.5 bg-indigo-100 text-indigo-600 rounded-full text-[10px]">
+                <span className="ml-1 px-2 py-0.5 bg-brand-primary text-white rounded-full text-[10px]">
                   {joinRequests.length}
                 </span>
               )}
@@ -232,10 +231,10 @@ export default function OrgDetail() {
         
         {showSettings && (
           <section className="animate-in fade-in slide-in-from-top-4 duration-300">
-             <Card className="p-6 border-blue-100 bg-white shadow-xl shadow-blue-100/20">
+              <Card className="p-6 border-brand-border bg-white shadow-xl shadow-brand-primary/5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-blue-600" /> Organization Settings
+                <h2 className="text-lg font-bold text-brand-text flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-brand-primary" /> Organization Settings
                 </h2>
                 <button onClick={() => setShowSettings(false)} className="text-gray-400 hover:text-gray-600">
                   <X className="h-5 w-5" />
@@ -266,22 +265,22 @@ export default function OrgDetail() {
 
         {activeTab === 'units' ? (
           <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500">Units</h2>
-              <Button size="sm" onClick={() => { setShowCreate(!showCreate); setEditingUnit(null); setNewName(''); setNewDesc('') }} className="shadow-lg shadow-blue-200/50">
+             <div className="flex items-center justify-between mb-6">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-brand-slate">Units</h2>
+              <Button size="sm" onClick={() => { setShowCreate(!showCreate); setEditingUnit(null); setNewName(''); setNewDesc('') }} className="shadow-lg shadow-brand-primary/20">
                 <Plus className="h-4 w-4 mr-1.5" /> New Unit
               </Button>
             </div>
 
-            {(showCreate || editingUnit) && (
-              <form onSubmit={editingUnit ? handleUpdateUnit : handleCreate} className="mb-8 rounded-2xl bg-white p-6 shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+             {(showCreate || editingUnit) && (
+              <form onSubmit={editingUnit ? handleUpdateUnit : handleCreate} className="mb-8 rounded-2xl bg-white p-6 shadow-xl shadow-brand-primary/5 border border-brand-border flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
                 <div className="flex items-center gap-3 mb-1">
-                  <div className="p-2 bg-blue-50 rounded-lg">
-                    {editingUnit ? <Edit2 className="h-5 w-5 text-blue-700" /> : <Plus className="h-5 w-5 text-blue-700" />}
+                  <div className="p-2 bg-brand-primary/5 rounded-lg">
+                    {editingUnit ? <Edit2 className="h-5 w-5 text-brand-primary" /> : <Plus className="h-5 w-5 text-brand-primary" />}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{editingUnit ? 'Edit Unit' : 'Create New Unit'}</h3>
-                    <p className="text-xs text-gray-500 text-sm">
+                    <h3 className="font-semibold text-brand-text">{editingUnit ? 'Edit Unit' : 'Create New Unit'}</h3>
+                    <p className="text-brand-slate text-sm">
                       Distribute responsibility by creating units you manage.
                     </p>
                   </div>
@@ -311,19 +310,19 @@ export default function OrgDetail() {
               </form>
             )}
 
-            {loading ? (
+             {loading ? (
               <div className="flex justify-center py-20">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-700 border-t-transparent" />
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
               </div>
             ) : units.length === 0 ? (
-              <Card className="rounded-3xl bg-white p-12 text-center shadow-xl shadow-gray-200/50 border border-gray-50 overflow-hidden relative">
-                <div className="absolute -bottom-10 -left-10 h-40 w-40 bg-blue-50 rounded-full opacity-50 blur-3xl"></div>
-                <Users className="mx-auto mb-6 h-16 w-16 text-blue-100" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No units yet</h3>
-                <p className="text-gray-500 mb-8 max-w-sm mx-auto">
+              <Card className="rounded-3xl bg-white p-12 text-center border-brand-border overflow-hidden relative">
+                <div className="absolute -bottom-10 -left-10 h-40 w-40 bg-brand-primary/5 rounded-full opacity-50 blur-3xl"></div>
+                <Users className="mx-auto mb-6 h-16 w-16 text-brand-primary/10" />
+                <h3 className="text-xl font-bold text-brand-text mb-2">No units yet</h3>
+                <p className="text-brand-slate mb-8 max-w-sm mx-auto">
                   Create a unit to start managing members and tracking attendance for this organization.
                 </p>
-                <Button onClick={() => setShowCreate(true)} className="px-8 shadow-xl shadow-blue-100">
+                <Button onClick={() => setShowCreate(true)} className="px-8 shadow-xl shadow-brand-primary/20">
                   Setup your first Unit
                 </Button>
               </Card>
@@ -343,26 +342,26 @@ export default function OrgDetail() {
             )}
           </section>
         ) : (
-          <section className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+           <section className="animate-in fade-in slide-in-from-bottom-2 duration-300">
              <div className="flex items-center justify-between mb-6">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500">Pending Join Requests</h2>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-brand-slate">Pending Join Requests</h2>
             </div>
             
             {loadingRequests ? (
               <div className="flex justify-center py-10">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-700 border-t-transparent" />
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
               </div>
-            ) : joinRequests.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-200 text-gray-500 italic">
+             ) : joinRequests.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-brand-border text-brand-slate italic">
                 No pending requests to join this organization.
               </div>
             ) : (
               <div className="space-y-4">
                 {joinRequests.map(req => (
-                  <div key={req.id} className="p-5 bg-white rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center">
+                  <div key={req.id} className="p-5 bg-white rounded-2xl border border-brand-border shadow-sm flex justify-between items-center group hover:border-brand-primary/30 transition-all">
                     <div>
-                      <p className="font-bold text-gray-900">{req.admin?.email}</p>
-                      <p className="text-xs text-gray-500">Requested {new Date(req.created_at).toLocaleDateString()}</p>
+                      <p className="font-bold text-brand-text">{req.admin?.email}</p>
+                      <p className="text-xs text-brand-slate">Requested {new Date(req.created_at).toLocaleDateString()}</p>
                     </div>
                     <div className="flex gap-2">
                       <Button

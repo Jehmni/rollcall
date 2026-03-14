@@ -30,27 +30,27 @@ function OrgCard({
     <div className="flex items-center gap-2 group">
       <button
         onClick={onClick}
-        className="flex-1 flex items-center justify-between rounded-2xl bg-white px-4 py-4 ring-1 ring-gray-100 hover:ring-blue-200 hover:shadow-sm transition-all text-left"
+        className="flex-1 flex items-center justify-between rounded-2xl bg-white px-4 py-4 border border-brand-border hover:border-brand-primary/30 hover:shadow-md transition-all text-left"
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 group-hover:bg-blue-600 transition-colors">
-            <Building2 className="h-5 w-5 text-blue-700 group-hover:text-white transition-colors" />
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-primary/5 group-hover:bg-brand-primary transition-colors">
+            <Building2 className="h-5 w-5 text-brand-primary group-hover:text-white transition-colors" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-900">{org.name}</p>
-            <p className="text-xs text-gray-400">
+            <p className="text-sm font-bold text-brand-text">{org.name}</p>
+            <p className="text-xs text-brand-slate">
               {new Date(org.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
             </p>
           </div>
         </div>
-        <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-blue-500 transition-colors" />
+        <ChevronRight className="h-5 w-5 text-brand-slate/40 group-hover:text-brand-primary transition-colors" />
       </button>
       
       {canManage && (
         <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={onRename}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-brand-slate hover:bg-brand-primary/5 hover:text-brand-primary transition-colors"
             title="Rename Organization"
           >
             <Edit2 className="h-4 w-4" />
@@ -138,20 +138,20 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-gray-50 to-gray-50">
-      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-gray-100">
+    <div className="min-h-screen bg-brand-secondary">
+      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-brand-border">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-center rounded-xl p-2 hover:bg-brand-secondary transition-colors"
           title="Back to Landing"
         >
-          <ArrowLeft className="h-5 w-5 text-gray-600" />
+          <ArrowLeft className="h-5 w-5 text-brand-slate" />
         </button>
         <div className="flex flex-1 items-center gap-2">
-          <Building2 className="h-5 w-5 text-blue-700" />
-          <span className="font-semibold text-gray-900">Rollcally</span>
+          <Building2 className="h-5 w-5 text-brand-primary" />
+          <span className="font-bold text-brand-text">Rollcally</span>
           {isSuper && (
-            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">Super Admin</span>
+            <span className="rounded-full bg-brand-primary/5 px-2 py-0.5 text-xs font-bold text-brand-primary border border-brand-primary/10">Super Admin</span>
           )}
         </div>
         <Button variant="ghost" size="sm" onClick={signOut} title="Sign Out">
@@ -159,14 +159,10 @@ export default function AdminDashboard() {
         </Button>
       </header>
 
-      <div className="mx-auto max-w-2xl px-4 py-8 flex flex-col gap-6 relative">
-        {/* Animated Background Blobs (subtle) */}
-        <div className="absolute top-20 -left-20 w-64 h-64 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute top-40 -right-20 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-
+      <div className="mx-auto max-max-w-2xl px-4 py-8 flex flex-col gap-6 relative">
         <section className="relative z-10">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-brand-slate">
               {isSuper ? 'All Organizations' : 'Your Organizations'}
             </h2>
             <div className="flex gap-2">
@@ -177,21 +173,20 @@ export default function AdminDashboard() {
               >
                 Find an Organization
               </Button>
-              <Button size="sm" onClick={() => { setShowCreate(!showCreate); setEditingOrg(null); setNewName('') }} className="shadow-lg shadow-blue-200/50">
+              <Button size="sm" onClick={() => { setShowCreate(!showCreate); setEditingOrg(null); setNewName('') }} className="shadow-lg shadow-brand-primary/20">
                 <Plus className="h-4 w-4 mr-1.5" /> New Organization
               </Button>
             </div>
           </div>
-激
           {(showCreate || editingOrg) && (
-            <form onSubmit={editingOrg ? handleUpdate : handleCreate} className="mb-6 rounded-2xl bg-white p-6 shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+            <form onSubmit={editingOrg ? handleUpdate : handleCreate} className="mb-6 rounded-2xl bg-white p-6 shadow-xl shadow-brand-primary/5 border border-brand-border flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
               <div className="flex items-center gap-3 mb-1">
-                <div className="p-2 bg-blue-50 rounded-lg">
-                  {editingOrg ? <Edit2 className="h-5 w-5 text-blue-700" /> : <Building2 className="h-5 w-5 text-blue-700" />}
+                <div className="p-2 bg-brand-primary/5 rounded-lg">
+                  {editingOrg ? <Edit2 className="h-5 w-5 text-brand-primary" /> : <Building2 className="h-5 w-5 text-brand-primary" />}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">{editingOrg ? 'Rename Organization' : 'Start a New Organization'}</h3>
-                  <p className="text-xs text-gray-500">
+                  <h3 className="font-semibold text-brand-text">{editingOrg ? 'Rename Organization' : 'Start a New Organization'}</h3>
+                  <p className="text-xs text-brand-slate">
                     {editingOrg ? 'Update the name of your organization.' : 'Choose a name for your group, team, or organization.'}
                   </p>
                 </div>
@@ -216,17 +211,17 @@ export default function AdminDashboard() {
 
           {loading ? (
             <div className="flex justify-center py-20">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-700 border-t-transparent" />
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
             </div>
           ) : orgs.length === 0 ? (
-            <Card className="rounded-3xl bg-white p-12 text-center shadow-xl shadow-gray-200/50 border border-gray-50 overflow-hidden relative">
-              <div className="absolute -top-10 -right-10 h-40 w-40 bg-blue-50 rounded-full opacity-50 blur-3xl"></div>
-              <Building2 className="mx-auto mb-6 h-16 w-16 text-blue-100" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Welcome to Rollcally</h3>
-              <p className="text-gray-500 mb-8 max-w-sm mx-auto">
+            <Card className="rounded-3xl bg-white p-12 text-center border-brand-border overflow-hidden relative">
+              <div className="absolute -top-10 -right-10 h-40 w-40 bg-brand-primary/5 rounded-full opacity-50 blur-3xl"></div>
+              <Building2 className="mx-auto mb-6 h-16 w-16 text-brand-primary/10" />
+              <h3 className="text-xl font-bold text-brand-text mb-2">Welcome to Rollcally</h3>
+              <p className="text-brand-slate mb-8 max-w-sm mx-auto">
                 Ready to start tracking? Create your first organization to begin managing units and take attendance.
               </p>
-              <Button onClick={() => setShowCreate(true)} className="px-8 shadow-xl shadow-blue-100">
+              <Button onClick={() => setShowCreate(true)} className="px-8 shadow-xl shadow-brand-primary/20">
                 Setup your first Organization
               </Button>
             </Card>
@@ -260,24 +255,24 @@ export default function AdminDashboard() {
 
         {!isSuper && adminUnits.length > 0 && (
           <section className="mt-4">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Direct Unit Access</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-brand-slate mb-4">Direct Unit Access</h2>
             <div className="grid gap-3">
               {adminUnits.map(u => (
                 <button
                   key={u.id}
                   onClick={() => navigate(`/admin/units/${u.id}`)}
-                  className="group w-full flex items-center justify-between rounded-2xl bg-white px-5 py-4 shadow-sm border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all text-left"
+                  className="group w-full flex items-center justify-between rounded-2xl bg-white px-5 py-4 shadow-sm border border-brand-border hover:border-brand-primary/30 hover:shadow-md transition-all text-left"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-700 group-hover:bg-blue-700 group-hover:text-white transition-colors">
+                   <div className="flex items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-primary/5 text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-colors">
                       <Users className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">{u.name}</p>
-                      <p className="text-xs text-gray-400">{u.organization.name}</p>
+                      <p className="font-bold text-brand-text">{u.name}</p>
+                      <p className="text-xs text-brand-slate">{u.organization.name}</p>
                     </div>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="h-5 w-5 text-brand-slate/40 group-hover:text-brand-primary transform group-hover:translate-x-1 transition-all" />
                 </button>
               ))}
             </div>

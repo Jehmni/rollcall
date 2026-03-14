@@ -167,37 +167,37 @@ export default function AdminServiceDetail() {
 
   if (serviceLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-700 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-brand-secondary">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
       </div>
     )
   }
 
   if (!service) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
-        <p className="text-gray-600">Event not found.</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 bg-brand-secondary text-center">
+        <p className="text-brand-slate">Event not found.</p>
         <Button variant="secondary" onClick={() => navigate(`/admin/units/${unitId}`)}>Back to unit</Button>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-brand-secondary">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-gray-100">
+      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-brand-border">
         <button
           onClick={() => navigate(`/admin/units/${unitId}`)}
-          className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-center rounded-xl p-2 hover:bg-brand-secondary transition-colors"
           title="Back to Unit"
         >
-          <ArrowLeft className="h-5 w-5 text-gray-600" />
+          <ArrowLeft className="h-5 w-5 text-brand-slate" />
         </button>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 truncate">
+          <p className="font-bold text-brand-text truncate">
             {EVENT_LABEL[service.service_type]}
           </p>
-          <p className="text-xs text-gray-400">{formatDate(service.date)}</p>
+          <p className="text-xs text-brand-slate">{formatDate(service.date)}</p>
         </div>
         <Button variant="ghost" size="sm" onClick={refetch}>
           <RefreshCw className="h-4 w-4" />
@@ -206,26 +206,26 @@ export default function AdminServiceDetail() {
 
       <div className="mx-auto max-w-2xl px-4 py-6 flex flex-col gap-6">
 
-        {/* QR Code section */}
-        <section className="rounded-2xl bg-white ring-1 ring-gray-100 overflow-hidden">
+         {/* QR Code section */}
+        <section className="rounded-2xl bg-white border border-brand-border overflow-hidden shadow-sm">
           <button
             onClick={() => setShowQR(v => !v)}
-            className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
+            className="w-full flex items-center justify-between px-5 py-4 hover:bg-brand-secondary transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100">
-                <QrCode className="h-5 w-5 text-blue-700" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary/5">
+                <QrCode className="h-5 w-5 text-brand-primary" />
               </div>
               <div className="text-left">
-                <p className="text-sm font-semibold text-gray-900">QR Code</p>
-                <p className="text-xs text-gray-400">Tap to {showQR ? 'hide' : 'show or print'}</p>
+                <p className="text-sm font-bold text-brand-text">QR Code</p>
+                <p className="text-xs text-brand-slate">Tap to {showQR ? 'hide' : 'show or print'}</p>
               </div>
             </div>
-            <span className="text-xs font-medium text-blue-600">{showQR ? 'Hide' : 'Show'}</span>
+            <span className="text-xs font-bold text-brand-primary uppercase tracking-wider">{showQR ? 'Hide' : 'Show'}</span>
           </button>
 
-          {showQR && (
-            <div className="border-t border-gray-50 px-5 py-5 flex flex-col items-center gap-4">
+           {showQR && (
+            <div className="border-t border-brand-border px-5 py-5 flex flex-col items-center gap-4 bg-brand-secondary/30">
               <QRCodeCanvas
                 id="service-qr"
                 value={qrUrl}
@@ -233,12 +233,12 @@ export default function AdminServiceDetail() {
                 includeMargin
                 level="H"
               />
-              <p className="text-xs text-gray-400 text-center break-all max-w-xs">{qrUrl}</p>
-              <Button variant="secondary" size="sm" onClick={downloadQR}>
+              <p className="text-xs text-brand-slate text-center break-all max-w-xs">{qrUrl}</p>
+              <Button variant="secondary" size="sm" onClick={downloadQR} className="shadow-sm">
                 <Download className="h-4 w-4" />
                 Download PNG
               </Button>
-              <p className="text-xs text-gray-400">Display on a screen or print for members to scan</p>
+              <p className="text-xs text-brand-slate/60 text-center font-medium">Display on a screen or print for members to scan</p>
             </div>
           )}
         </section>
@@ -252,16 +252,16 @@ export default function AdminServiceDetail() {
         </section>
 
         {/* Tabs */}
-        <section>
-          <div className="mb-4 flex rounded-xl bg-gray-100 p-1">
+         <section>
+          <div className="mb-4 flex rounded-xl bg-brand-primary/5 p-1 border border-brand-primary/5">
             {(['absent', 'present', 'all'] as const).map(t => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
-                className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
+                className={`flex-1 rounded-lg py-2 text-xs font-bold uppercase tracking-wider transition-all ${
                   tab === t
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-white text-brand-primary shadow-sm border border-brand-primary/10'
+                    : 'text-brand-slate/60 hover:text-brand-primary'
                 }`}
               >
                 {t === 'absent'
@@ -272,41 +272,42 @@ export default function AdminServiceDetail() {
               </button>
             ))}
           </div>
-
-          {/* Export buttons — shown when viewing absent list */}
+   {/* Export buttons — shown when viewing absent list */}
           {tab === 'absent' && absent.length > 0 && (
-            <div className="mb-4 flex gap-2 flex-wrap">
-              <span className="text-xs text-gray-400 self-center mr-1">Export absent list:</span>
+            <div className="mb-4 flex gap-2 flex-wrap items-center">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-slate/60 mr-1">Export absent list:</span>
               <button
                 onClick={() => exportTXT(absent, eventLabel)}
-                className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
+                className="flex items-center gap-1.5 rounded-lg border border-brand-border bg-white px-3 py-1.5 text-xs font-bold text-brand-slate hover:bg-brand-secondary transition-colors"
               >
                 <FileText className="h-3.5 w-3.5" />
                 TXT
               </button>
               <button
                 onClick={() => exportCSV(absent, eventLabel)}
-                className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
+                className="flex items-center gap-1.5 rounded-lg border border-brand-border bg-white px-3 py-1.5 text-xs font-bold text-brand-slate hover:bg-brand-secondary transition-colors"
               >
                 <FileSpreadsheet className="h-3.5 w-3.5" />
                 Excel (CSV)
               </button>
               <button
                 onClick={() => exportRTF(absent, eventLabel)}
-                className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
+                className="flex items-center gap-1.5 rounded-lg border border-brand-border bg-white px-3 py-1.5 text-xs font-bold text-brand-slate hover:bg-brand-secondary transition-colors"
               >
                 <FileText className="h-3.5 w-3.5" />
                 Word (RTF)
               </button>
             </div>
           )}
+        </section>
 
+        <section>
           {loading ? (
             <div className="flex justify-center py-10">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-700 border-t-transparent" />
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
             </div>
-          ) : displayMembers.length === 0 ? (
-            <p className="py-8 text-center text-sm text-gray-400">
+           ) : displayMembers.length === 0 ? (
+            <p className="py-8 text-center text-sm text-brand-slate">
               {tab === 'absent' ? 'All members have checked in!' : 'No members to show.'}
             </p>
           ) : (
@@ -314,11 +315,11 @@ export default function AdminServiceDetail() {
               {Object.entries(grouped).map(([section, members]) => (
                 <div key={section}>
                   {section && (
-                    <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    <h3 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-brand-slate/60 px-1">
                       {section}
                     </h3>
                   )}
-                  <div className="rounded-2xl bg-white ring-1 ring-gray-100 overflow-hidden">
+                  <div className="rounded-2xl bg-white border border-brand-border overflow-hidden shadow-sm">
                     {members.map((m, i) => (
                       <div
                         key={m.id}
@@ -332,10 +333,10 @@ export default function AdminServiceDetail() {
                               m.checked_in ? 'bg-green-500' : 'bg-red-400'
                             }`}
                           />
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">{m.name}</p>
+                           <div>
+                            <p className="text-sm font-bold text-brand-text">{m.name}</p>
                             {m.checkin_time ? (
-                              <p className="text-xs text-gray-400">
+                              <p className="text-xs text-brand-primary font-medium">
                                 Checked in at{' '}
                                 {new Date(m.checkin_time).toLocaleTimeString([], {
                                   hour: '2-digit',
@@ -343,14 +344,14 @@ export default function AdminServiceDetail() {
                                 })}
                               </p>
                             ) : (
-                              <p className="text-xs text-gray-400">{m.phone ?? 'No phone'}</p>
+                              <p className="text-xs text-brand-slate">{m.phone ?? 'No phone'}</p>
                             )}
                           </div>
                         </div>
-                        {m.phone && !m.checked_in && (
+                         {m.phone && !m.checked_in && (
                           <a
                             href={`tel:${m.phone}`}
-                            className="flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                            className="flex items-center gap-1.5 rounded-lg bg-brand-primary/5 px-3 py-1.5 text-xs font-bold text-brand-primary hover:bg-brand-primary/10 transition-all border border-brand-primary/10"
                           >
                             <Phone className="h-3.5 w-3.5" />
                             Call
@@ -385,14 +386,14 @@ export default function AdminServiceDetail() {
               Quick contact list
             </p>
             <div className="flex flex-col gap-1">
-              {absent.filter(m => m.phone).map(m => (
+               {absent.filter(m => m.phone).map(m => (
                 <a
                   key={m.id}
                   href={`tel:${m.phone}`}
-                  className="flex items-center justify-between rounded-lg px-2 py-1.5 hover:bg-amber-100"
+                  className="flex items-center justify-between rounded-lg px-2 py-1.5 hover:bg-amber-100 transition-colors"
                 >
-                  <span className="text-sm text-gray-900">{m.name}</span>
-                  <span className="text-sm text-blue-700">{m.phone}</span>
+                  <span className="text-sm font-medium text-brand-text">{m.name}</span>
+                  <span className="text-sm font-bold text-brand-primary">{m.phone}</span>
                 </a>
               ))}
             </div>

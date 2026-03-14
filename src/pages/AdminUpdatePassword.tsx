@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Save, CheckCircle2, ShieldAlert, ArrowLeft } from 'lucide-react'
+import { KeyRound, CheckCircle2, ShieldAlert, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
@@ -50,26 +50,24 @@ export default function AdminUpdatePassword() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-100 via-white to-white px-4 py-12 overflow-hidden relative">
-      {/* Animated Background Blobs */}
-      <div className="absolute top-0 -left-4 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-brand-secondary px-4 relative overflow-hidden">
+      <div className="absolute top-0 -left-6 w-96 h-96 bg-brand-primary/5 rounded-full blur-3xl -z-10 animate-blob"></div>
+      <div className="absolute bottom-0 -right-6 w-96 h-96 bg-brand-primary/5 rounded-full blur-3xl -z-10 animate-blob animation-delay-2000"></div>
 
       <div className="relative w-full max-w-md">
         <button
           onClick={() => navigate('/admin/login')}
-          className="absolute -top-12 left-0 flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-blue-600 transition-colors group"
+          className="absolute -top-12 left-0 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-brand-slate hover:text-brand-primary transition-colors group"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/50 backdrop-blur-sm ring-1 ring-gray-200 group-hover:ring-blue-200 group-hover:bg-blue-50">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-brand-border group-hover:border-brand-primary/30 group-hover:bg-brand-primary/5 transition-all">
             <ArrowLeft className="h-4 w-4" />
           </div>
           Back to Login
         </button>
 
         <div className="mb-8 flex flex-col items-center gap-4 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-700 shadow-xl shadow-blue-200 ring-4 ring-blue-50">
-            <Save className="h-8 w-8 text-white" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-primary shadow-2xl shadow-brand-primary/40 ring-4 ring-white">
+            <KeyRound className="h-8 w-8 text-white" />
           </div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">Set New Password</h1>
@@ -97,12 +95,13 @@ export default function AdminUpdatePassword() {
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               {error && (
-                <div className="rounded-xl bg-red-50/80 backdrop-blur-sm p-4 text-sm text-red-600 border border-red-100">
-                  {error}
+                <div className="rounded-xl bg-brand-primary/5 p-3 flex gap-3 text-xs text-brand-primary border border-brand-primary/10">
+                  <ShieldAlert className="h-4 w-4 flex-shrink-0" />
+                  <p>{error}</p>
                 </div>
               )}
 
-              <div className="rounded-xl bg-blue-50/50 p-3 flex gap-3 text-xs text-blue-700 border border-blue-100/50">
+                <div className="rounded-xl bg-brand-primary/5 p-3 flex gap-3 text-xs text-brand-primary border border-brand-primary/10">
                 <ShieldAlert className="h-4 w-4 flex-shrink-0" />
                 <p>Make sure your password is unique and at least 6 characters long.</p>
               </div>

@@ -44,17 +44,17 @@ function StatCard({
   label, value, color = 'gray',
 }: { label: string; value: string | number; color?: 'gray' | 'green' | 'amber' | 'red' | 'blue' }) {
   const valueClass = {
-    gray: 'text-gray-900',
+    gray: 'text-brand-slate',
     green: 'text-green-600',
-    amber: 'text-amber-600',
+    amber: 'text-brand-gold',
     red: 'text-red-500',
-    blue: 'text-blue-600',
+    blue: 'text-brand-primary',
   }[color]
 
   return (
-    <div className="rounded-2xl bg-white p-4 ring-1 ring-gray-100 text-center">
+    <div className="rounded-2xl bg-white p-4 border border-brand-border text-center shadow-sm">
       <p className={`text-2xl font-bold ${valueClass}`}>{value}</p>
-      <p className="mt-1 text-xs text-gray-400 leading-tight">{label}</p>
+      <p className="mt-1 text-xs text-brand-slate uppercase tracking-wider font-medium opacity-60 leading-tight">{label}</p>
     </div>
   )
 }
@@ -126,19 +126,19 @@ export default function MemberDetail() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-700 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-brand-secondary">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
       </div>
     )
   }
 
   if (!member) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
-        <p className="text-gray-600">Member not found.</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 bg-brand-secondary text-center">
+        <p className="text-brand-slate">Member not found.</p>
         <button
           onClick={() => navigate(`/admin/units/${unitId}/members`)}
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm text-brand-primary font-semibold hover:underline"
         >
           Back to members
         </button>
@@ -149,22 +149,22 @@ export default function MemberDetail() {
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-brand-secondary">
 
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-gray-100">
+      <header className="bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm flex items-center gap-3 sticky top-0 z-20 border-b border-brand-border">
         <button
           onClick={() => navigate(`/admin/units/${unitId}/members`)}
-          className="flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-center rounded-xl p-2 hover:bg-brand-secondary transition-colors"
           title="Back to Members"
         >
-          <ArrowLeft className="h-5 w-5 text-gray-600" />
+          <ArrowLeft className="h-5 w-5 text-brand-slate" />
         </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="font-semibold text-gray-900 truncate">{member.name}</p>
+            <p className="font-bold text-brand-text truncate">{member.name}</p>
             {member.section && (
-              <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600 flex-shrink-0">
+              <span className="rounded-full bg-brand-primary/5 px-2.5 py-1 text-xs font-semibold text-brand-primary flex-shrink-0">
                 {member.section}
               </span>
             )}
@@ -177,14 +177,14 @@ export default function MemberDetail() {
           {member.phone && (
             <a
               href={`tel:${member.phone}`}
-              className="mt-0.5 flex items-center gap-1 text-xs text-blue-600 hover:underline w-fit"
+              className="mt-0.5 flex items-center gap-1 text-xs text-brand-primary font-medium hover:underline w-fit"
             >
               <Phone className="h-3 w-3" />
               {member.phone}
             </a>
           )}
           {member.birthday && (
-            <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+            <div className="mt-1 flex items-center gap-1 text-xs text-brand-slate">
               <Cake className="h-3 w-3" />
               {formatDate(member.birthday)}
               {isBirthday(member.birthday) && (
@@ -209,8 +209,8 @@ export default function MemberDetail() {
 
         {/* ── Recent trend ─────────────────────────────────────────────────── */}
         {recentTrend.length > 0 && (
-          <section className="rounded-2xl bg-white p-5 ring-1 ring-gray-100">
-            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <section className="rounded-2xl bg-white p-5 border border-brand-border shadow-sm">
+            <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-slate/60">
               Recent trend · last {recentTrend.length} event{recentTrend.length !== 1 ? 's' : ''}
             </h2>
 
@@ -230,12 +230,12 @@ export default function MemberDetail() {
 
             <div className="mt-3 flex items-center gap-4">
               <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full bg-green-500" />
-                <span className="text-xs text-gray-500">Present</span>
+                <span className="h-3 w-3 rounded-full bg-green-500 shadow-sm" />
+                <span className="text-xs font-medium text-brand-slate">Present</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full border-2 border-red-300 bg-white" />
-                <span className="text-xs text-gray-500">Absent</span>
+                <span className="h-3 w-3 rounded-full border border-red-300 bg-white shadow-sm" />
+                <span className="text-xs font-medium text-brand-slate">Absent</span>
               </span>
             </div>
           </section>
@@ -243,16 +243,16 @@ export default function MemberDetail() {
 
         {/* ── Event history ───────────────────────────────────────────────── */}
         <section>
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-slate/60">
             Event History
           </h2>
 
           {records.length === 0 ? (
-            <div className="rounded-2xl bg-white p-10 text-center ring-1 ring-gray-100">
-              <p className="text-sm text-gray-500">No events found for this unit.</p>
+            <div className="rounded-2xl bg-white p-10 text-center border border-brand-border">
+              <p className="text-sm text-brand-slate">No events found for this unit.</p>
             </div>
           ) : (
-            <div className="rounded-2xl bg-white ring-1 ring-gray-100 overflow-hidden">
+            <div className="rounded-2xl bg-white border border-brand-border overflow-hidden shadow-sm">
               {records.map((r, i) => (
                 <div
                   key={r.serviceId}
@@ -261,11 +261,11 @@ export default function MemberDetail() {
                 >
                   {/* Status dot */}
                   <div
-                    className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${r.status === 'attended'
+                    className={`h-2.5 w-2.5 rounded-full flex-shrink-0 shadow-sm ${r.status === 'attended'
                         ? 'bg-green-500'
                         : r.status === 'absent'
                           ? 'bg-red-400'
-                          : 'bg-gray-200'
+                          : 'bg-brand-secondary'
                       }`}
                   />
 
@@ -275,11 +275,11 @@ export default function MemberDetail() {
                         {EVENT_LABEL[r.serviceType]}
                       </p>
                       <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${r.status === 'attended'
+                        className={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${r.status === 'attended'
                             ? 'bg-green-50 text-green-700'
                             : r.status === 'absent'
                               ? 'bg-red-50 text-red-600'
-                              : 'bg-gray-100 text-gray-400'
+                              : 'bg-brand-secondary text-brand-slate'
                           }`}
                       >
                         {r.status === 'attended'

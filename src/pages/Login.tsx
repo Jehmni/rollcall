@@ -47,11 +47,13 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white px-4 py-12">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-brand-secondary px-4 relative overflow-hidden">
+      <div className="absolute top-0 -left-6 w-96 h-96 bg-brand-primary/5 rounded-full blur-3xl -z-10 animate-blob"></div>
+      <div className="absolute bottom-0 -right-6 w-96 h-96 bg-brand-primary/5 rounded-full blur-3xl -z-10 animate-blob animation-delay-2000"></div>
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center gap-3">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-700 shadow-lg">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-primary shadow-2xl shadow-brand-primary/40 ring-4 ring-white">
             <Music className="h-8 w-8 text-white" />
           </div>
           <div className="text-center">
@@ -100,7 +102,7 @@ export default function Login() {
               </div>
               <button
                 onClick={() => { setStep('enter_email'); setError(null) }}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm font-bold uppercase tracking-wider text-brand-primary hover:text-brand-primary/80"
               >
                 Use a different email
               </button>
