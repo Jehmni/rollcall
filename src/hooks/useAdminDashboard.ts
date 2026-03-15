@@ -12,6 +12,14 @@ export function useOrganizations() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
+    /*
+     - [x] Fix Missing Creator-Organization Association <!-- id: 11 -->
+        - [x] Modify `createOrg` in `useAdminDashboard.ts` to add association <!-- id: 12 -->
+        - [x] Verify fix by creating a test organization <!-- id: 13 -->
+    - [ ] Fix Missing Creator-Unit Association <!-- id: 14 -->
+        - [ ] Modify `createUnit` in `useAdminDashboard.ts` to set `created_by_admin_id` <!-- id: 15 -->
+        - [ ] Verify fix by creating a test unit and checking for CRUD access <!-- id: 16 -->
+    */
     // Fetch organizations where the current user is a member
     const { data } = await supabase
       .from('organizations')
@@ -34,8 +42,32 @@ export function useOrganizations() {
   useEffect(() => { fetch() }, [fetch])
 
   async function createOrg(name: string): Promise<Organization> {
-    const { data, error } = await supabase.from('organizations').insert({ name }).select().single()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Authentication required')
+
+    const { data, error } = await supabase
+      .from('organizations')
+      .insert({ 
+        name,
+        created_by_admin_id: user.id
+      })
+      .select()
+      .single()
+    
     if (error) throw error
+
+    // Automatically associate the creator as the 'owner'
+    const { error: memberError } = await supabase
+      .from('organization_members')
+      .insert({
+        organization_id: data.id,
+        admin_id: user.id,
+        role: 'owner'
+      })
+
+    if (memberError) {
+      console.error('Failed to associate creator with organization:', memberError)
+    }
     
     await fetch()
     return data
@@ -74,12 +106,16 @@ export function useUnits(orgId: string | null) {
 
   async function createUnit(name: string, description?: string): Promise<Unit> {
     if (!orgId) throw new Error('No org selected')
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Authentication required')
+
     const { data, error } = await supabase
       .from('units')
       .insert({ 
         org_id: orgId, 
         name, 
-        description: description ?? null 
+        description: description ?? null,
+        created_by_admin_id: user.id
       })
       .select()
       .single()
