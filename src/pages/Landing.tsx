@@ -5,7 +5,7 @@ export default function Landing() {
   const navigate = useNavigate()
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-brand-secondary px-4 relative overflow-hidden font-inter">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-brand-secondary px-6 sm:px-8 relative overflow-hidden font-inter">
       {/* Decorative background elements */}
       <div className="absolute top-0 -left-10 w-[500px] h-[500px] bg-brand-primary/5 rounded-full blur-[120px] -z-10 animate-pulse"></div>
       <div className="absolute bottom-0 -right-10 w-[500px] h-[500px] bg-brand-primary/5 rounded-full blur-[120px] -z-10 animate-pulse delay-700"></div>
@@ -31,7 +31,7 @@ export default function Landing() {
           {/* Member Card */}
           <button
             onClick={() => navigate('/checkin')}
-            className="group relative flex flex-col items-start p-12 text-left transition-all bg-white border border-brand-border/50 rounded-[3rem] shadow-sm hover:shadow-2xl hover:-translate-y-3 active:scale-[0.98] overflow-hidden"
+            className="group relative flex flex-col items-start p-8 sm:p-12 text-left transition-all bg-white border border-brand-border/50 rounded-[3rem] shadow-sm hover:shadow-2xl hover:-translate-y-3 active:scale-[0.98] overflow-hidden"
           >
             <div className="absolute top-0 right-0 -mt-10 -mr-10 h-40 w-40 rounded-full bg-brand-primary/5 blur-3xl group-hover:bg-brand-primary/10 transition-colors"></div>
             <div className="relative mb-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-primary/5 text-brand-primary transition-all group-hover:bg-brand-primary group-hover:text-white group-hover:rotate-6">
@@ -49,7 +49,7 @@ export default function Landing() {
           {/* Admin Card */}
           <button
             onClick={() => navigate('/admin')}
-            className="group relative flex flex-col items-start p-12 text-left transition-all bg-white border border-brand-border/50 rounded-[3rem] shadow-sm hover:shadow-2xl hover:-translate-y-3 active:scale-[0.98] overflow-hidden"
+            className="group relative flex flex-col items-start p-8 sm:p-12 text-left transition-all bg-white border border-brand-border/50 rounded-[3rem] shadow-sm hover:shadow-2xl hover:-translate-y-3 active:scale-[0.98] overflow-hidden"
           >
             <div className="absolute top-0 right-0 -mt-10 -mr-10 h-40 w-40 rounded-full bg-brand-primary/5 blur-3xl group-hover:bg-brand-primary/10 transition-colors"></div>
             <div className="relative mb-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-primary/5 text-brand-primary transition-all group-hover:bg-brand-primary group-hover:text-white group-hover:-rotate-6">

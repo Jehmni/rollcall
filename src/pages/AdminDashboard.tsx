@@ -29,7 +29,7 @@ function OrgCard({
     <div className="flex items-center gap-3 group animate-in slide-in-from-left-4 duration-500">
       <button
         onClick={onClick}
-        className="flex-1 flex items-center justify-between rounded-[2rem] bg-white px-8 py-7 border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.99] transition-all text-left"
+        className="flex-1 flex items-center justify-between rounded-[2rem] bg-white px-6 sm:px-8 py-6 sm:py-7 border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.99] transition-all text-left"
       >
         <div className="flex items-center gap-5">
           <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-brand-primary/5 group-hover:bg-brand-primary group-hover:rotate-3 transition-all duration-500 relative overflow-hidden">
@@ -146,7 +146,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-brand-secondary">
-      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
+      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
         {/* Abstract background glow */}
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
         
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl px-4 py-8 flex flex-col gap-6 relative">
+      <div className="mx-auto max-w-2xl px-5 sm:px-8 py-8 flex flex-col gap-6 relative">
         <section className="relative z-10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
             <div>
@@ -200,7 +200,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           {(showCreate || editingOrg) && (
-            <div className="mb-10 rounded-[2.5rem] bg-white p-10 shadow-2xl shadow-brand-primary/5 border border-brand-border/50 animate-in fade-in slide-in-from-top-6 duration-700 relative overflow-hidden">
+            <div className="mb-10 rounded-[2.5rem] bg-white p-6 sm:p-10 shadow-2xl shadow-brand-primary/5 border border-brand-border/50 animate-in fade-in slide-in-from-top-6 duration-700 relative overflow-hidden">
                <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl"></div>
               <form onSubmit={editingOrg ? handleUpdate : handleCreate} className="flex flex-col gap-8 relative z-10">
                 <div className="flex items-center gap-6">
@@ -239,7 +239,7 @@ export default function AdminDashboard() {
               <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
             </div>
           ) : orgs.length === 0 ? (
-            <div className="rounded-[2.5rem] bg-white p-20 text-center border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] relative overflow-hidden group">
+            <div className="rounded-[2.5rem] bg-white p-10 sm:p-20 text-center border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] relative overflow-hidden group">
                <div className="absolute -top-10 -right-10 h-40 w-40 bg-brand-primary/5 rounded-full opacity-50 blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
                <Building2 className="mx-auto mb-6 h-20 w-20 text-brand-primary/10 group-hover:text-brand-primary/20 transition-colors" />
                <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">Welcome to Rollcally</h3>
@@ -279,7 +279,7 @@ export default function AdminDashboard() {
         />
 
           <section className="mt-8">
-            <div className="flex items-center gap-4 mb-8 px-4">
+            <div className="flex items-center gap-4 mb-8 px-2 sm:px-4">
                <div className="h-px flex-1 bg-brand-border/50"></div>
                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-slate opacity-40">Direct Unit Access</h2>
                <div className="h-px flex-1 bg-brand-border/50"></div>
@@ -289,7 +289,7 @@ export default function AdminDashboard() {
                 <button
                   key={u.id}
                   onClick={() => navigate(`/admin/units/${u.id}`)}
-                  className="group w-full flex items-center justify-between rounded-[2rem] bg-white px-8 py-6 shadow-lg shadow-brand-primary/[0.02] border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 transition-all text-left overflow-hidden relative"
+                  className="group w-full flex items-center justify-between rounded-[2rem] bg-white px-6 sm:px-8 py-6 shadow-lg shadow-brand-primary/[0.02] border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 transition-all text-left overflow-hidden relative"
                 >
                    <div className="absolute top-0 right-0 -mt-8 -mr-8 h-24 w-24 bg-brand-primary/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                    <div className="flex items-center gap-5 relative z-10">

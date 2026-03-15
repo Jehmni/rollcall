@@ -107,7 +107,7 @@ function MemberRow({
     >
       <div className="absolute inset-y-0 left-0 w-1 bg-brand-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top duration-500"></div>
       
-      <div className="flex-1 min-w-0 px-8 py-7">
+      <div className="flex-1 min-w-0 px-5 sm:px-8 py-6 sm:py-7">
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
              <p className="text-xl font-bold text-brand-text tracking-tight uppercase italic group-hover:text-brand-primary transition-colors">{member.name}</p>
@@ -133,7 +133,7 @@ function MemberRow({
       </div>
       
       {canManage && (
-        <div className="flex items-center gap-1.5 pr-6 flex-shrink-0 relative z-10 transition-all duration-300 opacity-20 group-hover:opacity-100">
+        <div className="flex items-center gap-1.5 pr-4 sm:pr-6 flex-shrink-0 relative z-10 transition-all duration-300 opacity-20 group-hover:opacity-100">
           <button
             onClick={e => { e.stopPropagation(); onEdit(member) }}
             className="flex h-11 w-11 items-center justify-center rounded-2xl text-brand-slate hover:bg-brand-primary hover:text-white border border-transparent hover:border-brand-primary transition-all active:scale-90"
@@ -441,7 +441,7 @@ export default function UnitMembers() {
         onChange={handleFileChange}
       />
 
-      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
+      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
         {/* Abstract background glow */}
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
         
@@ -491,11 +491,11 @@ export default function UnitMembers() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl px-4 py-6 flex flex-col gap-4">
+      <div className="mx-auto max-w-2xl px-5 sm:px-8 py-6 flex flex-col gap-4">
 
         {/* ── Add / Edit form ─────────────────────────────────────────────── */}
         {panel === 'add' && (
-          <div className="rounded-[2.5rem] bg-white p-10 shadow-2xl shadow-brand-primary/5 border border-brand-border/50 animate-in fade-in slide-in-from-top-6 duration-700 relative overflow-hidden mb-8">
+          <div className="rounded-[2.5rem] bg-white p-6 sm:p-10 shadow-2xl shadow-brand-primary/5 border border-brand-border/50 animate-in fade-in slide-in-from-top-6 duration-700 relative overflow-hidden mb-8">
             <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl"></div>
             <form onSubmit={handleSave} className="flex flex-col gap-8 relative z-10">
               <div className="flex items-center justify-between">
@@ -579,7 +579,7 @@ export default function UnitMembers() {
 
          {/* ── CSV import panel ─────────────────────────────────────────────── */}
         {panel === 'import' && (
-          <div className="rounded-2xl bg-white p-5 border border-brand-border flex flex-col gap-4 shadow-xl shadow-brand-slate/5 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="rounded-2xl bg-white p-4 sm:p-5 border border-brand-border flex flex-col gap-4 shadow-xl shadow-brand-slate/5 animate-in fade-in slide-in-from-top-4 duration-300">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-gray-900">Import from CSV</h3>
@@ -676,14 +676,14 @@ export default function UnitMembers() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-brand-border/30">
-                      {csvRows.map((r, i) => (
+                       {csvRows.map((r, i) => (
                         <tr
                           key={i}
-                          className={`border-t border-gray-50 transition-colors ${r.duplicateStatus === 'exact' ? 'bg-red-50' :
-                            r.duplicateStatus === 'fuzzy' ? 'bg-amber-50' : 'hover:bg-gray-50'
-                            }`}
+                          className={`border-t border-gray-50 transition-colors whitespace-nowrap ${r.duplicateStatus === 'exact' ? 'bg-red-50' :
+                             r.duplicateStatus === 'fuzzy' ? 'bg-amber-50' : 'hover:bg-gray-50'
+                             }`}
                         >
-                          <td className="px-3 py-2 font-medium text-gray-900">
+                          <td className="px-4 py-3 font-medium text-gray-900 min-w-[150px]">
                             {r.name}
                             {r.duplicateStatus === 'exact' && (
                               <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-600">
@@ -780,7 +780,7 @@ Bob Smith,,Bass,active,1985-11-20`}
             placeholder="Search roster by name or section…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full rounded-3xl bg-white border-brand-border/50 px-8 py-7 shadow-2xl shadow-brand-primary/5 focus:border-brand-primary/50 transition-all text-lg placeholder:text-brand-slate/30"
+             className="w-full rounded-3xl bg-white border-brand-border/50 px-6 sm:px-8 py-6 sm:py-7 shadow-2xl shadow-brand-primary/5 focus:border-brand-primary/50 transition-all text-lg placeholder:text-brand-slate/30"
           />
           <div className="absolute right-6 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-brand-primary/5 text-brand-primary opacity-40 group-focus-within:opacity-100 transition-all">
             <Search className="h-5 w-5" />

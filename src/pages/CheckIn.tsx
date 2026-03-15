@@ -78,7 +78,7 @@ export default function CheckIn() {
     params.set('event_id', scannedServiceId)
     window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
     setShowScanner(false)
-    window.location.reload() // Reload to catch new event_id in hooks
+    window.location.reload()
   }
 
   const noService = !serviceId
@@ -86,7 +86,7 @@ export default function CheckIn() {
   return (
     <div className="flex min-h-screen flex-col bg-brand-secondary">
       {/* Header */}
-      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
+      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
         {/* Abstract background glow */}
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
         
@@ -117,12 +117,12 @@ export default function CheckIn() {
              {step === 'welcome' ? 'Welcome Back' : step === 'list' ? 'Check In' : step === 'confirm' ? 'Is this you?' : 'Success!'}
            </h2>
            <p className="mt-2 text-sm font-medium text-white/60">
-             {step === 'welcome' ? 'Ready for today&apos;s session?' : step === 'list' ? 'Find your name below' : step === 'confirm' ? 'Please verify your identity' : 'Attendance recorded'}
+             {step === 'welcome' ? 'Ready for today\'s session?' : step === 'list' ? 'Find your name below' : step === 'confirm' ? 'Please verify your identity' : 'Attendance recorded'}
            </p>
         </div>
       </header>
 
-      <div className="flex-1 px-4 pb-8">
+      <div className="flex-1 px-5 sm:px-8 pb-8">
 
         {/* No service */}
         {noService && (
@@ -170,7 +170,7 @@ export default function CheckIn() {
           <div className="flex flex-col gap-6 animate-in fade-in duration-500">
             {/* Search and Filters */}
             <div className="flex flex-col gap-5 pt-8">
-              <div className="relative group">
+              <div className="relative group mx-1">
                 <div className="absolute inset-0 bg-brand-primary/5 rounded-2xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
                 <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-brand-slate opacity-30 group-focus-within:opacity-100 transition-opacity" />
                 <input
@@ -235,7 +235,7 @@ export default function CheckIn() {
                        <button
                         key={m.id}
                         onClick={() => handleSelect(m)}
-                        className="group flex min-h-[4.5rem] items-center justify-between rounded-3xl bg-white px-8 py-6 shadow-sm border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] transition-all text-left"
+                         className="group flex min-h-[4.5rem] items-center justify-between rounded-3xl bg-white px-6 sm:px-8 py-6 shadow-sm border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] transition-all text-left"
                       >
                         <span className="text-lg font-bold text-brand-text tracking-tight uppercase italic">{m.name}</span>
                         {m.section && !activeSection && (

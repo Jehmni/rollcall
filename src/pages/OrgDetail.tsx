@@ -27,7 +27,7 @@ function UnitCard({
     <div className="flex items-center gap-4 group animate-in slide-in-from-left-4 duration-500">
       <button
         onClick={onClick}
-        className="flex-1 flex items-center justify-between rounded-[2.5rem] bg-white px-10 py-8 border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.99] transition-all text-left group/card overflow-hidden relative"
+        className="flex-1 flex items-center justify-between rounded-[2.5rem] bg-white px-6 sm:px-10 py-6 sm:py-8 border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.99] transition-all text-left group/card overflow-hidden relative"
       >
         <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl group-hover/card:scale-150 transition-transform duration-700"></div>
         
@@ -187,7 +187,7 @@ export default function OrgDetail() {
 
   return (
     <div className="min-h-screen bg-brand-secondary">
-      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
+      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
         {/* Abstract background glow */}
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
         
@@ -220,7 +220,7 @@ export default function OrgDetail() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl px-4 py-8 flex flex-col gap-8">
+      <div className="mx-auto max-w-2xl px-5 sm:px-8 py-8 flex flex-col gap-8">
                 {isOwner && (
           <div className="flex p-2 bg-brand-primary/5 rounded-[2rem] max-w-sm mx-auto border border-brand-primary/5 shadow-inner">
             <button
@@ -294,7 +294,7 @@ export default function OrgDetail() {
             </div>
 
              {(showCreate || editingUnit) && (
-              <div className="mb-10 rounded-[2.5rem] bg-white p-10 shadow-2xl shadow-brand-primary/5 border border-brand-border/50 animate-in fade-in slide-in-from-top-6 duration-700 relative overflow-hidden">
+              <div className="mb-10 rounded-[2.5rem] bg-white p-6 sm:p-10 shadow-2xl shadow-brand-primary/5 border border-brand-border/50 animate-in fade-in slide-in-from-top-6 duration-700 relative overflow-hidden">
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl"></div>
                 <form onSubmit={editingUnit ? handleUpdateUnit : handleCreate} className="flex flex-col gap-8 relative z-10">
                   <div className="flex items-center gap-6">
@@ -343,7 +343,7 @@ export default function OrgDetail() {
                 <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
               </div>
             ) : units.length === 0 ? (
-              <Card className="rounded-3xl bg-white p-12 text-center border-brand-border overflow-hidden relative">
+              <Card className="rounded-3xl bg-white p-8 sm:p-12 text-center border-brand-border overflow-hidden relative">
                 <div className="absolute -bottom-10 -left-10 h-40 w-40 bg-brand-primary/5 rounded-full opacity-50 blur-3xl"></div>
                 <Users className="mx-auto mb-6 h-16 w-16 text-brand-primary/10" />
                 <h3 className="text-xl font-bold text-brand-text mb-2">No units yet</h3>
@@ -380,7 +380,7 @@ export default function OrgDetail() {
                 <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
               </div>
              ) : joinRequests.length === 0 ? (
-              <div className="rounded-[2.5rem] bg-white p-20 text-center border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02]">
+              <div className="rounded-[2.5rem] bg-white p-10 sm:p-20 text-center border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02]">
                  <Users className="h-20 w-20 text-brand-primary/10 mx-auto mb-6" />
                  <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">Silent Comms</h3>
                  <p className="text-sm font-medium text-brand-slate opacity-40 mt-3">
@@ -389,8 +389,8 @@ export default function OrgDetail() {
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                {joinRequests.map(req => (
-                  <div key={req.id} className="p-8 bg-white rounded-[2rem] border border-brand-border/50 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 group hover:border-brand-primary/30 hover:shadow-2xl transition-all animate-in slide-in-from-bottom-4 duration-500">
+                 {joinRequests.map(req => (
+                  <div key={req.id} className="p-6 sm:p-8 bg-white rounded-[2rem] border border-brand-border/50 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 group hover:border-brand-primary/30 hover:shadow-2xl transition-all animate-in slide-in-from-bottom-4 duration-500">
                     <div className="flex items-center gap-5">
                       <div className="h-14 w-14 bg-brand-primary/5 rounded-2xl flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all">
                          <ShieldCheck className="h-7 w-7" />

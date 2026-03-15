@@ -153,7 +153,7 @@ export default function MemberDetail() {
     <div className="min-h-screen bg-brand-secondary">
 
       {/* Header */}
-      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
+      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
         
         <div className="flex items-center justify-between relative z-10 w-full">
@@ -203,9 +203,8 @@ export default function MemberDetail() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl px-4 py-6 flex flex-col gap-6">
+      <div className="mx-auto max-w-2xl px-5 sm:px-8 py-8 flex flex-col gap-8">
 
-        {/* ── Stat cards ──────────────────────────────────────────────────── */}
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard label="Attended" value={attendedCount} color="gray" />
           <StatCard label="Total Events" value={pastRecords.length} color="gray" />
@@ -215,7 +214,7 @@ export default function MemberDetail() {
 
         {/* ── Recent trend ─────────────────────────────────────────────────── */}
         {recentTrend.length > 0 && (
-          <section className="rounded-[2.5rem] bg-white p-10 border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] relative overflow-hidden">
+          <section className="rounded-[2.5rem] bg-white p-6 sm:p-10 border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] relative overflow-hidden">
             <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl"></div>
             <div className="relative z-10">
               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40 mb-6">
@@ -270,7 +269,7 @@ export default function MemberDetail() {
               {records.map((r, i) => (
                 <div
                   key={r.serviceId}
-                  className={`flex items-center gap-6 px-8 py-6 group hover:bg-brand-primary/[0.02] transition-colors ${i < records.length - 1 ? 'border-b border-brand-border/30' : ''
+                  className={`flex items-center gap-6 px-6 sm:px-8 py-6 group hover:bg-brand-primary/[0.02] transition-colors ${i < records.length - 1 ? 'border-b border-brand-border/30' : ''
                     }`}
                 >
                   <div

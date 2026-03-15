@@ -54,7 +54,7 @@ export default function AdminOrgDiscovery() {
 
   return (
     <div className="min-h-screen bg-brand-secondary">
-      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
+      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
         {/* Abstract background glow */}
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
         
@@ -80,12 +80,12 @@ export default function AdminOrgDiscovery() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl px-4 py-8 flex flex-col gap-8">
+      <div className="mx-auto max-w-2xl px-5 sm:px-8 py-8 flex flex-col gap-8">
 
       <form onSubmit={handleSearch} className="mb-12 pt-8">
         <div className="group relative">
           <div className="absolute inset-0 bg-brand-primary/10 rounded-[2rem] blur-2xl opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
-          <div className="relative flex gap-1 bg-white p-2 rounded-[2rem] border border-brand-border/50 shadow-sm focus-within:shadow-2xl transition-all">
+            <div className="relative flex gap-1 bg-white p-1.5 sm:p-2 rounded-[2rem] border border-brand-border/50 shadow-sm focus-within:shadow-2xl transition-all">
             <input
               type="text"
               value={query}
@@ -117,7 +117,7 @@ export default function AdminOrgDiscovery() {
             const isRequested = requestedIds.has(org.id)
 
              return (
-                <div key={org.id} className="p-10 bg-white rounded-[3rem] border border-brand-border/50 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8 group hover:border-brand-primary/30 hover:shadow-2xl hover:-translate-y-1 transition-all animate-in slide-in-from-bottom-4 duration-500 overflow-hidden relative">
+                <div key={org.id} className="p-6 sm:p-10 bg-white rounded-[3rem] border border-brand-border/50 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8 group hover:border-brand-primary/30 hover:shadow-2xl hover:-translate-y-1 transition-all animate-in slide-in-from-bottom-4 duration-500 overflow-hidden relative">
                    <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
                   
                   <div className="flex items-center gap-6 relative z-10">
@@ -178,7 +178,7 @@ export default function AdminOrgDiscovery() {
              <div className="h-px flex-1 bg-brand-border/50"></div>
           </div>
           
-          <div className="bg-white rounded-[3rem] p-12 border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] animate-in fade-in slide-in-from-bottom-8 duration-1000">
+          <div className="bg-white rounded-[3rem] p-8 sm:p-12 border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] animate-in fade-in slide-in-from-bottom-8 duration-1000">
             <div className="space-y-10">
               {myRequests.map((req) => (
                 <div key={req.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 group">
