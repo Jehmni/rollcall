@@ -304,14 +304,14 @@ export default function OrgDetail() {
                     <div>
                       <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">{editingUnit ? 'Edit Unit' : 'Launch Unit'}</h3>
                       <p className="text-sm font-medium text-brand-slate opacity-40">
-                         {editingUnit ? 'Refine group details' : 'Deploy a new organizational node'}
+                         {editingUnit ? 'Refine group details' : 'Create new organizational unit'}
                       </p>
                     </div>
                   </div>
 
                   <div className="space-y-6">
                     <Input
-                      label="Unit Identity"
+                      label="Unit Name"
                       placeholder="e.g. Volunteers, Lead Team..."
                       value={newName}
                       onChange={e => setNewName(e.target.value)}
