@@ -184,7 +184,7 @@ export default function AdminServiceDetail() {
   return (
     <div className="min-h-screen bg-brand-secondary">
       {/* Header */}
-      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden sticky top-0 z-30">
+      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
         
         <div className="flex items-center justify-between relative z-10 w-full">
