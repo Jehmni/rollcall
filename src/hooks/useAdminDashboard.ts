@@ -12,14 +12,6 @@ export function useOrganizations() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    /*
-     - [x] Fix Missing Creator-Organization Association <!-- id: 11 -->
-        - [x] Modify `createOrg` in `useAdminDashboard.ts` to add association <!-- id: 12 -->
-        - [x] Verify fix by creating a test organization <!-- id: 13 -->
-    - [ ] Fix Missing Creator-Unit Association <!-- id: 14 -->
-        - [ ] Modify `createUnit` in `useAdminDashboard.ts` to set `created_by_admin_id` <!-- id: 15 -->
-        - [ ] Verify fix by creating a test unit and checking for CRUD access <!-- id: 16 -->
-    */
     // Fetch organizations where the current user is a member
     const { data } = await supabase
       .from('organizations')
@@ -47,28 +39,19 @@ export function useOrganizations() {
 
     const { data, error } = await supabase
       .from('organizations')
-      .insert({ 
+      .insert({
         name,
         created_by_admin_id: user.id
       })
       .select()
       .single()
-    
+
     if (error) throw error
 
-    // Automatically associate the creator as the 'owner'
-    const { error: memberError } = await supabase
-      .from('organization_members')
-      .insert({
-        organization_id: data.id,
-        admin_id: user.id,
-        role: 'owner'
-      })
+    // The handle_new_organization() DB trigger automatically inserts the creator
+    // into organization_members with role='owner' (security definer, bypasses RLS).
+    // No manual insert needed here.
 
-    if (memberError) {
-      console.error('Failed to associate creator with organization:', memberError)
-    }
-    
     await fetch()
     return data
   }
