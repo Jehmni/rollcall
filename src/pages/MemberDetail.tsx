@@ -295,7 +295,7 @@ export default function MemberDetail() {
                           }`}
                       >
                         {r.status === 'attended'
-                          ? 'Duty Fulfilled'
+                          ? 'Present'
                           : r.status === 'absent'
                             ? 'Missed Action'
                             : 'On Orders'}

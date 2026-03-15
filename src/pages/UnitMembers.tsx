@@ -550,7 +550,7 @@ export default function UnitMembers() {
                       value={form.status}
                       onChange={e => setForm(f => ({ ...f, status: e.target.value as MemberStatus }))}
                     >
-                      <option value="active">Active Duty</option>
+                      <option value="active">Active</option>
                       <option value="inactive">Retired / Inactive</option>
                     </select>
                   </div>

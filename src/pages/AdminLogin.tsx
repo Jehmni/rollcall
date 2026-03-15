@@ -70,7 +70,7 @@ export default function AdminLogin() {
           </div>
           <div>
             <h1 className="text-4xl font-black tracking-tighter text-brand-text italic">Admin Portal</h1>
-            <p className="mt-2 text-sm text-brand-slate font-bold uppercase tracking-[0.2em] opacity-40">Rollcally Command Center</p>
+            <p className="mt-2 text-sm text-brand-slate font-bold uppercase tracking-[0.2em] opacity-40">Rollcally Administrator Console</p>
           </div>
         </header>
 
@@ -91,7 +91,7 @@ export default function AdminLogin() {
 
             <div className="space-y-6">
               <Input
-                label="Administrator Email"
+                label="Enter your email"
                 type="email"
                 placeholder="admin@rollcally.com"
                 value={email}
@@ -129,7 +129,7 @@ export default function AdminLogin() {
             <div className="pt-8 mt-4 border-t border-brand-border text-center">
               <p className="text-xs text-brand-slate font-medium opacity-60">New organization?</p>
               <Link to="/admin/signup" className="mt-2 inline-block font-black text-xs uppercase tracking-[0.3em] text-brand-primary hover:underline underline-offset-8">
-                Request Access
+                Register
               </Link>
             </div>
           </form>

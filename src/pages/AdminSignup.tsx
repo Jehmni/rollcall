@@ -109,7 +109,7 @@ export default function AdminSignup() {
 
             <div className="space-y-6">
               <Input
-                label="Email Directive"
+                label="Enter your email"
                 type="email"
                 placeholder="commander@organization.com"
                 value={email}
@@ -121,7 +121,7 @@ export default function AdminSignup() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                  label="Passkey"
+                  label="Password"
                   type="password"
                   placeholder="••••••••"
                   value={password}
@@ -132,7 +132,7 @@ export default function AdminSignup() {
                 />
 
                 <Input
-                  label="Verify Key"
+                  label="Verify password"
                   type="password"
                   placeholder="••••••••"
                   value={confirmPassword}
@@ -155,9 +155,9 @@ export default function AdminSignup() {
 
             <div className="pt-4 text-center border-t border-brand-border/30">
               <p className="text-[10px] font-bold text-brand-slate opacity-40 uppercase tracking-widest leading-loose">
-                Already registered in the census? <br/>
+                Already Have an Account? <br/>
                 <Link to="/admin/login" className="text-brand-primary hover:text-brand-primary/80 transition-colors font-black ml-1">
-                  Secure Login
+                  Sign in
                 </Link>
               </p>
             </div>

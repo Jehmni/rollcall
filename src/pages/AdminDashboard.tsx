@@ -210,7 +210,7 @@ export default function AdminDashboard() {
                   <div>
                     <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">{editingOrg ? 'Rename' : 'Launch New'}</h3>
                     <p className="text-sm font-medium text-brand-slate opacity-40">
-                      {editingOrg ? 'Update organization details' : 'Create a fresh attendance hub'}
+                      {editingOrg ? 'Update organization details' : 'Create a new organisation'}
                     </p>
                   </div>
                 </div>
@@ -227,7 +227,7 @@ export default function AdminDashboard() {
                 <div className="flex gap-4 justify-end">
                   <Button variant="ghost" size="lg" type="button" onClick={() => { setShowCreate(false); setEditingOrg(null) }} className="text-xs font-black uppercase tracking-[0.2em] opacity-40">Cancel</Button>
                   <Button size="lg" type="submit" loading={isUpdating} className="px-10 shadow-xl shadow-brand-primary/20 text-xs font-black uppercase tracking-[0.2em] rounded-2xl">
-                    {editingOrg ? 'Update Hub' : 'Create Hub'}
+                    {editingOrg ? 'Update Hub' : 'Create'}
                   </Button>
                 </div>
               </form>

@@ -116,24 +116,30 @@ export default function CheckIn() {
            <h2 className="text-2xl font-black leading-tight">
              {step === 'welcome' ? 'Welcome Back' : step === 'list' ? 'Check In' : step === 'confirm' ? 'Is this you?' : 'Success!'}
            </h2>
-           <p className="mt-2 text-sm font-medium text-white/60">
-             {step === 'welcome' ? 'Ready for today\'s session?' : step === 'list' ? 'Find your name below' : step === 'confirm' ? 'Please verify your identity' : 'Attendance recorded'}
-           </p>
+            <p className="mt-2 text-sm font-medium text-white/60">
+              {step === 'welcome' ? 'Ready for today\'s session?' : step === 'list' ? 'Scan QR code to checkin' : step === 'confirm' ? 'Please verify your identity' : 'Attendance recorded'}
+            </p>
         </div>
       </header>
 
       <div className="flex-1 px-5 sm:px-8 pb-8">
 
-        {/* No service */}
+        {/* No service - Primary Scan Action */}
         {noService && (
-          <div className="mt-8 flex flex-col items-center gap-4 rounded-2xl bg-white p-8 text-center shadow-sm border border-brand-border">
-            <AlertCircle className="h-12 w-12 text-brand-gold" />
-            <div>
-              <h2 className="font-semibold text-brand-text">No active event</h2>
-              <p className="mt-1 text-sm text-gray-500">
-                This QR code is not linked to an event. Ask your administrator for a fresh code.
-              </p>
-            </div>
+          <div className="mt-12 flex flex-col items-center gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 text-center">
+             <button
+               onClick={() => setShowScanner(true)}
+               className="group relative flex h-64 w-full max-w-sm flex-col items-center justify-center gap-6 rounded-[3.5rem] bg-white border border-brand-border shadow-2xl hover:shadow-brand-primary/10 transition-all hover:-translate-y-1 active:scale-95"
+             >
+               <div className="absolute inset-0 bg-brand-primary/5 rounded-[3.5rem] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+               <div className="relative flex h-32 w-32 items-center justify-center rounded-[2rem] bg-brand-primary/5 text-brand-primary border border-brand-primary/10 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500">
+                  <QrCode className="h-16 w-16" />
+               </div>
+               <div className="flex flex-col items-center gap-1">
+                 <span className="text-sm font-black uppercase tracking-[0.3em] text-brand-primary">Tap to Scan</span>
+                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-slate opacity-40">Ready for checkin</span>
+               </div>
+             </button>
           </div>
         )}
 

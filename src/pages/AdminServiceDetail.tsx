@@ -229,7 +229,7 @@ export default function AdminServiceDetail() {
               </div>
               <div className="text-left">
                 <p className="text-lg font-black text-brand-text italic uppercase tracking-tighter">Attendance QR</p>
-                <p className="text-xs font-medium text-brand-slate opacity-40">Scan to check in instantly</p>
+                <p className="text-xs font-medium text-brand-slate opacity-40">get event qrcode</p>
               </div>
             </div>
             <div className={`h-8 px-4 rounded-full flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all ${showQR ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'bg-brand-secondary text-brand-primary border border-brand-primary/10'}`}>
@@ -265,11 +265,11 @@ export default function AdminServiceDetail() {
           </div>
           <div className="rounded-2xl bg-white p-6 border border-brand-border/50 text-center shadow-lg shadow-brand-primary/[0.02]">
              <p className="text-3xl font-black tracking-tighter italic text-green-600">{present.length}</p>
-             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">Present</p>
+             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">present</p>
           </div>
           <div className="rounded-2xl bg-white p-6 border border-brand-border/50 text-center shadow-lg shadow-brand-primary/[0.02]">
              <p className="text-3xl font-black tracking-tighter italic text-red-500">{absent.length}</p>
-             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">Absent</p>
+             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">absent</p>
           </div>
           <div className="rounded-2xl bg-white p-6 border border-brand-border/50 text-center shadow-lg shadow-brand-primary/[0.02]">
              <p className="text-3xl font-black tracking-tighter italic text-brand-primary">{attendanceRate}%</p>
@@ -291,9 +291,9 @@ export default function AdminServiceDetail() {
                 }`}
               >
                 {t === 'absent'
-                  ? `AWOL (${absent.length})`
+                  ? `absent (${absent.length})`
                   : t === 'present'
-                  ? `Duty (${present.length})`
+                  ? `present (${present.length})`
                   : `Total (${total})`}
               </button>
             ))}

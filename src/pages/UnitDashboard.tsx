@@ -329,7 +329,7 @@ export default function UnitDashboard() {
         <section>
           <div className="flex items-center justify-between mb-8">
             <div>
-               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40">Hub</h2>
+               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40">Unit</h2>
                <p className="text-2xl font-black text-brand-text tracking-tight uppercase italic mt-1">Calendar</p>
             </div>
             {isOwnerOrCreator && (
@@ -349,7 +349,7 @@ export default function UnitDashboard() {
                     </div>
                     <div>
                       <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">Schedule Event</h3>
-                      <p className="text-sm font-medium text-brand-slate opacity-40">Add a new session to the command board</p>
+                      <p className="text-sm font-medium text-brand-slate opacity-40">Initialise a formal session for attendance tracking and reporting.</p>
                     </div>
                   </div>
                   
