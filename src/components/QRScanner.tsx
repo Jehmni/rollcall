@@ -46,7 +46,6 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
         { facingMode: "environment" },
         { 
           fps: 15, 
-          qrbox: { width: 250, height: 250 },
           aspectRatio: 1.0 
         },
         (decodedText) => {
@@ -83,8 +82,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
               <span className="material-symbols-outlined text-white text-2xl">qr_code_scanner</span>
             </div>
             <div>
-              <h3 className="text-lg font-black tracking-tight text-white uppercase italic">Scan Venue Node</h3>
-              <p className="text-[10px] text-primary font-black uppercase tracking-[0.2em]">Intel Capture Module</p>
+              <h3 className="text-xl font-black tracking-tight text-white uppercase italic">scan meeting qrcode</h3>
             </div>
           </div>
           <button
@@ -97,8 +95,8 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
         
         <div className="p-8">
           {/* Scanner Container */}
-          <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-black border border-primary/20 shadow-2xl">
-            <div id="qr-reader" className="h-full w-full [&_video]:object-cover" />
+          <div className="relative aspect-square overflow-hidden rounded-[2.5rem] bg-black border border-primary/20 shadow-2xl">
+            <div id="qr-reader" className="h-full w-full [&_video]:object-cover [&_img]:hidden [&_span]:hidden [&_a]:hidden [&_button]:hidden" />
             
             {/* Permission Screens */}
             {permissionState !== 'granted' && (
@@ -150,15 +148,18 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
               </div>
             )}
             
-            {/* Guide Overlay for scanning state */}
+            {/* Simple Guide Overlay for scanning state */}
             {permissionState === 'granted' && (
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-10">
-                <div className="h-48 w-48 rounded-[2rem] border-2 border-primary shadow-[0_0_40px_rgba(82,71,230,0.3)] ring-[1000px] ring-black/60" />
-                <div className="absolute top-10 text-center px-4">
-                  <p className="rounded-full bg-primary/20 border border-primary/40 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary backdrop-blur-xl shadow-2xl">
-                    Position QR code within node frame
-                  </p>
-                </div>
+                {/* Subtle scanning line animation */}
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-primary/40 shadow-[0_0_15px_rgba(82,71,230,0.8)] animate-[scan_2s_linear_infinite]" />
+                
+                {/* Corner Accents (Matching CheckIn design) */}
+                <div className="absolute top-8 left-8 size-10 border-t-4 border-l-4 border-primary rounded-tl-2xl shadow-[0_0_10px_rgba(82,71,230,0.3)]"></div>
+                <div className="absolute top-8 right-8 size-10 border-t-4 border-r-4 border-primary rounded-tr-2xl shadow-[0_0_10px_rgba(82,71,230,0.3)]"></div>
+                <div className="absolute bottom-8 left-8 size-10 border-b-4 border-l-4 border-primary rounded-bl-2xl shadow-[0_0_10px_rgba(82,71,230,0.3)]"></div>
+                <div className="absolute bottom-8 right-8 size-10 border-b-4 border-r-4 border-primary rounded-br-2xl shadow-[0_0_10px_rgba(82,71,230,0.3)]"></div>
+
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent pointer-events-none"></div>
               </div>
             )}

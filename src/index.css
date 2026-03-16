@@ -10,6 +10,27 @@
   }
 
   body {
-    @apply bg-brand-secondary text-brand-text antialiased font-sans;
+    @apply bg-background-dark text-slate-100 antialiased font-sans;
   }
+}
+
+@keyframes scan {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(340px); }
+  100% { transform: translateY(0); }
+}
+
+/* Hide html5-qrcode internal UI */
+#qr-reader__dashboard, 
+#qr-reader__status_span, 
+#qr-reader video + div,
+#qr-reader img {
+  display: none !important;
+}
+
+#qr-reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 2.5rem !important;
 }
