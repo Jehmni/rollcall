@@ -86,37 +86,37 @@ export default function CheckIn() {
   return (
     <div className="flex min-h-screen flex-col bg-brand-secondary">
       {/* Header */}
-      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
+      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-12 sm:pt-24 pb-12 sm:pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
         {/* Abstract background glow */}
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
         
-        <div className="flex items-center justify-between relative z-10 w-full">
+        <div className="flex items-center justify-between relative z-10 w-full max-w-7xl mx-auto">
           {(step === 'confirm' || step === 'list' || step === 'welcome') && (
             <button
               onClick={step === 'confirm' ? handleBack : () => navigate('/')}
-              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+              className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
             >
-              <ArrowLeft className="h-6 w-6" />
+              <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
           )}
           <div className="flex flex-col items-center flex-1">
-             <h1 className="text-3xl font-black tracking-tighter italic">Rollcally</h1>
+             <h1 className="text-2xl sm:text-3xl font-black tracking-tighter italic">Rollcally</h1>
              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mt-1">Smart Entry</p>
           </div>
           <button
             onClick={() => setShowScanner(true)}
-            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-md transition-all active:scale-95"
+            className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-md transition-all active:scale-95"
             title="Scan QR Code"
           >
-            <QrCode className="h-6 w-6 text-white" />
+            <QrCode className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
           </button>
         </div>
 
-        <div className="text-center relative z-10 mt-4 animate-in fade-in slide-in-from-top-4 duration-700">
-           <h2 className="text-2xl font-black leading-tight">
+        <div className="text-center relative z-10 mt-4 animate-in fade-in slide-in-from-top-4 duration-700 max-w-7xl mx-auto w-full px-4">
+           <h2 className="text-xl sm:text-2xl font-black leading-tight">
              {step === 'welcome' ? 'Welcome Back' : step === 'list' ? 'Check In' : step === 'confirm' ? 'Is this you?' : 'Success!'}
            </h2>
-            <p className="mt-2 text-sm font-medium text-white/60">
+            <p className="mt-2 text-xs sm:text-sm font-medium text-white/60">
               {step === 'welcome' ? 'Ready for today\'s session?' : step === 'list' ? 'Scan QR code to checkin' : step === 'confirm' ? 'Please verify your identity' : 'Attendance recorded'}
             </p>
         </div>
@@ -126,18 +126,18 @@ export default function CheckIn() {
 
         {/* No service - Primary Scan Action */}
         {noService && (
-          <div className="mt-12 flex flex-col items-center gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 text-center">
+          <div className="mt-8 sm:mt-12 flex flex-col items-center gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 text-center max-w-5xl mx-auto w-full">
              <button
                onClick={() => setShowScanner(true)}
-               className="group relative flex h-64 w-full max-w-sm flex-col items-center justify-center gap-6 rounded-[3.5rem] bg-white border border-brand-border shadow-2xl hover:shadow-brand-primary/10 transition-all hover:-translate-y-1 active:scale-95"
+               className="group relative flex h-48 sm:h-64 w-full max-w-sm flex-col items-center justify-center gap-4 sm:gap-6 rounded-[2.5rem] sm:rounded-[3.5rem] bg-white border border-brand-border shadow-2xl hover:shadow-brand-primary/10 transition-all hover:-translate-y-1 active:scale-95"
              >
-               <div className="absolute inset-0 bg-brand-primary/5 rounded-[3.5rem] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-               <div className="relative flex h-32 w-32 items-center justify-center rounded-[2rem] bg-brand-primary/5 text-brand-primary border border-brand-primary/10 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500">
-                  <QrCode className="h-16 w-16" />
+               <div className="absolute inset-0 bg-brand-primary/5 rounded-[2.5rem] sm:rounded-[3.5rem] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+               <div className="relative flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-[1.5rem] sm:rounded-[2rem] bg-brand-primary/5 text-brand-primary border border-brand-primary/10 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 shadow-xl">
+                  <QrCode className="h-10 w-10 sm:h-16 sm:w-16" />
                </div>
-               <div className="flex flex-col items-center gap-1">
-                 <span className="text-sm font-black uppercase tracking-[0.3em] text-brand-primary">Tap to Scan</span>
-                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-slate opacity-40">Ready for checkin</span>
+               <div className="flex flex-col items-center gap-1 px-4">
+                 <span className="text-xs sm:text-sm font-black uppercase tracking-[0.3em] text-brand-primary">Tap to Scan</span>
+                 <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-brand-slate opacity-40">Ready for checkin</span>
                </div>
              </button>
           </div>
@@ -236,16 +236,16 @@ export default function CheckIn() {
                   {section && !activeSection && (
                     <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400 px-1">{section}</p>
                   )}
-                  <div className="flex flex-col gap-1.5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                     {sectionMembers.map(m => (
                        <button
                         key={m.id}
                         onClick={() => handleSelect(m)}
-                         className="group flex min-h-[4.5rem] items-center justify-between rounded-3xl bg-white px-6 sm:px-8 py-6 shadow-sm border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] transition-all text-left"
+                         className="group flex min-h-[4rem] sm:min-h-[4.5rem] items-center justify-between rounded-2xl sm:rounded-3xl bg-white px-5 sm:px-8 py-5 sm:py-6 shadow-sm border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] transition-all text-left"
                       >
-                        <span className="text-lg font-bold text-brand-text tracking-tight uppercase italic">{m.name}</span>
+                        <span className="text-base sm:text-lg font-bold text-brand-text tracking-tight uppercase italic truncate mr-2">{m.name}</span>
                         {m.section && !activeSection && (
-                          <span className="ml-4 flex-shrink-0 rounded-xl bg-brand-primary/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary border border-brand-primary/10">
+                          <span className="flex-shrink-0 rounded-xl bg-brand-primary/5 px-2 sm:px-3 py-1 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary border border-brand-primary/10">
                             {m.section}
                           </span>
                         )}

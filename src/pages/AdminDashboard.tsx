@@ -29,27 +29,27 @@ function OrgCard({
     <div className="flex items-center gap-3 group animate-in slide-in-from-left-4 duration-500">
       <button
         onClick={onClick}
-        className="flex-1 flex items-center justify-between rounded-[2rem] bg-white px-6 sm:px-8 py-6 sm:py-7 border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.99] transition-all text-left"
+        className="flex-1 flex items-center justify-between rounded-[2rem] bg-white px-5 sm:px-8 py-5 sm:py-7 border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.99] transition-all text-left"
       >
-        <div className="flex items-center gap-5">
-          <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-brand-primary/5 group-hover:bg-brand-primary group-hover:rotate-3 transition-all duration-500 relative overflow-hidden">
+        <div className="flex items-center gap-3 sm:gap-5">
+          <div className="flex h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-brand-primary/5 group-hover:bg-brand-primary group-hover:rotate-3 transition-all duration-500 relative overflow-hidden">
             <div className="absolute inset-0 bg-brand-primary opacity-0 group-hover:opacity-10 scale-150 blur-xl transition-opacity"></div>
-            <Building2 className="h-8 w-8 text-brand-primary group-hover:text-white transition-colors relative z-10" />
+            <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-brand-primary group-hover:text-white transition-colors relative z-10" />
           </div>
-          <div>
-            <p className="text-xl font-bold text-brand-text tracking-tight uppercase italic">{org.name}</p>
+          <div className="min-w-0">
+            <p className="text-lg sm:text-xl font-bold text-brand-text tracking-tight uppercase italic truncate">{org.name}</p>
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">
-              Established {new Date(org.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
+              {new Date(org.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
            {userRole === 'owner' && (
              <span className="hidden sm:inline-block rounded-full bg-brand-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-brand-primary border border-brand-primary/10">
                Owner
              </span>
            )}
-           <ChevronRight className="h-6 w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:opacity-100 transition-all" />
+           <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:opacity-100 transition-all" />
         </div>
       </button>
       
@@ -146,37 +146,37 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-brand-secondary">
-      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
+      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-12 sm:pt-24 pb-12 sm:pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
         {/* Abstract background glow */}
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
         
-        <div className="flex items-center justify-between relative z-10 w-full">
+        <div className="flex items-center justify-between relative z-10 w-full max-w-7xl mx-auto">
           <button
             onClick={() => navigate('/')}
-            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+            className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
           >
-            <ArrowLeft className="h-6 w-6" />
+            <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
           <div className="flex flex-col items-center flex-1">
-             <h1 className="text-3xl font-black tracking-tighter italic">Rollcally Admin</h1>
+             <h1 className="text-2xl sm:text-3xl font-black tracking-tighter italic">Rollcally Admin</h1>
              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mt-1">Management Hub</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={signOut} title="Sign Out" className="text-white hover:bg-white/10 h-12 w-12 rounded-2xl border border-white/10">
-            <LogOut className="h-5 w-5" />
+          <Button variant="ghost" size="sm" onClick={signOut} title="Sign Out" className="text-white hover:bg-white/10 h-10 w-10 sm:h-12 sm:w-12 rounded-2xl border border-white/10">
+            <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </div>
 
-        <div className="text-center relative z-10 mt-4 animate-in fade-in slide-in-from-top-4 duration-700">
-           <h2 className="text-2xl font-black leading-tight">
+        <div className="text-center relative z-10 mt-4 animate-in fade-in slide-in-from-top-4 duration-700 max-w-7xl mx-auto w-full">
+           <h2 className="text-xl sm:text-2xl font-black leading-tight">
              {isSuper ? 'System Overview' : 'My Organizations'}
            </h2>
-           <p className="mt-2 text-sm font-medium text-white/60">
+           <p className="mt-2 text-xs sm:text-sm font-medium text-white/60">
              {isSuper ? 'Controlling all active entities' : 'Manage your attendance groups'}
            </p>
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl px-5 sm:px-8 py-8 flex flex-col gap-6 relative">
+      <div className="mx-auto max-w-5xl px-5 sm:px-8 py-8 flex flex-col gap-8 relative">
         <section className="relative z-10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
             <div>
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
                </Button>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {orgs.map(o => (
                 <OrgCard 
                   key={o.id} 
@@ -284,24 +284,24 @@ export default function AdminDashboard() {
                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-slate opacity-40">Direct Unit Access</h2>
                <div className="h-px flex-1 bg-brand-border/50"></div>
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {adminUnits.map(u => (
                 <button
                   key={u.id}
                   onClick={() => navigate(`/admin/units/${u.id}`)}
-                  className="group w-full flex items-center justify-between rounded-[2rem] bg-white px-6 sm:px-8 py-6 shadow-lg shadow-brand-primary/[0.02] border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 transition-all text-left overflow-hidden relative"
+                  className="group w-full flex items-center justify-between rounded-[2rem] bg-white px-5 sm:px-8 py-5 sm:py-6 shadow-lg shadow-brand-primary/[0.02] border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 transition-all text-left overflow-hidden relative"
                 >
                    <div className="absolute top-0 right-0 -mt-8 -mr-8 h-24 w-24 bg-brand-primary/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                   <div className="flex items-center gap-5 relative z-10">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-primary/5 text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 shadow-inner group-hover:rotate-3">
-                      <Users className="h-7 w-7" />
+                   <div className="flex items-center gap-4 sm:gap-5 relative z-10 min-w-0">
+                    <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-brand-primary/5 text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 shadow-inner group-hover:rotate-3 flex-shrink-0">
+                      <Users className="h-6 w-6 sm:h-7 sm:w-7" />
                     </div>
-                    <div>
-                      <p className="text-lg font-bold text-brand-text uppercase italic tracking-tight">{u.name}</p>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-brand-slate opacity-40 mt-1">{u.organization.name}</p>
+                    <div className="min-w-0">
+                      <p className="text-lg font-bold text-brand-text uppercase italic tracking-tight truncate">{u.name}</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-brand-slate opacity-40 mt-1 truncate">{u.organization.name}</p>
                     </div>
                   </div>
-                  <ChevronRight className="h-6 w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:opacity-100 group-hover:translate-x-1 transition-all flex-shrink-0" />
                 </button>
               ))}
             </div>

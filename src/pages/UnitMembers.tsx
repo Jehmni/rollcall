@@ -107,56 +107,56 @@ function MemberRow({
     >
       <div className="absolute inset-y-0 left-0 w-1 bg-brand-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top duration-500"></div>
       
-      <div className="flex-1 min-w-0 px-5 sm:px-8 py-6 sm:py-7">
+      <div className="flex-1 min-w-0 px-4 sm:px-8 py-5 sm:py-7">
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
-             <p className="text-xl font-bold text-brand-text tracking-tight uppercase italic group-hover:text-brand-primary transition-colors">{member.name}</p>
-             <div className="flex items-center gap-3 mt-1.5">
+             <p className="text-lg sm:text-xl font-bold text-brand-text tracking-tight uppercase italic group-hover:text-brand-primary transition-colors truncate">{member.name}</p>
+             <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1.5">
                 {member.section && (
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary opacity-60">
                     {member.section}
                   </span>
                 )}
-                {member.section && member.phone && <span className="text-brand-slate/20 text-[10px]">/</span>}
+                {member.section && member.phone && <span className="hidden sm:inline text-brand-slate/20 text-[10px]">/</span>}
                 {member.phone && <p className="text-[10px] font-bold text-brand-slate opacity-40 uppercase tracking-widest">{member.phone}</p>}
                 {isBirthdayToday(member.birthday) && (
-                  <span title="Birthday Today! 🎂" className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-pink-600 bg-pink-50 px-2 py-1 rounded-lg border border-pink-100 ml-2 animate-pulse">
-                    <Cake className="h-3 w-3" /> Celebration
+                  <span title="Birthday Today! 🎂" className="flex items-center gap-1.5 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] text-pink-600 bg-pink-50 px-2 py-1 rounded-lg border border-pink-100 animate-pulse">
+                    <Cake className="h-3 w-3" /> <span className="hidden sm:inline">Celebration</span>
                   </span>
                 )}
              </div>
           </div>
           {member.status === 'inactive' && (
-            <span className="rounded-full bg-brand-secondary px-3 py-1 text-[8px] font-black uppercase tracking-widest text-brand-slate/40 border border-brand-border/50">Retired</span>
+            <span className="rounded-full bg-brand-secondary px-2 sm:px-3 py-1 text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-brand-slate/40 border border-brand-border/50 flex-shrink-0">Retired</span>
           )}
         </div>
       </div>
       
       {canManage && (
-        <div className="flex items-center gap-1.5 pr-4 sm:pr-6 flex-shrink-0 relative z-10 transition-all duration-300 opacity-20 group-hover:opacity-100">
+        <div className="flex items-center gap-1 sm:gap-1.5 pr-2 sm:pr-6 flex-shrink-0 relative z-10 transition-all duration-300 opacity-40 sm:opacity-20 group-hover:opacity-100">
           <button
             onClick={e => { e.stopPropagation(); onEdit(member) }}
-            className="flex h-11 w-11 items-center justify-center rounded-2xl text-brand-slate hover:bg-brand-primary hover:text-white border border-transparent hover:border-brand-primary transition-all active:scale-90"
+            className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl text-brand-slate hover:bg-brand-primary hover:text-white border border-transparent hover:border-brand-primary transition-all active:scale-90"
             title="Refine Identity"
           >
-            <Pencil className="h-4.5 w-4.5" />
+            <Pencil className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
           </button>
           <button
             onClick={e => { e.stopPropagation(); onDelete(member.id) }}
-            className="flex h-11 w-11 items-center justify-center rounded-2xl text-brand-slate/40 hover:bg-red-500 hover:text-white border border-transparent hover:border-red-500 transition-all active:scale-90"
+            className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl text-brand-slate/40 hover:bg-red-500 hover:text-white border border-transparent hover:border-red-500 transition-all active:scale-90"
             title="Decommission"
           >
-            <Trash2 className="h-4.5 w-4.5" />
+            <Trash2 className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
           </button>
-          <div className="h-10 w-px bg-brand-border/30 mx-2"></div>
-          <div className="flex h-11 w-11 items-center justify-center text-brand-slate/20 group-hover:text-brand-primary group-hover:translate-x-1 transition-all">
-             <ChevronRight className="h-6 w-6" />
+          <div className="hidden sm:block h-10 w-px bg-brand-border/30 mx-2"></div>
+          <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center text-brand-slate/20 group-hover:text-brand-primary group-hover:translate-x-1 transition-all">
+             <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
         </div>
       )}
       {!canManage && (
-        <div className="flex items-center gap-1 pr-8 flex-shrink-0">
-          <ChevronRight className="h-6 w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:translate-x-1 transition-all" />
+        <div className="flex items-center gap-1 pr-4 sm:pr-8 flex-shrink-0">
+          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:translate-x-1 transition-all" />
         </div>
       )}
     </div>
@@ -441,34 +441,34 @@ export default function UnitMembers() {
         onChange={handleFileChange}
       />
 
-      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
+      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-12 sm:pt-24 pb-12 sm:pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
         {/* Abstract background glow */}
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
         
-        <div className="flex items-center justify-between relative z-10 w-full">
+        <div className="flex items-center justify-between relative z-10 w-full max-w-7xl mx-auto">
           <button
             onClick={() => navigate(`/admin/units/${unitId}`)}
-            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+            className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
             title="Back to Unit"
           >
-            <ArrowLeft className="h-6 w-6" />
+            <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
           
           <div className="flex flex-col items-center flex-1 overflow-hidden px-4 text-center">
-             <h1 className="text-3xl font-black tracking-tighter italic truncate w-full">{unitName}</h1>
+             <h1 className="text-2xl sm:text-3xl font-black tracking-tighter italic truncate w-full">{unitName}</h1>
              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mt-1">
-               Roster Management
+                Roster Management
              </p>
           </div>
 
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white/20">
-            <Users className="h-6 w-6" />
+          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white/20">
+            <Users className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-3 relative z-10">
-           <div className="flex h-12 items-center px-6 rounded-2xl bg-white/10 border border-white/10">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
+           <div className="flex h-10 sm:h-12 items-center px-4 sm:px-6 rounded-2xl bg-white/10 border border-white/10">
+              <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-white">
                 {members.filter(m => m.status === 'active').length} Active Members
               </p>
            </div>
@@ -476,22 +476,22 @@ export default function UnitMembers() {
             <>
               <button
                  onClick={openImport}
-                 className="flex items-center gap-3 h-12 px-6 rounded-2xl bg-white/10 border border-white/10 text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-white/20 transition-all active:scale-95"
+                 className="flex items-center gap-3 h-10 sm:h-12 px-4 sm:px-6 rounded-2xl bg-white/10 border border-white/10 text-white font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] hover:bg-white/20 transition-all active:scale-95"
               >
                 <Upload className="h-4 w-4" /> Import
               </button>
               <button
                  onClick={openCreate}
-                 className="flex items-center gap-3 h-12 px-8 rounded-2xl bg-white text-brand-primary shadow-xl shadow-brand-primary/20 border border-white font-black text-[10px] uppercase tracking-[0.2em] hover:scale-105 transition-all active:scale-95"
+                 className="flex items-center gap-2 sm:gap-3 h-10 sm:h-12 px-6 sm:px-8 rounded-2xl bg-white text-brand-primary shadow-xl shadow-brand-primary/20 border border-white font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] hover:scale-105 transition-all active:scale-95"
               >
-                <Plus className="h-5 w-5" /> Add New
+                <Plus className="h-4 w-4 sm:h-5 sm:w-5" /> Add New
               </button>
             </>
           )}
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl px-5 sm:px-8 py-6 flex flex-col gap-4">
+      <div className="mx-auto max-w-5xl px-5 sm:px-8 py-8 flex flex-col gap-8">
 
         {/* ── Add / Edit form ─────────────────────────────────────────────── */}
         {panel === 'add' && (
@@ -774,20 +774,21 @@ Bob Smith,,Bass,active,1985-11-20`}
         )}
 
         {/* ── Search ──────────────────────────────────────────────────────── */}
-        <div className="relative group">
+        <div className="relative group max-w-7xl mx-auto w-full">
           <Input
             type="search"
             placeholder="Search roster by name or section…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-             className="w-full rounded-3xl bg-white border-brand-border/50 px-6 sm:px-8 py-6 sm:py-7 shadow-2xl shadow-brand-primary/5 focus:border-brand-primary/50 transition-all text-lg placeholder:text-brand-slate/30"
+             className="w-full rounded-3xl bg-white border-brand-border/50 px-6 sm:px-8 py-5 sm:py-7 shadow-2xl shadow-brand-primary/5 focus:border-brand-primary/50 transition-all text-lg placeholder:text-brand-slate/30"
           />
           <div className="absolute right-6 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-brand-primary/5 text-brand-primary opacity-40 group-focus-within:opacity-100 transition-all">
             <Search className="h-5 w-5" />
           </div>
         </div>
 
-        {/* ── Member list ─────────────────────────────────────────────────── */}
+        <div className="max-w-7xl mx-auto w-full">
+          {/* ── Member list ─────────────────────────────────────────────────── */}
          {loading ? (
           <div className="flex justify-center py-12">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
@@ -845,5 +846,6 @@ Bob Smith,,Bass,active,1985-11-20`}
         )}
       </div>
     </div>
+  </div>
   )
 }

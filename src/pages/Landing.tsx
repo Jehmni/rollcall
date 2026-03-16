@@ -226,39 +226,48 @@ export default function Landing() {
         </section>
 
         {/* Footer */}
-        <footer className="bg-slate-100 dark:bg-background-dark border-t border-slate-200 dark:border-primary/10 px-6 pt-16 pb-32">
-          <div className="flex flex-col gap-10 max-w-5xl mx-auto">
-            <div className="flex flex-col gap-4">
+        <footer className="bg-slate-100 dark:bg-background-dark border-t border-slate-200 dark:border-primary/10 px-6 pt-16 pb-32 md:pb-16">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 md:gap-8">
+            <div className="flex flex-col gap-4 max-w-xs">
               <div className="flex items-center gap-2">
-                <div className="bg-primary p-1 rounded-lg">
+                <div className="bg-primary p-1.5 rounded-lg">
                   <span className="material-symbols-outlined text-white text-lg">grid_view</span>
                 </div>
                 <h2 className="text-slate-900 dark:text-white text-xl font-extrabold tracking-tight">Rollcally</h2>
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed max-w-xs">The premium standard for organizational attendance and member engagement analytics.</p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">The premium standard for organizational attendance and member engagement analytics.</p>
+              <div className="flex gap-4 pt-4">
+                <a className="text-slate-400 hover:text-primary transition-colors" href="#"><span className="material-symbols-outlined">public</span></a>
+                <a className="text-slate-400 hover:text-primary transition-colors" href="#"><span className="material-symbols-outlined">alternate_email</span></a>
+                <a className="text-slate-400 hover:text-primary transition-colors" href="#"><span className="material-symbols-outlined">share_reviews</span></a>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-8">
+
+            <div className="grid grid-cols-2 sm:flex sm:gap-20">
               <div className="flex flex-col gap-4">
-                <h4 className="font-bold text-slate-900 dark:text-white">Product</h4>
-                <ul className="flex flex-col gap-2 text-slate-500 text-sm">
+                <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-xs">Product</h4>
+                <ul className="flex flex-col gap-3 text-slate-500 dark:text-slate-400 text-sm">
                   <li><a href="#" className="hover:text-primary transition-colors">Features</a></li>
                   <li><a href="#" className="hover:text-primary transition-colors">Security</a></li>
+                  <li><a href="#" className="hover:text-primary transition-colors">Pricing</a></li>
                 </ul>
               </div>
               <div className="flex flex-col gap-4">
-                <h4 className="font-bold text-slate-900 dark:text-white">Company</h4>
-                <ul className="flex flex-col gap-2 text-slate-500 text-sm">
+                <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-xs">Company</h4>
+                <ul className="flex flex-col gap-3 text-slate-500 dark:text-slate-400 text-sm">
                   <li><a href="#" className="hover:text-primary transition-colors">About Us</a></li>
                   <li><a href="#" className="hover:text-primary transition-colors">Contact</a></li>
+                  <li><a href="#" className="hover:text-primary transition-colors">Privacy</a></li>
                 </ul>
               </div>
             </div>
-            <div className="flex gap-4 pt-8 border-t border-slate-200 dark:border-primary/10">
-              <a className="text-slate-400 hover:text-primary transition-colors" href="#"><span className="material-symbols-outlined">public</span></a>
-              <a className="text-slate-400 hover:text-primary transition-colors" href="#"><span className="material-symbols-outlined">alternate_email</span></a>
-              <a className="text-slate-400 hover:text-primary transition-colors" href="#"><span className="material-symbols-outlined">share_reviews</span></a>
+          </div>
+          <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-slate-200 dark:border-primary/10 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase">© {new Date().getFullYear()} ROLLCALLY INC. ALL RIGHTS RESERVED.</p>
+            <div className="flex gap-6 text-[10px] font-black tracking-[0.2em] uppercase text-slate-400">
+              <a href="#" className="hover:text-primary transition-colors">Status</a>
+              <a href="#" className="hover:text-primary transition-colors">Terms</a>
             </div>
-            <p className="text-slate-400 text-[10px] font-medium tracking-widest uppercase">© {new Date().getFullYear()} ROLLCALLY INC. ALL RIGHTS RESERVED.</p>
           </div>
         </footer>
       </main>

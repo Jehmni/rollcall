@@ -44,23 +44,23 @@ function ServiceCard({ service, unitId, onClick }: { service: Service; unitId: s
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between rounded-[2.5rem] bg-white px-10 py-8 border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.99] transition-all text-left group animate-in slide-in-from-left-4 duration-500 relative overflow-hidden"
+      className="w-full flex items-center justify-between rounded-[2.5rem] bg-white px-6 sm:px-10 py-6 sm:py-8 border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.99] transition-all text-left group animate-in slide-in-from-left-4 duration-500 relative overflow-hidden"
     >
       <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
       
-      <div className="flex items-center gap-6 relative z-10">
-        <div className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl ${iconBg} group-hover:rotate-3 transition-all duration-500 shadow-xl`}>
-          <CalendarDays className={`h-8 w-8 ${iconColor}`} />
+      <div className="flex items-center gap-4 sm:gap-6 relative z-10 min-w-0">
+        <div className={`flex h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0 items-center justify-center rounded-2xl ${iconBg} group-hover:rotate-3 transition-all duration-500 shadow-xl`}>
+          <CalendarDays className={`h-6 w-6 sm:h-8 sm:w-8 ${iconColor}`} />
         </div>
-        <div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <p className="text-xl font-bold text-brand-text tracking-tighter uppercase italic group-hover:text-brand-primary transition-colors">{EVENT_LABEL[service.service_type]}</p>
-            <span className={`inline-block w-fit rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.1em] border shadow-sm ${statusStyle}`}>{statusLabel}</span>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <p className="text-lg sm:text-xl font-bold text-brand-text tracking-tighter uppercase italic group-hover:text-brand-primary transition-colors truncate">{EVENT_LABEL[service.service_type]}</p>
+            <span className={`inline-block w-fit rounded-full px-3 py-1 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.1em] border shadow-sm ${statusStyle}`}>{statusLabel}</span>
           </div>
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">{formatDate(service.date)}</p>
         </div>
       </div>
-      <ChevronRight className="h-6 w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:opacity-100 group-hover:translate-x-1 transition-all relative z-10" />
+      <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:opacity-100 group-hover:translate-x-1 transition-all relative z-10 flex-shrink-0" />
     </button>
   )
 }
@@ -183,22 +183,22 @@ export default function UnitDashboard() {
 
   return (
     <div className="min-h-screen bg-brand-secondary">
-      <header className="flex flex-col gap-8 px-4 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
+      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-12 sm:pt-24 pb-12 sm:pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
         {/* Abstract background glow */}
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
         
-        <div className="flex items-center justify-between relative z-10 w-full">
+        <div className="flex items-center justify-between relative z-10 w-full max-w-7xl mx-auto">
           <button
             onClick={() => navigate(isSuper && unit ? `/admin/orgs/${unit.org_id}` : '/admin')}
-            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+            className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
           >
-            <ArrowLeft className="h-6 w-6" />
+            <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
           
-          <div className="flex flex-col items-center flex-1 overflow-hidden px-4 text-center">
-             <h1 className="text-3xl font-black tracking-tighter italic truncate w-full">{unit?.name ?? 'Unit'}</h1>
+          <div className="flex flex-col items-center flex-1 overflow-hidden px-2 text-center">
+             <h1 className="text-2xl sm:text-3xl font-black tracking-tighter italic truncate w-full">{unit?.name ?? 'Unit'}</h1>
              <div className="flex items-center gap-2 mt-1">
-                {orgName && <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">{orgName}</p>}
+                {orgName && <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-white/40 truncate max-w-[120px] sm:max-w-none">{orgName}</p>}
                 <span className="text-[8px] font-black uppercase tracking-widest bg-white/10 px-2 py-0.5 rounded-full border border-white/10">
                   {userRole === 'owner' ? 'Org Owner' : isOwnerOrCreator ? 'Command' : 'Observer'}
                 </span>
@@ -209,41 +209,41 @@ export default function UnitDashboard() {
             {unitId && <NotificationBell unitId={unitId} />}
             <button
                onClick={() => signOut()}
-               className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+               className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
                title="Sign Out"
             >
-              <LogOut className="h-5 w-5" />
+              <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-3 relative z-10">
+        <div className="flex items-center justify-center gap-3 relative z-10 flex-wrap">
            <button 
              onClick={() => navigate(`/admin/units/${unitId}/members`)}
-             className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white text-brand-primary shadow-xl shadow-brand-primary/20 border border-white font-black text-[10px] uppercase tracking-[0.2em] hover:scale-105 transition-all active:scale-95"
+             className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-white text-brand-primary shadow-xl shadow-brand-primary/20 border border-white font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] hover:scale-105 transition-all active:scale-95"
            >
              <Users className="h-4 w-4" /> Members
            </button>
            {isOwnerOrCreator && (
             <button
                onClick={() => setShowSettings(!showSettings)}
-               className={`flex h-12 w-12 items-center justify-center rounded-2xl transition-all border active:scale-95 ${showSettings ? 'bg-white text-brand-primary border-white shadow-xl' : 'bg-white/10 border-white/10 text-white hover:bg-white/20'}`}
+               className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl transition-all border active:scale-95 ${showSettings ? 'bg-white text-brand-primary border-white shadow-xl' : 'bg-white/10 border-white/10 text-white hover:bg-white/20'}`}
             >
-              <Settings className="h-6 w-6" />
+              <Settings className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
           )}
           {isSuper && (
             <button
                onClick={() => setShowAdmins(!showAdmins)}
-               className={`flex h-12 w-12 items-center justify-center rounded-2xl transition-all border active:scale-95 ${showAdmins ? 'bg-white text-brand-primary border-white shadow-xl' : 'bg-white/10 border-white/10 text-white hover:bg-white/20'}`}
+               className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl transition-all border active:scale-95 ${showAdmins ? 'bg-white text-brand-primary border-white shadow-xl' : 'bg-white/10 border-white/10 text-white hover:bg-white/20'}`}
             >
-              <UserCog className="h-6 w-6" />
+              <UserCog className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
           )}
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl px-4 py-8 flex flex-col gap-8">
+      <div className="mx-auto max-w-5xl px-5 sm:px-8 py-8 flex flex-col gap-8">
 
         {showSettings && (
           <section className="animate-in fade-in slide-in-from-top-4 duration-300">
@@ -396,19 +396,21 @@ export default function UnitDashboard() {
                </Button>
             </div>
           ) : (
-            <div className="flex flex-col gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
               {upcoming.length > 0 && (
-                <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-5 md:col-span-2">
                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40 ml-4">Current & Coming</h3>
-                  {upcoming.map(s => (
-                    <ServiceCard key={s.id} service={s} unitId={unitId!} onClick={() => navigate(`/admin/units/${unitId}/events/${s.id}`)} />
-                  ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {upcoming.map(s => (
+                      <ServiceCard key={s.id} service={s} unitId={unitId!} onClick={() => navigate(`/admin/units/${unitId}/events/${s.id}`)} />
+                    ))}
+                  </div>
                 </div>
               )}
               {past.length > 0 && (
-                <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-5 md:col-span-2">
                   <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40 ml-4">Past Sessions</h3>
-                  <div className="flex flex-col gap-3 opacity-60">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 opacity-70">
                     {past.map(s => (
                       <ServiceCard key={s.id} service={s} unitId={unitId!} onClick={() => navigate(`/admin/units/${unitId}/events/${s.id}`)} />
                     ))}
