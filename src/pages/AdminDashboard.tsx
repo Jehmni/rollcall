@@ -1,6 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, Plus, ChevronRight, Building2, Users, Trash2, Edit2, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useOrganizations } from '../hooks/useAdminDashboard'
 import { Button } from '../components/ui/Button'
@@ -26,51 +25,51 @@ function OrgCard({
   const canManage = isSuper || userRole === 'owner';
 
   return (
-    <div className="flex items-center gap-3 group animate-in slide-in-from-left-4 duration-500">
+    <div className="bg-white dark:bg-[#1E293B] p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4 group active:scale-[0.98] transition-all relative">
       <button
         onClick={onClick}
-        className="flex-1 flex items-center justify-between rounded-[2rem] bg-white px-5 sm:px-8 py-5 sm:py-7 border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.99] transition-all text-left"
+        className="flex-1 flex items-center gap-4 text-left"
       >
-        <div className="flex items-center gap-3 sm:gap-5">
-          <div className="flex h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-brand-primary/5 group-hover:bg-brand-primary group-hover:rotate-3 transition-all duration-500 relative overflow-hidden">
-            <div className="absolute inset-0 bg-brand-primary opacity-0 group-hover:opacity-10 scale-150 blur-xl transition-opacity"></div>
-            <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-brand-primary group-hover:text-white transition-colors relative z-10" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-lg sm:text-xl font-bold text-brand-text tracking-tight uppercase italic truncate">{org.name}</p>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">
-              {new Date(org.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
-            </p>
-          </div>
+        <div className="w-14 h-14 bg-slate-100 dark:bg-slate-700/50 rounded-xl flex items-center justify-center text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+          <span className="material-symbols-outlined text-3xl">corporate_fare</span>
         </div>
-        <div className="flex items-center gap-2 sm:gap-4">
-           {userRole === 'owner' && (
-             <span className="hidden sm:inline-block rounded-full bg-brand-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-brand-primary border border-brand-primary/10">
-               Owner
-             </span>
-           )}
-           <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:opacity-100 transition-all" />
+        <div className="flex-1 min-w-0">
+          <h4 className="text-lg font-extrabold italic dark:text-white uppercase tracking-tight truncate">{org.name}</h4>
+          <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase">
+            {new Date(org.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
+          </p>
         </div>
       </button>
       
-      {canManage && (
-        <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-          <button
-            onClick={(e) => { e.stopPropagation(); onRename(); }}
-            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white border border-brand-border text-brand-slate hover:bg-brand-primary/5 hover:text-brand-primary hover:border-brand-primary/20 shadow-sm transition-all active:scale-90"
-            title="Rename"
-          >
-            <Edit2 className="h-4 w-4" />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onDelete(); }}
-            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white border border-brand-border text-gray-300 hover:bg-red-50 hover:text-red-500 hover:border-red-200 shadow-sm transition-all active:scale-90"
-            title="Delete"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        </div>
-      )}
+      <div className="flex items-center gap-3">
+        <span className={`px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider border ${
+          userRole === 'owner' 
+            ? 'bg-primary/10 text-primary border-primary/20' 
+            : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600'
+        }`}>
+          {userRole === 'owner' ? 'Owner' : 'Admin'}
+        </span>
+        
+        {canManage && (
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={(e) => { e.stopPropagation(); onRename(); }}
+              className="p-2 text-slate-400 hover:text-primary transition-colors"
+              title="Rename"
+            >
+              <span className="material-symbols-outlined text-xl">edit</span>
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+              className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+              title="Delete"
+            >
+              <span className="material-symbols-outlined text-xl">delete</span>
+            </button>
+          </div>
+        )}
+        <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:translate-x-1 transition-transform">chevron_right</span>
+      </div>
     </div>
   )
 }
@@ -145,75 +144,80 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-secondary">
-      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-12 sm:pt-24 pb-12 sm:pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
-        {/* Abstract background glow */}
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
-        
-        <div className="flex items-center justify-between relative z-10 w-full max-w-7xl mx-auto">
-          <button
+    <div className="bg-background-light dark:bg-[#0F172A] min-h-screen text-slate-900 dark:text-slate-100 antialiased font-display selection:bg-primary/30">
+      {/* Header/Top Bar */}
+      <header className="bg-[#172554] text-white pt-12 pb-8 px-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        <div className="flex justify-between items-center mb-8 relative z-10 w-full max-w-5xl mx-auto">
+          <button 
             onClick={() => navigate('/')}
-            className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+            <span className="material-symbols-outlined text-xl">arrow_back</span>
           </button>
-          <div className="flex flex-col items-center flex-1">
-             <h1 className="text-2xl sm:text-3xl font-black tracking-tighter italic">Rollcally Admin</h1>
-             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mt-1">Management Hub</p>
+          <div className="flex flex-col items-center">
+            <h1 className="text-xl font-extrabold tracking-tighter italic uppercase">ROLLCALLY ADMIN</h1>
+            <p className="text-[10px] uppercase tracking-[0.2em] opacity-60 font-medium">Management Hub</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={signOut} title="Sign Out" className="text-white hover:bg-white/10 h-10 w-10 sm:h-12 sm:w-12 rounded-2xl border border-white/10">
-            <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
-          </Button>
+          <button 
+            onClick={signOut}
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+          >
+            <span className="material-symbols-outlined text-xl">logout</span>
+          </button>
         </div>
-
-        <div className="text-center relative z-10 mt-4 animate-in fade-in slide-in-from-top-4 duration-700 max-w-7xl mx-auto w-full">
-           <h2 className="text-xl sm:text-2xl font-black leading-tight">
-             {isSuper ? 'System Overview' : 'My Organizations'}
-           </h2>
-           <p className="mt-2 text-xs sm:text-sm font-medium text-white/60">
-             {isSuper ? 'Controlling all active entities' : 'Manage your attendance groups'}
-           </p>
+        <div className="text-center relative z-10 animate-in fade-in slide-in-from-top-4 duration-700">
+          <h2 className="text-2xl font-bold mb-1">
+            {isSuper ? 'System Overview' : 'My Organizations'}
+          </h2>
+          <p className="text-slate-400 text-sm">
+            {isSuper ? 'Controlling all active entities' : 'Manage your attendance groups'}
+          </p>
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-5 sm:px-8 py-8 flex flex-col gap-8 relative">
-        <section className="relative z-10">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
-            <div>
-              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40">
-                Dashboard
-              </h2>
-              <p className="text-2xl font-black text-brand-text tracking-tight uppercase italic mt-1">Directory</p>
-            </div>
-            <div className="flex gap-3 w-full sm:w-auto">
-              <Button 
-                variant="secondary" 
-                size="lg" 
-                onClick={() => navigate('/admin/discover')}
-                className="flex-1 sm:flex-none border-brand-border/50 text-xs font-bold uppercase tracking-[0.1em] rounded-2xl"
-              >
-                Explore
-              </Button>
-              <Button size="lg" onClick={() => { setShowCreate(!showCreate); setEditingOrg(null); setNewName('') }} className="flex-1 sm:flex-none shadow-2xl shadow-brand-primary/30 rounded-2xl text-xs font-bold uppercase tracking-[0.1em]">
-                <Plus className="h-5 w-5 mr-3" /> New
-              </Button>
-            </div>
+      <main className="max-w-5xl mx-auto px-6 py-8">
+        <div className="flex justify-between items-end mb-6">
+          <div>
+            <p className="text-[10px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase mb-1">Dashboard</p>
+            <h3 className="text-2xl font-extrabold italic dark:text-white uppercase tracking-tight">Directory</h3>
           </div>
-          {(showCreate || editingOrg) && (
-            <div className="mb-10 rounded-[2.5rem] bg-white p-6 sm:p-10 shadow-2xl shadow-brand-primary/5 border border-brand-border/50 animate-in fade-in slide-in-from-top-6 duration-700 relative overflow-hidden">
-               <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl"></div>
-              <form onSubmit={editingOrg ? handleUpdate : handleCreate} className="flex flex-col gap-8 relative z-10">
-                <div className="flex items-center gap-6">
-                  <div className="h-16 w-16 bg-brand-primary shadow-xl shadow-brand-primary/20 rounded-3xl flex items-center justify-center text-white">
-                    {editingOrg ? <Edit2 className="h-8 w-8" /> : <Plus className="h-8 w-8" />}
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">{editingOrg ? 'Rename' : 'Launch New'}</h3>
-                    <p className="text-sm font-medium text-brand-slate opacity-40">
-                      {editingOrg ? 'Update organization details' : 'Create a new organisation'}
-                    </p>
-                  </div>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => navigate('/admin/discover')}
+              className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 bg-white dark:bg-[#1E293B] rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+            >
+              Explore
+            </button>
+            <button 
+              onClick={() => { setShowCreate(!showCreate); setEditingOrg(null); setNewName('') }}
+              className="px-4 py-2 text-xs font-bold uppercase tracking-wider bg-primary text-white rounded-lg shadow-lg shadow-primary/20 flex items-center gap-1 hover:bg-primary/90 transition-colors"
+            >
+              <span className="material-symbols-outlined text-sm">add</span>
+              New
+            </button>
+          </div>
+        </div>
+
+        {/* Create/Edit Form */}
+        {(showCreate || editingOrg) && (
+          <div className="mb-10 rounded-[2.5rem] bg-white dark:bg-[#1E293B] p-6 sm:p-10 shadow-2xl border border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-6 duration-700 relative overflow-hidden">
+            <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-primary/5 rounded-full blur-3xl"></div>
+            <form onSubmit={editingOrg ? handleUpdate : handleCreate} className="flex flex-col gap-8 relative z-10">
+              <div className="flex items-center gap-6">
+                <div className="w-16 h-16 bg-primary shadow-xl shadow-primary/20 rounded-3xl flex items-center justify-center text-white">
+                  <span className="material-symbols-outlined text-3xl">
+                    {editingOrg ? 'edit' : 'add'}
+                  </span>
                 </div>
+                <div>
+                  <h3 className="text-2xl font-black dark:text-white uppercase tracking-tighter italic">{editingOrg ? 'Rename' : 'Launch New'}</h3>
+                  <p className="text-sm font-medium text-slate-400 dark:text-slate-500">
+                    {editingOrg ? 'Update organization details' : 'Create a new organisation'}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-4">
                 <Input
                   label="Name of Organization"
                   placeholder="e.g. Metro Parish, Sports Club..."
@@ -222,91 +226,127 @@ export default function AdminDashboard() {
                   error={error ?? undefined}
                   required
                   autoFocus
-                  className="text-lg py-6"
+                  className="bg-transparent dark:bg-slate-900/50 dark:border-slate-800 rounded-xl"
                 />
-                <div className="flex gap-4 justify-end">
-                  <Button variant="ghost" size="lg" type="button" onClick={() => { setShowCreate(false); setEditingOrg(null) }} className="text-xs font-black uppercase tracking-[0.2em] opacity-40">Cancel</Button>
-                  <Button size="lg" type="submit" loading={isUpdating} className="px-10 shadow-xl shadow-brand-primary/20 text-xs font-black uppercase tracking-[0.2em] rounded-2xl">
-                    {editingOrg ? 'Update Hub' : 'Create'}
-                  </Button>
-                </div>
-              </form>
-            </div>
-          )}
+              </div>
+              <div className="flex gap-4 justify-end">
+                <Button variant="ghost" type="button" onClick={() => { setShowCreate(false); setEditingOrg(null) }} className="text-xs font-bold uppercase tracking-[0.2em] opacity-50 dark:text-white dark:hover:bg-white/5">Cancel</Button>
+                <Button type="submit" loading={isUpdating} className="px-10 shadow-xl shadow-primary/20 text-xs font-bold uppercase tracking-[0.2em] rounded-xl">
+                  {editingOrg ? 'Update Hub' : 'Create'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        )}
 
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
-            </div>
-          ) : orgs.length === 0 ? (
-            <div className="rounded-[2.5rem] bg-white p-10 sm:p-20 text-center border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] relative overflow-hidden group">
-               <div className="absolute -top-10 -right-10 h-40 w-40 bg-brand-primary/5 rounded-full opacity-50 blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
-               <Building2 className="mx-auto mb-6 h-20 w-20 text-brand-primary/10 group-hover:text-brand-primary/20 transition-colors" />
-               <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">Welcome to Rollcally</h3>
-               <p className="text-sm font-medium text-brand-slate opacity-40 mb-10 max-w-sm mx-auto mt-3">
-                 Ready to start tracking? Launch your first organization to begin managing units and take attendance.
-               </p>
-               <Button onClick={() => setShowCreate(true)} className="px-12 py-6 shadow-2xl shadow-brand-primary/30 rounded-2xl text-xs font-black uppercase tracking-widest">
-                 Setup first Organization
-               </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              {orgs.map(o => (
-                <OrgCard 
-                  key={o.id} 
-                  org={o} 
-                  userRole={o.userRole}
-                  isSuper={isSuper}
-                  onClick={() => navigate(`/admin/orgs/${o.id}`)}
-                  onDelete={() => setConfirmDelete({ id: o.id, name: o.name })}
-                  onRename={() => startRename(o)}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          </div>
+        ) : orgs.length === 0 ? (
+          <div className="rounded-[2.5rem] bg-white dark:bg-[#1E293B] p-10 sm:p-20 text-center border border-slate-100 dark:border-slate-800 shadow-2xl relative overflow-hidden group">
+             <div className="absolute -top-10 -right-10 h-40 w-40 bg-primary/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+             <span className="material-symbols-outlined text-8xl text-primary/10 group-hover:text-primary/20 transition-colors mb-6 block">corporate_fare</span>
+             <h3 className="text-2xl font-black dark:text-white uppercase tracking-tighter italic">Welcome to Rollcally</h3>
+             <p className="text-sm font-medium text-slate-400 dark:text-slate-500 mb-10 max-w-sm mx-auto mt-3">
+               Ready to start tracking? Launch your first organization to begin managing units and take attendance.
+             </p>
+             <Button onClick={() => setShowCreate(true)} className="px-12 py-6 shadow-2xl shadow-primary/30 rounded-2xl text-xs font-black uppercase tracking-widest">
+               Setup first Organization
+             </Button>
+          </div>
+        ) : (
+          <div className="space-y-4 mb-10">
+            {orgs.map(o => (
+              <OrgCard 
+                key={o.id} 
+                org={o} 
+                userRole={o.userRole}
+                isSuper={isSuper}
+                onClick={() => navigate(`/admin/orgs/${o.id}`)}
+                onDelete={() => setConfirmDelete({ id: o.id, name: o.name })}
+                onRename={() => startRename(o)}
+              />
+            ))}
+          </div>
+        )}
 
-        <ConfirmDialog
-          isOpen={!!confirmDelete}
-          onClose={() => setConfirmDelete(null)}
-          onConfirm={handleDelete}
-          title="Delete Organization"
-          description={`DANGER: Delete organization "${confirmDelete?.name}"? This will delete ALL units, members, and historical records. This action cannot be undone.`}
-          confirmText="Delete Everything"
-          variant="danger"
-          isLoading={isUpdating}
-        />
-
-          <section className="mt-8">
-            <div className="flex items-center gap-4 mb-8 px-2 sm:px-4">
-               <div className="h-px flex-1 bg-brand-border/50"></div>
-               <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-slate opacity-40">Direct Unit Access</h2>
-               <div className="h-px flex-1 bg-brand-border/50"></div>
+        {/* Units Section */}
+        {adminUnits.length > 0 && (
+          <>
+            <div className="relative mb-6 mt-12">
+              <div aria-hidden="true" className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-background-light dark:bg-[#0F172A] px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+                  Direct Unit Access
+                </span>
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+
+            <div className="space-y-4">
               {adminUnits.map(u => (
-                <button
+                <div 
                   key={u.id}
                   onClick={() => navigate(`/admin/units/${u.id}`)}
-                  className="group w-full flex items-center justify-between rounded-[2rem] bg-white px-5 sm:px-8 py-5 sm:py-6 shadow-lg shadow-brand-primary/[0.02] border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 transition-all text-left overflow-hidden relative"
+                  className="bg-white dark:bg-[#1E293B] p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4 group active:scale-[0.98] transition-all cursor-pointer"
                 >
-                   <div className="absolute top-0 right-0 -mt-8 -mr-8 h-24 w-24 bg-brand-primary/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                   <div className="flex items-center gap-4 sm:gap-5 relative z-10 min-w-0">
-                    <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-brand-primary/5 text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 shadow-inner group-hover:rotate-3 flex-shrink-0">
-                      <Users className="h-6 w-6 sm:h-7 sm:w-7" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-lg font-bold text-brand-text uppercase italic tracking-tight truncate">{u.name}</p>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-brand-slate opacity-40 mt-1 truncate">{u.organization.name}</p>
-                    </div>
+                  <div className="w-14 h-14 bg-slate-100 dark:bg-slate-700/50 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors group-hover:bg-primary group-hover:text-white">
+                    <span className="material-symbols-outlined text-3xl">groups</span>
                   </div>
-                  <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:opacity-100 group-hover:translate-x-1 transition-all flex-shrink-0" />
-                </button>
+                  <div className="flex-1">
+                    <h4 className="text-lg font-extrabold italic dark:text-white uppercase tracking-tight truncate">{u.name}</h4>
+                    <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase">{u.organization.name}</p>
+                  </div>
+                  <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:translate-x-1 transition-transform">chevron_right</span>
+                </div>
               ))}
             </div>
-          </section>
-      </div>
+          </>
+        )}
+      </main>
+
+      {/* Floating Action Button */}
+      <button 
+        onClick={() => { setShowCreate(true); setEditingOrg(null); setNewName('') }}
+        className="fixed right-6 bottom-24 sm:bottom-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-20"
+      >
+        <span className="material-symbols-outlined text-3xl">add</span>
+      </button>
+
+      {/* Navigation Footer */}
+      <nav className="fixed bottom-0 left-0 right-0 backdrop-blur-md bg-white/70 dark:bg-[#1E293B]/70 border-t border-slate-200/20 dark:border-slate-800/50 px-8 py-3 pb-8 flex justify-between items-center z-10 transition-colors">
+        <button className="flex flex-col items-center gap-1 text-primary">
+          <span className="material-symbols-outlined">dashboard</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#5247e6]">Dash</span>
+        </button>
+        <button className="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors">
+          <span className="material-symbols-outlined">person</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest">Staff</span>
+        </button>
+        <button className="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors">
+          <span className="material-symbols-outlined">analytics</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest">Stats</span>
+        </button>
+        <button className="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors">
+          <span className="material-symbols-outlined">settings</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest">Setup</span>
+        </button>
+      </nav>
+
+      <div className="h-32"></div>
+
+      <ConfirmDialog
+        isOpen={!!confirmDelete}
+        onClose={() => setConfirmDelete(null)}
+        onConfirm={handleDelete}
+        title="Delete Organization"
+        description={`DANGER: Delete organization "${confirmDelete?.name}"? This will delete ALL units, members, and historical records. This action cannot be undone.`}
+        confirmText="Delete Everything"
+        variant="danger"
+        isLoading={isUpdating}
+      />
     </div>
   )
 }
