@@ -315,3 +315,72 @@ export function useAdminDashboard(serviceId: string | null) {
     refetch: () => fetchMembers(0, true) 
   }
 }
+
+// ── Organisation Analytics ────────────────────────────────────────────────────
+
+export interface UnitStats {
+  unitId: string
+  memberCount: number       // active members in this unit
+  sessionCount: number      // services in the last 30 days
+}
+
+export interface OrgStats {
+  totalMembers: number      // all active members across all units
+  totalUnits: number        // number of units
+  unitStats: Record<string, UnitStats>  // keyed by unit id
+}
+
+export function useOrgStats(orgId: string | null, unitIds: string[]) {
+  const [stats, setStats] = useState<OrgStats>({
+    totalMembers: 0,
+    totalUnits: 0,
+    unitStats: {},
+  })
+  const [loading, setLoading] = useState(false)
+
+  const fetch = useCallback(async () => {
+    if (!orgId || unitIds.length === 0) {
+      setStats({ totalMembers: 0, totalUnits: unitIds.length, unitStats: {} })
+      return
+    }
+    setLoading(true)
+
+    // Fetch all active members for all units in one query
+    const { data: members } = await supabase
+      .from('members')
+      .select('unit_id')
+      .in('unit_id', unitIds)
+      .eq('status', 'active')
+
+    // Fetch all services from the last 30 days for these units
+    const since = new Date()
+    since.setDate(since.getDate() - 30)
+    const { data: services } = await supabase
+      .from('services')
+      .select('unit_id')
+      .in('unit_id', unitIds)
+      .gte('date', since.toISOString().slice(0, 10))
+
+    // Aggregate
+    const unitStats: Record<string, UnitStats> = {}
+    for (const id of unitIds) {
+      unitStats[id] = { unitId: id, memberCount: 0, sessionCount: 0 }
+    }
+    for (const m of (members ?? [])) {
+      if (unitStats[m.unit_id]) unitStats[m.unit_id].memberCount++
+    }
+    for (const s of (services ?? [])) {
+      if (unitStats[s.unit_id]) unitStats[s.unit_id].sessionCount++
+    }
+
+    const totalMembers = Object.values(unitStats).reduce((sum, s) => sum + s.memberCount, 0)
+
+    setStats({ totalMembers, totalUnits: unitIds.length, unitStats })
+    setLoading(false)
+  }, [orgId, unitIds.join(',')]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => { fetch() }, [fetch])
+
+  return { stats, loading, refetch: fetch }
+}
+

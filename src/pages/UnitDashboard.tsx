@@ -1,12 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, CalendarDays, Users, ChevronRight, LogOut, UserCog, Settings, Trash2, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useServices, useUnitAdmins, useUnits } from '../hooks/useAdminDashboard'
 import { useAuth } from '../contexts/AuthContext'
-import { Button } from '../components/ui/Button'
-import { Input } from '../components/ui/Input'
-import { Card } from '../components/ui/Card'
 import { ConfirmDialog } from '../components/ui/Modal'
 import type { Service, ServiceType, Unit, OrgRole } from '../types'
 import { NotificationBell } from '../components/NotificationBell'
@@ -28,59 +24,255 @@ function formatDate(dateStr: string) {
   })
 }
 
-function ServiceCard({ service, unitId, onClick }: { service: Service; unitId: string; onClick: () => void }) {
+// ── Service card (dark style) ─────────────────────────────────────────────────
+function ServiceCard({ service, onClick }: { service: Service; onClick: () => void }) {
   const status = serviceStatus(service.date)
-  const statusStyle = { 
-    today: 'bg-brand-primary/10 text-brand-primary border-brand-primary/10', 
-    upcoming: 'bg-green-50 text-green-700 border-green-100', 
-    past: 'bg-brand-secondary/50 text-brand-slate opacity-60 border-brand-border/30' 
-  }[status]
-  const statusLabel = { today: 'Active Today', upcoming: 'Scheduled', past: 'Archived' }[status]
-  const iconBg = { today: 'bg-brand-primary shadow-brand-primary/20', upcoming: 'bg-green-600 shadow-green-500/20', past: 'bg-brand-slate/10' }[status]
-  const iconColor = status === 'past' ? 'text-brand-slate/40' : 'text-white'
+  const isToday = status === 'today'
+  const isPast  = status === 'past'
 
-  void unitId 
+  const accentColor = isToday ? '#5247e6' : isPast ? '#475569' : '#10b981'
+  const accentBg    = `${accentColor}1a`
+  const statusLabel = { today: 'Active Today', upcoming: 'Scheduled', past: 'Archived' }[status]
 
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between rounded-[2.5rem] bg-white px-6 sm:px-10 py-6 sm:py-8 border border-brand-border/50 hover:border-brand-primary/40 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.99] transition-all text-left group animate-in slide-in-from-left-4 duration-500 relative overflow-hidden"
+      className={`w-full group rounded-xl border transition-all text-left duration-300 animate-in slide-in-from-bottom-2 overflow-hidden hover:scale-[1.01] active:scale-[0.99] ${
+        isPast
+          ? 'bg-surface-dark border-border-dark opacity-60 hover:opacity-80'
+          : 'bg-surface-dark border-border-dark hover:border-primary/40'
+      }`}
     >
-      <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
-      
-      <div className="flex items-center gap-4 sm:gap-6 relative z-10 min-w-0">
-        <div className={`flex h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0 items-center justify-center rounded-2xl ${iconBg} group-hover:rotate-3 transition-all duration-500 shadow-xl`}>
-          <CalendarDays className={`h-6 w-6 sm:h-8 sm:w-8 ${iconColor}`} />
+      {/* Top accent line */}
+      <div className="h-0.5 w-full" style={{ backgroundColor: isToday ? accentColor : 'transparent' }} />
+
+      <div className="flex items-center gap-4 p-4 sm:p-5">
+        {/* Icon */}
+        <div
+          className="size-12 sm:size-14 flex-shrink-0 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300"
+          style={{ backgroundColor: accentBg }}
+        >
+          <span className="material-symbols-outlined text-xl sm:text-2xl" style={{ color: accentColor }}>
+            {isToday ? 'event_available' : isPast ? 'event' : 'calendar_month'}
+          </span>
         </div>
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <p className="text-lg sm:text-xl font-bold text-brand-text tracking-tighter uppercase italic group-hover:text-brand-primary transition-colors truncate">{EVENT_LABEL[service.service_type]}</p>
-            <span className={`inline-block w-fit rounded-full px-3 py-1 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.1em] border shadow-sm ${statusStyle}`}>{statusLabel}</span>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2 mb-1">
+            <p className="text-sm sm:text-base font-bold text-slate-100 tracking-tight group-hover:text-primary transition-colors">
+              {EVENT_LABEL[service.service_type]}
+            </p>
+            <span
+              className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border"
+              style={{ color: accentColor, borderColor: `${accentColor}40`, backgroundColor: accentBg }}
+            >
+              {statusLabel}
+            </span>
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 mt-1">{formatDate(service.date)}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">{formatDate(service.date)}</p>
         </div>
+
+        <span className="material-symbols-outlined text-slate-600 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all flex-shrink-0">
+          chevron_right
+        </span>
       </div>
-      <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:opacity-100 group-hover:translate-x-1 transition-all relative z-10 flex-shrink-0" />
     </button>
   )
 }
 
+// ── Create Event Modal ────────────────────────────────────────────────────────
+function CreateEventModal({
+  date, type, error, loading,
+  onChangeDate, onChangeType, onSubmit, onClose,
+}: {
+  date: string; type: ServiceType; error: string | null; loading: boolean
+  onChangeDate: (v: string) => void
+  onChangeType: (v: ServiceType) => void
+  onSubmit: (e: FormEvent) => void
+  onClose: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300">
+        <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mb-5 sm:hidden" />
+
+        <div className="flex items-center gap-4 mb-6">
+          <div className="size-12 bg-primary/10 rounded-xl flex items-center justify-center">
+            <span className="material-symbols-outlined text-primary text-xl">calendar_add_on</span>
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-slate-100">Schedule Event</h3>
+            <p className="text-xs text-slate-500">Initialise a formal session for attendance tracking</p>
+          </div>
+          <button onClick={onClose} className="ml-auto size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Event Date</span>
+            <input
+              type="date"
+              value={date}
+              onChange={e => onChangeDate(e.target.value)}
+              required
+              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all [color-scheme:dark]"
+            />
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Event Type</span>
+            <select
+              value={type}
+              onChange={e => onChangeType(e.target.value as ServiceType)}
+              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
+            >
+              <option value="rehearsal">Regular Meeting</option>
+              <option value="sunday_service">Main Event</option>
+            </select>
+          </label>
+          {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
+          <div className="flex gap-3 justify-end pt-2">
+            <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-xl hover:bg-border-dark transition-colors">
+              Cancel
+            </button>
+            <button type="submit" disabled={loading}
+              className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50">
+              {loading ? 'Creating…' : 'Create Event'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ── Settings Modal ────────────────────────────────────────────────────────────
+function SettingsModal({
+  name, desc, error, loading,
+  onChangeName, onChangeDesc, onSubmit, onDelete, onClose,
+}: {
+  name: string; desc: string; error: string | null; loading: boolean
+  onChangeName: (v: string) => void; onChangeDesc: (v: string) => void
+  onSubmit: (e: FormEvent) => void; onDelete: () => void; onClose: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300">
+        <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mb-5 sm:hidden" />
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-xl">settings</span>
+            Unit Settings
+          </h3>
+          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Unit Name</span>
+            <input value={name} onChange={e => onChangeName(e.target.value)} required
+              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Description <span className="normal-case font-normal text-slate-600">(optional)</span></span>
+            <input value={desc} onChange={e => onChangeDesc(e.target.value)} placeholder="Purpose of this unit…"
+              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
+          </label>
+          {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
+          <div className="flex items-center justify-between pt-2">
+            <button type="button" onClick={onDelete} className="text-sm font-semibold text-red-400 hover:text-red-300 flex items-center gap-1.5 transition-colors">
+              <span className="material-symbols-outlined text-lg">delete</span> Delete Unit
+            </button>
+            <div className="flex gap-2">
+              <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-xl hover:bg-border-dark transition-colors">Cancel</button>
+              <button type="submit" disabled={loading}
+                className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50">
+                {loading ? 'Saving…' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ── Admins Panel Modal (super only) ──────────────────────────────────────────
+function AdminsModal({
+  admins, newEmail, error, loading,
+  onChangeEmail, onSubmit, onRemove, onClose,
+}: {
+  admins: any[]; newEmail: string; error: string | null; loading: boolean
+  onChangeEmail: (v: string) => void; onSubmit: (e: FormEvent) => void
+  onRemove: (id: string) => void; onClose: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[80vh] overflow-y-auto">
+        <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mb-5 sm:hidden" />
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-xl">manage_accounts</span>
+            Unit Admins
+          </h3>
+          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <form onSubmit={onSubmit} className="flex gap-2 mb-5">
+          <input
+            type="email" value={newEmail} onChange={e => onChangeEmail(e.target.value)} placeholder="admin@email.com" required
+            className="flex-1 bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
+          />
+          <button type="submit" disabled={loading}
+            className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50 flex-shrink-0">
+            {loading ? '…' : 'Add'}
+          </button>
+        </form>
+        {error && <p className="text-sm text-red-400 mb-4 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
+        <div className="flex flex-col gap-2">
+          {admins.length === 0 ? (
+            <p className="text-sm text-slate-500 text-center py-4">No unit admins assigned yet.</p>
+          ) : admins.map(a => (
+            <div key={a.id} className="flex items-center justify-between rounded-xl px-4 py-3 bg-background-dark border border-border-dark">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="size-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-outlined text-primary text-sm">person</span>
+                </div>
+                <span className="text-sm font-medium text-slate-300 truncate">{a.email !== '—' ? a.email : a.user_id}</span>
+              </div>
+              <button onClick={() => onRemove(a.id)} className="p-2 text-slate-600 hover:text-red-400 transition-colors flex-shrink-0">
+                <span className="material-symbols-outlined text-lg">delete</span>
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
 export default function UnitDashboard() {
   const { unitId } = useParams<{ unitId: string }>()
   const navigate = useNavigate()
   const { isSuper, signOut, session } = useAuth()
   const { services, loading: servicesLoading, createService } = useServices(unitId ?? null)
-  const { updateUnit, deleteUnit } = useUnits(null) // pass null because we don't need a list here
+  const { updateUnit, deleteUnit } = useUnits(null)
   const { admins, addAdmin, removeAdmin } = useUnitAdmins(isSuper ? unitId ?? null : null)
 
   const [unit, setUnit] = useState<Unit | null>(null)
   const [orgName, setOrgName] = useState('')
-  const [showCreate, setShowCreate] = useState(false)
-  const [showAdmins, setShowAdmins] = useState(false)
+  const [orgId, setOrgId] = useState('')
+  const [showCreate, setShowCreate]     = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [showAdmins, setShowAdmins]     = useState(false)
   const [userRole, setUserRole] = useState<OrgRole>('member')
   const [isOwnerOrCreator, setIsOwnerOrCreator] = useState(false)
-  
+
   // Forms state
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0])
   const [newType, setNewType] = useState<ServiceType>('rehearsal')
@@ -88,10 +280,11 @@ export default function UnitDashboard() {
   const [newDesc, setNewDesc] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   const [newAdminEmail, setNewAdminEmail] = useState('')
-  const [addingAdmin, setAddingAdmin] = useState(false)
-  const [adminError, setAdminError] = useState<string | null>(null)
+  const [addingAdmin, setAddingAdmin]     = useState(false)
+  const [adminError, setAdminError]       = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   useEffect(() => {
     if (!unitId || !session?.user?.id) return
@@ -106,9 +299,9 @@ export default function UnitDashboard() {
           setUnit(data)
           const org = data.organization as any
           setOrgName(org?.name ?? '')
+          setOrgId(org?.id ?? '')
           setNewName(data.name)
           setNewDesc(data.description ?? '')
-          
           const role = org?.organization_members?.[0]?.role || 'member'
           setUserRole(role)
           setIsOwnerOrCreator(isSuper || role === 'owner' || data.created_by_admin_id === session.user.id)
@@ -116,11 +309,8 @@ export default function UnitDashboard() {
       })
   }, [unitId, session?.user?.id, isSuper])
 
-
   async function handleCreate(e: FormEvent) {
-    e.preventDefault()
-    setError(null)
-    setIsUpdating(true)
+    e.preventDefault(); setError(null); setIsUpdating(true)
     try {
       const svc = await createService(newDate, newType)
       setShowCreate(false)
@@ -128,310 +318,287 @@ export default function UnitDashboard() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       setError(msg.includes('unique') ? 'An event already exists for that date and type.' : msg)
-    } finally {
-      setIsUpdating(false)
-    }
+    } finally { setIsUpdating(false) }
   }
 
   async function handleUpdateUnit(e: FormEvent) {
-    e.preventDefault()
-    if (!unitId) return
-    setError(null)
-    setIsUpdating(true)
+    e.preventDefault(); if (!unitId) return; setError(null); setIsUpdating(true)
     try {
       const updated = await updateUnit(unitId, newName.trim(), newDesc.trim() || undefined)
-      setUnit(updated)
-      setShowSettings(false)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update unit')
-    } finally {
-      setIsUpdating(false)
-    }
+      setUnit(updated); setShowSettings(false)
+    } catch (err) { setError(err instanceof Error ? err.message : 'Failed to update unit') }
+    finally { setIsUpdating(false) }
   }
 
-  const [confirmDelete, setConfirmDelete] = useState(false)
-
   async function handleDeleteUnit() {
-    if (!unitId || !unit) return
-    setIsUpdating(true)
+    if (!unitId || !unit) return; setIsUpdating(true)
     try {
       await deleteUnit(unitId)
       navigate(isSuper ? `/admin/orgs/${unit.org_id}` : '/admin', { replace: true })
-    } catch {
-      setError('Failed to delete unit')
-      setIsUpdating(false)
-    }
+    } catch { setError('Failed to delete unit'); setIsUpdating(false) }
   }
 
   async function handleAddAdmin(e: FormEvent) {
-    e.preventDefault()
-    setAdminError(null)
-    setAddingAdmin(true)
-    try {
-      await addAdmin(newAdminEmail.trim().toLowerCase())
-      setNewAdminEmail('')
-    } catch (_err) {
-      setAdminError(_err instanceof Error ? _err.message : 'Failed to add admin')
-    } finally {
-      setAddingAdmin(false)
-    }
+    e.preventDefault(); setAdminError(null); setAddingAdmin(true)
+    try { await addAdmin(newAdminEmail.trim().toLowerCase()); setNewAdminEmail('') }
+    catch (err) { setAdminError(err instanceof Error ? err.message : 'Failed to add admin') }
+    finally { setAddingAdmin(false) }
   }
 
-  const today = new Date().toISOString().split('T')[0]
+  const today    = new Date().toISOString().split('T')[0]
   const upcoming = services.filter(s => s.date >= today)
-  const past = services.filter(s => s.date < today)
+  const past     = services.filter(s => s.date < today)
+
+  const totalSessions = services.length
+  const todaySessions = services.filter(s => s.date === today).length
+
+  const roleLabel = userRole === 'owner' ? 'Org Owner' : isOwnerOrCreator ? 'Command' : 'Observer'
+  const roleBadgeColor = userRole === 'owner' ? '#5247e6' : isOwnerOrCreator ? '#10b981' : '#64748b'
 
   return (
-    <div className="min-h-screen bg-brand-secondary">
-      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-12 sm:pt-24 pb-12 sm:pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
-        {/* Abstract background glow */}
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
-        
-        <div className="flex items-center justify-between relative z-10 w-full max-w-7xl mx-auto">
-          <button
-            onClick={() => navigate(isSuper && unit ? `/admin/orgs/${unit.org_id}` : '/admin')}
-            className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
-          >
-            <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
-          </button>
-          
-          <div className="flex flex-col items-center flex-1 overflow-hidden px-2 text-center">
-             <h1 className="text-2xl sm:text-3xl font-black tracking-tighter italic truncate w-full">{unit?.name ?? 'Unit'}</h1>
-             <div className="flex items-center gap-2 mt-1">
-                {orgName && <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-white/40 truncate max-w-[120px] sm:max-w-none">{orgName}</p>}
-                <span className="text-[8px] font-black uppercase tracking-widest bg-white/10 px-2 py-0.5 rounded-full border border-white/10">
-                  {userRole === 'owner' ? 'Org Owner' : isOwnerOrCreator ? 'Command' : 'Observer'}
-                </span>
-             </div>
-          </div>
+    <div className="relative min-h-screen w-full bg-background-dark text-slate-100 font-display antialiased overflow-x-hidden">
 
-          <div className="flex items-center gap-2">
-            {unitId && <NotificationBell unitId={unitId} />}
+      {/* ── Hero Header ────────────────────────────────────────────────────── */}
+      <header className="relative overflow-hidden pb-8">
+        {/* Background glows */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-primary/5 to-transparent pointer-events-none" />
+        <div className="absolute top-0 right-0 -mt-16 -mr-16 size-72 bg-primary/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-8 size-48 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6">
+          {/* Top bar */}
+          <div className="flex items-center justify-between pt-4 pb-6 sm:pt-6">
             <button
-               onClick={() => signOut()}
-               className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
-               title="Sign Out"
+              onClick={() => navigate(isSuper && orgId ? `/admin/orgs/${orgId}` : '/admin')}
+              className="size-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
             >
-              <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="material-symbols-outlined text-white">arrow_back</span>
             </button>
-          </div>
-        </div>
 
-        <div className="flex items-center justify-center gap-3 relative z-10 flex-wrap">
-           <button 
-             onClick={() => navigate(`/admin/units/${unitId}/members`)}
-             className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-white text-brand-primary shadow-xl shadow-brand-primary/20 border border-white font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] hover:scale-105 transition-all active:scale-95"
-           >
-             <Users className="h-4 w-4" /> Members
-           </button>
-           {isOwnerOrCreator && (
-            <button
-               onClick={() => setShowSettings(!showSettings)}
-               className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl transition-all border active:scale-95 ${showSettings ? 'bg-white text-brand-primary border-white shadow-xl' : 'bg-white/10 border-white/10 text-white hover:bg-white/20'}`}
-            >
-              <Settings className="h-5 w-5 sm:h-6 sm:w-6" />
-            </button>
-          )}
-          {isSuper && (
-            <button
-               onClick={() => setShowAdmins(!showAdmins)}
-               className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl transition-all border active:scale-95 ${showAdmins ? 'bg-white text-brand-primary border-white shadow-xl' : 'bg-white/10 border-white/10 text-white hover:bg-white/20'}`}
-            >
-              <UserCog className="h-5 w-5 sm:h-6 sm:w-6" />
-            </button>
-          )}
-        </div>
-      </header>
+            <span className="text-xs font-bold uppercase tracking-widest text-white/40">Rollcally</span>
 
-      <div className="mx-auto max-w-5xl px-5 sm:px-8 py-8 flex flex-col gap-8">
-
-        {showSettings && (
-          <section className="animate-in fade-in slide-in-from-top-4 duration-300">
-             <Card className="p-6 border-brand-primary/10 bg-white shadow-xl shadow-brand-primary/5">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-brand-text flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-brand-primary" /> Unit Settings
-                </h2>
-                <button onClick={() => setShowSettings(false)} className="text-brand-slate hover:text-brand-text">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              
-              <form onSubmit={handleUpdateUnit} className="space-y-4">
-                <Input
-                  label="Unit Name"
-                  value={newName}
-                  onChange={e => setNewName(e.target.value)}
-                  placeholder="e.g. Volunteers, Youth Group, or Staff"
-                  required
-                />
-                <Input
-                  label="Description"
-                  value={newDesc}
-                  onChange={e => setNewDesc(e.target.value)}
-                  placeholder="Optional description"
-                />
-                <div className="flex items-center justify-between pt-2">
-                  <Button variant="ghost" type="button" onClick={() => setConfirmDelete(true)} className="text-red-600 hover:bg-red-50 hover:text-red-700">
-                    <Trash2 className="h-4 w-4 mr-2" /> Delete Unit
-                  </Button>
-                  <div className="flex gap-2">
-                    <Button variant="secondary" size="sm" type="button" onClick={() => setShowSettings(false)}>Cancel</Button>
-                    <Button size="sm" type="submit" loading={isUpdating}>Save Changes</Button>
-                  </div>
-                </div>
-              </form>
-             </Card>
-          </section>
-        )}
-
-        {/* Unit admins panel (super admin only) */}
-        {isSuper && showAdmins && (
-          <section className="animate-in fade-in slide-in-from-top-4 duration-300">
-            <Card className="p-6 border-brand-border bg-white shadow-xl shadow-brand-slate/5">
-              <h3 className="text-lg font-bold text-brand-text flex items-center gap-2 mb-4">
-                <UserCog className="h-5 w-5 text-brand-slate" /> Managed Unit Admins
-              </h3>
-              <form onSubmit={handleAddAdmin} className="flex gap-2 mb-4">
-                <Input
-                  placeholder="admin@email.com"
-                  type="email"
-                  value={newAdminEmail}
-                  onChange={e => setNewAdminEmail(e.target.value)}
-                  error={adminError ?? undefined}
-                  required
-                  className="flex-1"
-                />
-                <Button size="sm" type="submit" loading={addingAdmin}>Add Admin</Button>
-              </form>
-              {admins.length > 0 && (
-                <div className="flex flex-col gap-2">
-                  {admins.map(a => (
-                    <div key={a.id} className="flex items-center justify-between rounded-xl px-4 py-3 bg-gray-50 border border-gray-100">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
-                          ID
-                        </div>
-                        <span className="text-sm font-medium text-gray-700 truncate max-w-[150px]">{a.user_id}</span>
-                      </div>
-                      <button onClick={() => removeAdmin(a.id)} className="p-2 text-gray-400 hover:text-red-500 transition-colors">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Card>
-          </section>
-        )}
-
-        {/* Create service */}
-        <section>
-          <div className="flex items-center justify-between mb-8">
-            <div>
-               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40">Unit</h2>
-               <p className="text-2xl font-black text-brand-text tracking-tight uppercase italic mt-1">Calendar</p>
+            <div className="flex items-center gap-2">
+              {unitId && <NotificationBell unitId={unitId} />}
+              <button
+                onClick={() => signOut()}
+                className="size-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
+                title="Sign Out"
+              >
+                <span className="material-symbols-outlined text-white text-xl">logout</span>
+              </button>
             </div>
-            {isOwnerOrCreator && (
-              <Button size="lg" onClick={() => setShowCreate(!showCreate)} className="shadow-2xl shadow-brand-primary/30 rounded-2xl text-xs font-black uppercase tracking-[0.1em]">
-                <Plus className="h-5 w-5 mr-3" /> New Event
-              </Button>
+          </div>
+
+          {/* Unit identity */}
+          <div className="flex flex-col items-center text-center mb-6">
+            <div className="size-20 sm:size-24 bg-primary/20 border-2 border-primary/40 rounded-3xl flex items-center justify-center mb-4 shadow-2xl shadow-primary/30">
+              <span className="material-symbols-outlined text-primary text-4xl sm:text-5xl" style={{ fontVariationSettings: "'FILL' 1" }}>groups</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-1">{unit?.name ?? 'Unit'}</h1>
+            <div className="flex items-center gap-2 flex-wrap justify-center">
+              {orgName && <span className="text-xs font-medium text-white/40 uppercase tracking-wider">{orgName}</span>}
+              {orgName && <span className="text-white/20">·</span>}
+              <span
+                className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border"
+                style={{ color: roleBadgeColor, borderColor: `${roleBadgeColor}40`, backgroundColor: `${roleBadgeColor}15` }}
+              >
+                {roleLabel}
+              </span>
+            </div>
+            {unit?.description && (
+              <p className="text-sm text-white/40 mt-2 max-w-xs">{unit.description}</p>
             )}
           </div>
 
-          {showCreate && (
-             <div className="mb-10 rounded-[2.5rem] bg-white p-10 shadow-2xl shadow-brand-primary/5 border border-brand-border/50 animate-in fade-in slide-in-from-top-6 duration-700 relative overflow-hidden">
-                <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl"></div>
-                <form onSubmit={handleCreate} className="flex flex-col gap-8 relative z-10">
-                  <div className="flex items-center gap-6">
-                    <div className="h-16 w-16 bg-brand-primary shadow-xl shadow-brand-primary/20 rounded-3xl flex items-center justify-center text-white">
-                      <CalendarDays className="h-8 w-8" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">Schedule Event</h3>
-                      <p className="text-sm font-medium text-brand-slate opacity-40">Initialise a formal session for attendance tracking and reporting.</p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <Input label="Event Date" type="date" value={newDate} onChange={e => setNewDate(e.target.value)} required className="text-lg py-6" />
-                    <div className="flex flex-col gap-2">
-                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 ml-1">Event Type</label>
-                      <select
-                        className="w-full rounded-2xl border border-brand-border bg-white px-6 py-4 text-sm focus:outline-none focus:ring-4 focus:ring-brand-primary/5 transition-all font-bold h-[62px] text-brand-text appearance-none cursor-pointer hover:border-brand-primary/30"
-                        value={newType}
-                        onChange={e => setNewType(e.target.value as ServiceType)}
-                      >
-                        <option value="rehearsal">Regular Meeting</option>
-                        <option value="sunday_service">Main Event</option>
-                      </select>
-                    </div>
-                  </div>
-                  {error && <p className="text-sm font-bold text-red-600">{error}</p>}
-                  <div className="flex gap-4 justify-end">
-                    <Button variant="ghost" size="lg" type="button" onClick={() => { setShowCreate(false); setError(null) }} className="text-xs font-black uppercase tracking-[0.2em] opacity-40">Cancel</Button>
-                    <Button size="lg" type="submit" loading={isUpdating} className="px-10 shadow-xl shadow-brand-primary/20 text-xs font-black uppercase tracking-[0.2em] rounded-2xl">
-                      Create Event
-                    </Button>
-                  </div>
-                </form>
-             </div>
+          {/* Quick stat pills */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
+              <p className="text-xl sm:text-2xl font-extrabold text-white">{servicesLoading ? '–' : upcoming.length}</p>
+              <p className="text-[9px] font-bold uppercase tracking-wider text-white/50 mt-0.5">Upcoming</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
+              <p className="text-xl sm:text-2xl font-extrabold text-white">{servicesLoading ? '–' : totalSessions}</p>
+              <p className="text-[9px] font-bold uppercase tracking-wider text-white/50 mt-0.5">Total</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
+              <p className={`text-xl sm:text-2xl font-extrabold ${todaySessions > 0 ? 'text-emerald-300' : 'text-white'}`}>
+                {servicesLoading ? '–' : todaySessions > 0 ? 'Live' : '—'}
+              </p>
+              <p className="text-[9px] font-bold uppercase tracking-wider text-white/50 mt-0.5">Today</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* ── Action Bar ─────────────────────────────────────────────────────── */}
+      <div className="sticky top-0 z-40 bg-background-dark/90 backdrop-blur-md border-b border-border-dark/60">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-2 sm:gap-3">
+          {/* Members — always visible */}
+          <button
+            onClick={() => navigate(`/admin/units/${unitId}/members`)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-xs font-black uppercase tracking-wider rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 flex-1 sm:flex-none justify-center sm:justify-start"
+          >
+            <span className="material-symbols-outlined text-sm">group</span>
+            Members
+          </button>
+
+          {/* Create Event */}
+          {isOwnerOrCreator && (
+            <button
+              onClick={() => setShowCreate(true)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-surface-dark border border-border-dark text-slate-200 text-xs font-black uppercase tracking-wider rounded-xl hover:border-primary/50 hover:text-primary active:scale-95 transition-all flex-1 sm:flex-none justify-center sm:justify-start"
+            >
+              <span className="material-symbols-outlined text-sm">add</span>
+              New Event
+            </button>
           )}
 
-          {/* Service list */}
-          {servicesLoading ? (
-            <div className="flex justify-center py-20">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
-            </div>
-          ) : services.length === 0 ? (
-            <div className="rounded-[2.5rem] bg-white p-20 text-center border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] relative overflow-hidden group">
-               <div className="absolute -top-10 -right-10 h-40 w-40 bg-brand-primary/5 rounded-full opacity-50 blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
-               <CalendarDays className="mx-auto mb-6 h-20 w-20 text-brand-primary/10 group-hover:text-brand-primary/20 transition-colors" />
-               <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">No Events Scheduled</h3>
-               <p className="text-sm font-medium text-brand-slate opacity-40 mb-10 max-w-sm mx-auto mt-3">
-                 The calendar is currently clear. Setup your first event to generate a check-in QR code and track attendance.
-               </p>
-               <Button onClick={() => setShowCreate(true)} className="px-12 py-6 shadow-2xl shadow-brand-primary/30 rounded-2xl text-xs font-black uppercase tracking-widest">
-                 Setup first Event
-               </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
-              {upcoming.length > 0 && (
-                <div className="flex flex-col gap-5 md:col-span-2">
-                   <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40 ml-4">Current & Coming</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {upcoming.map(s => (
-                      <ServiceCard key={s.id} service={s} unitId={unitId!} onClick={() => navigate(`/admin/units/${unitId}/events/${s.id}`)} />
-                    ))}
-                  </div>
-                </div>
-              )}
-              {past.length > 0 && (
-                <div className="flex flex-col gap-5 md:col-span-2">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40 ml-4">Past Sessions</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 opacity-70">
-                    {past.map(s => (
-                      <ServiceCard key={s.id} service={s} unitId={unitId!} onClick={() => navigate(`/admin/units/${unitId}/events/${s.id}`)} />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </section>
+          <div className="ml-auto flex items-center gap-2">
+            {/* Unit Calendar (QR Code shortcut) */}
+            <button
+              onClick={() => navigate(`/admin/units/${unitId}/members`)}
+              className="size-10 flex items-center justify-center rounded-xl bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 transition-all"
+              title="Unit Calendar"
+            >
+              <span className="material-symbols-outlined text-lg">qr_code</span>
+            </button>
 
-        <ConfirmDialog
-          isOpen={confirmDelete}
-          onClose={() => setConfirmDelete(false)}
-          onConfirm={handleDeleteUnit}
-          title="Delete Unit"
-          description={`Are you sure you want to delete "${unit?.name}"? All events and attendance data will be permanently removed.`}
-          confirmText="Delete Unit"
-          variant="danger"
-          isLoading={isUpdating}
-        />
+            {/* Settings */}
+            {isOwnerOrCreator && (
+              <button
+                onClick={() => setShowSettings(true)}
+                className="size-10 flex items-center justify-center rounded-xl bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 transition-all"
+                title="Unit Settings"
+              >
+                <span className="material-symbols-outlined text-lg">settings</span>
+              </button>
+            )}
+
+            {/* Manage Admins (super only) */}
+            {isSuper && (
+              <button
+                onClick={() => setShowAdmins(true)}
+                className="size-10 flex items-center justify-center rounded-xl bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 transition-all"
+                title="Manage Admins"
+              >
+                <span className="material-symbols-outlined text-lg">manage_accounts</span>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* ── Main Content ───────────────────────────────────────────────────── */}
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 pb-20">
+
+        {/* Loading */}
+        {servicesLoading && (
+          <div className="flex justify-center py-16">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!servicesLoading && services.length === 0 && (
+          <div className="bg-surface-dark rounded-2xl border border-dashed border-border-dark p-12 text-center animate-in fade-in duration-300">
+            <div className="size-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-5">
+              <span className="material-symbols-outlined text-4xl text-primary">calendar_month</span>
+            </div>
+            <h3 className="text-xl font-bold text-slate-100 mb-2">No Events Yet</h3>
+            <p className="text-sm text-slate-500 max-w-xs mx-auto mb-7">
+              The calendar is clear. Create your first event to generate a check-in QR code and track attendance.
+            </p>
+            {isOwnerOrCreator && (
+              <button
+                onClick={() => setShowCreate(true)}
+                className="px-8 py-3 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30"
+              >
+                Schedule First Event
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Upcoming events */}
+        {!servicesLoading && upcoming.length > 0 && (
+          <section className="mb-8 animate-in fade-in duration-300">
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-base font-bold text-slate-100">Upcoming Sessions</h2>
+              <span className="px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-[10px] font-black uppercase tracking-wider">
+                {upcoming.length}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {upcoming.map(s => (
+                <ServiceCard
+                  key={s.id}
+                  service={s}
+                  onClick={() => navigate(`/admin/units/${unitId}/events/${s.id}`)}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Past sessions */}
+        {!servicesLoading && past.length > 0 && (
+          <section className="animate-in fade-in duration-300">
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-base font-bold text-slate-400">Past Sessions</h2>
+              <span className="px-2 py-0.5 bg-slate-800 text-slate-500 border border-slate-700 rounded-full text-[10px] font-black uppercase tracking-wider">
+                {past.length}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 opacity-70">
+              {past.map(s => (
+                <ServiceCard
+                  key={s.id}
+                  service={s}
+                  onClick={() => navigate(`/admin/units/${unitId}/events/${s.id}`)}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+
+      {/* ── Modals ─────────────────────────────────────────────────────────── */}
+      {showCreate && (
+        <CreateEventModal
+          date={newDate} type={newType} error={error} loading={isUpdating}
+          onChangeDate={setNewDate} onChangeType={setNewType}
+          onSubmit={handleCreate}
+          onClose={() => { setShowCreate(false); setError(null) }}
+        />
+      )}
+      {showSettings && (
+        <SettingsModal
+          name={newName} desc={newDesc} error={error} loading={isUpdating}
+          onChangeName={setNewName} onChangeDesc={setNewDesc}
+          onSubmit={handleUpdateUnit}
+          onDelete={() => { setShowSettings(false); setConfirmDelete(true) }}
+          onClose={() => { setShowSettings(false); setError(null) }}
+        />
+      )}
+      {isSuper && showAdmins && (
+        <AdminsModal
+          admins={admins} newEmail={newAdminEmail} error={adminError} loading={addingAdmin}
+          onChangeEmail={setNewAdminEmail}
+          onSubmit={handleAddAdmin}
+          onRemove={removeAdmin}
+          onClose={() => { setShowAdmins(false); setAdminError(null) }}
+        />
+      )}
+      <ConfirmDialog
+        isOpen={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={handleDeleteUnit}
+        title="Delete Unit"
+        description={`Are you sure you want to delete "${unit?.name}"? All events and attendance data will be permanently removed.`}
+        confirmText="Delete Unit"
+        variant="danger"
+        isLoading={isUpdating}
+      />
     </div>
   )
 }

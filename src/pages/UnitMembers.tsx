@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Trash2, Pencil, Users, Upload, Download, X, CheckCircle2, ChevronRight, Cake, Search } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, Pencil, Users, Upload, Download, X, ChevronRight, Cake, Search } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
@@ -597,22 +597,52 @@ export default function UnitMembers() {
 
             {/* Success state */}
             {importDone !== null && (
-              <div className="flex flex-col items-center gap-10 py-12 text-center animate-in zoom-in-95 duration-700">
-                <div className="relative">
-                   <div className="absolute inset-0 bg-green-500 blur-2xl opacity-20 animate-pulse"></div>
-                   <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-green-500 shadow-2xl shadow-green-500/40">
-                      <CheckCircle2 className="h-10 w-10 text-white" />
-                   </div>
+              <div className="flex flex-col items-center gap-0 animate-in fade-in slide-in-from-bottom-8 duration-700 rounded-[2rem] overflow-hidden">
+                {/* Dark success card */}
+                <div className="w-full bg-background-dark border border-primary/20 rounded-[2rem] overflow-hidden shadow-2xl relative">
+                  <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl"></div>
+
+                  {/* Icon + message */}
+                  <div className="flex flex-col items-center gap-6 p-10 text-center">
+                    <div className="relative flex flex-col items-center justify-center">
+                      <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150"></div>
+                      <div className="relative bg-primary text-white rounded-[2rem] p-5 shadow-[0_0_50px_rgba(82,71,230,0.5)] border border-white/20">
+                        <span className="material-symbols-outlined !text-5xl">group_add</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-white text-3xl font-black tracking-tighter uppercase italic">Transfer Complete!</h3>
+                      <p className="text-slate-400 text-sm font-medium">Roster integration successful</p>
+                    </div>
+                  </div>
+
+                  {/* Stat row */}
+                  <div className="mx-8 mb-8 p-6 bg-primary/5 border border-primary/10 rounded-[1.5rem] flex items-center gap-5">
+                    <div className="bg-primary/10 p-3 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/10">
+                      <span className="material-symbols-outlined text-2xl">people</span>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-black mb-1">Members Integrated</p>
+                      <p className="text-white font-black uppercase italic text-xl tracking-tight">
+                        {importDone} {importDone !== 1 ? 'Members' : 'Member'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <div className="px-8 pb-10">
+                    <button
+                      onClick={() => setPanel('none')}
+                      className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-2xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-[0.3em] text-xs"
+                    >
+                      <span>View Roster</span>
+                      <span className="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </button>
+                    <p className="text-center text-slate-600 text-[10px] font-black uppercase tracking-[0.2em] mt-4">
+                      Rollcally Roster Management System
+                    </p>
+                  </div>
                 </div>
-                <div>
-                   <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">Transfer Complete</h3>
-                   <p className="text-sm font-medium text-brand-slate opacity-40 mt-2">
-                     {importDone} member{importDone !== 1 ? 's' : ''} have been successfully integrated into the roster.
-                   </p>
-                </div>
-                <Button size="lg" onClick={() => setPanel('none')} className="px-12 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-brand-primary/20">
-                   Log Entry
-                </Button>
               </div>
             )}
 

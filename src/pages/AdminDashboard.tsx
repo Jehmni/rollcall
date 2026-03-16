@@ -81,6 +81,7 @@ export default function AdminDashboard() {
   const { orgs, loading, createOrg, updateOrg, deleteOrg } = useOrganizations()
 
   const [showCreate, setShowCreate] = useState(false)
+  const [createdOrg, setCreatedOrg] = useState<Organization | null>(null)
   
   // Handle automatic open of create form from Discovery page
   useEffect(() => {
@@ -108,7 +109,7 @@ export default function AdminDashboard() {
       const org = await createOrg(newName.trim())
       setNewName('')
       setShowCreate(false)
-      navigate(`/admin/orgs/${org.id}`)
+      setCreatedOrg(org)
     } catch {
       setError('Failed to create')
     } finally {
@@ -151,6 +152,102 @@ export default function AdminDashboard() {
     setEditingOrg(o)
     setNewName(o.name)
     setShowCreate(false)
+  }
+
+  // ── Success Screen ──────────────────────────────────────────────────────
+  if (createdOrg) {
+    return (
+      <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased">
+        {/* Header */}
+        <header className="grid grid-cols-3 items-center p-4 sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(`/admin/orgs/${createdOrg.id}`)}
+              className="flex size-10 items-center justify-center rounded-full hover:bg-primary/20 transition-colors"
+            >
+              <span className="material-symbols-outlined text-white">close</span>
+            </button>
+          </div>
+          <div className="text-center">
+            <span className="font-black text-white uppercase italic tracking-tighter text-sm">Organisation Live</span>
+          </div>
+          <div className="w-full"></div>
+        </header>
+
+        <main className="flex-1 flex flex-col items-center px-6 pt-8 pb-12 overflow-y-auto">
+          <div className="w-full max-w-sm pt-4 animate-in zoom-in-95 duration-500">
+            <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-12 duration-1000">
+              {/* Success icon */}
+              <div className="relative flex flex-col items-center justify-center mb-8">
+                <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150"></div>
+                <div className="relative bg-primary text-white rounded-[2.5rem] p-6 shadow-[0_0_60px_rgba(82,71,230,0.5)] border border-white/20">
+                  <span className="material-symbols-outlined !text-7xl">check_circle</span>
+                </div>
+              </div>
+
+              {/* Message */}
+              <div className="text-center space-y-3 mb-12">
+                <h1 className="text-white text-5xl font-black tracking-tighter uppercase italic">Connected!</h1>
+                <p className="text-slate-400 text-lg font-medium tracking-tight">Organisation is live and active</p>
+              </div>
+
+              {/* Details card */}
+              <div className="w-full bg-primary/5 border border-primary/20 rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl"></div>
+
+                <div className="p-8 text-center border-b border-primary/10">
+                  <div className="inline-flex size-20 rounded-[2rem] bg-primary/10 border border-primary/20 items-center justify-center mb-4">
+                    <span className="material-symbols-outlined text-primary text-4xl">corporate_fare</span>
+                  </div>
+                  <h2 className="text-white text-3xl font-black uppercase italic tracking-tighter mb-1">{createdOrg.name}</h2>
+                  <p className="text-primary font-black uppercase tracking-[0.2em] text-[10px]">Established Organisation</p>
+                </div>
+
+                <div className="p-8 space-y-6">
+                  <div className="flex items-center gap-5">
+                    <div className="bg-primary/10 p-3 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/10">
+                      <span className="material-symbols-outlined text-2xl">calendar_today</span>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-black mb-1">Established</p>
+                      <p className="text-white font-bold text-lg tracking-tight">
+                        {new Date(createdOrg.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-5">
+                    <div className="bg-primary/10 p-3 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/10">
+                      <span className="material-symbols-outlined text-2xl">shield_person</span>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-black mb-1">Your Role</p>
+                      <p className="text-white font-black uppercase italic text-lg tracking-tight">Owner</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="w-full mt-10">
+                <button
+                  onClick={() => navigate(`/admin/orgs/${createdOrg.id}`)}
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-3xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-[0.3em] text-xs"
+                >
+                  <span>Open Organisation</span>
+                  <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </button>
+                <button
+                  onClick={() => setCreatedOrg(null)}
+                  className="w-full text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-primary transition-colors py-4 mt-2"
+                >
+                  Back to Dashboard
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
   }
 
   return (
