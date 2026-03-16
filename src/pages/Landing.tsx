@@ -29,13 +29,6 @@ export default function Landing() {
                 backgroundImage: 'linear-gradient(rgba(18, 17, 33, 0.7) 0%, rgba(18, 17, 33, 0.95) 100%), url("/images/hero_bg.jpg")'
               }}
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 mb-2">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                </span>
-                <span className="text-primary text-xs font-bold tracking-wider uppercase">Next-Gen Attendance</span>
-              </div>
               <h1 className="text-white text-4xl font-black leading-tight tracking-tight @[480px]:text-6xl max-w-2xl">
                 Attendance Reimagined for Elite Organizations
               </h1>
