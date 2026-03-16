@@ -63,13 +63,9 @@ export default function AdminOrgDiscovery() {
           >
             <span className="material-symbols-outlined text-xl leading-none">arrow_back</span>
           </button>
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white uppercase leading-none tracking-tighter italic">Discovery</h1>
-            <p className="text-[10px] font-bold text-white/60 tracking-[0.3em] mt-1 uppercase">Expansion Node</p>
-          </div>
           <div className="text-center animate-in fade-in slide-in-from-top-4 duration-700">
-            <h2 className="text-xl font-bold tracking-tight text-white mb-2">Find your organization</h2>
-            <p className="text-sm text-slate-300">Search for your team or company to join them</p>
+            <h1 className="text-3xl font-extrabold tracking-tighter text-white mb-2 uppercase italic">Find your organization</h1>
+            <p className="text-sm text-white/60 font-medium">Search for your team or company to join them</p>
           </div>
         </div>
       </header>
