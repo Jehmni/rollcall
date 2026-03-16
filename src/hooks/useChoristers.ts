@@ -64,3 +64,27 @@ export function useMemberById(memberId: string | null) {
 
   return { member, loading, error }
 }
+
+export function useServiceInfo(serviceId: string | null) {
+  const [unitName, setUnitName] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!serviceId) return
+
+    setLoading(true)
+    supabase
+      .from('services')
+      .select('units(name)')
+      .eq('id', serviceId)
+      .single()
+      .then(({ data, error }) => {
+        if (!error && data) {
+          setUnitName((data.units as any)?.name || null)
+        }
+        setLoading(false)
+      })
+  }, [serviceId])
+
+  return { unitName, loading }
+}
