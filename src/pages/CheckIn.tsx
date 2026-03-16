@@ -84,20 +84,27 @@ export default function CheckIn() {
   return (
     <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased">
       {/* Top Navigation Header */}
-      <header className="flex items-center justify-between p-4 sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-primary/20">
-        <button 
-          onClick={() => navigate('/')}
-          className="flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-colors"
-        >
-          <span className="material-symbols-outlined text-white">arrow_back</span>
-        </button>
-        <div className="flex items-center gap-2">
-          <div className="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
-            <span className="material-symbols-outlined text-white text-xl">grid_view</span>
+      <header className="grid grid-cols-3 items-center p-4 sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-primary/20">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => navigate('/')}
+            className="flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-colors"
+          >
+            <span className="material-symbols-outlined text-white">arrow_back</span>
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
+              <span className="material-symbols-outlined text-white text-lg">grid_view</span>
+            </div>
+            <span className="font-extrabold text-sm tracking-tight text-white hidden sm:block">Rollcally</span>
           </div>
-          <span className="font-extrabold text-xl tracking-tight text-white">Rollcally</span>
         </div>
-        <div className="w-10"></div> {/* Spacer for symmetry */}
+        
+        <div className="text-center">
+          <span className="font-black text-white uppercase italic tracking-tighter text-sm">Check In</span>
+        </div>
+        
+        <div className="w-full"></div> {/* Grid symmetry */}
       </header>
 
       <main className="flex-1 flex flex-col items-center px-6 pt-8 pb-12 overflow-y-auto">
@@ -107,7 +114,7 @@ export default function CheckIn() {
             <div className="text-center mb-10 max-w-sm">
               <h1 className="text-4xl font-black mb-3 tracking-tighter uppercase italic">Check In</h1>
               <p className="text-slate-400 text-base leading-relaxed">
-                Scan the QR code at your venue to record attendance.
+                Scan the QR code at your venue to register attendance.
               </p>
             </div>
 
