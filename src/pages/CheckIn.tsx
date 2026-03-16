@@ -150,8 +150,8 @@ export default function CheckIn() {
                   <span className="material-symbols-outlined text-2xl">location_on</span>
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 uppercase tracking-[0.2em] font-black">Node Status</p>
-                  <p className="font-extrabold text-white text-lg tracking-tight uppercase italic">{unitName || 'Scanning Environment'}</p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-[0.2em] font-black">Venue Status</p>
+                  <p className="font-extrabold text-white text-lg tracking-tight uppercase italic">{unitName || 'Will update after you scan qrcode'}</p>
                 </div>
               </div>
             </div>
@@ -329,12 +329,12 @@ export default function CheckIn() {
         {/* Admin Link Footer */}
         <div className="mt-auto pt-10 text-center pb-20">
           <p className="text-slate-600 text-[10px] font-black tracking-[0.2em] uppercase">
-            Privileged Operator? 
+            Not a visitor? 
             <button 
               onClick={() => navigate('/admin')}
               className="text-primary font-black hover:underline ml-2"
             >
-              Admin Control
+              Admin portal
             </button>
           </p>
         </div>
