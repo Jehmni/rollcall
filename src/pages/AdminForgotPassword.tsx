@@ -44,7 +44,7 @@ export default function AdminForgotPassword() {
           className="flex items-center text-slate-300 transition-all hover:text-primary group"
         >
           <span className="material-symbols-outlined mr-1 group-hover:-translate-x-1 transition-transform">chevron_left</span>
-          <span className="text-sm font-bold uppercase tracking-wider">Portal Access</span>
+          <span className="text-sm font-bold uppercase tracking-wider">sign in</span>
         </button>
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-[0_0_15px_rgba(82,71,230,0.2)]">
