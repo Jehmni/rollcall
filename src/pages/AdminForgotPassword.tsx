@@ -153,21 +153,6 @@ export default function AdminForgotPassword() {
               </button>
             </form>
 
-            {/* Security Notice */}
-            <div className="mt-auto pt-20">
-              <div className="bg-primary/5 border border-primary/10 p-6 rounded-[2.5rem] flex items-start gap-5 backdrop-blur-sm relative overflow-hidden group">
-                <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl group-hover:scale-110 transition-transform"></div>
-                <span className="material-symbols-outlined text-primary text-2xl mt-0.5 relative z-10">info</span>
-                <p className="text-[11px] text-slate-500 font-bold leading-normal uppercase tracking-wider relative z-10">
-                  This request will be logged under your administrative profile. If you did not initiate this, please contact the Security Operations Center immediately.
-                </p>
-              </div>
-              <div className="mt-10 text-center">
-                <p className="text-[10px] font-black tracking-[0.2em] uppercase text-slate-600">
-                  Rollcally Identity Security Protocol © {new Date().getFullYear()}
-                </p>
-              </div>
-            </div>
           </div>
         )}
       </main>
