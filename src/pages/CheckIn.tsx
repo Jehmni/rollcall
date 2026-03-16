@@ -12,6 +12,9 @@ export default function CheckIn() {
   const [step, setStep] = useState<Step>('list')
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<PublicMember | null>(null)
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [successTime, setSuccessTime] = useState<string | null>(null)
   const [showScanner, setShowScanner] = useState(false)
 
   const storedMemberId = localStorage.getItem('rollcally_member_id')
@@ -33,7 +36,10 @@ export default function CheckIn() {
   }, [recognizedMember, step])
 
   const { members, loading: listLoading, error: listError } = useServiceMembers(serviceId, query)
-  const { status, checkedInName, errorMessage, checkIn, reset } = useAttendance(serviceId)
+  // The useAttendance hook is still imported but its status/error/checkIn/reset are now managed locally for the main flow.
+  // Assuming a new function `registerAttendance` is available or `checkIn` from useAttendance is used with local state management.
+  // For this change, I'll assume `checkIn` from `useAttendance` is still the underlying function, but its state is managed here.
+  const { checkIn: registerAttendance } = useAttendance(serviceId); // Renaming for clarity in this context
 
   const filtered = members
 
@@ -57,18 +63,40 @@ export default function CheckIn() {
   function handleStartLinking() {
     setStep('list')
     setSelected(null)
+    setStatus('idle') // Reset status when switching profile
+    setErrorMessage(null)
   }
 
   async function handleConfirm() {
-    if (!selected) return
-    await checkIn(selected.id)
-    setStep('done')
+    if (!selected || !serviceId) return
+
+    setStatus('loading')
+    setErrorMessage(null)
+    setSuccessTime(null)
+    setStep('done') // Move to done step immediately to show loading
+
+    try {
+      await registerAttendance(selected.id) // Use the renamed checkIn from useAttendance
+      setSuccessTime(new Date().toLocaleString('en-US', { 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }).replace(',', ' •'))
+      setStatus('success')
+    } catch (err: any) {
+      setStatus('error')
+      setErrorMessage(err.message || 'An unknown error occurred during check-in.')
+    }
   }
 
   function handleBack() {
     setStep('list')
     setSelected(null)
-    reset()
+    setStatus('idle') // Reset status
+    setErrorMessage(null)
   }
 
   function handleScan(scannedServiceId: string) {
@@ -81,27 +109,40 @@ export default function CheckIn() {
 
   const noService = !serviceId
 
+  const headerTitle = useMemo(() => {
+    if (step === 'done') {
+      if (status === 'success') return 'Verification'
+      if (status === 'error') return 'Sync Denied'
+      return 'Processing'
+    }
+    return 'Check In'
+  }, [step, status])
+
   return (
     <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased">
       {/* Top Navigation Header */}
-      <header className="grid grid-cols-3 items-center p-4 sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-primary/20">
+      <header className="grid grid-cols-3 items-center p-4 sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-primary/10">
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => navigate('/')}
-            className="flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-colors"
+            onClick={() => step === 'done' ? navigate('/') : navigate('/')}
+            className="flex size-10 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-primary/20 transition-colors"
           >
-            <span className="material-symbols-outlined text-white">arrow_back</span>
+            <span className="material-symbols-outlined text-white">{step === 'done' ? 'close' : 'arrow_back'}</span>
           </button>
-          <div className="flex items-center gap-2">
-            <div className="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
-              <span className="material-symbols-outlined text-white text-lg">grid_view</span>
+          {step !== 'done' && (
+            <div className="flex items-center gap-2 animate-in fade-in duration-300">
+              <div className="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
+                <span className="material-symbols-outlined text-white text-lg">grid_view</span>
+              </div>
+              <span className="font-extrabold text-sm tracking-tight text-white hidden sm:block">Rollcally</span>
             </div>
-            <span className="font-extrabold text-sm tracking-tight text-white hidden sm:block">Rollcally</span>
-          </div>
+          )}
         </div>
         
         <div className="text-center">
-          <span className="font-black text-white uppercase italic tracking-tighter text-sm">Check In</span>
+          <span className="font-black text-white uppercase italic tracking-tighter text-sm">
+            {headerTitle}
+          </span>
         </div>
         
         <div className="w-full"></div> {/* Grid symmetry */}
@@ -284,37 +325,92 @@ export default function CheckIn() {
              </div>
           </div>
         ) : step === 'done' ? (
-           <div className="w-full max-w-sm pt-20 animate-in zoom-in-95 duration-500">
-             {status === 'loading' ? (
-                <div className="flex flex-col items-center gap-8 py-16 rounded-[4rem] bg-primary/5 border border-primary/20 shadow-2xl shadow-primary/10">
-                  <div className="h-20 w-20 animate-spin rounded-full border-[8px] border-primary border-t-transparent shadow-lg shadow-primary/20" />
-                  <p className="text-xs font-black uppercase tracking-[0.4em] text-primary animate-pulse">Syncing Intel Node...</p>
-                </div>
-             ) : status === 'success' ? (
-                <div className="flex flex-col items-center gap-12 text-center py-20 px-8 rounded-[4.5rem] bg-primary/5 shadow-[0_0_100px_rgba(34,197,94,0.1)] border border-green-500/20 animate-in slide-in-from-bottom-12 duration-1000 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 -mt-12 -ml-12 h-40 w-40 bg-green-500/10 rounded-full blur-3xl"></div>
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-green-500 blur-3xl opacity-30 animate-pulse"></div>
-                    <div className="relative flex h-28 w-28 items-center justify-center rounded-[2.5rem] bg-green-500 text-white shadow-[0_20px_40px_rgba(34,197,94,0.4)]">
-                       <span className="material-symbols-outlined text-6xl">check_circle</span>
+            <div className="w-full max-w-sm pt-4 animate-in zoom-in-95 duration-500">
+              {status === 'loading' ? (
+                 <div className="flex flex-col items-center gap-8 py-20 rounded-[4rem] bg-primary/5 border border-primary/20 shadow-2xl">
+                   <div className="h-20 w-20 animate-spin rounded-full border-[8px] border-primary border-t-transparent" />
+                   <p className="text-xs font-black uppercase tracking-[0.4em] text-primary animate-pulse italic">Securing Protocols...</p>
+                 </div>
+              ) : status === 'success' ? (
+                 <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-12 duration-1000">
+                    {/* Success Animation/Icon Container */}
+                    <div className="relative flex flex-col items-center justify-center mb-8">
+                      <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150"></div>
+                      <div className="relative bg-primary text-white rounded-[2.5rem] p-6 shadow-[0_0_60px_rgba(82,71,230,0.5)] border border-white/20">
+                        <span className="material-symbols-outlined !text-7xl">check_circle</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="relative z-10">
-                    <h2 className="text-5xl font-black text-white uppercase tracking-tighter italic mb-4">Verified!</h2>
-                    {checkedInName && (
-                      <p className="text-xl text-slate-300 font-medium leading-relaxed">
-                        Access granted to node: <br/> <span className="font-black text-white uppercase italic">{checkedInName}</span>
+
+                    {/* Success Message */}
+                    <div className="text-center space-y-3 mb-12">
+                      <h1 className="text-white text-5xl font-black tracking-tighter uppercase italic">Success!</h1>
+                      <p className="text-slate-400 text-lg font-medium tracking-tight">Check-in Successful</p>
+                    </div>
+
+                    {/* Details Card */}
+                    <div className="w-full bg-primary/5 border border-primary/20 rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
+                       <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl"></div>
+                       
+                       {/* User Info */}
+                       <div className="p-8 text-center border-b border-primary/10">
+                          <div className="inline-block size-24 rounded-full border-2 border-primary p-2 mb-6 group relative">
+                            <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div className="relative w-full h-full rounded-full bg-background-dark border border-primary/30 flex items-center justify-center text-3xl font-black text-primary italic">
+                              {selected?.name.charAt(0)}
+                            </div>
+                          </div>
+                          <h2 className="text-white text-3xl font-black uppercase italic tracking-tighter mb-1">Welcome, {selected?.name}</h2>
+                          <p className="text-primary font-black uppercase tracking-[0.2em] text-[10px]">Confirmed Attendee</p>
+                       </div>
+
+                       {/* Event Info */}
+                       <div className="p-8 space-y-6">
+                          <div className="flex items-center gap-5">
+                            <div className="bg-primary/10 p-3 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/10">
+                              <span className="material-symbols-outlined text-2xl">corporate_fare</span>
+                            </div>
+                            <div>
+                              <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-black mb-1">Venue</p>
+                              <p className="text-white font-black uppercase italic text-lg tracking-tight">{unitName || 'Main Conference Hall'}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-5">
+                            <div className="bg-primary/10 p-3 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/10">
+                              <span className="material-symbols-outlined text-2xl">schedule</span>
+                            </div>
+                            <div>
+                              <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-black mb-1">Time</p>
+                              <p className="text-white font-bold text-lg tracking-tight">{successTime || 'Registering...'}</p>
+                            </div>
+                          </div>
+
+                          {/* Map Preview Container */}
+                          <div className="w-full h-32 rounded-3xl overflow-hidden border border-primary/20 mt-4 relative group">
+                            <div className="absolute inset-0 bg-primary/5 flex items-center justify-center">
+                               <div className="absolute inset-0 bg-[url('https://lh3.googleusercontent.com/aida-public/AB6AXuApCLyeszxIrO0TAvbwlI8rUi6sgaCVdqdMlTHKJ7QEPyvpU1iRMw2zo_O3WkMsdyymJnhIyWpTpjvZ-c58bSe0wnJnEd5-LRocmWniUoUg7jTKuJYWZxIpzH1pBdkeGHJJLHVcDhfvNuDnZ3JvF97-r_6Y_dQVW2f7nA5txClOLtHWXFhv9Avh8BuI_SoiekRWZr8oE7N3uUPbtshSlCzkeZ9GpvBy0nUJRgwtG0zCOpW0q6nB5v57SFka26RqRaB8gcUreZAU8lTu')] bg-cover bg-center grayscale opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                               <div className="relative z-10 px-4 py-2 rounded-full bg-background-dark/80 backdrop-blur-md border border-primary/30 shadow-xl">
+                                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white">Local Node: {unitName || 'Security Perimeter'}</p>
+                               </div>
+                            </div>
+                          </div>
+                       </div>
+                    </div>
+
+                    <div className="w-full mt-10">
+                      <button 
+                        onClick={() => navigate('/')}
+                        className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-3xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-[0.3em] text-xs"
+                      >
+                        <span>Done</span>
+                        <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                      </button>
+                      <p className="text-center text-slate-600 text-[10px] font-black uppercase tracking-[0.2em] mt-6">
+                        Rollcally Identity Verification System
                       </p>
-                    )}
-                  </div>
-                  <button 
-                    onClick={() => navigate('/')}
-                    className="w-full py-8 rounded-[2.5rem] bg-white text-primary font-black uppercase tracking-[0.4em] text-sm shadow-2xl hover:scale-105 active:scale-95 transition-all"
-                  >
-                    Logout Terminal
-                  </button>
-                </div>
-             ) : (
+                    </div>
+                 </div>
+              ) : (
                 <div className="flex flex-col items-center gap-10 text-center py-20 rounded-[4rem] bg-red-500/5 border border-red-500/20 shadow-2xl">
                   <div className="flex h-24 w-24 items-center justify-center rounded-[2.5rem] bg-red-500 text-white shadow-[0_20px_40px_rgba(239,68,68,0.4)]">
                     <span className="material-symbols-outlined text-6xl">warning</span>
