@@ -1,9 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { ShieldCheck, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { Button } from '../components/ui/Button'
-import { Input } from '../components/ui/Input'
 
 export default function AdminSignup() {
   const navigate = useNavigate()
@@ -11,6 +8,7 @@ export default function AdminSignup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -66,107 +64,139 @@ export default function AdminSignup() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-brand-secondary px-4 relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute top-0 left-0 w-full h-full -z-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-brand-primary/[0.05] via-transparent to-transparent"></div>
-      <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-brand-primary/5 blur-[100px] -z-10 animate-pulse"></div>
-      <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-brand-primary/5 blur-[100px] -z-10 animate-pulse animation-delay-2000"></div>
-
-      <div className="relative w-full max-w-lg">
-        <Link
-          to="/admin/login"
-          className="absolute -top-16 left-0 inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40 hover:opacity-100 hover:text-brand-primary transition-all group"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white border border-brand-border/50 group-hover:scale-110 group-hover:rotate-12 transition-all shadow-sm">
-            <ArrowLeft className="h-5 w-5" />
-          </div>
-          Return to Portal
-        </Link>
-
-        <div className="mb-12 flex flex-col items-center gap-6 text-center animate-in fade-in slide-in-from-top-4 duration-1000">
-          <div className="flex h-24 w-24 items-center justify-center rounded-[2.5rem] bg-brand-primary shadow-2xl shadow-brand-primary/40 ring-[12px] ring-white relative group">
-            <div className="absolute inset-0 rounded-[2.5rem] bg-white transition-all group-hover:scale-110 group-hover:rotate-6 -z-10 opacity-0 group-hover:opacity-10"></div>
-            <ShieldCheck className="h-10 w-10 text-white" />
-          </div>
-          <div>
-            <h1 className="text-5xl font-black tracking-tighter italic text-brand-text mb-2">
-              JOIN THE CADRE
-            </h1>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-brand-slate opacity-40">
-              Administer your organization with precision
-            </p>
-          </div>
+    <div className="bg-[#0f172a] font-display text-white min-h-screen flex flex-col antialiased selection:bg-blue-500/30">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+        {/* Decorative background blurs */}
+        <div className="absolute top-0 right-0 -z-10 opacity-20 pointer-events-none">
+          <div className="w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full"></div>
+        </div>
+        <div className="absolute bottom-0 left-0 -z-10 opacity-10 pointer-events-none">
+          <div className="w-[300px] h-[300px] bg-blue-600/30 blur-[100px] rounded-full"></div>
         </div>
 
-        <div className="rounded-[3rem] bg-white p-12 shadow-2xl shadow-brand-primary/10 border border-brand-border/50 animate-in zoom-in-95 duration-700">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-            {error && (
-              <div className="rounded-2xl bg-red-50 p-5 text-[11px] font-bold text-red-600 border border-red-100 flex items-center gap-3 animate-in shake duration-500">
-                <div className="h-2 w-2 rounded-full bg-red-500 shadow-sm animate-pulse"></div>
-                {error}
-              </div>
-            )}
+        <div className="w-full max-w-md mx-auto relative z-10">
+          <div className="text-center mb-10 animate-in fade-in slide-in-from-top-6 duration-700">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-[1.25rem] bg-blue-600 mb-6 shadow-[0_0_25px_rgba(37,99,235,0.4)] relative group overflow-hidden">
+              <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+              <span className="material-symbols-outlined text-white text-3xl">corporate_fare</span>
+            </div>
+            <h1 className="text-3xl font-extrabold tracking-tight mb-3">
+              Create Your Account
+            </h1>
+            <p className="text-slate-400 text-sm px-4 leading-relaxed font-medium">
+              Empower your team with better organization tools.
+            </p>
+          </div>
 
-            <div className="space-y-6">
-              <Input
-                label="Enter your email"
-                type="email"
-                placeholder="commander@organization.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-                className="h-16 rounded-2xl border-brand-border/50 focus:ring-brand-primary/20 bg-brand-secondary/30"
-              />
+          <div className="bg-[#1e293b] rounded-[2rem] p-8 shadow-2xl border border-white/5 animate-in fade-in zoom-in-95 duration-500 delay-200">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="rounded-xl bg-red-500/10 p-4 text-[11px] font-black uppercase tracking-[0.2em] text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
+                  <span className="material-symbols-outlined text-base">warning</span>
+                  {error}
+                </div>
+              )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="Password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                  className="h-16 rounded-2xl border-brand-border/50 focus:ring-brand-primary/20 bg-brand-secondary/30"
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1" htmlFor="email">
+                  Email Address
+                </label>
+                <input 
+                  className="w-full px-4 py-4 rounded-xl border border-white/10 bg-[#0f172a] text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200 outline-none text-base font-medium" 
+                  id="email" 
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="name@company.com" 
+                  required 
+                  autoComplete="email"
                 />
+              </div>
 
-                <Input
-                  label="Verify password"
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1" htmlFor="password">
+                  Password
+                </label>
+                <div className="relative">
+                  <input 
+                    className="w-full px-4 py-4 rounded-xl border border-white/10 bg-[#0f172a] text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200 outline-none text-base font-medium pr-12" 
+                    id="password" 
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="••••••••" 
+                    required 
+                    autoComplete="new-password"
+                  />
+                  <button 
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors" 
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    <span className="material-symbols-outlined text-xl">
+                      {showPassword ? 'visibility' : 'visibility_off'}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1" htmlFor="confirm-password">
+                  Confirm Password
+                </label>
+                <input 
+                  className="w-full px-4 py-4 rounded-xl border border-white/10 bg-[#0f172a] text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200 outline-none text-base font-medium" 
+                  id="confirm-password" 
                   type="password"
-                  placeholder="••••••••"
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
-                  required
+                  placeholder="••••••••" 
+                  required 
                   autoComplete="new-password"
-                  className="h-16 rounded-2xl border-brand-border/50 focus:ring-brand-primary/20 bg-brand-secondary/30"
                 />
               </div>
-            </div>
 
-            <Button 
-              type="submit" 
-              loading={loading} 
-              className="w-full h-16 rounded-[1.5rem] bg-brand-primary hover:bg-brand-primary/95 text-white font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-brand-primary/30 transition-all hover:scale-[1.02] active:scale-95 group overflow-hidden relative"
-            >
-              <span className="relative z-10">Enlist Now</span>
-              <div className="absolute top-0 left-0 w-full h-full bg-white/10 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-            </Button>
+              <div className="pt-2">
+                <button 
+                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl shadow-[0_8px_20px_rgba(37,99,235,0.3)] hover:shadow-[0_12px_24px_rgba(37,99,235,0.5)] transition-all duration-300 active:scale-[0.98] uppercase tracking-[0.2em] text-xs disabled:opacity-50 disabled:cursor-not-allowed group" 
+                  type="submit"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      <span>Enlisting...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <span>Get Started</span>
+                      <span className="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </div>
+                  )}
+                </button>
+              </div>
+            </form>
 
-            <div className="pt-4 text-center border-t border-brand-border/30">
-              <p className="text-[10px] font-bold text-brand-slate opacity-40 uppercase tracking-widest leading-loose">
-                Already Have an Account? <br/>
-                <Link to="/admin/login" className="text-brand-primary hover:text-brand-primary/80 transition-colors font-black ml-1">
-                  Sign in
+            <div className="mt-8 text-center">
+              <p className="text-sm text-slate-400 font-medium">
+                Already have an account? 
+                <Link className="text-blue-500 font-bold hover:text-blue-400 transition-colors ml-1 uppercase tracking-wider underline underline-offset-4" to="/admin/login">
+                  Log In
                 </Link>
               </p>
             </div>
-          </form>
-        </div>
+          </div>
 
-        <p className="mt-12 text-center text-[10px] font-bold text-brand-slate opacity-20 uppercase tracking-[0.2em] max-w-xs mx-auto leading-relaxed">
-          Standard operational protocols apply. By enlisting, you authorize full system integration.
-        </p>
+          <div className="mt-10 text-center px-8 animate-in fade-in duration-1000 delay-500">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold leading-relaxed">
+              By signing up, you agree to our <br/>
+              <a className="underline hover:text-slate-300 transition-colors" href="#">Terms of Service</a> and <a className="underline hover:text-slate-300 transition-colors" href="#">Privacy Policy</a>
+            </p>
+          </div>
+        </div>
+        
+        {/* Mobile-style home indicator decoration */}
+        <div className="fixed bottom-2 w-32 h-1 bg-white/10 rounded-full left-1/2 -translate-x-1/2"></div>
       </div>
     </div>
   )
