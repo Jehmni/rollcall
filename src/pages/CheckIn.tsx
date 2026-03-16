@@ -112,7 +112,6 @@ export default function CheckIn() {
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-700">
             {/* Text Content */}
             <div className="text-center mb-10 max-w-sm">
-              <h1 className="text-4xl font-black mb-3 tracking-tighter uppercase italic">Check In</h1>
               <p className="text-slate-400 text-base leading-relaxed">
                 Scan the QR code at your venue to register attendance.
               </p>
@@ -140,7 +139,6 @@ export default function CheckIn() {
                     <span className="material-symbols-outlined text-2xl">photo_camera</span>
                     <span>Tap to Scan</span>
                   </button>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Align QR code within frame</p>
                 </div>
                 {/* Abstract Decorative Image */}
                 <div 
