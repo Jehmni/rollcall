@@ -55,43 +55,56 @@ export default function AdminForgotPassword() {
 
       <main className="flex-1 flex flex-col px-6 pt-12 pb-20 max-w-md mx-auto w-full relative z-10">
         {success ? (
-          <div className="animate-in fade-in zoom-in-95 duration-700 h-full flex flex-col">
-            <div className="mb-10 text-center sm:text-left">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-[2rem] bg-green-500/10 mb-8 border border-green-500/20 shadow-2xl relative group">
-                <div className="absolute inset-0 bg-green-500/20 blur-2xl rounded-full animate-pulse"></div>
-                <span className="material-symbols-outlined text-green-500 text-4xl relative z-10">mark_email_read</span>
+          <div className="animate-in fade-in zoom-in-95 duration-700 h-full flex flex-col items-center">
+            {/* Icon Illustration */}
+            <div className="mb-8 relative">
+              <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full"></div>
+              <div className="relative w-24 h-24 bg-primary/10 border border-primary/30 rounded-2xl flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary text-5xl">mark_email_read</span>
               </div>
-              <h1 className="text-white text-5xl font-black leading-tight tracking-tighter mb-4 uppercase italic">Transmission Sent</h1>
-              <p className="text-slate-400 text-lg font-medium leading-relaxed tracking-tight">
-                Encrypted reset instructions have been dispatched to:
-                <br/>
-                <span className="text-primary font-black mt-2 block break-all">{email}</span>
-              </p>
             </div>
 
-            <div className="space-y-4">
-              <button 
-                onClick={() => navigate('/admin/login')}
-                className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-[2rem] shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-[0.3em] text-xs"
-              >
-                <span>Back to Login</span>
-                <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">login</span>
-              </button>
-              <button 
-                onClick={() => setSuccess(false)}
-                className="w-full py-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-primary transition-colors"
-              >
-                Resend Directive
-              </button>
-            </div>
-
-            <div className="mt-auto pt-16">
-              <div className="bg-primary/5 border border-primary/10 p-5 rounded-2xl flex items-start gap-4 backdrop-blur-sm">
-                <span className="material-symbols-outlined text-primary text-xl">verified</span>
-                <p className="text-[10px] text-slate-500 font-bold leading-relaxed uppercase tracking-wider">
-                  Check your spam folder if the transmission does not arrive within 300 seconds.
+            {/* Content */}
+            <div className="text-center space-y-4 mb-10">
+              <h1 className="text-3xl font-bold text-white tracking-tight uppercase italic">Check Your Inbox</h1>
+              <div className="space-y-4 text-slate-400">
+                <p className="text-lg leading-relaxed font-medium">
+                  We have sent a password reset link to <br/>
+                  <span className="text-primary font-black break-all">{email}</span>.
+                </p>
+                <p className="text-sm font-bold uppercase tracking-wider opacity-60">
+                  Please click the link in that email to choose a new password. If you don’t see it within a few minutes, please check your spam folder.
                 </p>
               </div>
+            </div>
+
+            {/* Action Area */}
+            <div className="w-full space-y-4">
+              <button 
+                onClick={() => window.open('mailto:', '_blank')}
+                className="w-full py-5 bg-primary hover:bg-primary/90 text-white font-black rounded-[2rem] shadow-2xl shadow-primary/40 transition-all active:scale-[0.98] uppercase tracking-[0.3em] text-xs"
+              >
+                Open Email App
+              </button>
+              <button 
+                onClick={() => navigate('/admin/login')}
+                className="w-full py-5 bg-transparent border border-primary/20 text-white font-black rounded-[2rem] hover:bg-primary/10 transition-all active:scale-[0.98] uppercase tracking-[0.3em] text-xs"
+              >
+                Back to Login
+              </button>
+            </div>
+
+            {/* Support Footer */}
+            <div className="mt-auto pt-16 text-center">
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-widest leading-loose">
+                Still having trouble? <br/>
+                <button 
+                  onClick={() => setSuccess(false)}
+                  className="text-primary hover:underline font-black mt-1"
+                >
+                  CONTACT YOUR ADMINISTRATOR
+                </button>
+              </p>
             </div>
           </div>
         ) : (
