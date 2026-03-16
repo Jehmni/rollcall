@@ -1,5 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useOrganizations } from '../hooks/useAdminDashboard'
 import { Button } from '../components/ui/Button'
@@ -76,10 +76,20 @@ function OrgCard({
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { isSuper, adminUnits, refreshPermissions, signOut } = useAuth()
   const { orgs, loading, createOrg, updateOrg, deleteOrg } = useOrganizations()
 
   const [showCreate, setShowCreate] = useState(false)
+  
+  // Handle automatic open of create form from Discovery page
+  useEffect(() => {
+    if ((location.state as { openCreate?: boolean })?.openCreate) {
+      setShowCreate(true)
+      // Clear state to avoid reopening on refresh
+      window.history.replaceState({}, document.title)
+    }
+  }, [location.state])
   const [editingOrg, setEditingOrg] = useState<Organization | null>(null)
   
   const [newName, setNewName] = useState('')
