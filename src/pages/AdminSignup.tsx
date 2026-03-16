@@ -64,23 +64,23 @@ export default function AdminSignup() {
   }
 
   return (
-    <div className="bg-[#0f172a] font-display text-white min-h-screen flex flex-col antialiased selection:bg-blue-500/30">
+    <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased selection:bg-primary/30">
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-hidden">
         {/* Decorative background blurs */}
         <div className="absolute top-0 right-0 -z-10 opacity-20 pointer-events-none">
-          <div className="w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full"></div>
+          <div className="w-[500px] h-[500px] bg-primary/20 blur-[120px] rounded-full"></div>
         </div>
         <div className="absolute bottom-0 left-0 -z-10 opacity-10 pointer-events-none">
-          <div className="w-[300px] h-[300px] bg-blue-600/30 blur-[100px] rounded-full"></div>
+          <div className="w-[300px] h-[300px] bg-primary/30 blur-[100px] rounded-full"></div>
         </div>
 
         <div className="w-full max-w-md mx-auto relative z-10">
           <div className="text-center mb-10 animate-in fade-in slide-in-from-top-6 duration-700">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-[1.25rem] bg-blue-600 mb-6 shadow-[0_0_25px_rgba(37,99,235,0.4)] relative group overflow-hidden">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-[1.25rem] bg-primary mb-6 shadow-[0_0_25px_rgba(82,71,230,0.4)] relative group overflow-hidden">
               <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
               <span className="material-symbols-outlined text-white text-3xl">corporate_fare</span>
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight mb-3">
+            <h1 className="text-3xl font-extrabold tracking-tight mb-3 uppercase italic">
               Create Your Account
             </h1>
             <p className="text-slate-400 text-sm px-4 leading-relaxed font-medium">
@@ -88,7 +88,7 @@ export default function AdminSignup() {
             </p>
           </div>
 
-          <div className="bg-[#1e293b] rounded-[2rem] p-8 shadow-2xl border border-white/5 animate-in fade-in zoom-in-95 duration-500 delay-200">
+          <div className="bg-primary/5 rounded-[2.5rem] p-8 shadow-2xl border border-primary/10 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-500 delay-200">
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
                 <div className="rounded-xl bg-red-500/10 p-4 text-[11px] font-black uppercase tracking-[0.2em] text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
@@ -98,11 +98,11 @@ export default function AdminSignup() {
               )}
 
               <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1" htmlFor="email">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1" htmlFor="email">
                   Email Address
                 </label>
                 <input 
-                  className="w-full px-4 py-4 rounded-xl border border-white/10 bg-[#0f172a] text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200 outline-none text-base font-medium" 
+                  className="w-full px-5 py-5 rounded-[1.5rem] border border-primary/10 bg-primary/5 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all duration-200 outline-none text-base font-medium" 
                   id="email" 
                   type="email"
                   value={email}
@@ -114,12 +114,12 @@ export default function AdminSignup() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1" htmlFor="password">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1" htmlFor="password">
                   Password
                 </label>
                 <div className="relative">
                   <input 
-                    className="w-full px-4 py-4 rounded-xl border border-white/10 bg-[#0f172a] text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200 outline-none text-base font-medium pr-12" 
+                    className="w-full px-5 py-5 rounded-[1.5rem] border border-primary/10 bg-primary/5 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all duration-200 outline-none text-base font-medium pr-14" 
                     id="password" 
                     type={showPassword ? 'text' : 'password'}
                     value={password}
@@ -129,7 +129,7 @@ export default function AdminSignup() {
                     autoComplete="new-password"
                   />
                   <button 
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors" 
+                    className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors" 
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                   >
@@ -141,11 +141,11 @@ export default function AdminSignup() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1" htmlFor="confirm-password">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1" htmlFor="confirm-password">
                   Confirm Password
                 </label>
                 <input 
-                  className="w-full px-4 py-4 rounded-xl border border-white/10 bg-[#0f172a] text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200 outline-none text-base font-medium" 
+                  className="w-full px-5 py-5 rounded-[1.5rem] border border-primary/10 bg-primary/5 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all duration-200 outline-none text-base font-medium" 
                   id="confirm-password" 
                   type="password"
                   value={confirmPassword}
@@ -158,7 +158,7 @@ export default function AdminSignup() {
 
               <div className="pt-2">
                 <button 
-                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl shadow-[0_8px_20px_rgba(37,99,235,0.3)] hover:shadow-[0_12px_24px_rgba(37,99,235,0.5)] transition-all duration-300 active:scale-[0.98] uppercase tracking-[0.2em] text-xs disabled:opacity-50 disabled:cursor-not-allowed group" 
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-[2rem] shadow-2xl shadow-primary/40 transition-all active:scale-[0.98] uppercase tracking-[0.3em] text-xs disabled:opacity-50 disabled:cursor-not-allowed group" 
                   type="submit"
                   disabled={loading}
                 >
@@ -178,9 +178,9 @@ export default function AdminSignup() {
             </form>
 
             <div className="mt-8 text-center">
-              <p className="text-sm text-slate-400 font-medium">
+              <p className="text-sm text-slate-500 font-medium">
                 Already have an account? 
-                <Link className="text-blue-500 font-bold hover:text-blue-400 transition-colors ml-1 uppercase tracking-wider underline underline-offset-4" to="/admin/login">
+                <Link className="text-primary font-bold hover:text-primary transition-colors ml-1 uppercase tracking-wider underline underline-offset-4" to="/admin/login">
                   Log In
                 </Link>
               </p>
