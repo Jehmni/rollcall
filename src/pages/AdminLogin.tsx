@@ -1,10 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react'
-import { useNavigate, Link, useLocation } from 'react-router-dom'
-import { Users, ArrowRight, CheckCircle2, ArrowLeft } from 'lucide-react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Button } from '../components/ui/Button'
-import { Input } from '../components/ui/Input'
-import { Card } from '../components/ui/Card'
 
 export default function AdminLogin() {
   const navigate = useNavigate()
@@ -12,6 +8,7 @@ export default function AdminLogin() {
   const { session, signIn } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -55,94 +52,155 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-brand-secondary px-4 relative overflow-hidden font-inter">
-      {/* Decorative background elements */}
-      <div className="absolute top-0 -left-10 w-[500px] h-[500px] bg-brand-primary/5 rounded-full blur-[120px] -z-10 animate-pulse"></div>
-      <div className="absolute bottom-0 -right-10 w-[500px] h-[500px] bg-brand-primary/5 rounded-full blur-[120px] -z-10 animate-pulse delay-700"></div>
-
-      <div className="relative w-full max-w-md">
-        <header className="mb-12 flex flex-col items-center gap-6 text-center animate-in fade-in slide-in-from-top-10 duration-1000">
-          <div className="group relative">
-            <div className="absolute inset-0 bg-brand-primary blur-2xl opacity-20 transition-opacity duration-500"></div>
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-brand-primary shadow-2xl shadow-brand-primary/40 ring-1 ring-white/20">
-              <Users className="h-10 w-10 text-white" />
-            </div>
+    <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased">
+      <div className="relative flex min-h-screen w-full flex-col bg-background-dark overflow-x-hidden">
+        {/* Header */}
+        <header className="flex items-center bg-background-dark p-4 justify-between border-b border-primary/20 sticky top-0 z-50 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => navigate('/')}
+              className="text-primary flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+            >
+              <span className="material-symbols-outlined">arrow_back</span>
+            </button>
+            <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Admin Portal</h2>
           </div>
-          <div>
-            <h1 className="text-4xl font-black tracking-tighter text-brand-text italic">Admin Portal</h1>
-            <p className="mt-2 text-sm text-brand-slate font-bold uppercase tracking-[0.2em] opacity-40">Rollcally Administrator Console</p>
+          <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_15px_rgba(82,71,230,0.2)]">
+            <span className="material-symbols-outlined text-primary text-xl">admin_panel_settings</span>
           </div>
         </header>
 
-        <Card className="p-10 border-brand-border/50 bg-white/80 backdrop-blur-xl shadow-2xl shadow-brand-primary/10 rounded-[3rem] animate-in fade-in zoom-in-95 duration-500 delay-300">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        {/* Main Content Area */}
+        <main className="flex-1 flex flex-col px-6 py-8 max-w-md mx-auto w-full">
+          <div className="text-center mb-10 animate-in fade-in slide-in-from-top-6 duration-700">
+            <div className="mb-6 inline-flex p-4 rounded-2xl bg-gradient-to-tr from-primary/20 to-primary/5 border border-primary/20 shadow-2xl relative group">
+              <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <span className="material-symbols-outlined text-primary text-5xl relative z-10">shield_person</span>
+            </div>
+            <h3 className="text-white tracking-tight text-2xl font-black leading-tight uppercase italic">
+              ROLLCALLY ADMINISTRATOR PORTAL
+            </h3>
+            <p className="text-slate-400 mt-3 text-sm font-medium tracking-tight">Secure access for organization managers</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6 animate-in fade-in zoom-in-95 duration-500 delay-200">
             {successMessage && (
-              <div className="rounded-2xl bg-green-50/80 backdrop-blur-sm p-4 text-xs font-bold uppercase tracking-wider text-green-700 border border-green-100 flex items-center gap-2 animate-in fade-in slide-in-from-top-4">
-                <CheckCircle2 className="h-4 w-4" />
+              <div className="rounded-2xl bg-green-500/10 p-4 text-[10px] font-black uppercase tracking-[0.2em] text-green-400 border border-green-500/20 flex items-center gap-2 animate-in slide-in-from-top-4">
+                <span className="material-symbols-outlined text-base">check_circle</span>
                 {successMessage}
               </div>
             )}
 
             {error && (
-              <div className="rounded-2xl bg-red-50 p-4 text-xs font-bold uppercase tracking-wider text-red-600 border border-red-100 animate-in shake duration-500">
+              <div className="rounded-2xl bg-red-500/10 p-4 text-[10px] font-black uppercase tracking-[0.2em] text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
+                <span className="material-symbols-outlined text-base">warning</span>
                 {error}
               </div>
             )}
 
-            <div className="space-y-6">
-              <Input
-                label="Enter your email"
-                type="email"
-                placeholder="admin@rollcally.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-                autoFocus
-              />
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-brand-slate opacity-60">Password</label>
-                  <Link 
-                    to="/admin/forgot-password" 
-                    className="text-xs font-bold uppercase tracking-wider text-brand-primary hover:text-brand-primary/80 transition-colors"
-                  >
-                    Forgot?
-                  </Link>
-                </div>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
+            <div className="flex flex-col gap-2">
+              <label className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">Email</label>
+              <div className="relative group">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">mail</span>
+                <input 
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="Enter your email"
                   required
-                  autoComplete="current-password"
+                  className="w-full rounded-2xl text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-primary/20 bg-primary/5 h-16 pl-14 placeholder:text-slate-600 text-base font-medium transition-all"
                 />
               </div>
             </div>
 
-            <Button type="submit" size="lg" loading={loading} className="w-full h-14 text-sm font-bold uppercase tracking-[0.2em] shadow-lg shadow-brand-primary/20 mt-2">
-              Sign in <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-
-            <div className="pt-8 mt-4 border-t border-brand-border text-center">
-              <p className="text-xs text-brand-slate font-medium opacity-60">New organization?</p>
-              <Link to="/admin/signup" className="mt-2 inline-block font-black text-xs uppercase tracking-[0.3em] text-brand-primary hover:underline underline-offset-8">
-                Register
-              </Link>
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-center">
+                <label className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">PASSWORD</label>
+                <button 
+                  type="button"
+                  onClick={() => navigate('/admin/forgot-password')}
+                  className="text-primary text-[10px] font-black tracking-[0.2em] uppercase hover:underline"
+                >
+                  FORGOT?
+                </button>
+              </div>
+              <div className="relative group">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors transition-colors">lock</span>
+                <input 
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                  className="w-full rounded-2xl text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-primary/20 bg-primary/5 h-16 pl-14 pr-14 placeholder:text-slate-600 text-base font-medium transition-all"
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors transition-colors"
+                >
+                  <span className="material-symbols-outlined">{showPassword ? 'visibility_off' : 'visibility'}</span>
+                </button>
+              </div>
             </div>
-          </form>
-        </Card>
 
-        <div className="mt-12 flex items-center justify-between text-xs font-bold uppercase tracking-[0.2em] text-brand-slate opacity-40">
-          <Link to="/" className="hover:text-brand-primary transition-colors flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" /> Home
-          </Link>
-          <Link to="/checkin" className="hover:text-brand-primary transition-colors underline underline-offset-4">
-            Member Check-in
-          </Link>
-        </div>
+            <button 
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-[2rem] shadow-2xl shadow-primary/40 transition-all active:scale-[0.98] uppercase tracking-[0.3em] text-xs mt-4 disabled:opacity-50 disabled:cursor-not-allowed group"
+            >
+              {loading ? (
+                <div className="flex items-center justify-center gap-3">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  <span>Authenticating...</span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  <span>Sign In</span>
+                  <span className="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </div>
+              )}
+            </button>
+          </form>
+
+          {/* Secondary Actions */}
+          <div className="mt-auto pt-16 animate-in fade-in duration-1000 delay-500">
+            <div className="bg-primary/5 rounded-[2.5rem] p-8 border border-primary/10 shadow-inner relative overflow-hidden">
+              <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl"></div>
+              <p className="text-slate-400 text-center text-xs font-bold uppercase tracking-[0.1em] mb-6">New organization?</p>
+              <button 
+                onClick={() => navigate('/admin/signup')}
+                className="w-full bg-background-dark text-white border border-primary/30 font-black py-4 rounded-2xl hover:bg-primary/10 transition-colors uppercase tracking-[0.3em] text-[10px]"
+              >
+                REGISTER
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mt-8 pb-10">
+              <button 
+                onClick={() => navigate('/')}
+                className="flex items-center justify-center gap-3 text-slate-500 hover:text-primary py-3 transition-all group"
+              >
+                <div className="bg-slate-500/10 p-2 rounded-xl group-hover:bg-primary/10 group-hover:text-primary">
+                  <span className="material-symbols-outlined text-xl">home</span>
+                </div>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-black">HOME</span>
+              </button>
+              <button 
+                onClick={() => navigate('/checkin')}
+                className="flex items-center justify-center gap-3 text-slate-500 hover:text-primary py-3 transition-all group"
+              >
+                <div className="bg-slate-500/10 p-2 rounded-xl group-hover:bg-primary/10 group-hover:text-primary">
+                  <span className="material-symbols-outlined text-xl">how_to_reg</span>
+                </div>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-black text-center">CHECK-IN</span>
+              </button>
+            </div>
+          </div>
+        </main>
+
+        {/* Subtle Gradient Decor */}
+        <div className="fixed bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-20"></div>
       </div>
     </div>
   )
