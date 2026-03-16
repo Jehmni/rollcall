@@ -173,20 +173,13 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
             </div>
           )}
 
-          <div className="mt-10 flex flex-col gap-4">
+          <div className="mt-10 flex flex-col items-center">
               <button
                 onClick={onClose}
                 className="w-full h-16 text-slate-400 font-black uppercase tracking-[0.3em] text-[10px] hover:text-white transition-colors"
               >
-                Terminate Scan
+                Close Scanner
               </button>
-              <div className="flex items-center gap-3 justify-center opacity-30">
-                <div className="h-[1px] w-8 bg-primary"></div>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-black">
-                  Elite Access Guard
-                </p>
-                <div className="h-[1px] w-8 bg-primary"></div>
-              </div>
           </div>
         </div>
       </div>
