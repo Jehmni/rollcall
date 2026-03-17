@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { useToast } from '../contexts/ToastContext'
 import type { DashboardMember, Organization, OrgRole, Service, ServiceType, Unit } from '../types'
 
 // ── Organizations ────────────────────────────────────────────────────────────
@@ -215,6 +216,7 @@ export function useServices(unitId: string | null) {
 // ── Dashboard (attendance for a service) ─────────────────────────────────────
 
 export function useAdminDashboard(serviceId: string | null) {
+  const { toast } = useToast()
   const [members, setMembers] = useState<DashboardMember[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -253,7 +255,7 @@ export function useAdminDashboard(serviceId: string | null) {
     })
 
     if (error) {
-      console.error('Failed to fetch dashboard members:', error)
+      toast('Failed to load attendance data. Please refresh.', 'error')
       setLoading(false)
       setLoadingMore(false)
       return

@@ -18,6 +18,7 @@ export default defineConfig({
             urlPattern: ({ url }) =>
               url.pathname.includes('/rest/v1/rpc/get_service_members'),
             handler: 'NetworkFirst',
+            method: 'POST',
             options: {
               cacheName: 'member-list-cache',
               networkTimeoutSeconds: 3,

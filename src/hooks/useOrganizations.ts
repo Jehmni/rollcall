@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+import { useToast } from '../contexts/ToastContext'
 import type { Organization, JoinRequest, OrganizationMember } from '../types'
 
 export function useOrganizations() {
   const { session } = useAuth()
   const user = session?.user
+  const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -61,10 +63,10 @@ export function useOrganizations() {
       if (err) throw err
       return data as JoinRequest[]
     } catch (err) {
-      console.error('Error fetching join requests:', err)
+      toast('Failed to load join requests.', 'error')
       return []
     }
-  }, [user])
+  }, [user, toast])
 
   const getOrgJoinRequests = useCallback(async (orgId: string) => {
     try {
@@ -86,10 +88,10 @@ export function useOrganizations() {
       }
       return data
     } catch (err) {
-      console.error('Error fetching org join requests:', err)
+      toast('Failed to load pending requests.', 'error')
       return []
     }
-  }, [])
+  }, [toast])
 
   const respondToJoinRequest = useCallback(async (requestId: string, status: 'approved' | 'rejected') => {
     setLoading(true)
@@ -119,10 +121,10 @@ export function useOrganizations() {
       if (err) throw err
       return data as OrganizationMember[]
     } catch (err) {
-      console.error('Error fetching org members:', err)
+      toast('Failed to load organisation members.', 'error')
       return []
     }
-  }, [])
+  }, [toast])
 
   return {
     loading,

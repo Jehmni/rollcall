@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
+import { ToastProvider } from './contexts/ToastContext'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { AdminRoute } from './components/ProtectedRoute'
 import CheckIn from './pages/CheckIn'
 import Landing from './pages/Landing'
@@ -17,36 +19,38 @@ import AdminOrgDiscovery from './pages/AdminOrgDiscovery'
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-      >
-        <Routes>
-          {/* Public */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/checkin" element={<CheckIn />} />
+    <ToastProvider>
+      <AuthProvider>
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
+          <Routes>
+            {/* Public */}
+            <Route path="/" element={<ErrorBoundary label="Landing"><Landing /></ErrorBoundary>} />
+            <Route path="/checkin" element={<ErrorBoundary label="Check-in"><CheckIn /></ErrorBoundary>} />
 
-          {/* Admin auth */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/signup" element={<AdminSignup />} />
-          <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
-          <Route path="/admin/update-password" element={<AdminUpdatePassword />} />
+            {/* Admin auth */}
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/signup" element={<AdminSignup />} />
+            <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
+            <Route path="/admin/update-password" element={<AdminUpdatePassword />} />
 
-          {/* Admin — protected */}
-          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-          <Route path="/admin/discover" element={<AdminRoute><AdminOrgDiscovery /></AdminRoute>} />
-          <Route path="/admin/orgs/:orgId" element={<AdminRoute><OrgDetail /></AdminRoute>} />
-          <Route path="/admin/units/:unitId" element={<AdminRoute><UnitDashboard /></AdminRoute>} />
-          <Route path="/admin/units/:unitId/members" element={<AdminRoute><UnitMembers /></AdminRoute>} />
-          <Route path="/admin/units/:unitId/members/:memberId" element={<AdminRoute><MemberDetail /></AdminRoute>} />
-          <Route path="/admin/units/:unitId/events/:serviceId" element={<AdminRoute><AdminServiceDetail /></AdminRoute>} />
+            {/* Admin — protected */}
+            <Route path="/admin" element={<AdminRoute><ErrorBoundary label="Dashboard"><AdminDashboard /></ErrorBoundary></AdminRoute>} />
+            <Route path="/admin/discover" element={<AdminRoute><ErrorBoundary label="Discover"><AdminOrgDiscovery /></ErrorBoundary></AdminRoute>} />
+            <Route path="/admin/orgs/:orgId" element={<AdminRoute><ErrorBoundary label="Org Detail"><OrgDetail /></ErrorBoundary></AdminRoute>} />
+            <Route path="/admin/units/:unitId" element={<AdminRoute><ErrorBoundary label="Unit Dashboard"><UnitDashboard /></ErrorBoundary></AdminRoute>} />
+            <Route path="/admin/units/:unitId/members" element={<AdminRoute><ErrorBoundary label="Unit Members"><UnitMembers /></ErrorBoundary></AdminRoute>} />
+            <Route path="/admin/units/:unitId/members/:memberId" element={<AdminRoute><ErrorBoundary label="Member Detail"><MemberDetail /></ErrorBoundary></AdminRoute>} />
+            <Route path="/admin/units/:unitId/events/:serviceId" element={<AdminRoute><ErrorBoundary label="Service Detail"><AdminServiceDetail /></ErrorBoundary></AdminRoute>} />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ToastProvider>
   )
 }
