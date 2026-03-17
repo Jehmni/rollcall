@@ -252,6 +252,36 @@ export default function AdminDashboard() {
 
   return (
     <div className="bg-background-light dark:bg-[#0F172A] min-h-screen text-slate-900 dark:text-slate-100 antialiased font-display selection:bg-primary/30">
+
+      {/* Desktop Sidebar — hidden on mobile */}
+      <aside className="hidden sm:flex fixed inset-y-0 left-0 z-30 w-64 flex-col bg-background-dark border-r border-slate-800">
+        <div className="flex items-center gap-3 px-6 py-6 border-b border-slate-800">
+          <div className="bg-primary p-1.5 rounded-lg">
+            <span className="material-symbols-outlined text-white text-xl">grid_view</span>
+          </div>
+          <h2 className="text-white text-lg font-extrabold tracking-tight">Rollcally</h2>
+        </div>
+        <nav className="flex-1 px-4 py-6 flex flex-col gap-2 overflow-y-auto">
+          <button className="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-bold text-sm">
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
+            Dashboard
+          </button>
+          <button onClick={() => navigate('/admin/discover')} className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 font-medium text-sm transition-colors">
+            <span className="material-symbols-outlined">explore</span>
+            Explore
+          </button>
+        </nav>
+        <div className="px-4 py-4 border-t border-slate-800">
+          <button onClick={signOut} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 font-medium text-sm transition-colors">
+            <span className="material-symbols-outlined text-xl">logout</span>
+            Sign Out
+          </button>
+        </div>
+      </aside>
+
+      {/* Main content area — offset on desktop for sidebar */}
+      <div className="sm:ml-64">
+
       {/* Header/Top Bar */}
       <header className="bg-[#172554] text-white pt-12 pb-8 px-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
@@ -414,35 +444,31 @@ export default function AdminDashboard() {
         )}
       </main>
 
-      {/* Floating Action Button */}
+      {/* Floating Action Button — hidden on desktop (use sidebar or header button) */}
       <button 
         onClick={() => { setShowCreate(true); setEditingOrg(null); setNewName('') }}
-        className="fixed right-6 bottom-24 sm:bottom-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-20"
+        className="fixed right-6 bottom-24 sm:right-8 sm:bottom-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-20 sm:hidden"
       >
         <span className="material-symbols-outlined text-3xl">add</span>
       </button>
 
-      {/* Navigation Footer */}
-      <nav className="fixed bottom-0 left-0 right-0 backdrop-blur-md bg-white/70 dark:bg-[#1E293B]/70 border-t border-slate-200/20 dark:border-slate-800/50 px-8 py-3 pb-8 flex justify-between items-center z-10 transition-colors">
+      {/* Navigation Footer — mobile only */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 backdrop-blur-md bg-white/70 dark:bg-[#1E293B]/70 border-t border-slate-200/20 dark:border-slate-800/50 px-8 py-3 pb-8 flex justify-between items-center z-10 transition-colors">
         <button className="flex flex-col items-center gap-1 text-primary">
           <span className="material-symbols-outlined">dashboard</span>
           <span className="text-[10px] font-bold uppercase tracking-widest text-[#5247e6]">Dash</span>
         </button>
-        <button className="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors">
-          <span className="material-symbols-outlined">person</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest">Staff</span>
+        <button onClick={() => navigate('/admin/discover')} className="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors">
+          <span className="material-symbols-outlined">explore</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest">Explore</span>
         </button>
-        <button className="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors">
-          <span className="material-symbols-outlined">analytics</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest">Stats</span>
-        </button>
-        <button className="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors">
-          <span className="material-symbols-outlined">settings</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest">Setup</span>
+        <button onClick={signOut} className="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors">
+          <span className="material-symbols-outlined">logout</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest">Logout</span>
         </button>
       </nav>
 
-      <div className="h-32"></div>
+      <div className="h-32 sm:h-8"></div>
 
       <ConfirmDialog
         isOpen={!!confirmDelete}
@@ -454,6 +480,7 @@ export default function AdminDashboard() {
         variant="danger"
         isLoading={isUpdating}
       />
+      </div> {/* End sm:ml-64 */}
     </div>
   )
 }

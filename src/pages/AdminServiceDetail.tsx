@@ -13,14 +13,6 @@ const EVENT_LABEL: Record<string, string> = {
   meeting:        'Meeting',
 }
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
 
 function formatTime(dateStr: string) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
@@ -201,8 +193,13 @@ export default function AdminServiceDetail() {
       </header>
 
       {/* ── Main Content ───────────────────────────────────────────────────── */}
-      <main className="flex-1 pb-24 max-w-2xl mx-auto w-full">
+      <main className="flex-1 pb-8 w-full">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Desktop: 2-col layout. Mobile: single column */}
+          <div className="lg:grid lg:grid-cols-[360px_1fr] lg:gap-6 lg:pt-4">
 
+          {/* Left column: QR + Stats */}
+          <div className="lg:sticky lg:top-[73px] lg:self-start flex flex-col gap-4">
         {/* ── QR Section (Collapsed by default) ─────────────────────────── */}
         <section className="p-4">
           <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-primary to-primary/60 p-[1px]">
@@ -298,10 +295,13 @@ export default function AdminServiceDetail() {
             </div>
           </div>
         </section>
+          </div> {/* End left column */}
 
-        {/* ── Tabs + Search ──────────────────────────────────────────────── */}
-        <section className="mt-6">
-          <div className="sticky top-[73px] z-40 bg-background-dark/95 backdrop-blur-sm px-4 pt-2">
+          {/* Right column: Tabs + Member List */}
+          <div>
+          {/* ── Tabs + Search ──────────────────────────────────────────────── */}
+          <section className="mt-4">
+            <div className="sticky top-[73px] z-40 bg-background-dark/95 backdrop-blur-sm pt-2">
             {/* Tab pills */}
             <div className="flex gap-1 rounded-lg bg-surface-dark p-1">
               {(['all', 'present', 'absent'] as const).map(t => (
@@ -359,8 +359,8 @@ export default function AdminServiceDetail() {
             </div>
           </div>
 
-          {/* ── Member List ─────────────────────────────────────────────── */}
-          <div className="px-4">
+            {/* ── Member List ─────────────────────────────────────────────── */}
+            <div>
             {loading ? (
               <div className="flex justify-center py-16">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -451,6 +451,10 @@ export default function AdminServiceDetail() {
             )}
           </div>
         </section>
+        </div> {/* End right column */}
+
+        </div> {/* End lg:grid */}
+        </div> {/* End max-w container */}
       </main>
     </div>
   )

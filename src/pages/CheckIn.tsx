@@ -148,7 +148,7 @@ export default function CheckIn() {
         <div className="w-full"></div> {/* Grid symmetry */}
       </header>
 
-      <main className="flex-1 flex flex-col items-center px-6 pt-8 pb-12 overflow-y-auto">
+      <main className="flex-1 flex flex-col items-center px-6 pt-8 pb-28 sm:pb-12 overflow-y-auto">
         {noService ? (
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-700">
             {/* Text Content */}
@@ -441,8 +441,10 @@ export default function CheckIn() {
         </div>
       </main>
 
-      {/* Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-primary/20 bg-background-dark/90 backdrop-blur-xl px-4 pb-8 pt-4">
+      {/* Bottom Navigation Bar — mobile focused */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-primary/20 bg-background-dark/90 backdrop-blur-xl px-4 pt-4 sm:hidden"
+        style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
+      >
         <button 
           onClick={() => navigate('/')} 
           className="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary transition-all group"

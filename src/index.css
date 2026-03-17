@@ -7,10 +7,38 @@
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+    height: 100%;
   }
 
   body {
     @apply bg-background-dark text-slate-100 antialiased font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100svh;
+    min-height: 100dvh;
+  }
+
+  /* Extend background behind the notch/status bar on iOS PWA */
+  #root {
+    min-height: 100svh;
+    min-height: 100dvh;
+    @apply bg-background-dark;
+  }
+
+  /* Custom dark scrollbars for desktop browsers */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-slate-700;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-500;
   }
 }
 
@@ -22,7 +50,7 @@
 
 /* Hide html5-qrcode internal UI */
 #qr-reader__dashboard, 
-#qr-reader__status_span, 
+#qr-reader__status_span,
 #qr-reader video + div,
 #qr-reader img {
   display: none !important;

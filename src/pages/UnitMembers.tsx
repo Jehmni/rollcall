@@ -247,11 +247,10 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
 // ─── CSV Import Modal ─────────────────────────────────────────────────────────
 
 function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importing, importError,
-  fileInputRef, onChooseFile, onImport, onClose, onDownloadTemplate,
+  onChooseFile, onImport, onClose, onDownloadTemplate,
 }: {
   csvRows: CsvRow[]; csvSkipped: number; csvFilename: string
   importDone: number | null; importing: boolean; importError: string | null
-  fileInputRef: React.RefObject<HTMLInputElement>
   onChooseFile: () => void; onImport: () => void; onClose: () => void; onDownloadTemplate: () => void
 }) {
   const exactCount = csvRows.filter(r => r.duplicateStatus === 'exact').length
@@ -805,7 +804,6 @@ export default function UnitMembers() {
         <CsvImportModal
           csvRows={csvRows} csvSkipped={csvSkipped} csvFilename={csvFilename}
           importDone={importDone} importing={importing} importError={importError}
-          fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
           onChooseFile={() => fileInputRef.current?.click()}
           onImport={handleImport}
           onClose={() => setPanel('none')}
