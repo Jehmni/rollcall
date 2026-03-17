@@ -15,11 +15,11 @@ import {
 } from './helpers'
 
 test.describe('Check-in: no service ID', () => {
-  test('shows "No active service" when QR has no service_id', async ({ page }) => {
+  test('shows QR scanner prompt when no service_id is in URL', async ({ page }) => {
     silenceRealtime(page)
     await page.goto('/checkin')
-    await expect(page.getByText('No active service')).toBeVisible()
-    await expect(page.getByText('Ask your leader for a fresh code')).toBeVisible()
+    await expect(page.getByText('Scan the QR code at your venue')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Tap to Scan' })).toBeVisible()
   })
 })
 
@@ -37,9 +37,9 @@ test.describe('Check-in: member list', () => {
 
   test('groups members by section with section headers', async ({ page }) => {
     await page.goto(`/checkin?service_id=${IDS.service}`)
-    // Section labels are uppercase <p> elements (distinct from the per-member badges)
-    await expect(page.locator('p.uppercase').filter({ hasText: 'Soprano' })).toBeVisible()
-    await expect(page.locator('p.uppercase').filter({ hasText: 'Bass' })).toBeVisible()
+    // Section labels are in h3 elements
+    await expect(page.locator('h3').filter({ hasText: 'Soprano' })).toBeVisible()
+    await expect(page.locator('h3').filter({ hasText: 'Bass' })).toBeVisible()
   })
 
   test('search filters the list', async ({ page }) => {
@@ -73,8 +73,8 @@ test.describe('Check-in: confirmation flow', () => {
   test('confirmation card shows the selected member name', async ({ page }) => {
     await page.goto(`/checkin?service_id=${IDS.service}`)
     await page.getByText('Alice Johnson').click()
-    // Name in the large card heading
-    await expect(page.locator('p.font-bold').filter({ hasText: 'Alice Johnson' })).toBeVisible()
+    // Name appears in the large card
+    await expect(page.getByText('Alice Johnson').last()).toBeVisible()
   })
 
   test('confirmation card shows section label', async ({ page }) => {
@@ -110,25 +110,25 @@ test.describe('Check-in: result screens', () => {
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, check me in' }).click()
     await expect(page.getByText("You're in!")).toBeVisible()
-    await expect(page.getByText('Attendance recorded. Enjoy the service.')).toBeVisible()
+    await expect(page.getByText('Check-in Successful')).toBeVisible()
   })
 
-  test('already checked in shows correct screen', async ({ page }) => {
+  test('already checked in shows error screen', async ({ page }) => {
     await mockCheckinAlreadyIn(page)
     await page.goto(`/checkin?service_id=${IDS.service}`)
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await expect(page.getByText('Already checked in')).toBeVisible()
-    await expect(page.getByText('already recorded')).toBeVisible()
+    await expect(page.getByText('Sync Denied')).toBeVisible()
+    await expect(page.getByText(/Already checked in/)).toBeVisible()
   })
 
-  test('"Go back" from already-checked-in returns to list', async ({ page }) => {
+  test('"Re-verify Identity" from error returns to list', async ({ page }) => {
     await mockCheckinAlreadyIn(page)
     await page.goto(`/checkin?service_id=${IDS.service}`)
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await expect(page.getByText('Already checked in')).toBeVisible()
-    await page.getByRole('button', { name: 'Go back' }).click()
+    await expect(page.getByText('Sync Denied')).toBeVisible()
+    await page.getByRole('button', { name: 'Re-verify Identity' }).click()
     await expect(page.getByPlaceholder('Search your name…')).toBeVisible()
   })
 
@@ -137,16 +137,16 @@ test.describe('Check-in: result screens', () => {
     await page.goto(`/checkin?service_id=${IDS.service}`)
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await expect(page.getByRole('heading', { name: 'Something went wrong' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Try again' })).toBeVisible()
+    await expect(page.getByText('Sync Denied')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Re-verify Identity' })).toBeVisible()
   })
 
-  test('"Try again" from error returns to list', async ({ page }) => {
+  test('"Re-verify Identity" from invalid service returns to list', async ({ page }) => {
     await mockCheckinInvalidService(page)
     await page.goto(`/checkin?service_id=${IDS.service}`)
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await page.getByRole('button', { name: 'Try again' }).click()
+    await page.getByRole('button', { name: 'Re-verify Identity' }).click()
     await expect(page.getByPlaceholder('Search your name…')).toBeVisible()
   })
 })

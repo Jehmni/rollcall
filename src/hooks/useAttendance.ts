@@ -24,7 +24,10 @@ export function useAttendance(serviceId: string | null) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   async function checkIn(memberId: string) {
-    if (!serviceId) { setStatus('no_service'); return }
+    if (!serviceId) {
+      setStatus('no_service')
+      throw new Error('no_service')
+    }
 
     setStatus('loading')
     setCheckedInName(null)
@@ -33,7 +36,7 @@ export function useAttendance(serviceId: string | null) {
     let lat: number | null = null
     let lng: number | null = null
     try {
-      const pos = await new Promise<GeolocationPosition>((res, rej) => 
+      const pos = await new Promise<GeolocationPosition>((res, rej) =>
         navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 })
       )
       lat = pos.coords.latitude
@@ -60,7 +63,7 @@ export function useAttendance(serviceId: string | null) {
     if (error) {
       setStatus('error')
       setErrorMessage(error.message)
-      return
+      throw error
     }
 
     const result = data as RpcResult
@@ -71,17 +74,25 @@ export function useAttendance(serviceId: string | null) {
       setStatus('success')
     } else {
       if (result.name) setCheckedInName(result.name)
+      let msg: string | null = null
       switch (result.error) {
         case 'not_found':          setStatus('not_found'); break
         case 'already_checked_in': setStatus('already_checked_in'); break
         case 'invalid_service':    setStatus('invalid_service'); break
-        case 'location_required':  setStatus('error'); setErrorMessage('Location access is required to check in.'); break
-        case 'too_far':            setStatus('error'); setErrorMessage(`You are too far from the venue (${result.distance}m).`); break
-        case 'device_locked':      setStatus('error'); setErrorMessage('This device is already linked to another member for this event.'); break
+        case 'location_required':
+          msg = 'Location access is required to check in.'
+          setStatus('error'); setErrorMessage(msg); break
+        case 'too_far':
+          msg = `You are too far from the venue (${result.distance}m).`
+          setStatus('error'); setErrorMessage(msg); break
+        case 'device_locked':
+          msg = 'This device is already linked to another member for this event.'
+          setStatus('error'); setErrorMessage(msg); break
         default:
-          setStatus('error')
-          setErrorMessage(result.error ?? 'Something went wrong')
+          msg = result.error ?? 'Something went wrong'
+          setStatus('error'); setErrorMessage(msg)
       }
+      throw new Error(result.error ?? 'check_in_failed')
     }
   }
 

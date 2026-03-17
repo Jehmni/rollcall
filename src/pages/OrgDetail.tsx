@@ -459,8 +459,8 @@ export default function OrgDetail() {
               <h3 className="text-lg font-bold text-slate-100">Active Units</h3>
             </div>
 
-            {/* Prominent "New Unit" CTA — always visible for owners */}
-            {isOwner && (
+            {/* Prominent "New Unit" CTA — visible to all org members */}
+            {(isOwner || org?.userRole === 'member') && (
               <button
                 onClick={openCreate}
                 className="w-full mb-5 flex items-center justify-center gap-2 py-4 rounded-xl bg-primary/10 border-2 border-dashed border-primary/40 text-primary font-bold text-sm hover:bg-primary/20 hover:border-primary/70 active:scale-[0.98] transition-all group"

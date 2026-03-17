@@ -78,11 +78,11 @@ export default function AdminDashboard() {
   const navigate = useNavigate()
   const location = useLocation()
   const { isSuper, adminUnits, refreshPermissions, signOut } = useAuth()
-  const { orgs, loading, createOrg, updateOrg, deleteOrg } = useOrganizations()
+  const { orgs, loading, createOrg, updateOrg, deleteOrg, refetch: refetchOrgs } = useOrganizations()
 
   const [showCreate, setShowCreate] = useState(false)
   const [createdOrg, setCreatedOrg] = useState<Organization | null>(null)
-  
+
   // Handle automatic open of create form from Discovery page
   useEffect(() => {
     if ((location.state as { openCreate?: boolean })?.openCreate) {
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
     }
   }, [location.state])
   const [editingOrg, setEditingOrg] = useState<Organization | null>(null)
-  
+
   const [newName, setNewName] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -100,6 +100,24 @@ export default function AdminDashboard() {
   useEffect(() => {
     refreshPermissions()
   }, [refreshPermissions])
+
+  // Re-fetch orgs when tab regains focus (e.g. after approving a join request in another tab)
+  useEffect(() => {
+    function handleVisibility() {
+      if (document.visibilityState === 'visible') {
+        refetchOrgs()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [refetchOrgs])
+
+  // Unit admin with exactly one unit and no org memberships → go straight to that unit
+  useEffect(() => {
+    if (!loading && !isSuper && orgs.length === 0 && adminUnits.length === 1) {
+      navigate(`/admin/units/${adminUnits[0].id}`, { replace: true })
+    }
+  }, [loading, isSuper, orgs, adminUnits, navigate])
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault()

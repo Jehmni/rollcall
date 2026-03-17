@@ -29,14 +29,15 @@ test.describe('Super admin: AdminDashboard', () => {
     await expect(page.getByText('Grace Baptist Church')).toBeVisible()
   })
 
-  test('shows "Super Admin" badge', async ({ page }) => {
+  test('shows "System Overview" for super admin', async ({ page }) => {
     await page.goto('/admin')
-    await expect(page.getByText('Super Admin')).toBeVisible()
+    await expect(page.getByText('System Overview')).toBeVisible()
   })
 
-  test('shows "New Organization" button', async ({ page }) => {
+  test('shows "New" button to create organization', async ({ page }) => {
     await page.goto('/admin')
-    await expect(page.getByRole('button', { name: /New Organization/i })).toBeVisible()
+    // The create button is labelled "New" (with an add icon)
+    await expect(page.getByRole('button', { name: /^New$/i })).toBeVisible()
   })
 
   test('clicking org card navigates to org detail', async ({ page }) => {
@@ -46,18 +47,18 @@ test.describe('Super admin: AdminDashboard', () => {
     await expect(page).toHaveURL(`/admin/orgs/${IDS.org}`)
   })
 
-  test('"New Organization" toggles the create form', async ({ page }) => {
+  test('"New" button toggles the create form', async ({ page }) => {
     await page.goto('/admin')
-    await page.getByRole('button', { name: /New Organization/i }).click()
-    await expect(page.getByLabel('Organization name')).toBeVisible()
+    await page.getByRole('button', { name: /^New$/i }).click()
+    await expect(page.getByLabel('Name of Organization')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible()
   })
 
   test('cancel hides the create form', async ({ page }) => {
     await page.goto('/admin')
-    await page.getByRole('button', { name: /New Organization/i }).click()
+    await page.getByRole('button', { name: /^New$/i }).click()
     await page.getByRole('button', { name: 'Cancel' }).click()
-    await expect(page.getByLabel('Organization name')).not.toBeVisible()
+    await expect(page.getByLabel('Name of Organization')).not.toBeVisible()
   })
 })
 
@@ -78,14 +79,14 @@ test.describe('Super admin: OrgDetail', () => {
     await expect(page.getByText('Main Choir')).toBeVisible()
   })
 
-  test('shows "New Unit" button', async ({ page }) => {
+  test('shows "Create New Unit" button', async ({ page }) => {
     await page.goto(`/admin/orgs/${IDS.org}`)
-    await expect(page.getByRole('button', { name: /New Unit/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Create New Unit/i })).toBeVisible()
   })
 
-  test('clicking "New Unit" shows create form', async ({ page }) => {
+  test('clicking "Create New Unit" shows create form', async ({ page }) => {
     await page.goto(`/admin/orgs/${IDS.org}`)
-    await page.getByRole('button', { name: /New Unit/i }).click()
+    await page.getByRole('button', { name: /Create New Unit/i }).click()
     await expect(page.getByLabel('Unit name')).toBeVisible()
     await expect(page.getByLabel(/Description/i)).toBeVisible()
   })
@@ -113,6 +114,10 @@ test.describe('Unit admin: single unit auto-redirect', () => {
   test('unit admin with one unit is redirected straight to their unit', async ({ page }) => {
     silenceRealtime(page)
     await mockServicesAll(page)
+    // Mock organizations as empty (unit admin has no org memberships)
+    await page.route(`${SUPABASE_URL}/rest/v1/organizations*`, route =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+    )
     // asUnitAdmin registered LAST → highest priority for unit_admins (LIFO)
     await asUnitAdmin(page, 1)
     await page.goto('/admin')
@@ -127,7 +132,7 @@ test.describe('Unit admin: multiple units — unit picker', () => {
     await page.goto('/admin')
     await expect(page.getByText('Main Choir')).toBeVisible()
     await expect(page.getByText('Youth Choir')).toBeVisible()
-    await expect(page.getByText('Your Units')).toBeVisible()
+    await expect(page.getByText('Direct Unit Access')).toBeVisible()
   })
 })
 
@@ -189,7 +194,7 @@ test.describe('UnitDashboard', () => {
     await mockAttendanceWithAlice(page)
     await page.goto(`/admin/units/${IDS.unit}`)
     await page.getByText('Rehearsal').click()
-    await expect(page).toHaveURL(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await expect(page).toHaveURL(`/admin/units/${IDS.unit}/events/${IDS.service}`)
   })
 })
 
@@ -247,10 +252,6 @@ test.describe('UnitMembers', () => {
 
   test('edit icon pre-fills the form with member data', async ({ page }) => {
     await page.goto(`/admin/units/${IDS.unit}/members`)
-    // Members are ordered: section ASC (Bass→Bob first, Soprano→Alice second)
-    // Each row has two icon buttons: pencil (hover:bg-blue-50) then trash (hover:bg-red-50)
-    // Alice's pencil is the 3rd hover:bg-blue-50 element (Bob's is 1st, Alice's is 2nd)
-    // Use the row containing Alice's name instead
     await page.locator('div').filter({ hasText: /^Alice Johnson/ }).getByRole('button').first().click()
     await expect(page.getByText('Edit Member')).toBeVisible()
     await expect(page.getByLabel('Full name')).toHaveValue('Alice Johnson')
@@ -281,39 +282,37 @@ test.describe('AdminServiceDetail', () => {
   })
 
   test('shows service type and formatted date', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await expect(page.getByText('Rehearsal')).toBeVisible()
     await expect(page.getByText(/Tuesday/)).toBeVisible() // 2026-03-10 is a Tuesday
   })
 
   test('shows attendance stat cards', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await expect(page.getByText('Total Members')).toBeVisible()
     await expect(page.getByText('Attendance Rate')).toBeVisible()
   })
 
   test('shows correct attendance rate (1 present, 1 absent = 50%)', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await expect(page.getByText('50%')).toBeVisible()
   })
 
   test('QR code section is collapsed by default', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
-    // "Show" label is in a <span> inside the QR toggle button
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await expect(page.locator('span.text-blue-600', { hasText: 'Show' })).toBeVisible()
     await expect(page.locator('#service-qr')).not.toBeVisible()
   })
 
   test('clicking QR section header expands and shows the QR canvas', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
-    // The QR toggle is the first button in the QR section
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await page.locator('section').filter({ hasText: 'QR Code' }).getByRole('button').first().click()
     await expect(page.locator('#service-qr')).toBeVisible()
     await expect(page.getByText('Download PNG')).toBeVisible()
   })
 
   test('clicking QR section again collapses it', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     const qrToggle = page.locator('section').filter({ hasText: 'QR Code' }).getByRole('button').first()
     await qrToggle.click()
     await expect(page.locator('#service-qr')).toBeVisible()
@@ -322,27 +321,27 @@ test.describe('AdminServiceDetail', () => {
   })
 
   test('absent tab shows Bob (absent by default)', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await expect(page.getByText('Bob Smith')).toBeVisible()
     await expect(page.getByText('Alice Johnson')).not.toBeVisible()
   })
 
   test('present tab shows Alice (present)', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await page.getByRole('button', { name: /Present/i }).click()
     await expect(page.getByText('Alice Johnson')).toBeVisible()
     await expect(page.getByText('Bob Smith')).not.toBeVisible()
   })
 
   test('all tab shows both members', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await page.getByRole('button', { name: /All/i }).click()
     await expect(page.getByText('Alice Johnson')).toBeVisible()
     await expect(page.getByText('Bob Smith')).toBeVisible()
   })
 
   test('export buttons appear on absent tab', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await expect(page.getByText('Export absent list:')).toBeVisible()
     await expect(page.getByRole('button', { name: 'TXT' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Excel (CSV)' })).toBeVisible()
@@ -350,21 +349,20 @@ test.describe('AdminServiceDetail', () => {
   })
 
   test('export buttons not shown on present tab', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await page.getByRole('button', { name: /Present/i }).click()
     await expect(page.getByText('Export absent list:')).not.toBeVisible()
   })
 
   test('all-tab members are grouped by section', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await page.getByRole('button', { name: /All/i }).click()
-    // Section headers are h3 elements
     await expect(page.locator('h3').filter({ hasText: 'Bass' })).toBeVisible()
     await expect(page.locator('h3').filter({ hasText: 'Soprano' })).toBeVisible()
   })
 
   test('present member shows check-in time', async ({ page }) => {
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await page.getByRole('button', { name: /Present/i }).click()
     await expect(page.getByText(/Checked in at/)).toBeVisible()
   })
@@ -373,7 +371,7 @@ test.describe('AdminServiceDetail', () => {
     await mockUnitAdmins(page)
     await mockServicesAll(page)
     await mockUnitLookup(page)
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await page.locator('header button').first().click()
     await expect(page).toHaveURL(`/admin/units/${IDS.unit}`)
   })
@@ -422,7 +420,6 @@ test.describe('MemberDetail', () => {
 
   test('past attended service shows Present badge', async ({ page }) => {
     await page.goto(`/admin/units/${IDS.unit}/members/${IDS.member1}`)
-    // The badge is a rounded-full span; the legend also has "Present" so scope to the badge class
     await expect(page.locator('span.rounded-full', { hasText: 'Present' })).toBeVisible()
   })
 
@@ -456,7 +453,6 @@ test.describe('UnitMembers: member row navigation', () => {
     // mockUnitName LAST → highest priority for units* (LIFO)
     await mockUnitName(page)
     await page.goto(`/admin/units/${IDS.unit}/members`)
-    // Click the row div (not a button) — locator by member name text
     await page.getByText('Alice Johnson').click()
     await expect(page).toHaveURL(`/admin/units/${IDS.unit}/members/${IDS.member1}`)
   })
@@ -472,7 +468,7 @@ test.describe('Edge cases', () => {
       route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
     )
     await page.goto('/admin')
-    await expect(page.getByText('No organizations yet')).toBeVisible()
+    await expect(page.getByText('Welcome to Rollcally')).toBeVisible()
   })
 
   test('empty services list shows placeholder', async ({ page }) => {
@@ -504,7 +500,7 @@ test.describe('Edge cases', () => {
     await mockGetServiceMembersFull(page)
     await mockAttendanceBothPresent(page)
     await mockServiceLookup(page)
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await expect(page.getByText('All members have checked in!')).toBeVisible()
   })
 
@@ -514,7 +510,7 @@ test.describe('Edge cases', () => {
     await mockGetServiceMembersFull(page)
     await mockAttendanceBothPresent(page)
     await mockServiceLookup(page)
-    await page.goto(`/admin/units/${IDS.unit}/services/${IDS.service}`)
+    await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await expect(page.getByText('100%')).toBeVisible()
   })
 })

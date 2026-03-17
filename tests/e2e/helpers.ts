@@ -316,6 +316,126 @@ export async function mockCheckinInvalidService(page: Page) {
   )
 }
 
+export async function mockCheckinTooFar(page: Page, distance = 350) {
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/checkin_by_id*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json',
+      body: JSON.stringify({ success: false, error: 'too_far', distance }) }),
+  )
+}
+
+export async function mockCheckinDeviceLocked(page: Page) {
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/checkin_by_id*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json',
+      body: JSON.stringify({ success: false, error: 'device_locked' }) }),
+  )
+}
+
+// ── Org / join-request mocks ──────────────────────────────────────────────────
+
+export const IDS_ORG2 = 'bbbbbbbb-0000-0000-0000-000000000002'
+export const IDS_MEMBER_ADMIN = 'aaaaaaaa-0000-0000-0000-000000000003'
+
+/** Inject a session for a member-admin (org member, not owner) */
+export async function asOrgMember(page: Page) {
+  const session = makeSession(IDS_MEMBER_ADMIN, 'member@example.com', {})
+  await page.addInitScript(
+    ({ key, val }) => localStorage.setItem(key, JSON.stringify(val)),
+    { key: STORAGE_KEY, val: session },
+  )
+  await page.route(`${SUPABASE_URL}/auth/v1/token*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(session) }),
+  )
+  // Return unit_admins — member has no direct unit access yet
+  await page.route(`${SUPABASE_URL}/rest/v1/unit_admins*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
+  )
+}
+
+/** Mock organizations list including org membership role */
+export async function mockOrgsWithRole(
+  page: Page,
+  role: 'owner' | 'member' = 'owner',
+) {
+  const data = [
+    {
+      id: IDS.org,
+      name: 'Grace Baptist Church',
+      created_by_admin_id: IDS.superAdmin,
+      created_at: '2024-01-01T00:00:00Z',
+      organization_members: [{ role }],
+    },
+  ]
+  await page.route(`${SUPABASE_URL}/rest/v1/organizations*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) }),
+  )
+}
+
+/** Mock organization_members list */
+export async function mockOrganizationMembers(page: Page) {
+  const data = [
+    { id: 'om-1', organization_id: IDS.org, admin_id: IDS.superAdmin, role: 'owner', joined_at: '2024-01-01T00:00:00Z' },
+    { id: 'om-2', organization_id: IDS.org, admin_id: IDS_MEMBER_ADMIN, role: 'member', joined_at: '2024-06-01T00:00:00Z' },
+  ]
+  await page.route(`${SUPABASE_URL}/rest/v1/organization_members*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) }),
+  )
+}
+
+/** Mock a pending join request */
+export async function mockJoinRequest(page: Page, status: 'pending' | 'approved' | 'rejected' = 'pending') {
+  const data = [
+    {
+      id: 'jr-1',
+      organization_id: IDS.org,
+      admin_id: IDS_MEMBER_ADMIN,
+      status,
+      created_at: '2024-06-01T00:00:00Z',
+      organization: { id: IDS.org, name: 'Grace Baptist Church' },
+    },
+  ]
+  await page.route(`${SUPABASE_URL}/rest/v1/join_requests*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) }),
+  )
+}
+
+/** Mock get_org_join_requests RPC */
+export async function mockGetOrgJoinRequests(page: Page) {
+  const data = [
+    {
+      id: 'jr-1',
+      organization_id: IDS.org,
+      admin_id: IDS_MEMBER_ADMIN,
+      admin_email: 'member@example.com',
+      status: 'pending',
+      created_at: '2024-06-01T00:00:00Z',
+    },
+  ]
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/get_org_join_requests*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) }),
+  )
+}
+
+/** Mock org creation (POST to organizations) */
+export async function mockOrgCreation(page: Page, name = 'New Test Church') {
+  const created = {
+    id: IDS_ORG2,
+    name,
+    created_by_admin_id: IDS.superAdmin,
+    created_at: new Date().toISOString(),
+  }
+  await page.route(`${SUPABASE_URL}/rest/v1/organizations*`, async route => {
+    if (route.request().method() === 'POST') {
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/vnd.pgrst.object+json',
+        body: JSON.stringify(created),
+      })
+    } else {
+      await route.continue()
+    }
+  })
+}
+
 /** Silence WebSocket console noise from Supabase Realtime */
 export function silenceRealtime(page: Page) {
   page.on('console', () => {})
