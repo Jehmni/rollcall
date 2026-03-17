@@ -125,9 +125,7 @@ export default function CheckIn() {
           </button>
           {step !== 'done' && (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
-              <div className="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
-                <span className="material-symbols-outlined text-white text-lg">grid_view</span>
-              </div>
+              <img src="/logo.png" alt="Rollcally" className="h-7 w-7 object-contain" />
               <span className="font-extrabold text-sm tracking-tight text-white hidden sm:block">Rollcally</span>
             </div>
           )}
@@ -139,7 +137,15 @@ export default function CheckIn() {
           </span>
         </div>
 
-        <div className="w-full"></div>
+        <div className="flex justify-end">
+          <button
+            onClick={() => navigate('/help')}
+            className="flex size-10 items-center justify-center rounded-full hover:bg-primary/20 transition-colors text-slate-400 hover:text-white"
+            title="User Guide"
+          >
+            <span className="material-symbols-outlined">help</span>
+          </button>
+        </div>
       </header>
 
       <main className="flex-1 flex flex-col items-center px-6 pt-8 pb-28 sm:pb-12 overflow-y-auto">
@@ -184,7 +190,7 @@ export default function CheckIn() {
                   <span className="material-symbols-outlined text-2xl">location_on</span>
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 uppercase tracking-[0.2em] font-black">Venue Status</p>
+                  <p className="text-2xs text-slate-500 uppercase tracking-spaced font-black">Venue Status</p>
                   <p className="font-extrabold text-white text-lg tracking-tight uppercase italic">
                     {unitName || 'Will update after you scan qrcode'}
                   </p>
@@ -201,7 +207,7 @@ export default function CheckIn() {
                   {selected.name.charAt(0)}
                 </div>
               </div>
-              <h2 className="text-4xl font-black text-white leading-tight uppercase tracking-tighter italic">
+              <h2 className="font-display text-4xl font-bold text-white leading-tight uppercase tracking-tighter italic">
                 Hi, {selected.name.split(' ')[0]}!
               </h2>
               <div className="h-1.5 w-16 bg-primary mx-auto mt-4 rounded-full shadow-[0_0_10px_rgba(82,71,230,0.5)]"></div>
@@ -211,13 +217,13 @@ export default function CheckIn() {
             <div className="flex flex-col gap-4 w-full">
               <button
                 onClick={handleConfirm}
-                className="w-full py-8 text-xl font-black uppercase tracking-[0.2em] bg-primary text-white rounded-3xl shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="w-full py-8 text-xl font-black uppercase tracking-spaced bg-primary text-white rounded-3xl shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 I&apos;m Here
               </button>
               <button
                 onClick={handleStartLinking}
-                className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-primary transition-colors py-4"
+                className="text-2xs font-black uppercase tracking-spread text-slate-500 hover:text-primary transition-colors py-4"
               >
                 Not you? Switch Profile
               </button>
@@ -228,7 +234,7 @@ export default function CheckIn() {
                 <span className="material-symbols-outlined text-3xl">location_on</span>
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Venue Verified</p>
+                <p className="text-2xs font-black uppercase tracking-spaced text-slate-500">Venue Verified</p>
                 <p className="font-extrabold text-white text-lg uppercase italic tracking-tight">{unitName ?? 'Main Venue Node'}</p>
               </div>
             </div>
@@ -236,7 +242,7 @@ export default function CheckIn() {
         ) : step === 'list' ? (
           <div className="w-full max-w-sm flex flex-col gap-8 animate-in fade-in duration-500">
             <div className="text-center">
-              <h1 className="text-4xl font-black mb-3 tracking-tighter italic uppercase">Check In</h1>
+              <h1 className="font-display text-4xl font-bold mb-3 tracking-tighter italic uppercase">Check In</h1>
               <p className="text-slate-400">Locate your credentials in the roster.</p>
             </div>
 
@@ -281,7 +287,7 @@ export default function CheckIn() {
                 )}
                 {Object.entries(grouped).map(([section, sectionMembers]) => (
                   <div key={section} className="flex flex-col gap-3 mb-4">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 ml-2">
+                    <h3 className="text-2xs font-black uppercase tracking-spread text-primary/60 ml-2">
                       {section || 'Main Roster'}
                     </h3>
                     {sectionMembers.map(m => (
@@ -310,13 +316,13 @@ export default function CheckIn() {
                   {selected.name.charAt(0)}
                 </div>
               </div>
-              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-4">Biometric Verification</h3>
-              <h2 className="text-4xl font-black text-white uppercase tracking-tighter italic">Is this you?</h2>
+              <h3 className="text-2xs font-black uppercase tracking-super text-slate-500 mb-4">Biometric Verification</h3>
+              <h2 className="font-display text-4xl font-bold text-white uppercase tracking-tighter italic">Is this you?</h2>
               <div className="mt-10 p-8 rounded-[2.5rem] bg-primary/5 border border-primary/20 shadow-[0_0_50px_rgba(82,71,230,0.1)] w-full relative overflow-hidden">
                 <div className="absolute top-0 right-0 -mt-8 -mr-8 h-24 w-24 bg-primary/10 rounded-full blur-2xl"></div>
                 <p className="text-3xl font-black text-white uppercase italic tracking-tighter relative z-10">{selected.name}</p>
                 {selected.section && (
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mt-3 relative z-10">
+                  <p className="text-2xs font-black uppercase tracking-spread text-primary mt-3 relative z-10">
                     {selected.section} Control Node
                   </p>
                 )}
@@ -326,13 +332,13 @@ export default function CheckIn() {
             <div className="flex flex-col gap-4 w-full">
               <button
                 onClick={handleConfirm}
-                className="w-full h-24 text-xl font-black uppercase tracking-[0.2em] bg-primary text-white rounded-3xl shadow-2xl shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="w-full h-24 text-xl font-black uppercase tracking-spaced bg-primary text-white rounded-3xl shadow-2xl shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 Yes, check me in
               </button>
               <button
                 onClick={handleBack}
-                className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-primary py-4"
+                className="text-2xs font-black uppercase tracking-spread text-slate-500 hover:text-primary py-4"
               >
                 No, go back
               </button>
@@ -343,7 +349,7 @@ export default function CheckIn() {
             {status === 'loading' ? (
               <div className="flex flex-col items-center gap-8 py-20 rounded-[4rem] bg-primary/5 border border-primary/20 shadow-2xl">
                 <div className="h-20 w-20 animate-spin rounded-full border-[8px] border-primary border-t-transparent" />
-                <p className="text-xs font-black uppercase tracking-[0.4em] text-primary animate-pulse italic">Securing Protocols...</p>
+                <p className="text-xs font-black uppercase tracking-super text-primary animate-pulse italic">Securing Protocols...</p>
               </div>
             ) : status === 'success' ? (
               <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-12 duration-1000">
@@ -355,7 +361,7 @@ export default function CheckIn() {
                 </div>
 
                 <div className="text-center space-y-3 mb-12">
-                  <h1 className="text-white text-5xl font-black tracking-tighter uppercase italic">You're in!</h1>
+                  <h1 className="font-display text-white text-5xl font-bold tracking-tighter uppercase italic">You're in!</h1>
                   <p className="text-slate-400 text-lg font-medium tracking-tight">Check-in Successful</p>
                 </div>
 
@@ -369,10 +375,10 @@ export default function CheckIn() {
                         {selected?.name.charAt(0)}
                       </div>
                     </div>
-                    <h2 className="text-white text-3xl font-black uppercase italic tracking-tighter mb-1">
+                    <h2 className="font-display text-white text-3xl font-bold uppercase italic tracking-tighter mb-1">
                       Welcome, {selected?.name}
                     </h2>
-                    <p className="text-primary font-black uppercase tracking-[0.2em] text-[10px]">Confirmed Attendee</p>
+                    <p className="text-primary font-black uppercase tracking-spaced text-2xs">Confirmed Attendee</p>
                   </div>
 
                   <div className="p-8 space-y-6">
@@ -381,7 +387,7 @@ export default function CheckIn() {
                         <span className="material-symbols-outlined text-2xl">corporate_fare</span>
                       </div>
                       <div>
-                        <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-black mb-1">Venue</p>
+                        <p className="text-slate-500 text-2xs uppercase tracking-spread font-black mb-1">Venue</p>
                         <p className="text-white font-black uppercase italic text-lg tracking-tight">
                           {unitName || 'Main Conference Hall'}
                         </p>
@@ -393,7 +399,7 @@ export default function CheckIn() {
                         <span className="material-symbols-outlined text-2xl">schedule</span>
                       </div>
                       <div>
-                        <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-black mb-1">Time</p>
+                        <p className="text-slate-500 text-2xs uppercase tracking-spread font-black mb-1">Time</p>
                         <p className="text-white font-bold text-lg tracking-tight">{successTime || 'Registering...'}</p>
                       </div>
                     </div>
@@ -403,12 +409,12 @@ export default function CheckIn() {
                 <div className="w-full mt-10">
                   <button
                     onClick={() => navigate('/')}
-                    className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-3xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-[0.3em] text-xs"
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-3xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-spread text-xs"
                   >
                     <span>Done</span>
                     <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
                   </button>
-                  <p className="text-center text-slate-600 text-[10px] font-black uppercase tracking-[0.2em] mt-6">
+                  <p className="text-center text-slate-600 text-2xs font-black uppercase tracking-spaced mt-6">
                     Rollcally Identity Verification System
                   </p>
                 </div>
@@ -419,14 +425,14 @@ export default function CheckIn() {
                   <span className="material-symbols-outlined text-6xl">warning</span>
                 </div>
                 <div className="px-10">
-                  <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-3">Sync Denied</h2>
+                  <h2 className="font-display text-3xl font-bold text-white uppercase tracking-tighter mb-3">Sync Denied</h2>
                   <p className="text-base text-red-500 font-bold uppercase tracking-wide leading-relaxed">
                     {getErrorDisplay()}
                   </p>
                 </div>
                 <button
                   onClick={handleBack}
-                  className="text-xs font-black uppercase tracking-[0.4em] text-primary hover:underline underline-offset-8"
+                  className="text-xs font-black uppercase tracking-super text-primary hover:underline underline-offset-8"
                 >
                   Re-verify Identity
                 </button>
@@ -436,7 +442,7 @@ export default function CheckIn() {
         ) : null}
 
         <div className="mt-auto pt-10 text-center pb-20">
-          <p className="text-slate-600 text-[10px] font-black tracking-[0.2em] uppercase">
+          <p className="text-slate-600 text-2xs font-black tracking-spaced uppercase">
             Not a visitor?
             <button
               onClick={() => navigate('/admin')}
@@ -458,7 +464,7 @@ export default function CheckIn() {
           className="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary transition-all group"
         >
           <span className="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">home</span>
-          <span className="text-[9px] font-black uppercase tracking-widest">Home</span>
+          <span className="text-2xs font-black uppercase tracking-widest">Home</span>
         </button>
         <button
           onClick={() => { setStep('list'); setSelected(null); }}
@@ -466,7 +472,7 @@ export default function CheckIn() {
         >
           <div className="absolute -top-1 w-12 h-1 bg-primary rounded-full blur-sm"></div>
           <span className="material-symbols-outlined text-2xl scale-125" style={{ fontVariationSettings: "'FILL' 1" }}>person_check</span>
-          <span className="text-[9px] font-black uppercase tracking-widest">Check-in</span>
+          <span className="text-2xs font-black uppercase tracking-widest">Check-in</span>
         </button>
       </nav>
 

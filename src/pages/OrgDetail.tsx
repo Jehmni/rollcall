@@ -20,7 +20,7 @@ function StatPill({ icon, label, value, color = '#5247e6' }: { icon: string; lab
   return (
     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
       <span className="material-symbols-outlined text-[14px]" style={{ color }}>{icon}</span>
-      <span className="text-[10px] font-semibold text-slate-400 leading-none">{value} <span className="text-slate-600">{label}</span></span>
+      <span className="text-2xs font-semibold text-slate-400 leading-none">{value} <span className="text-slate-600">{label}</span></span>
     </div>
   )
 }
@@ -282,7 +282,7 @@ export default function OrgDetail() {
           <button onClick={() => navigate(`/admin/units/${createdUnit.id}`)} className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors">
             <span className="material-symbols-outlined text-white">close</span>
           </button>
-          <span className="text-center font-black text-white uppercase italic tracking-tighter text-sm">Unit Created</span>
+          <span className="text-center font-display font-bold text-white uppercase italic tracking-tighter text-sm">Unit Created</span>
           <div />
         </header>
         <main className="flex-1 flex flex-col items-center px-5 pt-8 pb-12">
@@ -295,7 +295,7 @@ export default function OrgDetail() {
                 </div>
               </div>
               <div className="text-center space-y-3 mb-12">
-                <h1 className="text-white text-5xl font-black tracking-tighter uppercase italic">Unit Launched!</h1>
+                <h1 className="text-white text-5xl font-display font-bold tracking-tighter uppercase italic">Unit Launched!</h1>
                 <p className="text-slate-400 text-lg font-medium tracking-tight">New unit is online and ready</p>
               </div>
               <div className="w-full bg-primary/5 border border-primary/20 rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
@@ -304,8 +304,8 @@ export default function OrgDetail() {
                   <div className="inline-flex size-20 rounded-[2rem] bg-primary/10 border border-primary/20 items-center justify-center mb-4">
                     <span className="material-symbols-outlined text-primary text-4xl">groups</span>
                   </div>
-                  <h2 className="text-white text-3xl font-black uppercase italic tracking-tighter mb-1">{createdUnit.name}</h2>
-                  <p className="text-primary font-black uppercase tracking-[0.2em] text-[10px]">Active Unit Node</p>
+                  <h2 className="text-white text-3xl font-display font-bold uppercase italic tracking-tighter mb-1">{createdUnit.name}</h2>
+                  <p className="text-primary font-black uppercase tracking-spaced text-2xs">Active Unit Node</p>
                 </div>
                 <div className="p-8 space-y-6">
                   <div className="flex items-center gap-5">
@@ -313,8 +313,8 @@ export default function OrgDetail() {
                       <span className="material-symbols-outlined text-2xl">corporate_fare</span>
                     </div>
                     <div>
-                      <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-black mb-1">Organisation</p>
-                      <p className="text-white font-black uppercase italic text-lg tracking-tight">{org?.name || 'Hub'}</p>
+                      <p className="text-slate-500 text-2xs uppercase tracking-spread font-black mb-1">Organisation</p>
+                      <p className="text-white font-display font-bold uppercase italic text-lg tracking-tight">{org?.name || 'Hub'}</p>
                     </div>
                   </div>
                   {createdUnit.description && (
@@ -323,7 +323,7 @@ export default function OrgDetail() {
                         <span className="material-symbols-outlined text-2xl">info</span>
                       </div>
                       <div>
-                        <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-black mb-1">Objective</p>
+                        <p className="text-slate-500 text-2xs uppercase tracking-spread font-black mb-1">Objective</p>
                         <p className="text-white font-bold text-lg tracking-tight">{createdUnit.description}</p>
                       </div>
                     </div>
@@ -332,11 +332,11 @@ export default function OrgDetail() {
               </div>
               <div className="w-full mt-10">
                 <button onClick={() => navigate(`/admin/units/${createdUnit.id}`)}
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-3xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-[0.3em] text-xs">
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-3xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-spread text-xs">
                   <span>Enter Unit</span>
                   <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
                 </button>
-                <button onClick={() => setCreatedUnit(null)} className="w-full text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-primary transition-colors py-4 mt-2">
+                <button onClick={() => setCreatedUnit(null)} className="w-full text-2xs font-black uppercase tracking-spread text-slate-500 hover:text-primary transition-colors py-4 mt-2">
                   Back to Organisation
                 </button>
               </div>
@@ -357,11 +357,20 @@ export default function OrgDetail() {
           <span className="material-symbols-outlined text-slate-100">arrow_back</span>
         </button>
         <h1 className="text-base font-bold tracking-tight text-slate-100 truncate max-w-[60vw]">{org?.name ?? 'Organisation'}</h1>
-        {isOwner ? (
-          <button onClick={() => setShowSettings(true)} className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors">
-            <span className="material-symbols-outlined text-slate-400 hover:text-slate-100 transition-colors">settings</span>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => navigate('/help')}
+            className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors"
+            title="User Guide"
+          >
+            <span className="material-symbols-outlined text-slate-400 hover:text-slate-100 transition-colors">help</span>
           </button>
-        ) : <div className="size-10" />}
+          {isOwner && (
+            <button onClick={() => setShowSettings(true)} className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors">
+              <span className="material-symbols-outlined text-slate-400 hover:text-slate-100 transition-colors">settings</span>
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Content */}
@@ -377,7 +386,7 @@ export default function OrgDetail() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {/* Total Members */}
           <div className="bg-surface-dark p-4 rounded-xl border border-border-dark col-span-1">
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Total Members</p>
+            <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Total Members</p>
             {statsLoading ? (
               <div className="h-7 w-16 bg-white/5 rounded animate-pulse mb-2" />
             ) : (
@@ -391,7 +400,7 @@ export default function OrgDetail() {
 
           {/* Total Units */}
           <div className="bg-surface-dark p-4 rounded-xl border border-border-dark col-span-1">
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Active Units</p>
+            <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Active Units</p>
             {loading ? (
               <div className="h-7 w-8 bg-white/5 rounded animate-pulse mb-2" />
             ) : (
@@ -405,7 +414,7 @@ export default function OrgDetail() {
 
           {/* Pending Requests */}
           <div className="bg-surface-dark p-4 rounded-xl border border-border-dark col-span-1">
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Requests</p>
+            <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Requests</p>
             <p className="text-2xl font-bold text-slate-100 mb-1">{loadingRequests ? '—' : pendingCount}</p>
             <div className={`flex items-center gap-1 text-xs font-medium ${pendingCount > 0 ? 'text-amber-400' : 'text-slate-600'}`}>
               <span className="material-symbols-outlined text-sm">{pendingCount > 0 ? 'notifications_active' : 'check_circle'}</span>
@@ -415,7 +424,7 @@ export default function OrgDetail() {
 
           {/* Sessions (30d) */}
           <div className="bg-surface-dark p-4 rounded-xl border border-border-dark col-span-1">
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Sessions (30d)</p>
+            <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Sessions (30d)</p>
             {statsLoading ? (
               <div className="h-7 w-10 bg-white/5 rounded animate-pulse mb-2" />
             ) : (
@@ -445,7 +454,7 @@ export default function OrgDetail() {
             >
               Requests
               {pendingCount > 0 && (
-                <span className="absolute -top-1.5 -right-1 bg-amber-400 text-black text-[9px] font-black size-4 flex items-center justify-center rounded-full">{pendingCount}</span>
+                <span className="absolute -top-1.5 -right-1 bg-amber-400 text-black text-2xs font-black size-4 flex items-center justify-center rounded-full">{pendingCount}</span>
               )}
             </button>
           </div>
@@ -506,7 +515,7 @@ export default function OrgDetail() {
             <h3 className="text-lg font-bold text-slate-100 mb-4">
               Membership Requests
               {pendingCount > 0 && (
-                <span className="ml-2 inline-flex items-center justify-center size-5 bg-amber-400 text-black rounded-full text-[10px] font-black">{pendingCount}</span>
+                <span className="ml-2 inline-flex items-center justify-center size-5 bg-amber-400 text-black rounded-full text-2xs font-black">{pendingCount}</span>
               )}
             </h3>
             {loadingRequests ? (
@@ -552,7 +561,7 @@ export default function OrgDetail() {
                             </button>
                           </>
                         ) : (
-                          <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${req.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                          <span className={`px-3 py-1 rounded-lg text-2xs font-bold uppercase tracking-wider ${req.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
                             {req.status}
                           </span>
                         )}
@@ -571,22 +580,22 @@ export default function OrgDetail() {
         <div className="flex items-center justify-around max-w-lg mx-auto">
           <button onClick={() => setActiveTab('units')} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeTab === 'units' ? 'text-primary' : 'text-slate-500'}`}>
             <span className="material-symbols-outlined" style={activeTab === 'units' ? { fontVariationSettings: "'FILL' 1" } : {}}>dashboard</span>
-            <span className="text-[10px] font-bold">Dashboard</span>
+            <span className="text-2xs font-bold">Dashboard</span>
           </button>
           {isOwner && (
             <button onClick={() => setActiveTab('requests')} className={`flex flex-col items-center gap-1 p-2 transition-colors relative ${activeTab === 'requests' ? 'text-primary' : 'text-slate-500'}`}>
               {pendingCount > 0 && <span className="absolute top-1 right-1 bg-amber-400 size-2 rounded-full" />}
               <span className="material-symbols-outlined" style={activeTab === 'requests' ? { fontVariationSettings: "'FILL' 1" } : {}}>group_add</span>
-              <span className="text-[10px] font-bold">Requests</span>
+              <span className="text-2xs font-bold">Requests</span>
             </button>
           )}
           <button onClick={() => navigate('/admin')} className="flex flex-col items-center gap-1 p-2 text-slate-500 transition-colors">
             <span className="material-symbols-outlined">home</span>
-            <span className="text-[10px] font-medium">Home</span>
+            <span className="text-2xs font-medium">Home</span>
           </button>
           <button onClick={() => navigate('/admin/discover')} className="flex flex-col items-center gap-1 p-2 text-slate-500 transition-colors">
             <span className="material-symbols-outlined">explore</span>
-            <span className="text-[10px] font-medium">Explore</span>
+            <span className="text-2xs font-medium">Explore</span>
           </button>
         </div>
       </nav>

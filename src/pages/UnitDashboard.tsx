@@ -64,13 +64,13 @@ function ServiceCard({ service, onClick }: { service: Service; onClick: () => vo
               {EVENT_LABEL[service.service_type]}
             </p>
             <span
-              className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border"
+              className="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-black uppercase tracking-wider border"
               style={{ color: accentColor, borderColor: `${accentColor}40`, backgroundColor: accentBg }}
             >
               {statusLabel}
             </span>
           </div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">{formatDate(service.date)}</p>
+          <p className="text-2xs font-semibold uppercase tracking-label text-slate-500">{formatDate(service.date)}</p>
         </div>
 
         <span className="material-symbols-outlined text-slate-600 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all flex-shrink-0">
@@ -380,6 +380,13 @@ export default function UnitDashboard() {
             <div className="flex items-center gap-2">
               {unitId && <NotificationBell unitId={unitId} />}
               <button
+                onClick={() => navigate('/help')}
+                className="size-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
+                title="User Guide"
+              >
+                <span className="material-symbols-outlined text-white text-xl">help</span>
+              </button>
+              <button
                 onClick={() => signOut()}
                 className="size-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
                 title="Sign Out"
@@ -399,7 +406,7 @@ export default function UnitDashboard() {
               {orgName && <span className="text-xs font-medium text-white/40 uppercase tracking-wider">{orgName}</span>}
               {orgName && <span className="text-white/20">·</span>}
               <span
-                className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border"
+                className="text-2xs font-black uppercase tracking-widest px-2.5 py-1 rounded-full border"
                 style={{ color: roleBadgeColor, borderColor: `${roleBadgeColor}40`, backgroundColor: `${roleBadgeColor}15` }}
               >
                 {roleLabel}
@@ -414,17 +421,17 @@ export default function UnitDashboard() {
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
               <p className="text-xl sm:text-2xl font-extrabold text-white">{servicesLoading ? '–' : upcoming.length}</p>
-              <p className="text-[9px] font-bold uppercase tracking-wider text-white/50 mt-0.5">Upcoming</p>
+              <p className="text-2xs font-bold uppercase tracking-wider text-white/50 mt-0.5">Upcoming</p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
               <p className="text-xl sm:text-2xl font-extrabold text-white">{servicesLoading ? '–' : totalSessions}</p>
-              <p className="text-[9px] font-bold uppercase tracking-wider text-white/50 mt-0.5">Total</p>
+              <p className="text-2xs font-bold uppercase tracking-wider text-white/50 mt-0.5">Total</p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
               <p className={`text-xl sm:text-2xl font-extrabold ${todaySessions > 0 ? 'text-emerald-300' : 'text-white'}`}>
                 {servicesLoading ? '–' : todaySessions > 0 ? 'Live' : '—'}
               </p>
-              <p className="text-[9px] font-bold uppercase tracking-wider text-white/50 mt-0.5">Today</p>
+              <p className="text-2xs font-bold uppercase tracking-wider text-white/50 mt-0.5">Today</p>
             </div>
           </div>
         </div>
@@ -524,7 +531,7 @@ export default function UnitDashboard() {
           <section className="mb-8 animate-in fade-in duration-300">
             <div className="flex items-center gap-3 mb-4">
               <h2 className="text-base font-bold text-slate-100">Upcoming Sessions</h2>
-              <span className="px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-[10px] font-black uppercase tracking-wider">
+              <span className="px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-2xs font-black uppercase tracking-wider">
                 {upcoming.length}
               </span>
             </div>
@@ -545,7 +552,7 @@ export default function UnitDashboard() {
           <section className="animate-in fade-in duration-300">
             <div className="flex items-center gap-3 mb-4">
               <h2 className="text-base font-bold text-slate-400">Past Sessions</h2>
-              <span className="px-2 py-0.5 bg-slate-800 text-slate-500 border border-slate-700 rounded-full text-[10px] font-black uppercase tracking-wider">
+              <span className="px-2 py-0.5 bg-slate-800 text-slate-500 border border-slate-700 rounded-full text-2xs font-black uppercase tracking-wider">
                 {past.length}
               </span>
             </div>

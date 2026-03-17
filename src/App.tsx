@@ -16,6 +16,7 @@ import UnitMembers from './pages/UnitMembers'
 import AdminServiceDetail from './pages/AdminServiceDetail'
 import MemberDetail from './pages/MemberDetail'
 import AdminOrgDiscovery from './pages/AdminOrgDiscovery'
+import HelpCentre from './pages/HelpCentre'
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
             {/* Public */}
             <Route path="/" element={<ErrorBoundary label="Landing"><Landing /></ErrorBoundary>} />
             <Route path="/checkin" element={<ErrorBoundary label="Check-in"><CheckIn /></ErrorBoundary>} />
+            <Route path="/help" element={<ErrorBoundary label="Help Centre"><HelpCentre /></ErrorBoundary>} />
 
             {/* Admin auth */}
             <Route path="/admin/login" element={<AdminLogin />} />

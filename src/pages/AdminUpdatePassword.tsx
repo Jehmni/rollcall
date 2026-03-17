@@ -58,7 +58,7 @@ export default function AdminUpdatePassword() {
       <div className="relative w-full max-w-lg">
         <button
           onClick={() => navigate('/admin/login')}
-          className="absolute -top-16 left-0 inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40 hover:opacity-100 hover:text-brand-primary transition-all group"
+          className="absolute -top-16 left-0 inline-flex items-center gap-3 text-2xs font-black uppercase tracking-spread text-brand-slate opacity-40 hover:opacity-100 hover:text-brand-primary transition-all group"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white border border-brand-border/50 group-hover:scale-110 group-hover:rotate-12 transition-all shadow-sm">
             <ArrowLeft className="h-5 w-5" />
@@ -75,7 +75,7 @@ export default function AdminUpdatePassword() {
             <h1 className="text-5xl font-black tracking-tighter italic text-brand-text mb-2">
               UPDATE SECURITY
             </h1>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-brand-slate opacity-40">
+            <p className="text-xs font-black uppercase tracking-spread text-brand-slate opacity-40">
               Credentials modification protocol
             </p>
           </div>
@@ -88,15 +88,15 @@ export default function AdminUpdatePassword() {
                 <CheckCircle2 className="h-10 w-10" />
               </div>
               <div className="space-y-4">
-                <h2 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">Security Updated</h2>
-                <p className="text-[11px] font-bold text-brand-slate opacity-40 uppercase tracking-[0.2em] leading-loose px-4">
+                <h2 className="text-2xl font-display font-bold text-brand-text uppercase tracking-tighter italic">Security Updated</h2>
+                <p className="text-xs font-bold text-brand-slate opacity-40 uppercase tracking-spaced leading-loose px-4">
                   New credentials have been successfully authorized. <br/>
                   <span className="text-brand-primary font-black">Redirecting to headquarters...</span>
                 </p>
               </div>
               <Button 
                 onClick={() => navigate('/admin/login')} 
-                className="w-full h-16 rounded-[1.5rem] bg-brand-primary hover:bg-brand-primary/95 text-white font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-brand-primary/30 transition-all active:scale-95"
+                className="w-full h-16 rounded-[1.5rem] bg-brand-primary hover:bg-brand-primary/95 text-white font-black uppercase tracking-spaced text-xs shadow-2xl shadow-brand-primary/30 transition-all active:scale-95"
               >
                 Go to Login
               </Button>
@@ -104,13 +104,13 @@ export default function AdminUpdatePassword() {
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-8">
               {error && (
-                <div className="rounded-2xl bg-red-50 p-5 text-[11px] font-bold text-red-600 border border-red-100 flex items-center gap-3 animate-in shake duration-500">
+                <div className="rounded-2xl bg-red-50 p-5 text-xs font-bold text-red-600 border border-red-100 flex items-center gap-3 animate-in shake duration-500">
                   <div className="h-2 w-2 rounded-full bg-red-500 shadow-sm animate-pulse"></div>
                   {error}
                 </div>
               )}
 
-              <div className="rounded-2xl bg-brand-primary/5 p-5 flex gap-4 text-[10px] font-bold text-brand-primary border border-brand-primary/10 leading-relaxed uppercase tracking-widest">
+              <div className="rounded-2xl bg-brand-primary/5 p-5 flex gap-4 text-2xs font-bold text-brand-primary border border-brand-primary/10 leading-relaxed uppercase tracking-widest">
                 <ShieldAlert className="h-5 w-5 flex-shrink-0" />
                 <p>Authorized access requires a unique security string of at least 6 characters.</p>
               </div>
@@ -143,7 +143,7 @@ export default function AdminUpdatePassword() {
               <Button 
                 type="submit" 
                 loading={loading} 
-                className="w-full h-16 rounded-[1.5rem] bg-brand-primary hover:bg-brand-primary/95 text-white font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-brand-primary/30 transition-all hover:scale-[1.02] active:scale-95 group overflow-hidden relative"
+                className="w-full h-16 rounded-[1.5rem] bg-brand-primary hover:bg-brand-primary/95 text-white font-black uppercase tracking-spaced text-xs shadow-2xl shadow-brand-primary/30 transition-all hover:scale-[1.02] active:scale-95 group overflow-hidden relative"
               >
                 <span className="relative z-10">Finalize Update</span>
                 <div className="absolute top-0 left-0 w-full h-full bg-white/10 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -152,7 +152,7 @@ export default function AdminUpdatePassword() {
           )}
         </div>
 
-        <p className="mt-12 text-center text-[10px] font-bold text-brand-slate opacity-20 uppercase tracking-[0.2em] max-w-xs mx-auto leading-relaxed">
+        <p className="mt-12 text-center text-2xs font-bold text-brand-slate opacity-20 uppercase tracking-spaced max-w-xs mx-auto leading-relaxed">
           Standard operational protocols apply. Security modifications are tracked and archived.
         </p>
       </div>

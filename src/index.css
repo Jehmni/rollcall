@@ -1,4 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/*
+ * Typography — Rollcally
+ *
+ * Display / Headings: Cormorant Garamond
+ *   A classical high-contrast serif used by The Financial Times, The Economist,
+ *   luxury event programmes, and global cultural institutions. The italic cut is
+ *   exceptional — designed specifically for formal event typography.
+ *   Weights loaded: 400 (body copy in display), 600 (sub-headings), 700 (titles)
+ *
+ * Body / UI: Plus Jakarta Sans
+ *   A refined geometric sans-serif designed for premium digital products.
+ *   Cleaner and more authoritative than Inter. Used by top-tier fintech,
+ *   enterprise, and event-management platforms globally.
+ *   Weights loaded: 400, 500, 600, 700, 800
+ */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;

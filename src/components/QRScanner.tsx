@@ -82,7 +82,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
               <span className="material-symbols-outlined text-white text-2xl">qr_code_scanner</span>
             </div>
             <div>
-              <h3 className="text-xl font-black tracking-tight text-white uppercase italic">scan meeting qrcode</h3>
+              <h3 className="text-xl font-display font-bold tracking-tight text-white uppercase italic">scan meeting qrcode</h3>
             </div>
           </div>
           <button
@@ -106,7 +106,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                     <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-red-500/10 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.1)]">
                       <span className="material-symbols-outlined text-4xl text-red-500">no_photography</span>
                     </div>
-                    <p className="mb-2 text-xl font-black text-white uppercase italic tracking-tighter">Access Denied</p>
+                    <p className="mb-2 text-xl font-display font-bold text-white uppercase italic tracking-tighter">Access Denied</p>
                     <p className="mb-8 text-sm text-slate-400 leading-relaxed font-medium">
                       Camera permissions are required to scan venue nodes. Please update your system settings.
                     </p>
@@ -125,7 +125,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                         <span className="material-symbols-outlined text-5xl animate-spin text-primary">sync</span>
                       </div>
                     </div>
-                    <p className="text-xl font-black text-white uppercase italic tracking-tighter mb-2 italic">Syncing...</p>
+                    <p className="text-xl font-display font-bold text-white uppercase italic tracking-tighter mb-2 italic">Syncing...</p>
                     <p className="text-sm text-slate-400 font-medium">Authorizing system camera access</p>
                   </>
                 ) : (
@@ -133,12 +133,12 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                     <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 border border-primary/20">
                       <span className="material-symbols-outlined text-4xl text-primary">photo_camera</span>
                     </div>
-                    <p className="mb-2 text-xl font-black text-white uppercase italic tracking-tighter">Capture Ready</p>
+                    <p className="mb-2 text-xl font-display font-bold text-white uppercase italic tracking-tighter">Capture Ready</p>
                     <p className="mb-8 text-sm text-slate-400 font-medium leading-relaxed">
                       Initialize your physical scan module to continue check-in protocol.
                     </p>
                     <button 
-                      className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-2xl shadow-xl shadow-primary/30 transition-all active:scale-95 uppercase tracking-[0.2em] text-xs"
+                      className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-2xl shadow-xl shadow-primary/30 transition-all active:scale-95 uppercase tracking-spaced text-xs"
                       onClick={() => startScanner()}
                     >
                       Enable Scanner
@@ -177,7 +177,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
           <div className="mt-10 flex flex-col items-center">
               <button
                 onClick={onClose}
-                className="w-full h-16 text-slate-400 font-black uppercase tracking-[0.3em] text-[10px] hover:text-white transition-colors"
+                className="w-full h-16 text-slate-400 font-black uppercase tracking-spread text-2xs hover:text-white transition-colors"
               >
                 Close Scanner
               </button>

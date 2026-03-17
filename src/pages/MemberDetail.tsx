@@ -55,7 +55,7 @@ function StatCard({
     <div className="rounded-[1.5rem] bg-white p-6 border border-brand-border/50 text-center shadow-xl shadow-brand-primary/[0.02] hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 group">
       <p className={`text-4xl font-black tracking-tighter italic ${valueClass} group-hover:scale-110 transition-transform duration-500`}>{value}</p>
       <div className="h-px w-8 bg-brand-border/30 mx-auto my-3"></div>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 leading-tight">{label}</p>
+      <p className="text-2xs font-black uppercase tracking-spaced text-brand-slate opacity-40 leading-tight">{label}</p>
     </div>
   )
 }
@@ -169,32 +169,36 @@ export default function MemberDetail() {
              <h1 className="text-3xl font-black tracking-tighter italic truncate w-full">{member.name}</h1>
              <div className="flex items-center gap-2 mt-1">
                 {member.section && (
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] bg-white/10 px-3 py-0.5 rounded-full border border-white/10">
+                  <span className="text-2xs font-black uppercase tracking-spaced bg-white/10 px-3 py-0.5 rounded-full border border-white/10">
                     {member.section}
                   </span>
                 )}
                 {member.status === 'inactive' && (
-                  <span className="text-[8px] font-black uppercase tracking-widest text-white/40">Retired</span>
+                  <span className="text-2xs font-black uppercase tracking-widest text-white/40">Retired</span>
                 )}
              </div>
           </div>
 
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white/20">
-            <Users className="h-6 w-6" />
-          </div>
+          <button
+            onClick={() => navigate('/help')}
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
+            title="User Guide"
+          >
+            <span className="material-symbols-outlined text-white text-xl">help</span>
+          </button>
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-3 relative z-10">
           {member.phone && (
             <a
               href={`tel:${member.phone}`}
-              className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white text-brand-primary shadow-xl shadow-brand-primary/20 border border-white font-black text-[10px] uppercase tracking-[0.2em] hover:scale-105 transition-all active:scale-95"
+              className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white text-brand-primary shadow-xl shadow-brand-primary/20 border border-white font-black text-2xs uppercase tracking-spaced hover:scale-105 transition-all active:scale-95"
             >
               <Phone className="h-4 w-4" /> {member.phone}
             </a>
           )}
           {member.birthday && (
-            <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl border font-black text-[10px] uppercase tracking-[0.2em] transition-all ${isBirthday(member.birthday) ? 'bg-pink-600 border-pink-500 text-white shadow-xl shadow-pink-500/20' : 'bg-white/10 border-white/10 text-white'}`}>
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl border font-black text-2xs uppercase tracking-spaced transition-all ${isBirthday(member.birthday) ? 'bg-pink-600 border-pink-500 text-white shadow-xl shadow-pink-500/20' : 'bg-white/10 border-white/10 text-white'}`}>
               <Cake className="h-4 w-4" /> 
               {formatDate(member.birthday)}
               {isBirthday(member.birthday) && <span className="ml-2">🎂 Anniversary</span>}
@@ -217,7 +221,7 @@ export default function MemberDetail() {
           <section className="rounded-[2.5rem] bg-white p-6 sm:p-10 border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] relative overflow-hidden">
             <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl"></div>
             <div className="relative z-10">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40 mb-6">
+              <h2 className="text-2xs font-black uppercase tracking-spread text-brand-slate opacity-40 mb-6">
                 Activity Score · Last {recentTrend.length} Events
               </h2>
 
@@ -232,17 +236,17 @@ export default function MemberDetail() {
                       }`}
                   />
                 ))}
-                <p className="ml-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-20 italic">Timeline</p>
+                <p className="ml-3 text-2xs font-display font-bold uppercase tracking-spaced text-brand-slate opacity-20 italic">Timeline</p>
               </div>
 
               <div className="mt-8 flex items-center gap-6">
                 <span className="flex items-center gap-2.5">
                   <span className="h-3 w-3 rounded-md bg-green-500 shadow-sm" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.1em] text-brand-text">Check-in</span>
+                  <span className="text-2xs font-black uppercase tracking-widest text-brand-text">Check-in</span>
                 </span>
                 <span className="flex items-center gap-2.5">
                   <span className="h-3 w-3 rounded-md border-2 border-brand-border/50 bg-white" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.1em] text-brand-slate opacity-40">Missed</span>
+                  <span className="text-2xs font-black uppercase tracking-widest text-brand-slate opacity-40">Missed</span>
                 </span>
               </div>
             </div>
@@ -252,7 +256,7 @@ export default function MemberDetail() {
         {/* ── Event history ───────────────────────────────────────────────── */}
         <section className="animate-in fade-in slide-in-from-bottom-6 duration-700">
            <div className="flex items-center gap-3 mb-6 px-2">
-             <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40">
+             <h2 className="text-2xs font-black uppercase tracking-spread text-brand-slate opacity-40">
                Historical Log
              </h2>
              <div className="h-px flex-1 bg-brand-border/30"></div>
@@ -261,7 +265,7 @@ export default function MemberDetail() {
           {records.length === 0 ? (
             <div className="rounded-[2.5rem] bg-white p-16 text-center border border-brand-border/50 shadow-xl shadow-brand-primary/[0.02]">
                <Users className="h-16 w-16 text-brand-primary/5 mx-auto mb-6" />
-               <h3 className="text-xl font-black text-brand-text uppercase tracking-tighter italic">No History Found</h3>
+               <h3 className="text-xl font-display font-bold text-brand-text uppercase tracking-tighter italic">No History Found</h3>
                <p className="text-sm font-medium text-brand-slate opacity-40 mt-2">This member hasn't participated in any events yet.</p>
             </div>
           ) : (
@@ -287,7 +291,7 @@ export default function MemberDetail() {
                         {EVENT_LABEL[r.serviceType]}
                       </p>
                       <span
-                        className={`rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest border ${r.status === 'attended'
+                        className={`rounded-full px-3 py-1 text-2xs font-black uppercase tracking-widest border ${r.status === 'attended'
                             ? 'bg-green-50 text-green-700 border-green-100'
                             : r.status === 'absent'
                               ? 'bg-red-50 text-red-600 border-red-100'
@@ -301,13 +305,13 @@ export default function MemberDetail() {
                             : 'On Orders'}
                       </span>
                     </div>
-                    <p className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-30">{formatDate(r.date)}</p>
+                    <p className="mt-1 text-2xs font-black uppercase tracking-spaced text-brand-slate opacity-30">{formatDate(r.date)}</p>
                   </div>
 
                   {r.checkinTime && (
                     <div className="flex flex-col items-end flex-shrink-0">
                        <p className="text-xs font-black text-brand-text">{formatTime(r.checkinTime)}</p>
-                       <p className="text-[10px] font-bold text-brand-slate opacity-20 uppercase tracking-widest">Logged</p>
+                       <p className="text-2xs font-bold text-brand-slate opacity-20 uppercase tracking-widest">Logged</p>
                     </div>
                   )}
                 </div>

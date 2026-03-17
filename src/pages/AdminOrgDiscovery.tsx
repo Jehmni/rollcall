@@ -57,11 +57,18 @@ export default function AdminOrgDiscovery() {
       <header className="bg-[#172554] pt-12 pb-16 px-6 relative overflow-hidden">
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
         <div className="relative z-10 flex flex-col items-center max-w-2xl mx-auto w-full">
-          <button 
+          <button
             onClick={() => navigate('/admin')}
             className="absolute left-0 top-0 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
           >
             <span className="material-symbols-outlined text-xl leading-none">arrow_back</span>
+          </button>
+          <button
+            onClick={() => navigate('/help')}
+            className="absolute right-0 top-0 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+            title="User Guide"
+          >
+            <span className="material-symbols-outlined text-xl leading-none">help</span>
           </button>
           <div className="text-center animate-in fade-in slide-in-from-top-4 duration-700">
             <h1 className="text-3xl font-extrabold tracking-tighter text-white mb-2 uppercase italic">Find your organization</h1>
@@ -113,18 +120,18 @@ export default function AdminOrgDiscovery() {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-slate-900 dark:text-white uppercase italic tracking-tighter">{org.name}</h3>
-                      <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-[0.2em] mt-1 uppercase">Node · {org.id.split('-')[0]}</p>
+                      <p className="text-2xs font-bold text-slate-400 dark:text-slate-500 tracking-spaced mt-1 uppercase">Node · {org.id.split('-')[0]}</p>
                     </div>
                   </div>
                   
                   <div className="w-full sm:w-auto">
                     {status === 'pending' ? (
-                      <div className="px-6 py-3 bg-brand-gold/10 text-brand-gold rounded-xl text-[10px] font-bold uppercase tracking-widest border border-brand-gold/20 flex items-center justify-center gap-2">
+                      <div className="px-6 py-3 bg-brand-gold/10 text-brand-gold rounded-xl text-2xs font-bold uppercase tracking-widest border border-brand-gold/20 flex items-center justify-center gap-2">
                         <span className="material-symbols-outlined text-base">hourglass_empty</span>
                         Pending
                       </div>
                     ) : status === 'approved' ? (
-                      <div className="px-6 py-3 bg-green-500/10 text-green-400 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-green-500/20 flex items-center justify-center gap-2">
+                      <div className="px-6 py-3 bg-green-500/10 text-green-400 rounded-xl text-2xs font-bold uppercase tracking-widest border border-green-500/20 flex items-center justify-center gap-2">
                         <span className="material-symbols-outlined text-base">verified</span>
                         Verified
                       </div>
@@ -132,7 +139,7 @@ export default function AdminOrgDiscovery() {
                       <button 
                         onClick={() => handleJoin(org.id)}
                         disabled={isRequested || loading}
-                        className="w-full sm:w-auto px-8 py-3 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest border border-primary/20 transition-all active:scale-95 disabled:opacity-50"
+                        className="w-full sm:w-auto px-8 py-3 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-xl text-2xs font-bold uppercase tracking-widest border border-primary/20 transition-all active:scale-95 disabled:opacity-50"
                       >
                         {isRequested ? 'Sync Sent' : 'Request Access'}
                       </button>
@@ -153,7 +160,7 @@ export default function AdminOrgDiscovery() {
         {/* Separator */}
         <div className="mt-12 mb-6 flex items-center">
           <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
-          <span className="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-widest uppercase">OR</span>
+          <span className="px-4 text-2xs font-bold text-slate-400 dark:text-slate-500 tracking-widest uppercase">OR</span>
           <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
         </div>
 
@@ -188,7 +195,7 @@ export default function AdminOrgDiscovery() {
             <div className="mt-12 pb-20">
               <div className="flex items-center gap-4 mb-8">
                 <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
-                <h2 className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 dark:text-slate-500">Operational Log</h2>
+                <h2 className="text-2xs font-bold uppercase tracking-super text-slate-400 dark:text-slate-500">Operational Log</h2>
                 <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
               </div>
               
@@ -203,12 +210,12 @@ export default function AdminOrgDiscovery() {
                         <span className="text-sm font-bold text-slate-900 dark:text-white uppercase italic tracking-tighter">
                           {req.organization?.name || 'Authorized Hub'}
                         </span>
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-0.5">
+                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-0.5">
                           Deployment {new Date(req.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
                       </div>
                     </div>
-                    <span className={`px-4 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border shadow-sm ${
+                    <span className={`px-4 py-1.5 rounded-lg text-2xs font-bold uppercase tracking-widest border shadow-sm ${
                       req.status === 'approved' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
                       req.status === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
                       'bg-primary/5 text-primary border-primary/10'

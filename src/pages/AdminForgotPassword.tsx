@@ -82,13 +82,13 @@ export default function AdminForgotPassword() {
             <div className="w-full space-y-4">
               <button 
                 onClick={() => window.open('mailto:', '_blank')}
-                className="w-full py-5 bg-primary hover:bg-primary/90 text-white font-black rounded-[2rem] shadow-2xl shadow-primary/40 transition-all active:scale-[0.98] uppercase tracking-[0.3em] text-xs"
+                className="w-full py-5 bg-primary hover:bg-primary/90 text-white font-black rounded-[2rem] shadow-2xl shadow-primary/40 transition-all active:scale-[0.98] uppercase tracking-spread text-xs"
               >
                 Open Email App
               </button>
               <button 
                 onClick={() => navigate('/admin/login')}
-                className="w-full py-5 bg-transparent border border-primary/20 text-white font-black rounded-[2rem] hover:bg-primary/10 transition-all active:scale-[0.98] uppercase tracking-[0.3em] text-xs"
+                className="w-full py-5 bg-transparent border border-primary/20 text-white font-black rounded-[2rem] hover:bg-primary/10 transition-all active:scale-[0.98] uppercase tracking-spread text-xs"
               >
                 Back to Login
               </button>
@@ -115,21 +115,21 @@ export default function AdminForgotPassword() {
                 <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <span className="material-symbols-outlined text-primary text-4xl relative z-10">fingerprint</span>
               </div>
-              <h1 className="text-white text-5xl font-black leading-tight tracking-tighter mb-4 uppercase italic">Reset Your Password</h1>
+              <h1 className="text-white text-5xl font-display font-bold leading-tight tracking-tighter mb-4 uppercase italic">Reset Your Password</h1>
               <p className="text-slate-400 text-lg font-medium leading-relaxed tracking-tight">Enter your email address below, and we’ll send you a link to securely reset your password.</p>
             </div>
 
             {/* Recovery Form */}
             <form onSubmit={handleSubmit} className="space-y-8">
               {error && (
-                <div className="rounded-2xl bg-red-500/10 p-4 text-[10px] font-black uppercase tracking-[0.2em] text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
+                <div className="rounded-2xl bg-red-500/10 p-4 text-2xs font-black uppercase tracking-spaced text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
                   <span className="material-symbols-outlined text-base">warning</span>
                   {error}
                 </div>
               )}
 
               <div className="flex flex-col gap-3">
-                <label className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em]" htmlFor="email">Email Address</label>
+                <label className="text-slate-500 text-2xs font-black uppercase tracking-spread" htmlFor="email">Email Address</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
                     <span className="material-symbols-outlined text-slate-500 group-focus-within:text-primary transition-colors text-xl">alternate_email</span>
@@ -150,7 +150,7 @@ export default function AdminForgotPassword() {
               <button 
                 type="submit"
                 disabled={loading}
-                className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-[2rem] shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-[0.3em] text-xs"
+                className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-[2rem] shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-spread text-xs"
               >
                 {loading ? (
                   <div className="flex items-center gap-3">

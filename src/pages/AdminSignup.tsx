@@ -91,14 +91,14 @@ export default function AdminSignup() {
           <div className="bg-primary/5 rounded-[2.5rem] p-8 shadow-2xl border border-primary/10 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-500 delay-200">
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="rounded-xl bg-red-500/10 p-4 text-[11px] font-black uppercase tracking-[0.2em] text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
+                <div className="rounded-xl bg-red-500/10 p-4 text-xs font-black uppercase tracking-spaced text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
                   <span className="material-symbols-outlined text-base">warning</span>
                   {error}
                 </div>
               )}
 
               <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1" htmlFor="email">
+                <label className="block text-2xs font-black text-slate-500 uppercase tracking-spaced ml-1" htmlFor="email">
                   Email Address
                 </label>
                 <input 
@@ -114,7 +114,7 @@ export default function AdminSignup() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1" htmlFor="password">
+                <label className="block text-2xs font-black text-slate-500 uppercase tracking-spaced ml-1" htmlFor="password">
                   Password
                 </label>
                 <div className="relative">
@@ -141,7 +141,7 @@ export default function AdminSignup() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1" htmlFor="confirm-password">
+                <label className="block text-2xs font-black text-slate-500 uppercase tracking-spaced ml-1" htmlFor="confirm-password">
                   Confirm Password
                 </label>
                 <input 
@@ -158,7 +158,7 @@ export default function AdminSignup() {
 
               <div className="pt-2">
                 <button 
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-[2rem] shadow-2xl shadow-primary/40 transition-all active:scale-[0.98] uppercase tracking-[0.3em] text-xs disabled:opacity-50 disabled:cursor-not-allowed group" 
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-[2rem] shadow-2xl shadow-primary/40 transition-all active:scale-[0.98] uppercase tracking-spread text-xs disabled:opacity-50 disabled:cursor-not-allowed group" 
                   type="submit"
                   disabled={loading}
                 >
@@ -188,7 +188,7 @@ export default function AdminSignup() {
           </div>
 
           <div className="mt-10 text-center px-8 animate-in fade-in duration-1000 delay-500">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold leading-relaxed">
+            <p className="text-2xs uppercase tracking-spaced text-slate-500 font-bold leading-relaxed">
               By signing up, you agree to our <br/>
               <a className="underline hover:text-slate-300 transition-colors" href="#">Terms of Service</a> and <a className="underline hover:text-slate-300 transition-colors" href="#">Privacy Policy</a>
             </p>

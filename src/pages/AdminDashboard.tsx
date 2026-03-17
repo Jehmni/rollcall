@@ -42,7 +42,7 @@ function OrgCard({
       </button>
       
       <div className="flex items-center gap-3">
-        <span className={`px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider border ${
+        <span className={`px-3 py-1 text-2xs font-bold rounded-full uppercase tracking-wider border ${
           userRole === 'owner' 
             ? 'bg-primary/10 text-primary border-primary/20' 
             : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600'
@@ -187,7 +187,7 @@ export default function AdminDashboard() {
             </button>
           </div>
           <div className="text-center">
-            <span className="font-black text-white uppercase italic tracking-tighter text-sm">Organisation Live</span>
+            <span className="font-display font-bold text-white uppercase italic tracking-tighter text-sm">Organisation Live</span>
           </div>
           <div className="w-full"></div>
         </header>
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
 
               {/* Message */}
               <div className="text-center space-y-3 mb-12">
-                <h1 className="text-white text-5xl font-black tracking-tighter uppercase italic">Connected!</h1>
+                <h1 className="text-white text-5xl font-display font-bold tracking-tighter uppercase italic">Connected!</h1>
                 <p className="text-slate-400 text-lg font-medium tracking-tight">Organisation is live and active</p>
               </div>
 
@@ -217,8 +217,8 @@ export default function AdminDashboard() {
                   <div className="inline-flex size-20 rounded-[2rem] bg-primary/10 border border-primary/20 items-center justify-center mb-4">
                     <span className="material-symbols-outlined text-primary text-4xl">corporate_fare</span>
                   </div>
-                  <h2 className="text-white text-3xl font-black uppercase italic tracking-tighter mb-1">{createdOrg.name}</h2>
-                  <p className="text-primary font-black uppercase tracking-[0.2em] text-[10px]">Established Organisation</p>
+                  <h2 className="text-white text-3xl font-display font-bold uppercase italic tracking-tighter mb-1">{createdOrg.name}</h2>
+                  <p className="text-primary font-black uppercase tracking-spaced text-2xs">Established Organisation</p>
                 </div>
 
                 <div className="p-8 space-y-6">
@@ -227,7 +227,7 @@ export default function AdminDashboard() {
                       <span className="material-symbols-outlined text-2xl">calendar_today</span>
                     </div>
                     <div>
-                      <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-black mb-1">Established</p>
+                      <p className="text-slate-500 text-2xs uppercase tracking-spread font-black mb-1">Established</p>
                       <p className="text-white font-bold text-lg tracking-tight">
                         {new Date(createdOrg.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </p>
@@ -238,8 +238,8 @@ export default function AdminDashboard() {
                       <span className="material-symbols-outlined text-2xl">shield_person</span>
                     </div>
                     <div>
-                      <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-black mb-1">Your Role</p>
-                      <p className="text-white font-black uppercase italic text-lg tracking-tight">Owner</p>
+                      <p className="text-slate-500 text-2xs uppercase tracking-spread font-black mb-1">Your Role</p>
+                      <p className="text-white font-display font-bold uppercase italic text-lg tracking-tight">Owner</p>
                     </div>
                   </div>
                 </div>
@@ -249,14 +249,14 @@ export default function AdminDashboard() {
               <div className="w-full mt-10">
                 <button
                   onClick={() => navigate(`/admin/orgs/${createdOrg.id}`)}
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-3xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-[0.3em] text-xs"
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-3xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-spread text-xs"
                 >
                   <span>Open Organisation</span>
                   <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
                 </button>
                 <button
                   onClick={() => setCreatedOrg(null)}
-                  className="w-full text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-primary transition-colors py-4 mt-2"
+                  className="w-full text-2xs font-black uppercase tracking-spread text-slate-500 hover:text-primary transition-colors py-4 mt-2"
                 >
                   Back to Dashboard
                 </button>
@@ -274,9 +274,7 @@ export default function AdminDashboard() {
       {/* Desktop Sidebar — hidden on mobile */}
       <aside className="hidden sm:flex fixed inset-y-0 left-0 z-30 w-64 flex-col bg-background-dark border-r border-slate-800">
         <div className="flex items-center gap-3 px-6 py-6 border-b border-slate-800">
-          <div className="bg-primary p-1.5 rounded-lg">
-            <span className="material-symbols-outlined text-white text-xl">grid_view</span>
-          </div>
+          <img src="/logo.png" alt="Rollcally" className="h-8 w-8 object-contain" />
           <h2 className="text-white text-lg font-extrabold tracking-tight">Rollcally</h2>
         </div>
         <nav className="flex-1 px-4 py-6 flex flex-col gap-2 overflow-y-auto">
@@ -312,14 +310,23 @@ export default function AdminDashboard() {
           </button>
           <div className="flex flex-col items-center">
             <h1 className="text-xl font-extrabold tracking-tighter italic uppercase">ROLLCALLY ADMIN</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] opacity-60 font-medium">Management Hub</p>
+            <p className="text-2xs uppercase tracking-spaced opacity-60 font-medium">Management Hub</p>
           </div>
-          <button 
-            onClick={signOut}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-          >
-            <span className="material-symbols-outlined text-xl">logout</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/help')}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              title="User Guide"
+            >
+              <span className="material-symbols-outlined text-xl">help</span>
+            </button>
+            <button
+              onClick={signOut}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <span className="material-symbols-outlined text-xl">logout</span>
+            </button>
+          </div>
         </div>
         <div className="text-center relative z-10 animate-in fade-in slide-in-from-top-4 duration-700">
           <h2 className="text-2xl font-bold mb-1">
@@ -334,7 +341,7 @@ export default function AdminDashboard() {
       <main className="max-w-5xl mx-auto px-6 py-8">
         <div className="flex justify-between items-end mb-6">
           <div>
-            <p className="text-[10px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase mb-1">Dashboard</p>
+            <p className="text-2xs font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase mb-1">Dashboard</p>
             <h3 className="text-2xl font-extrabold italic dark:text-white uppercase tracking-tight">Directory</h3>
           </div>
           <div className="flex gap-2">
@@ -366,7 +373,7 @@ export default function AdminDashboard() {
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black dark:text-white uppercase tracking-tighter italic">{editingOrg ? 'Rename' : 'Launch New'}</h3>
+                  <h3 className="text-2xl font-display font-bold dark:text-white uppercase tracking-tighter italic">{editingOrg ? 'Rename' : 'Launch New'}</h3>
                   <p className="text-sm font-medium text-slate-400 dark:text-slate-500">
                     {editingOrg ? 'Update organization details' : 'Create a new organisation'}
                   </p>
@@ -385,8 +392,8 @@ export default function AdminDashboard() {
                 />
               </div>
               <div className="flex gap-4 justify-end">
-                <Button variant="ghost" type="button" onClick={() => { setShowCreate(false); setEditingOrg(null) }} className="text-xs font-bold uppercase tracking-[0.2em] opacity-50 dark:text-white dark:hover:bg-white/5">Cancel</Button>
-                <Button type="submit" loading={isUpdating} className="px-10 shadow-xl shadow-primary/20 text-xs font-bold uppercase tracking-[0.2em] rounded-xl">
+                <Button variant="ghost" type="button" onClick={() => { setShowCreate(false); setEditingOrg(null) }} className="text-xs font-bold uppercase tracking-spaced opacity-50 dark:text-white dark:hover:bg-white/5">Cancel</Button>
+                <Button type="submit" loading={isUpdating} className="px-10 shadow-xl shadow-primary/20 text-xs font-bold uppercase tracking-spaced rounded-xl">
                   {editingOrg ? 'Update Hub' : 'Create'}
                 </Button>
               </div>
@@ -402,7 +409,7 @@ export default function AdminDashboard() {
           <div className="rounded-[2.5rem] bg-white dark:bg-[#1E293B] p-10 sm:p-20 text-center border border-slate-100 dark:border-slate-800 shadow-2xl relative overflow-hidden group">
              <div className="absolute -top-10 -right-10 h-40 w-40 bg-primary/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
              <span className="material-symbols-outlined text-8xl text-primary/10 group-hover:text-primary/20 transition-colors mb-6 block">corporate_fare</span>
-             <h3 className="text-2xl font-black dark:text-white uppercase tracking-tighter italic">Welcome to Rollcally</h3>
+             <h3 className="text-2xl font-display font-bold dark:text-white uppercase tracking-tighter italic">Welcome to Rollcally</h3>
              <p className="text-sm font-medium text-slate-400 dark:text-slate-500 mb-10 max-w-sm mx-auto mt-3">
                Ready to start tracking? Launch your first organization to begin managing units and take attendance.
              </p>
@@ -434,7 +441,7 @@ export default function AdminDashboard() {
                 <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-background-light dark:bg-[#0F172A] px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+                <span className="bg-background-light dark:bg-[#0F172A] px-4 text-2xs font-bold uppercase tracking-spaced text-slate-400 dark:text-slate-500">
                   Direct Unit Access
                 </span>
               </div>
@@ -474,15 +481,15 @@ export default function AdminDashboard() {
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 backdrop-blur-md bg-white/70 dark:bg-[#1E293B]/70 border-t border-slate-200/20 dark:border-slate-800/50 px-8 py-3 pb-8 flex justify-between items-center z-10 transition-colors">
         <button className="flex flex-col items-center gap-1 text-primary">
           <span className="material-symbols-outlined">dashboard</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#5247e6]">Dash</span>
+          <span className="text-2xs font-bold uppercase tracking-widest text-[#5247e6]">Dash</span>
         </button>
         <button onClick={() => navigate('/admin/discover')} className="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors">
           <span className="material-symbols-outlined">explore</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest">Explore</span>
+          <span className="text-2xs font-bold uppercase tracking-widest">Explore</span>
         </button>
         <button onClick={signOut} className="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors">
           <span className="material-symbols-outlined">logout</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest">Logout</span>
+          <span className="text-2xs font-bold uppercase tracking-widest">Logout</span>
         </button>
       </nav>
 

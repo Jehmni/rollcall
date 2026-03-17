@@ -183,13 +183,22 @@ export default function AdminServiceDetail() {
             </p>
           </div>
         </div>
-        <button
-          onClick={refetch}
-          className="size-10 flex items-center justify-center rounded-full hover:bg-primary/20 transition-colors text-slate-400 hover:text-slate-100"
-          title="Refresh"
-        >
-          <span className="material-symbols-outlined">refresh</span>
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => navigate('/help')}
+            className="size-10 flex items-center justify-center rounded-full hover:bg-primary/20 transition-colors text-slate-400 hover:text-slate-100"
+            title="User Guide"
+          >
+            <span className="material-symbols-outlined">help</span>
+          </button>
+          <button
+            onClick={refetch}
+            className="size-10 flex items-center justify-center rounded-full hover:bg-primary/20 transition-colors text-slate-400 hover:text-slate-100"
+            title="Refresh"
+          >
+            <span className="material-symbols-outlined">refresh</span>
+          </button>
+        </div>
       </header>
 
       {/* ── Main Content ───────────────────────────────────────────────────── */}
@@ -215,12 +224,12 @@ export default function AdminServiceDetail() {
                   </div>
                   <div className="text-left space-y-0.5">
                     <h3 className="text-sm font-bold uppercase tracking-wide text-white">Attendance QR Code</h3>
-                    <p className="text-[10px] text-slate-400 font-medium">
+                    <p className="text-2xs text-slate-400 font-medium">
                       {showQR ? 'Click to collapse check-in code' : 'Click expand to show check-in code'}
                     </p>
                   </div>
                 </div>
-                <span className="rounded-full bg-primary/20 px-4 py-1.5 text-[11px] font-bold text-white uppercase tracking-wider transition-all hover:bg-primary hover:shadow-lg hover:shadow-primary/20 active:scale-95 border border-primary/30 flex-shrink-0">
+                <span className="rounded-full bg-primary/20 px-4 py-1.5 text-xs font-bold text-white uppercase tracking-wider transition-all hover:bg-primary hover:shadow-lg hover:shadow-primary/20 active:scale-95 border border-primary/30 flex-shrink-0">
                   {showQR ? 'Collapse' : 'Expand'}
                 </span>
               </button>
@@ -234,7 +243,7 @@ export default function AdminServiceDetail() {
                   </div>
                   <div className="text-center space-y-1">
                     <p className="text-xs font-semibold text-slate-300">Scan to check in</p>
-                    <p className="text-[10px] text-slate-500 break-all max-w-xs">{qrUrl}</p>
+                    <p className="text-2xs text-slate-500 break-all max-w-xs">{qrUrl}</p>
                   </div>
                   <button
                     onClick={downloadQR}
@@ -256,7 +265,7 @@ export default function AdminServiceDetail() {
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total</p>
             <div className="flex items-baseline justify-between">
               <p className="text-2xl font-bold">{total}</p>
-              <span className="text-[10px] font-bold text-slate-400">MEMBERS</span>
+              <span className="text-2xs font-bold text-slate-400">MEMBERS</span>
             </div>
           </div>
           {/* Present */}
@@ -264,7 +273,7 @@ export default function AdminServiceDetail() {
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Present</p>
             <div className="flex items-baseline justify-between">
               <p className="text-2xl font-bold text-emerald-500">{present.length}</p>
-              <span className="text-[10px] font-bold text-emerald-500/80">
+              <span className="text-2xs font-bold text-emerald-500/80">
                 {total > 0 ? `${Math.round((present.length / total) * 100)}%` : '—'}
               </span>
             </div>
@@ -274,7 +283,7 @@ export default function AdminServiceDetail() {
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Absent</p>
             <div className="flex items-baseline justify-between">
               <p className="text-2xl font-bold text-rose-500">{absent.length}</p>
-              <span className="text-[10px] font-bold text-rose-500/80">
+              <span className="text-2xs font-bold text-rose-500/80">
                 {total > 0 ? `${Math.round((absent.length / total) * 100)}%` : '—'}
               </span>
             </div>
@@ -384,7 +393,7 @@ export default function AdminServiceDetail() {
                   <div key={section}>
                     {/* Section header — only show if there are named sections */}
                     {(section || Object.keys(grouped).length > 1) && (
-                      <p className="px-2 pt-4 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary/60">
+                      <p className="px-2 pt-4 pb-2 text-2xs font-bold uppercase tracking-spaced text-primary/60">
                         {section || 'General'}
                       </p>
                     )}
@@ -405,26 +414,26 @@ export default function AdminServiceDetail() {
                           <div className="flex flex-col items-end gap-1">
                             {m.checked_in ? (
                               <>
-                                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-500 uppercase">Checked In</span>
+                                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-2xs font-bold text-emerald-500 uppercase">Checked In</span>
                                 {m.checkin_time && (
-                                  <p className="text-[10px] text-slate-500">
+                                  <p className="text-2xs text-slate-500">
                                     {new Date(m.checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                   </p>
                                 )}
                               </>
                             ) : (
                               <>
-                                <span className="rounded-full bg-rose-500/10 px-2 py-0.5 text-[10px] font-bold text-rose-500 uppercase">Absent</span>
+                                <span className="rounded-full bg-rose-500/10 px-2 py-0.5 text-2xs font-bold text-rose-500 uppercase">Absent</span>
                                 {m.phone ? (
                                   <a
                                     href={`tel:${m.phone}`}
                                     onClick={e => e.stopPropagation()}
-                                    className="text-[10px] text-primary/60 hover:text-primary transition-colors"
+                                    className="text-2xs text-primary/60 hover:text-primary transition-colors"
                                   >
                                     Call
                                   </a>
                                 ) : (
-                                  <p className="text-[10px] text-slate-600">No contact</p>
+                                  <p className="text-2xs text-slate-600">No contact</p>
                                 )}
                               </>
                             )}

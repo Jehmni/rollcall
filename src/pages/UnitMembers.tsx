@@ -122,19 +122,19 @@ function MemberRow({ member, canManage, onEdit, onDelete, onView }: {
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-sm font-semibold text-slate-100 truncate">{member.name}</p>
           {member.status === 'inactive' && (
-            <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-500 border border-slate-700">Retired</span>
+            <span className="text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-500 border border-slate-700">Retired</span>
           )}
           {isToday && (
-            <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20 animate-pulse">🎂 Today</span>
+            <span className="text-2xs font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20 animate-pulse">🎂 Today</span>
           )}
         </div>
         <div className="flex items-center gap-2 mt-0.5">
           {member.section && (
-            <span className="text-[10px] font-semibold text-primary/70">{member.section}</span>
+            <span className="text-2xs font-semibold text-primary/70">{member.section}</span>
           )}
-          {member.section && member.phone && <span className="text-slate-700 text-[10px]">·</span>}
+          {member.section && member.phone && <span className="text-slate-700 text-2xs">·</span>}
           {member.phone && (
-            <span className="text-[10px] text-slate-500">{member.phone}</span>
+            <span className="text-2xs text-slate-500">{member.phone}</span>
           )}
         </div>
       </div>
@@ -296,7 +296,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
                     <span className="material-symbols-outlined text-xl">people</span>
                   </div>
                   <div>
-                    <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-bold">Members Integrated</p>
+                    <p className="text-slate-500 text-2xs uppercase tracking-spread font-bold">Members Integrated</p>
                     <p className="text-white font-black text-lg">{importDone} {importDone !== 1 ? 'Members' : 'Member'}</p>
                   </div>
                 </div>
@@ -334,7 +334,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
               </div>
               <details className="text-xs text-slate-600 w-full text-left">
                 <summary className="cursor-pointer hover:text-slate-400 select-none">Expected CSV format</summary>
-                <pre className="mt-2 rounded-lg bg-background-dark p-3 font-mono leading-relaxed text-slate-500 overflow-x-auto text-[10px]">
+                <pre className="mt-2 rounded-lg bg-background-dark p-3 font-mono leading-relaxed text-slate-500 overflow-x-auto text-2xs">
                   {`Name,Phone,Section,Status,Birthday\nAlice Johnson,+2348001234567,Soprano,active,1990-05-14\nBob Smith,,Bass,active,1985-11-20`}
                 </pre>
                 <p className="mt-1 text-slate-600">Phone, Section, Status, and Birthday are optional. Status defaults to "active".</p>
@@ -369,7 +369,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
               <div className="overflow-x-auto rounded-xl border border-border-dark">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-background-dark text-left text-[9px] font-bold uppercase tracking-wider text-slate-500 border-b border-border-dark">
+                    <tr className="bg-background-dark text-left text-2xs font-bold uppercase tracking-wider text-slate-500 border-b border-border-dark">
                       <th className="px-3 py-3">Name</th>
                       <th className="px-3 py-3">Phone</th>
                       <th className="px-3 py-3">Section</th>
@@ -385,13 +385,13 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
                       }`}>
                         <td className="px-3 py-2.5 text-slate-200 font-medium">
                           {r.name}
-                          {r.duplicateStatus === 'exact' && <span className="ml-2 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase bg-red-500/20 text-red-400">Duplicate</span>}
-                          {r.duplicateStatus === 'fuzzy' && <span className="ml-2 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase bg-amber-500/20 text-amber-400">Similar</span>}
+                          {r.duplicateStatus === 'exact' && <span className="ml-2 rounded px-1.5 py-0.5 text-2xs font-bold uppercase bg-red-500/20 text-red-400">Duplicate</span>}
+                          {r.duplicateStatus === 'fuzzy' && <span className="ml-2 rounded px-1.5 py-0.5 text-2xs font-bold uppercase bg-amber-500/20 text-amber-400">Similar</span>}
                         </td>
                         <td className="px-3 py-2.5 text-slate-500">{r.phone ?? '—'}</td>
                         <td className="px-3 py-2.5 text-slate-500">{r.section ?? '—'}</td>
                         <td className="px-3 py-2.5">
-                          <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${r.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-500'}`}>
+                          <span className={`rounded-full px-2 py-0.5 text-2xs font-bold uppercase ${r.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-500'}`}>
                             {r.status}
                           </span>
                         </td>
@@ -650,14 +650,18 @@ export default function UnitMembers() {
             <div className="text-center">
               <h1 className="text-base font-bold text-slate-100 leading-tight">Unit Members</h1>
               {orgName && unitName && (
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">
+                <p className="text-2xs text-slate-500 uppercase tracking-widest mt-0.5">
                   {unitName} · {orgName}
                 </p>
               )}
             </div>
-            <div className="size-10 flex items-center justify-center rounded-full bg-surface-dark/50 border border-border-dark">
-              <span className="material-symbols-outlined text-slate-500 text-lg">more_vert</span>
-            </div>
+            <button
+              onClick={() => navigate('/help')}
+              className="size-10 flex items-center justify-center rounded-full bg-surface-dark/50 border border-border-dark hover:bg-surface-dark transition-colors"
+              title="User Guide"
+            >
+              <span className="material-symbols-outlined text-slate-400 hover:text-slate-100 transition-colors text-lg">help</span>
+            </button>
           </div>
 
           {/* Search */}
@@ -735,7 +739,7 @@ export default function UnitMembers() {
                 <div key={section}>
                   {section && (
                     <div className={`px-4 py-2.5 bg-background-dark/60 ${si > 0 ? 'border-t border-border-dark' : ''}`}>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/60">{section}</p>
+                      <p className="text-2xs font-bold uppercase tracking-spaced text-primary/60">{section}</p>
                     </div>
                   )}
                   {grouped[section].map(member => (
@@ -775,19 +779,19 @@ export default function UnitMembers() {
         <div className="flex items-center justify-around max-w-lg mx-auto">
           <button onClick={() => navigate(`/admin/units/${unitId}`)} className="flex flex-col items-center gap-1 p-2 text-slate-500">
             <span className="material-symbols-outlined">dashboard</span>
-            <span className="text-[10px] font-medium">Dashboard</span>
+            <span className="text-2xs font-medium">Dashboard</span>
           </button>
           <button onClick={() => navigate(`/admin/units/${unitId}`)} className="flex flex-col items-center gap-1 p-2 text-slate-500">
             <span className="material-symbols-outlined">hub</span>
-            <span className="text-[10px] font-medium">Units</span>
+            <span className="text-2xs font-medium">Units</span>
           </button>
           <button className="flex flex-col items-center gap-1 p-2 text-primary">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>group</span>
-            <span className="text-[10px] font-bold">Members</span>
+            <span className="text-2xs font-bold">Members</span>
           </button>
           <button onClick={() => navigate(`/admin/units/${unitId}`)} className="flex flex-col items-center gap-1 p-2 text-slate-500">
             <span className="material-symbols-outlined">event</span>
-            <span className="text-[10px] font-medium">Events</span>
+            <span className="text-2xs font-medium">Events</span>
           </button>
         </div>
       </nav>

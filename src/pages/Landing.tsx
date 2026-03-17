@@ -8,12 +8,11 @@ export default function Landing() {
       {/* Top Navigation Bar */}
       <nav className="sticky top-0 z-50 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-3 border-b border-slate-200 dark:border-primary/20 justify-between">
         <div className="flex items-center gap-2">
-          <div className="bg-primary p-1.5 rounded-lg">
-            <span className="material-symbols-outlined text-white text-2xl">grid_view</span>
-          </div>
+          <img src="/logo.png" alt="Rollcally" className="h-8 w-8 object-contain" />
           <h2 className="text-slate-900 dark:text-white text-xl font-extrabold tracking-tight">Rollcally</h2>
         </div>
         <div className="flex items-center gap-4">
+          <button onClick={() => navigate('/help')} className="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors font-medium text-sm">User Guide</button>
           <button onClick={() => navigate('/admin/login')} className="text-primary font-bold text-sm">Login</button>
           <button onClick={() => navigate('/admin/signup')} className="bg-primary text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg shadow-primary/20">Join</button>
         </div>
@@ -29,7 +28,7 @@ export default function Landing() {
                 backgroundImage: 'linear-gradient(rgba(18, 17, 33, 0.7) 0%, rgba(18, 17, 33, 0.95) 100%), url("/images/hero_bg.jpg")'
               }}
             >
-              <h1 className="text-white text-4xl font-black leading-tight tracking-tight @[480px]:text-6xl max-w-2xl">
+              <h1 className="font-display text-white text-4xl font-bold leading-tight tracking-tight @[480px]:text-6xl max-w-2xl italic">
                 Attendance Reimagined for Elite Organizations
               </h1>
               <p className="text-slate-300 text-base font-normal leading-relaxed @[480px]:text-lg max-w-xl">
@@ -49,7 +48,7 @@ export default function Landing() {
               <div className="bg-slate-100 dark:bg-primary/10 p-4 rounded-2xl mb-8 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-primary text-3xl">person_check</span>
               </div>
-              <h3 className="text-slate-900 dark:text-white text-3xl font-black mb-4">I'm Here</h3>
+              <h3 className="font-display text-slate-900 dark:text-white text-3xl font-bold mb-4">I'm Here</h3>
               <p className="text-slate-500 dark:text-slate-400 text-base mb-10 leading-relaxed">
                 Joining a meeting? Tap here to record your attendance in seconds.
               </p>
@@ -67,7 +66,7 @@ export default function Landing() {
               <div className="bg-slate-100 dark:bg-primary/10 p-4 rounded-2xl mb-8 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-primary text-3xl">verified_user</span>
               </div>
-              <h3 className="text-slate-900 dark:text-white text-3xl font-black mb-4">Admin Portal</h3>
+              <h3 className="font-display text-slate-900 dark:text-white text-3xl font-bold mb-4">Admin Portal</h3>
               <p className="text-slate-500 dark:text-slate-400 text-base mb-10 leading-relaxed">
                 Manage your units, members, and events with powerful analytics.
               </p>
@@ -82,7 +81,7 @@ export default function Landing() {
         {/* Feature Grid */}
         <section className="px-4 py-12 max-w-5xl mx-auto w-full">
           <div className="mb-10">
-            <h2 className="text-slate-900 dark:text-white text-3xl font-black tracking-tight mb-2 uppercase italic tracking-tighter">Core Security & Features</h2>
+            <h2 className="font-display text-slate-900 dark:text-white text-3xl font-bold uppercase italic tracking-tighter mb-2">Core Security & Features</h2>
             <div className="h-1 w-12 bg-primary rounded-full"></div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -142,12 +141,12 @@ export default function Landing() {
           <div className="max-w-md mx-auto">
             <div className="flex items-end justify-between mb-6">
               <div>
-                <h2 className="text-slate-900 dark:text-white text-2xl font-black">Live Insights</h2>
+                <h2 className="font-display text-slate-900 dark:text-white text-2xl font-bold">Live Insights</h2>
                 <p className="text-slate-500 dark:text-slate-400 text-sm">Real-time attendance dashboard</p>
               </div>
               <div className="text-right">
                 <span className="text-primary text-3xl font-black">94%</span>
-                <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase">Presence Rate</p>
+                <p className="text-slate-500 dark:text-slate-400 text-2xs font-bold uppercase">Presence Rate</p>
               </div>
             </div>
             <div className="bg-white dark:bg-background-dark rounded-2xl border border-slate-200 dark:border-primary/20 p-6 shadow-xl">
@@ -167,7 +166,7 @@ export default function Landing() {
                 <div className="bg-primary w-full rounded-t-lg h-[95%]"></div>
                 <div className="bg-primary/40 w-full rounded-t-lg h-[30%]"></div>
               </div>
-              <div className="flex justify-between text-[10px] text-slate-400 font-bold uppercase">
+              <div className="flex justify-between text-2xs text-slate-400 font-bold uppercase">
                 <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
               </div>
             </div>
@@ -188,23 +187,23 @@ export default function Landing() {
 
         {/* Built for Every Group */}
         <section className="px-4 py-16 text-center max-w-5xl mx-auto w-full">
-          <h2 className="text-slate-900 dark:text-white text-3xl font-black mb-4 uppercase italic tracking-tighter">Built for Every Elite Group</h2>
+          <h2 className="font-display text-slate-900 dark:text-white text-3xl font-bold mb-4 uppercase italic tracking-tighter">Built for Every Elite Group</h2>
           <p className="text-slate-600 dark:text-slate-400 mb-12 max-w-lg mx-auto">Rollcally adapts to your organizational hierarchy, whether you're a global titan or a specialized group.</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div className="relative group overflow-hidden rounded-2xl h-48 flex items-center justify-center p-6">
               <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style={{ backgroundImage: 'url("/images/corporations.jpg")' }}></div>
               <div className="absolute inset-0 bg-primary/60 mix-blend-multiply opacity-80"></div>
-              <h3 className="relative text-white text-2xl font-black uppercase italic tracking-tighter">Corporations</h3>
+              <h3 className="relative font-display text-white text-2xl font-bold uppercase italic tracking-tighter">Corporations</h3>
             </div>
             <div className="relative group overflow-hidden rounded-2xl h-48 flex items-center justify-center p-6">
               <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style={{ backgroundImage: 'url("/images/nonprofits.jpg")' }}></div>
               <div className="absolute inset-0 bg-primary/60 mix-blend-multiply opacity-80"></div>
-              <h3 className="relative text-white text-2xl font-black uppercase italic tracking-tighter">Non-profits</h3>
+              <h3 className="relative font-display text-white text-2xl font-bold uppercase italic tracking-tighter">Non-profits</h3>
             </div>
             <div className="relative group overflow-hidden rounded-2xl h-48 flex items-center justify-center p-6">
               <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style={{ backgroundImage: 'url("/images/large_groups.jpg")' }}></div>
               <div className="absolute inset-0 bg-primary/60 mix-blend-multiply opacity-80"></div>
-              <h3 className="relative text-white text-2xl font-black uppercase italic tracking-tighter">Large Groups</h3>
+              <h3 className="relative font-display text-white text-2xl font-bold uppercase italic tracking-tighter">Large Groups</h3>
             </div>
           </div>
         </section>
@@ -212,7 +211,7 @@ export default function Landing() {
         {/* Final CTA */}
         <section className="px-4 py-12 max-w-4xl mx-auto w-full">
           <div className="bg-primary rounded-[3rem] p-10 text-center text-white flex flex-col items-center gap-6 shadow-2xl shadow-primary/40">
-            <h2 className="text-3xl font-black leading-tight uppercase italic tracking-tighter">Ready to elevate your organization?</h2>
+            <h2 className="font-display text-3xl font-bold leading-tight uppercase italic tracking-tighter">Ready to elevate your organization?</h2>
             <p className="text-white/80 max-w-md">Join the elite groups who have already transformed their accountability and engagement with Rollcally.</p>
             <button onClick={() => navigate('/admin/signup')} className="w-full max-w-sm bg-white text-primary rounded-2xl h-14 font-black text-lg shadow-lg hover:scale-105 active:scale-95 transition-all uppercase tracking-widest">Get Started</button>
           </div>
@@ -223,9 +222,7 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 md:gap-8">
             <div className="flex flex-col gap-4 max-w-xs">
               <div className="flex items-center gap-2">
-                <div className="bg-primary p-1.5 rounded-lg">
-                  <span className="material-symbols-outlined text-white text-lg">grid_view</span>
-                </div>
+                <img src="/logo.png" alt="Rollcally" className="h-7 w-7 object-contain" />
                 <h2 className="text-slate-900 dark:text-white text-xl font-extrabold tracking-tight">Rollcally</h2>
               </div>
               <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">The premium standard for organizational attendance and member engagement analytics.</p>
@@ -256,9 +253,10 @@ export default function Landing() {
             </div>
           </div>
           <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-slate-200 dark:border-primary/10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase">© {new Date().getFullYear()} ROLLCALLY INC. ALL RIGHTS RESERVED.</p>
-            <div className="flex gap-6 text-[10px] font-black tracking-[0.2em] uppercase text-slate-400">
+            <p className="text-slate-400 text-2xs font-black tracking-spaced uppercase">© {new Date().getFullYear()} ROLLCALLY INC. ALL RIGHTS RESERVED.</p>
+            <div className="flex gap-6 text-2xs font-black tracking-spaced uppercase text-slate-400">
               <a href="#" className="hover:text-primary transition-colors">Status</a>
+              <button onClick={() => navigate('/help')} className="hover:text-primary transition-colors">User Guide</button>
               <a href="#" className="hover:text-primary transition-colors">Terms</a>
             </div>
           </div>
@@ -269,19 +267,19 @@ export default function Landing() {
       <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 flex border-t border-slate-200 dark:border-primary/20 bg-white/90 dark:bg-background-dark/90 backdrop-blur-xl px-4 pb-6 pt-3">
         <a className="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
           <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
-          <p className="text-[10px] font-bold uppercase tracking-wider">Home</p>
+          <p className="text-2xs font-bold uppercase tracking-wider">Home</p>
         </a>
         <a className="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
           <span className="material-symbols-outlined text-2xl">monitoring</span>
-          <p className="text-[10px] font-bold uppercase tracking-wider">Insights</p>
+          <p className="text-2xs font-bold uppercase tracking-wider">Insights</p>
         </a>
         <a className="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
           <span className="material-symbols-outlined text-2xl">verified_user</span>
-          <p className="text-[10px] font-bold uppercase tracking-wider">Security</p>
+          <p className="text-2xs font-bold uppercase tracking-wider">Security</p>
         </a>
         <a className="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
           <span className="material-symbols-outlined text-2xl">settings</span>
-          <p className="text-[10px] font-bold uppercase tracking-wider">Settings</p>
+          <p className="text-2xs font-bold uppercase tracking-wider">Settings</p>
         </a>
       </div>
     </div>

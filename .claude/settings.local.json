@@ -13,7 +13,11 @@
       "Bash(npx playwright test --reporter=list)",
       "Bash(npx playwright test \"admin-dashboard\" --grep \"shows the org name\" --reporter=list)",
       "Bash(npx playwright test)",
-      "Bash(npx playwright test tests/e2e/admin-dashboard.spec.ts --grep \"MemberDetail\")"
+      "Bash(npx playwright test tests/e2e/admin-dashboard.spec.ts --grep \"MemberDetail\")",
+      "Bash(node -e \"require\\(''sharp''\\)\")"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\ofone\\Downloads"
     ]
   }
 }

@@ -63,11 +63,15 @@ export default function AdminLogin() {
             >
               <span className="material-symbols-outlined">arrow_back</span>
             </button>
-            <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Admin Portal</h2>
+            <h2 className="text-white text-lg font-bold leading-tight tracking-tight">Admin Portal</h2>
           </div>
-          <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_15px_rgba(82,71,230,0.2)]">
-            <span className="material-symbols-outlined text-primary text-xl">admin_panel_settings</span>
-          </div>
+          <button
+            onClick={() => navigate('/help')}
+            className="size-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_15px_rgba(82,71,230,0.2)] hover:bg-primary/20 transition-colors"
+            title="User Guide"
+          >
+            <span className="material-symbols-outlined text-primary text-xl">help</span>
+          </button>
         </header>
 
         {/* Main Content Area */}
@@ -77,7 +81,7 @@ export default function AdminLogin() {
               <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <span className="material-symbols-outlined text-primary text-5xl relative z-10">shield_person</span>
             </div>
-            <h3 className="text-white tracking-tight text-2xl font-black leading-tight uppercase italic">
+            <h3 className="text-white tracking-tight text-2xl font-display font-bold leading-tight uppercase italic">
               ROLLCALLY ADMINISTRATOR PORTAL
             </h3>
             <p className="text-slate-400 mt-3 text-sm font-medium tracking-tight">Secure access for organization managers</p>
@@ -85,21 +89,21 @@ export default function AdminLogin() {
 
           <form onSubmit={handleSubmit} className="space-y-6 animate-in fade-in zoom-in-95 duration-500 delay-200">
             {successMessage && (
-              <div className="rounded-2xl bg-green-500/10 p-4 text-[10px] font-black uppercase tracking-[0.2em] text-green-400 border border-green-500/20 flex items-center gap-2 animate-in slide-in-from-top-4">
+              <div className="rounded-2xl bg-green-500/10 p-4 text-2xs font-black uppercase tracking-spaced text-green-400 border border-green-500/20 flex items-center gap-2 animate-in slide-in-from-top-4">
                 <span className="material-symbols-outlined text-base">check_circle</span>
                 {successMessage}
               </div>
             )}
 
             {error && (
-              <div className="rounded-2xl bg-red-500/10 p-4 text-[10px] font-black uppercase tracking-[0.2em] text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
+              <div className="rounded-2xl bg-red-500/10 p-4 text-2xs font-black uppercase tracking-spaced text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
                 <span className="material-symbols-outlined text-base">warning</span>
                 {error}
               </div>
             )}
 
             <div className="flex flex-col gap-2">
-              <label className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">Email</label>
+              <label className="text-slate-400 text-2xs font-black uppercase tracking-spread">Email</label>
               <div className="relative group">
                 <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">mail</span>
                 <input 
@@ -115,11 +119,11 @@ export default function AdminLogin() {
 
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <label className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">PASSWORD</label>
+                <label className="text-slate-400 text-2xs font-black uppercase tracking-spread">PASSWORD</label>
                 <button 
                   type="button"
                   onClick={() => navigate('/admin/forgot-password')}
-                  className="text-primary text-[10px] font-black tracking-[0.2em] uppercase hover:underline"
+                  className="text-primary text-2xs font-black tracking-spaced uppercase hover:underline"
                 >
                   FORGOT?
                 </button>
@@ -147,7 +151,7 @@ export default function AdminLogin() {
             <button 
               type="submit"
               disabled={loading}
-              className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-[2rem] shadow-2xl shadow-primary/40 transition-all active:scale-[0.98] uppercase tracking-[0.3em] text-xs mt-4 disabled:opacity-50 disabled:cursor-not-allowed group"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-[2rem] shadow-2xl shadow-primary/40 transition-all active:scale-[0.98] uppercase tracking-spread text-xs mt-4 disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-3">
@@ -167,10 +171,10 @@ export default function AdminLogin() {
           <div className="mt-auto pt-16 animate-in fade-in duration-1000 delay-500">
             <div className="bg-primary/5 rounded-[2.5rem] p-8 border border-primary/10 shadow-inner relative overflow-hidden">
               <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl"></div>
-              <p className="text-slate-400 text-center text-xs font-bold uppercase tracking-[0.1em] mb-6">New organization?</p>
+              <p className="text-slate-400 text-center text-xs font-bold uppercase tracking-widest mb-6">New organization?</p>
               <button 
                 onClick={() => navigate('/admin/signup')}
-                className="w-full bg-background-dark text-white border border-primary/30 font-black py-4 rounded-2xl hover:bg-primary/10 transition-colors uppercase tracking-[0.3em] text-[10px]"
+                className="w-full bg-background-dark text-white border border-primary/30 font-black py-4 rounded-2xl hover:bg-primary/10 transition-colors uppercase tracking-spread text-2xs"
               >
                 REGISTER
               </button>
@@ -184,7 +188,7 @@ export default function AdminLogin() {
                 <div className="bg-slate-500/10 p-2 rounded-xl group-hover:bg-primary/10 group-hover:text-primary">
                   <span className="material-symbols-outlined text-xl">home</span>
                 </div>
-                <span className="text-[10px] uppercase tracking-[0.2em] font-black">HOME</span>
+                <span className="text-2xs uppercase tracking-spaced font-black">HOME</span>
               </button>
               <button 
                 onClick={() => navigate('/checkin')}
@@ -193,7 +197,7 @@ export default function AdminLogin() {
                 <div className="bg-slate-500/10 p-2 rounded-xl group-hover:bg-primary/10 group-hover:text-primary">
                   <span className="material-symbols-outlined text-xl">how_to_reg</span>
                 </div>
-                <span className="text-[10px] uppercase tracking-[0.2em] font-black text-center">CHECK-IN</span>
+                <span className="text-2xs uppercase tracking-spaced font-black text-center">CHECK-IN</span>
               </button>
             </div>
           </div>
