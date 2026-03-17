@@ -7,6 +7,10 @@ import type { DashboardMember, Service } from '../types'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+const AVATAR_COLORS = ['#5247e6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899']
+function avatarColor(name: string) { return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length] }
+function getInitials(name: string) { return name.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase() }
+
 const EVENT_LABEL: Record<string, string> = {
   rehearsal:      'Regular Meeting',
   sunday_service: 'Main Event',
@@ -239,7 +243,7 @@ export default function AdminServiceDetail() {
                 <div className="border-t border-primary/20 bg-background-dark px-6 py-8 flex flex-col items-center gap-5 animate-in fade-in zoom-in-95 duration-300">
                   {/* QR canvas — white bg required for scanning */}
                   <div className="p-4 bg-white rounded-2xl shadow-2xl shadow-primary/30 ring-1 ring-primary/20">
-                    <QRCodeCanvas id="service-qr" value={qrUrl} size={220} includeMargin level="H" />
+                    <QRCodeCanvas id="service-qr" value={qrUrl} size={220} marginSize={2} level="H" />
                   </div>
                   <div className="text-center space-y-1">
                     <p className="text-xs font-semibold text-slate-300">Scan to check in</p>
@@ -297,7 +301,7 @@ export default function AdminServiceDetail() {
               </p>
               <div className="h-1.5 w-8 rounded-full bg-slate-700 overflow-hidden">
                 <div
-                  className={`h-full rounded-full ${attendanceRate >= 75 ? 'bg-primary' : attendanceRate >= 50 ? 'bg-amber-400' : 'bg-rose-500'}`}
+                  className={`h-full rounded-full transition-all duration-700 ease-out ${attendanceRate >= 75 ? 'bg-primary' : attendanceRate >= 50 ? 'bg-amber-400' : 'bg-rose-500'}`}
                   style={{ width: `${attendanceRate}%` }}
                 />
               </div>
@@ -317,10 +321,10 @@ export default function AdminServiceDetail() {
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className={`flex-1 rounded-md py-2 text-sm font-bold transition-colors capitalize ${
+                  className={`flex-1 rounded-md py-2 text-sm font-bold transition-all duration-150 capitalize active:scale-[0.97] ${
                     tab === t
                       ? 'bg-primary text-white shadow-sm'
-                      : 'text-slate-400 hover:text-white'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   {t === 'all' ? `All (${total})` : t === 'present' ? `Present (${present.length})` : `Absent (${absent.length})`}
@@ -371,8 +375,22 @@ export default function AdminServiceDetail() {
             {/* ── Member List ─────────────────────────────────────────────── */}
             <div>
             {loading ? (
-              <div className="flex justify-center py-16">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="space-y-1 mt-1">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <div key={i} className="flex items-center justify-between gap-3 rounded-xl bg-surface-dark p-3 border border-border-dark mb-1">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="size-9 rounded-full flex-shrink-0 animate-pulse bg-white/[0.06]" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3.5 w-28 animate-pulse rounded-md bg-white/[0.06]" />
+                        <div className="h-2.5 w-20 animate-pulse rounded-md bg-white/[0.06]" />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <div className="h-5 w-16 rounded-full animate-pulse bg-white/[0.06]" />
+                      <div className="size-10 rounded-xl animate-pulse bg-white/[0.06]" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : displayMembers.length === 0 ? (
               <div className="flex flex-col items-center gap-4 py-16 text-center">
@@ -397,17 +415,24 @@ export default function AdminServiceDetail() {
                         {section || 'General'}
                       </p>
                     )}
-                    {sectionMembers.map(m => (
+                    {sectionMembers.map(m => {
+                      const color = avatarColor(m.name)
+                      return (
                       <div
                         key={m.id}
-                        className={`group flex items-center justify-between gap-4 rounded-xl bg-surface-dark p-4 border border-transparent hover:border-primary/30 transition-all cursor-pointer mb-1 ${
-                          !m.checked_in ? 'opacity-80' : ''
-                        }`}
+                        className="group flex items-center justify-between gap-3 rounded-xl bg-surface-dark p-3 border border-transparent hover:border-primary/20 hover:bg-primary/[0.03] transition-all duration-150 cursor-default mb-1"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div>
-                            <h4 className="font-bold text-slate-100 truncate">{m.name}</h4>
-                            <p className="text-xs text-slate-400">{m.phone ?? 'No contact'}</p>
+                          {/* Avatar */}
+                          <div
+                            className="size-9 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white"
+                            style={{ backgroundColor: `${color}25`, border: `1.5px solid ${color}40` }}
+                          >
+                            <span style={{ color }}>{getInitials(m.name)}</span>
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="text-sm font-semibold text-slate-100 truncate">{m.name}</h4>
+                            <p className="text-2xs text-slate-500">{m.phone ?? 'No contact'}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3 flex-shrink-0">
@@ -444,9 +469,9 @@ export default function AdminServiceDetail() {
                               e.stopPropagation();
                               markAttendance(m.id, !m.checked_in);
                             }}
-                            className={`size-10 flex items-center justify-center rounded-xl transition-all active:scale-95 border ${
-                              m.checked_in 
-                                ? 'bg-rose-500/10 border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white' 
+                            className={`size-11 flex items-center justify-center rounded-xl transition-all duration-150 active:scale-95 border ${
+                              m.checked_in
+                                ? 'bg-rose-500/10 border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white'
                                 : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white'
                             }`}
                             title={m.checked_in ? "Mark Absent" : "Mark Present"}
@@ -457,7 +482,8 @@ export default function AdminServiceDetail() {
                           </button>
                         </div>
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 ))}
 
@@ -467,10 +493,10 @@ export default function AdminServiceDetail() {
                     <button
                       onClick={loadMore}
                       disabled={loadingMore}
-                      className="px-6 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 border border-border-dark hover:border-slate-600 rounded-xl transition-all flex items-center gap-2 disabled:opacity-40"
+                      className="px-6 py-3 text-sm font-bold text-slate-400 hover:text-slate-100 border border-border-dark hover:border-primary/40 hover:bg-primary/5 rounded-xl transition-all duration-150 flex items-center gap-2 disabled:opacity-40 active:scale-[0.97]"
                     >
                       {loadingMore
-                        ? <><span className="size-4 border-2 border-slate-600 border-t-slate-300 rounded-full animate-spin" /> Loading…</>
+                        ? <><span className="size-4 border-2 border-primary/40 border-t-primary rounded-full animate-spin" /> Loading…</>
                         : 'Load more'}
                     </button>
                   </div>

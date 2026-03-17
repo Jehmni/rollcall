@@ -464,7 +464,7 @@ export default function UnitDashboard() {
             {/* Unit Calendar (QR Code shortcut) */}
             <button
               onClick={() => navigate(`/admin/units/${unitId}/members`)}
-              className="size-10 flex items-center justify-center rounded-xl bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 transition-all"
+              className="size-11 flex items-center justify-center rounded-xl bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 active:scale-95 transition-all"
               title="Unit Calendar"
             >
               <span className="material-symbols-outlined text-lg">qr_code</span>
@@ -474,7 +474,7 @@ export default function UnitDashboard() {
             {isOwnerOrCreator && (
               <button
                 onClick={() => setShowSettings(true)}
-                className="size-10 flex items-center justify-center rounded-xl bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 transition-all"
+                className="size-11 flex items-center justify-center rounded-xl bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 active:scale-95 transition-all"
                 title="Unit Settings"
               >
                 <span className="material-symbols-outlined text-lg">settings</span>
@@ -485,7 +485,7 @@ export default function UnitDashboard() {
             {isSuper && (
               <button
                 onClick={() => setShowAdmins(true)}
-                className="size-10 flex items-center justify-center rounded-xl bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 transition-all"
+                className="size-11 flex items-center justify-center rounded-xl bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 active:scale-95 transition-all"
                 title="Manage Admins"
               >
                 <span className="material-symbols-outlined text-lg">manage_accounts</span>
@@ -498,10 +498,21 @@ export default function UnitDashboard() {
       {/* ── Main Content ───────────────────────────────────────────────────── */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 pb-20">
 
-        {/* Loading */}
+        {/* Loading — skeleton cards */}
         {servicesLoading && (
-          <div className="flex justify-center py-16">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <div className="space-y-3 animate-in fade-in duration-300">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="rounded-2xl bg-surface-dark border border-border-dark p-4">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl flex-shrink-0 animate-pulse bg-white/[0.06]" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3.5 w-24 animate-pulse rounded-md bg-white/[0.06]" />
+                    <div className="h-2.5 w-36 animate-pulse rounded-md bg-white/[0.06]" />
+                  </div>
+                  <div className="h-5 w-14 rounded-full animate-pulse bg-white/[0.06]" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 

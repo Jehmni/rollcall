@@ -107,7 +107,18 @@ export default function AdminOrgDiscovery() {
 
         {/* Search Results */}
         <div className="mt-10 grid gap-4">
-          {results.length > 0 ? (
+          {loading ? (
+            Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="bg-white dark:bg-[#1E293B] p-6 rounded-3xl border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                <div className="size-16 rounded-2xl flex-shrink-0 animate-pulse bg-slate-200 dark:bg-white/[0.06]" />
+                <div className="flex-1 space-y-2.5">
+                  <div className="h-5 w-40 animate-pulse rounded-lg bg-slate-200 dark:bg-white/[0.06]" />
+                  <div className="h-3 w-24 animate-pulse rounded-lg bg-slate-200 dark:bg-white/[0.06]" />
+                </div>
+                <div className="h-10 w-28 rounded-xl animate-pulse bg-slate-200 dark:bg-white/[0.06] hidden sm:block" />
+              </div>
+            ))
+          ) : results.length > 0 ? (
             results.map((org) => {
               const status = getStatus(org.id)
               const isRequested = requestedIds.has(org.id)
@@ -148,7 +159,7 @@ export default function AdminOrgDiscovery() {
                 </div>
               )
             })
-          ) : query && !loading && (
+          ) : query && (
             <div className="bg-white dark:bg-[#1E293B] p-12 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-center animate-in zoom-in-95">
               <span className="material-symbols-outlined text-6xl text-slate-200 dark:text-slate-700 mb-4 block">search_off</span>
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 uppercase italic">No Match Found</h3>

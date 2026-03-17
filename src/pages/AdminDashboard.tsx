@@ -51,17 +51,17 @@ function OrgCard({
         </span>
         
         {canManage && (
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
             <button
               onClick={(e) => { e.stopPropagation(); onRename(); }}
-              className="p-2 text-slate-400 hover:text-primary transition-colors"
+              className="size-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-primary hover:bg-primary/10 active:scale-95 transition-all"
               title="Rename"
             >
               <span className="material-symbols-outlined text-xl">edit</span>
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(); }}
-              className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+              className="size-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-500/10 active:scale-95 transition-all"
               title="Delete"
             >
               <span className="material-symbols-outlined text-xl">delete</span>
@@ -402,8 +402,17 @@ export default function AdminDashboard() {
         )}
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <div className="space-y-3 animate-in fade-in duration-300">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="bg-white dark:bg-[#1E293B] p-5 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                <div className="size-14 rounded-xl flex-shrink-0 animate-pulse bg-slate-200 dark:bg-white/[0.06]" />
+                <div className="flex-1 space-y-2.5">
+                  <div className="h-4 w-40 animate-pulse rounded-lg bg-slate-200 dark:bg-white/[0.06]" />
+                  <div className="h-3 w-24 animate-pulse rounded-lg bg-slate-200 dark:bg-white/[0.06]" />
+                </div>
+                <div className="h-6 w-16 rounded-full animate-pulse bg-slate-200 dark:bg-white/[0.06]" />
+              </div>
+            ))}
           </div>
         ) : orgs.length === 0 ? (
           <div className="rounded-[2.5rem] bg-white dark:bg-[#1E293B] p-10 sm:p-20 text-center border border-slate-100 dark:border-slate-800 shadow-2xl relative overflow-hidden group">

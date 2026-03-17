@@ -23,53 +23,54 @@ export function NotificationBell({ unitId }: { unitId: string }) {
         <div className="relative" ref={popoverRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 transition-colors"
+                className="relative size-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
+                title="Birthday alerts"
             >
-                <Bell className="h-5 w-5" />
+                <Bell className="h-5 w-5 text-white" />
                 {count > 0 && (
-                    <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-2xs font-bold text-white ring-2 ring-white">
+                    <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-pink-500 text-2xs font-bold text-white ring-2 ring-background-dark">
                         {count}
                     </span>
                 )}
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-white p-2 shadow-xl ring-1 ring-gray-100 z-50">
-                    <div className="flex items-center justify-between px-3 py-2 border-b border-gray-50 mb-1">
-                        <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <div className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-surface-dark border border-border-dark p-2 shadow-2xl shadow-black/40 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="flex items-center justify-between px-3 py-2 border-b border-border-dark mb-1">
+                        <h3 className="text-2xs font-bold uppercase tracking-spaced text-slate-500">
                             Birthday Alerts
                         </h3>
                         {count === 0 && (
-                            <span className="text-2xs text-gray-300">All caught up!</span>
+                            <span className="text-2xs text-slate-600">All clear</span>
                         )}
                     </div>
 
-                    <div className="max-h-80 overflow-y-auto flex flex-col gap-1">
+                    <div className="max-h-80 overflow-y-auto flex flex-col gap-0.5">
                         {notifications.length === 0 ? (
                             <div className="py-8 text-center">
-                                <Cake className="mx-auto h-8 w-8 text-gray-100 mb-2" />
-                                <p className="text-sm text-gray-400">No new alerts</p>
+                                <Cake className="mx-auto h-8 w-8 text-slate-700 mb-2" />
+                                <p className="text-sm text-slate-500">No new alerts</p>
                             </div>
                         ) : (
                             notifications.map((n) => (
                                 <div
                                     key={n.id}
-                                    className="group relative flex items-start gap-3 rounded-xl p-2.5 hover:bg-gray-50 transition-colors"
+                                    className="group relative flex items-start gap-3 rounded-xl p-2.5 hover:bg-white/5 transition-colors"
                                 >
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-50 text-pink-500 flex-shrink-0">
+                                    <div className="size-8 flex items-center justify-center rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-400 flex-shrink-0">
                                         <User className="h-4 w-4" />
                                     </div>
                                     <div className="flex-1 min-w-0 pr-6">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                        <p className="text-sm font-semibold text-slate-100 truncate">
                                             {n.member_name}
                                         </p>
-                                        <p className="text-xs text-gray-500">
-                                            {n.type === 'birthday_eve' ? "Birthday tomorrow!" : "Birthday today! 🎉"}
+                                        <p className="text-xs text-slate-500">
+                                            {n.type === 'birthday_eve' ? 'Birthday tomorrow!' : 'Birthday today! 🎉'}
                                         </p>
                                     </div>
                                     <button
                                         onClick={() => dismissNotification(n.id)}
-                                        className="absolute right-1 top-1 p-1.5 text-gray-300 hover:text-gray-500 rounded-lg hover:bg-white transition-opacity"
+                                        className="absolute right-1.5 top-1.5 p-1 text-slate-600 hover:text-slate-300 rounded-lg hover:bg-white/5 transition-colors"
                                         title="Dismiss"
                                     >
                                         <X className="h-3.5 w-3.5" />

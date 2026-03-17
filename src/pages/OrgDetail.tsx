@@ -114,7 +114,7 @@ function UnitFormModal({ editing, name, desc, error, loading, onChangeName, onCh
         <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mb-5 sm:hidden" />
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold text-slate-100">{editing ? 'Edit Unit' : 'New Unit'}</h3>
-          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
+          <button onClick={onClose} className="size-10 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 active:scale-95 transition-all">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -156,7 +156,7 @@ function SettingsModal({ orgName, onChange, onSave, onDelete, onClose, loading, 
             <span className="material-symbols-outlined text-primary text-xl">settings</span>
             Organisation Settings
           </h3>
-          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
+          <button onClick={onClose} className="size-10 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 active:scale-95 transition-all">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -480,8 +480,16 @@ export default function OrgDetail() {
             )}
 
             {loading ? (
-              <div className="flex justify-center py-16">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="space-y-3 animate-in fade-in duration-200">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="rounded-2xl bg-surface-dark border border-border-dark p-4 flex items-center gap-4">
+                    <div className="size-12 rounded-xl flex-shrink-0 animate-pulse bg-white/[0.06]" />
+                    <div className="flex-1 space-y-2.5">
+                      <div className="h-4 w-32 animate-pulse rounded-lg bg-white/[0.06]" />
+                      <div className="h-3 w-20 animate-pulse rounded-lg bg-white/[0.06]" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : units.length === 0 ? (
               <div className="bg-surface-dark rounded-xl border border-dashed border-border-dark p-10 text-center">
@@ -519,8 +527,20 @@ export default function OrgDetail() {
               )}
             </h3>
             {loadingRequests ? (
-              <div className="flex justify-center py-16">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="space-y-2 animate-in fade-in duration-200">
+                {Array.from({ length: 2 }).map((_, i) => (
+                  <div key={i} className="rounded-xl bg-surface-dark border border-border-dark p-4 flex items-center gap-3">
+                    <div className="size-9 rounded-full flex-shrink-0 animate-pulse bg-white/[0.06]" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3.5 w-28 animate-pulse rounded-md bg-white/[0.06]" />
+                      <div className="h-2.5 w-20 animate-pulse rounded-md bg-white/[0.06]" />
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="size-9 rounded-xl animate-pulse bg-white/[0.06]" />
+                      <div className="size-9 rounded-xl animate-pulse bg-white/[0.06]" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : joinRequests.length === 0 ? (
               <div className="bg-surface-dark rounded-xl border border-border-dark p-10 text-center">
@@ -551,12 +571,12 @@ export default function OrgDetail() {
                           <>
                             <button
                               onClick={async () => { await respondToJoinRequest(req.id, 'rejected'); setJoinRequests(p => p.filter(r => r.id !== req.id)) }}
-                              className="size-9 flex items-center justify-center rounded-xl bg-border-dark text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all" title="Decline">
+                              className="size-10 flex items-center justify-center rounded-xl bg-border-dark text-slate-500 hover:text-red-400 hover:bg-red-500/10 active:scale-95 transition-all" title="Decline">
                               <span className="material-symbols-outlined text-lg">close</span>
                             </button>
                             <button
                               onClick={async () => { await respondToJoinRequest(req.id, 'approved'); setJoinRequests(p => p.filter(r => r.id !== req.id)) }}
-                              className="size-9 flex items-center justify-center rounded-xl bg-primary text-white hover:opacity-90 transition-opacity" title="Approve">
+                              className="size-10 flex items-center justify-center rounded-xl bg-primary text-white hover:opacity-90 active:scale-95 transition-all" title="Approve">
                               <span className="material-symbols-outlined text-lg">check</span>
                             </button>
                           </>

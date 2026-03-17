@@ -103,7 +103,7 @@ function MemberRow({ member, canManage, onEdit, onDelete, onView }: {
 
   return (
     <div
-      className="group flex items-center gap-3 sm:gap-4 px-4 py-3.5 sm:py-4 cursor-pointer hover:bg-white/[0.03] active:bg-white/5 transition-colors border-b border-border-dark last:border-0"
+      className="group flex items-center gap-3 sm:gap-4 px-4 py-4 cursor-pointer hover:bg-primary/[0.04] active:bg-primary/[0.07] transition-all duration-150 border-b border-border-dark last:border-0"
       onClick={onView}
     >
       {/* Avatar */}
@@ -145,14 +145,14 @@ function MemberRow({ member, canManage, onEdit, onDelete, onView }: {
           <>
             <button
               onClick={e => { e.stopPropagation(); onEdit(member) }}
-              className="size-8 flex items-center justify-center rounded-lg text-slate-600 hover:text-primary hover:bg-primary/10 transition-all sm:opacity-0 sm:group-hover:opacity-100"
+              className="size-10 flex items-center justify-center rounded-xl text-slate-600 hover:text-primary hover:bg-primary/10 active:scale-95 transition-all sm:opacity-0 sm:group-hover:opacity-100"
               title="Edit"
             >
-              <span className="material-symbols-outlined text-[17px]">edit</span>
+              <span className="material-symbols-outlined text-lg">edit</span>
             </button>
             <button
               onClick={e => { e.stopPropagation(); onDelete(member.id) }}
-              className="size-8 flex items-center justify-center rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all sm:opacity-0 sm:group-hover:opacity-100"
+              className="size-10 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 active:scale-95 transition-all sm:opacity-0 sm:group-hover:opacity-100"
               title="Remove"
             >
               <span className="material-symbols-outlined text-[17px]">delete</span>
@@ -707,8 +707,20 @@ export default function UnitMembers() {
       {/* Content */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 pb-24">
         {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <div className="mt-4 space-y-3">
+            <div className="h-4 w-36 animate-pulse rounded-lg bg-white/[0.06]" />
+            <div className="bg-surface-dark rounded-2xl border border-border-dark overflow-hidden">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 py-3.5 border-b border-border-dark last:border-0">
+                  <div className="size-10 rounded-full flex-shrink-0 animate-pulse bg-white/[0.06]" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3.5 w-32 animate-pulse rounded-lg bg-white/[0.06]" />
+                    <div className="h-2.5 w-20 animate-pulse rounded-lg bg-white/[0.06]" />
+                  </div>
+                  <div className="h-5 w-14 rounded-full animate-pulse bg-white/[0.06]" />
+                </div>
+              ))}
+            </div>
           </div>
         ) : members.length === 0 ? (
           <div className="bg-surface-dark rounded-2xl border border-dashed border-border-dark p-12 text-center mt-4">
@@ -762,10 +774,10 @@ export default function UnitMembers() {
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="px-6 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 border border-border-dark hover:border-slate-600 rounded-xl transition-all flex items-center gap-2 disabled:opacity-40"
+                  className="px-6 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-100 border border-border-dark hover:border-primary/40 hover:bg-primary/5 rounded-xl transition-all duration-150 flex items-center gap-2 disabled:opacity-40 active:scale-[0.97]"
                 >
                   {loadingMore
-                    ? <><span className="size-4 border-2 border-slate-600 border-t-slate-300 rounded-full animate-spin" /> Loading…</>
+                    ? <><span className="size-4 border-2 border-primary/40 border-t-primary rounded-full animate-spin" /> Loading…</>
                     : 'Load more'}
                 </button>
               </div>

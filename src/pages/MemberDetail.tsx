@@ -127,8 +127,38 @@ export default function MemberDetail() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-brand-secondary">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
+      <div className="min-h-screen bg-brand-secondary">
+        {/* Skeleton header */}
+        <div className="px-5 sm:px-8 pt-24 pb-24 bg-brand-primary relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]" />
+          <div className="flex items-center justify-between relative z-10 w-full">
+            <div className="h-12 w-12 rounded-2xl bg-white/10 animate-pulse" />
+            <div className="flex-1 mx-4 space-y-2 flex flex-col items-center">
+              <div className="h-5 w-36 rounded-lg bg-white/10 animate-pulse" />
+              <div className="h-3 w-20 rounded-full bg-white/10 animate-pulse" />
+            </div>
+            <div className="h-12 w-12 rounded-2xl bg-white/10 animate-pulse" />
+          </div>
+        </div>
+        {/* Skeleton content */}
+        <div className="px-5 sm:px-8 py-8 space-y-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="rounded-2xl bg-white p-6 shadow-sm space-y-2">
+                <div className="h-3 w-12 rounded animate-pulse bg-slate-200" />
+                <div className="h-7 w-10 rounded animate-pulse bg-slate-200" />
+              </div>
+            ))}
+          </div>
+          <div className="rounded-2xl bg-white p-6 shadow-sm space-y-3">
+            <div className="h-3 w-24 rounded animate-pulse bg-slate-200" />
+            <div className="flex flex-wrap gap-2">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="h-4 w-4 rounded animate-pulse bg-slate-200" />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

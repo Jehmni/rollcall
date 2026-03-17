@@ -36,7 +36,10 @@ export function Modal({ isOpen, onClose, title, description, children }: ModalPr
       <div className={`relative w-full max-w-sm overflow-hidden rounded-3xl bg-white shadow-2xl transition-all duration-300 transform ${isOpen ? 'translate-y-0 scale-100' : 'translate-y-8 scale-95'} border border-brand-border`}>
         <div className="flex items-center justify-between border-b border-brand-border px-6 py-4">
           <h3 className="text-lg font-bold text-brand-text">{title}</h3>
-          <button onClick={onClose} className="rounded-full p-2 text-brand-slate hover:bg-brand-secondary transition-colors">
+          <button
+            onClick={onClose}
+            className="size-10 flex items-center justify-center rounded-xl text-brand-slate hover:bg-brand-secondary hover:text-brand-text active:scale-95 transition-all"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>

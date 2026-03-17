@@ -272,8 +272,16 @@ export default function CheckIn() {
                 </div>
               </div>
             ) : listLoading ? (
-              <div className="flex justify-center py-12">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent shadow-lg shadow-primary/20" />
+              <div className="flex flex-col gap-3 w-full">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-primary/5 border border-primary/10">
+                    <div className="size-10 rounded-full flex-shrink-0 animate-pulse bg-white/[0.08]" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3.5 w-28 animate-pulse rounded-lg bg-white/[0.08]" />
+                      <div className="h-2.5 w-16 animate-pulse rounded-lg bg-white/[0.08]" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="flex flex-col gap-4 max-h-[45vh] overflow-y-auto pr-2 scrollbar-hide">
@@ -283,7 +291,11 @@ export default function CheckIn() {
                   </div>
                 )}
                 {members.length === 0 && query && (
-                  <p className="text-center text-slate-500 py-8">No members match your search.</p>
+                  <div className="flex flex-col items-center gap-3 py-10 px-4 rounded-2xl bg-primary/5 border border-primary/10">
+                    <span className="material-symbols-outlined text-4xl text-slate-600">search_off</span>
+                    <p className="text-sm font-semibold text-slate-400 text-center">No members match <span className="text-white">"{query}"</span></p>
+                    <p className="text-2xs text-slate-600 text-center">Check the spelling or try a different name.</p>
+                  </div>
                 )}
                 {Object.entries(grouped).map(([section, sectionMembers]) => (
                   <div key={section} className="flex flex-col gap-3 mb-4">
@@ -294,7 +306,7 @@ export default function CheckIn() {
                       <button
                         key={m.id}
                         onClick={() => handleSelect(m)}
-                        className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-primary/5 border border-primary/10 hover:border-primary/40 hover:bg-primary/10 hover:shadow-2xl transition-all text-left group"
+                        className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-primary/5 border border-primary/10 hover:border-primary/40 hover:bg-primary/10 hover:shadow-2xl active:scale-[0.98] active:bg-primary/15 transition-all duration-150 text-left group"
                       >
                         <span className="font-extrabold text-white text-lg tracking-tight uppercase italic">{m.name}</span>
                         <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">
@@ -348,7 +360,13 @@ export default function CheckIn() {
           <div className="w-full max-w-sm pt-4 animate-in zoom-in-95 duration-500">
             {status === 'loading' ? (
               <div className="flex flex-col items-center gap-8 py-20 rounded-[4rem] bg-primary/5 border border-primary/20 shadow-2xl">
-                <div className="h-20 w-20 animate-spin rounded-full border-[8px] border-primary border-t-transparent" />
+                <div className="relative size-20">
+                  <div className="absolute inset-0 rounded-full border-[6px] border-primary/20" />
+                  <div className="absolute inset-0 rounded-full border-[6px] border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+                  <div className="absolute inset-3 flex items-center justify-center">
+                    <img src="/logo.png" alt="" className="w-full h-full object-contain opacity-70" />
+                  </div>
+                </div>
                 <p className="text-xs font-black uppercase tracking-super text-primary animate-pulse italic">Securing Protocols...</p>
               </div>
             ) : status === 'success' ? (

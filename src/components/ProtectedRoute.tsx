@@ -4,8 +4,15 @@ import { useAuth } from '../contexts/AuthContext'
 
 function Spinner() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-700 border-t-transparent" />
+    <div className="flex min-h-screen items-center justify-center flex-col gap-4 bg-background-dark">
+      <div className="relative size-14">
+        <div className="absolute inset-0 rounded-full border-4 border-primary/10" />
+        <div className="absolute inset-0 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+        <div className="absolute inset-2 flex items-center justify-center">
+          <img src="/logo.png" alt="" className="size-7 object-contain opacity-80" />
+        </div>
+      </div>
+      <p className="text-2xs font-bold uppercase tracking-spaced text-slate-600">Rollcally</p>
     </div>
   )
 }
