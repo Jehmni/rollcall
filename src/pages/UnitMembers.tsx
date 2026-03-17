@@ -1,13 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Trash2, Pencil, Users, Upload, Download, X, ChevronRight, Cake, Search } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { Button } from '../components/ui/Button'
-import { Input } from '../components/ui/Input'
 import type { Member, MemberStatus } from '../types'
 import { detectDuplicate, type DuplicateStatus } from '../lib/nameUtils'
 
-// ─── CSV import ───────────────────────────────────────────────────────────────
+// ─── CSV import helpers ───────────────────────────────────────────────────────
 
 interface CsvRow {
   name: string
@@ -18,12 +15,10 @@ interface CsvRow {
   duplicateStatus: DuplicateStatus
 }
 
-/** Parse a CSV string into import-ready rows. Handles quoted fields and an optional header. */
 function parseCsv(text: string): { rows: CsvRow[]; skipped: number } {
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean)
   if (lines.length === 0) return { rows: [], skipped: 0 }
 
-  // Split a single CSV line, respecting double-quoted fields
   function splitLine(line: string): string[] {
     const cells: string[] = []
     let cur = ''
@@ -43,10 +38,8 @@ function parseCsv(text: string): { rows: CsvRow[]; skipped: number } {
     return cells
   }
 
-  // Skip header if first cell looks like a column label
   const firstCell = splitLine(lines[0])[0].toLowerCase()
   const startIdx = (firstCell === 'name' || firstCell === 'full name' || firstCell === 'member') ? 1 : 0
-
   const rows: CsvRow[] = []
   let skipped = 0
 
@@ -64,7 +57,6 @@ function parseCsv(text: string): { rows: CsvRow[]; skipped: number } {
       duplicateStatus: 'ok',
     })
   }
-
   return { rows, skipped }
 }
 
@@ -82,7 +74,7 @@ function downloadTemplate() {
   URL.revokeObjectURL(url)
 }
 
-// ─── Member row ───────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function isBirthdayToday(birthday: string | null) {
   if (!birthday) return false
@@ -91,83 +83,352 @@ function isBirthdayToday(birthday: string | null) {
   return today.getMonth() === bday.getMonth() && today.getDate() === bday.getDate()
 }
 
-function MemberRow({
-  member, canManage, onEdit, onDelete, onView,
-}: {
-  member: Member
-  canManage: boolean
-  onEdit: (m: Member) => void
-  onDelete: (id: string) => void
-  onView: () => void
+function getInitials(name: string) {
+  return name.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase()
+}
+
+const AVATAR_COLORS = ['#5247e6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899']
+function avatarColor(name: string) {
+  return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length]
+}
+
+// ─── Member Row ───────────────────────────────────────────────────────────────
+
+function MemberRow({ member, canManage, onEdit, onDelete, onView }: {
+  member: Member; canManage: boolean
+  onEdit: (m: Member) => void; onDelete: (id: string) => void; onView: () => void
 }) {
+  const color = avatarColor(member.name)
+  const isToday = isBirthdayToday(member.birthday)
+
   return (
     <div
-      className="flex items-center border-b border-brand-border/30 last:border-0 cursor-pointer hover:bg-brand-primary/[0.02] transition-all group active:scale-[0.99] relative overflow-hidden"
+      className="group flex items-center gap-3 sm:gap-4 px-4 py-3.5 sm:py-4 cursor-pointer hover:bg-white/[0.03] active:bg-white/5 transition-colors border-b border-border-dark last:border-0"
       onClick={onView}
     >
-      <div className="absolute inset-y-0 left-0 w-1 bg-brand-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top duration-500"></div>
-      
-      <div className="flex-1 min-w-0 px-4 sm:px-8 py-5 sm:py-7">
-        <div className="flex items-center gap-4">
-          <div className="flex-1 min-w-0">
-             <p className="text-lg sm:text-xl font-bold text-brand-text tracking-tight uppercase italic group-hover:text-brand-primary transition-colors truncate">{member.name}</p>
-             <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1.5">
-                {member.section && (
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary opacity-60">
-                    {member.section}
-                  </span>
-                )}
-                {member.section && member.phone && <span className="hidden sm:inline text-brand-slate/20 text-[10px]">/</span>}
-                {member.phone && <p className="text-[10px] font-bold text-brand-slate opacity-40 uppercase tracking-widest">{member.phone}</p>}
-                {isBirthdayToday(member.birthday) && (
-                  <span title="Birthday Today! 🎂" className="flex items-center gap-1.5 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] text-pink-600 bg-pink-50 px-2 py-1 rounded-lg border border-pink-100 animate-pulse">
-                    <Cake className="h-3 w-3" /> <span className="hidden sm:inline">Celebration</span>
-                  </span>
-                )}
-             </div>
-          </div>
+      {/* Avatar */}
+      <div
+        className="size-10 sm:size-11 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold text-white relative"
+        style={{ backgroundColor: `${color}25`, border: `1.5px solid ${color}40` }}
+      >
+        <span style={{ color }}>{getInitials(member.name)}</span>
+        {isToday && (
+          <span className="absolute -top-1 -right-1 text-[14px]">🎂</span>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="text-sm font-semibold text-slate-100 truncate">{member.name}</p>
           {member.status === 'inactive' && (
-            <span className="rounded-full bg-brand-secondary px-2 sm:px-3 py-1 text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-brand-slate/40 border border-brand-border/50 flex-shrink-0">Retired</span>
+            <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-500 border border-slate-700">Retired</span>
+          )}
+          {isToday && (
+            <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20 animate-pulse">🎂 Today</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2 mt-0.5">
+          {member.section && (
+            <span className="text-[10px] font-semibold text-primary/70">{member.section}</span>
+          )}
+          {member.section && member.phone && <span className="text-slate-700 text-[10px]">·</span>}
+          {member.phone && (
+            <span className="text-[10px] text-slate-500">{member.phone}</span>
           )}
         </div>
       </div>
-      
-      {canManage && (
-        <div className="flex items-center gap-1 sm:gap-1.5 pr-2 sm:pr-6 flex-shrink-0 relative z-10 transition-all duration-300 opacity-40 sm:opacity-20 group-hover:opacity-100">
-          <button
-            onClick={e => { e.stopPropagation(); onEdit(member) }}
-            className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl text-brand-slate hover:bg-brand-primary hover:text-white border border-transparent hover:border-brand-primary transition-all active:scale-90"
-            title="Refine Identity"
-          >
-            <Pencil className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
-          </button>
-          <button
-            onClick={e => { e.stopPropagation(); onDelete(member.id) }}
-            className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl text-brand-slate/40 hover:bg-red-500 hover:text-white border border-transparent hover:border-red-500 transition-all active:scale-90"
-            title="Decommission"
-          >
-            <Trash2 className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
-          </button>
-          <div className="hidden sm:block h-10 w-px bg-brand-border/30 mx-2"></div>
-          <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center text-brand-slate/20 group-hover:text-brand-primary group-hover:translate-x-1 transition-all">
-             <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
-          </div>
-        </div>
-      )}
-      {!canManage && (
-        <div className="flex items-center gap-1 pr-4 sm:pr-8 flex-shrink-0">
-          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-brand-slate opacity-20 group-hover:text-brand-primary group-hover:translate-x-1 transition-all" />
-        </div>
-      )}
+
+      {/* Actions */}
+      <div className="flex items-center gap-1 flex-shrink-0">
+        {canManage && (
+          <>
+            <button
+              onClick={e => { e.stopPropagation(); onEdit(member) }}
+              className="size-8 flex items-center justify-center rounded-lg text-slate-600 hover:text-primary hover:bg-primary/10 transition-all sm:opacity-0 sm:group-hover:opacity-100"
+              title="Edit"
+            >
+              <span className="material-symbols-outlined text-[17px]">edit</span>
+            </button>
+            <button
+              onClick={e => { e.stopPropagation(); onDelete(member.id) }}
+              className="size-8 flex items-center justify-center rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all sm:opacity-0 sm:group-hover:opacity-100"
+              title="Remove"
+            >
+              <span className="material-symbols-outlined text-[17px]">delete</span>
+            </button>
+          </>
+        )}
+        <span className="material-symbols-outlined text-slate-700 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all text-lg">chevron_right</span>
+      </div>
     </div>
   )
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Add/Edit Member Modal ────────────────────────────────────────────────────
 
 const EMPTY: Omit<Member, 'id' | 'unit_id' | 'created_at'> = {
   name: '', phone: '', section: '', status: 'active', birthday: '',
 }
+
+function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onClose }: {
+  editing: Member | null
+  form: typeof EMPTY
+  setForm: React.Dispatch<React.SetStateAction<typeof EMPTY>>
+  error: string | null; saving: boolean
+  onSubmit: (e: FormEvent) => void; onClose: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
+        <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mt-4 mb-1 sm:hidden" />
+        <div className="sticky top-0 bg-surface-dark border-b border-border-dark/60 px-5 py-4 flex items-center justify-between">
+          <h3 className="text-base font-bold text-slate-100">{editing ? 'Edit Member' : 'Add Member'}</h3>
+          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <form onSubmit={onSubmit} className="p-5 flex flex-col gap-4">
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Full Name *</span>
+            <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required autoFocus
+              placeholder="e.g. Johnathan Doe"
+              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
+          </label>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Phone</span>
+              <input type="tel" value={form.phone ?? ''} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                placeholder="+234 800 000 0000"
+                className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Section / Group</span>
+              <input value={form.section ?? ''} onChange={e => setForm(f => ({ ...f, section: e.target.value }))}
+                placeholder="e.g. Soprano, Staff"
+                className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</span>
+              <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value as MemberStatus }))}
+                className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm appearance-none cursor-pointer">
+                <option value="active">Active</option>
+                <option value="inactive">Retired / Inactive</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Birthday</span>
+              <input type="date" value={form.birthday ?? ''} onChange={e => setForm(f => ({ ...f, birthday: e.target.value }))}
+                className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm [color-scheme:dark]" />
+            </label>
+          </div>
+
+          {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
+
+          <div className="flex gap-3 justify-end pt-2">
+            <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-xl hover:bg-border-dark transition-colors">Cancel</button>
+            <button type="submit" disabled={saving}
+              className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50 flex items-center gap-2">
+              {saving && <span className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              {editing ? 'Update Member' : 'Add Member'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ─── CSV Import Modal ─────────────────────────────────────────────────────────
+
+function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importing, importError,
+  fileInputRef, onChooseFile, onImport, onClose, onDownloadTemplate,
+}: {
+  csvRows: CsvRow[]; csvSkipped: number; csvFilename: string
+  importDone: number | null; importing: boolean; importError: string | null
+  fileInputRef: React.RefObject<HTMLInputElement>
+  onChooseFile: () => void; onImport: () => void; onClose: () => void; onDownloadTemplate: () => void
+}) {
+  const exactCount = csvRows.filter(r => r.duplicateStatus === 'exact').length
+  const fuzzyCount = csvRows.filter(r => r.duplicateStatus === 'fuzzy').length
+  const importableCount = csvRows.filter(r => r.duplicateStatus !== 'exact').length
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full sm:max-w-lg bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
+        <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mt-4 mb-1 sm:hidden" />
+
+        {/* Header */}
+        <div className="sticky top-0 bg-surface-dark border-b border-border-dark/60 px-5 py-4 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-slate-100">Import CSV</h3>
+            {csvFilename && <p className="text-xs text-slate-500 mt-0.5">{csvFilename}</p>}
+          </div>
+          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div className="p-5">
+          {/* Success state */}
+          {importDone !== null && (
+            <div className="flex flex-col items-center gap-0 animate-in fade-in slide-in-from-bottom-8 duration-700 rounded-2xl overflow-hidden">
+              <div className="w-full bg-background-dark border border-primary/20 rounded-2xl overflow-hidden shadow-2xl relative">
+                <div className="absolute top-0 right-0 -mt-8 -mr-8 size-24 bg-primary/10 rounded-full blur-3xl" />
+                <div className="flex flex-col items-center gap-5 p-8 text-center">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150" />
+                    <div className="relative bg-primary text-white rounded-2xl p-4 shadow-[0_0_40px_rgba(82,71,230,0.5)] border border-white/20">
+                      <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>group_add</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-white text-2xl font-black tracking-tight">Transfer Complete!</h3>
+                    <p className="text-slate-400 text-sm mt-1">Roster integration successful</p>
+                  </div>
+                </div>
+                <div className="mx-6 mb-6 p-4 bg-primary/5 border border-primary/10 rounded-xl flex items-center gap-4">
+                  <div className="bg-primary/10 p-2.5 rounded-xl text-primary border border-primary/20">
+                    <span className="material-symbols-outlined text-xl">people</span>
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-bold">Members Integrated</p>
+                    <p className="text-white font-black text-lg">{importDone} {importDone !== 1 ? 'Members' : 'Member'}</p>
+                  </div>
+                </div>
+                <div className="px-6 pb-6">
+                  <button onClick={onClose}
+                    className="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-3 group transition-all active:scale-95 text-sm">
+                    View Roster
+                    <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* No file chosen */}
+          {importDone === null && !csvFilename && (
+            <div className="flex flex-col items-center gap-6 py-8 text-center">
+              <div className="size-16 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary text-3xl">upload_file</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-100">Upload Roster</h3>
+                <p className="text-sm text-slate-500 mt-1 max-w-xs mx-auto">Select a CSV file to bulk-import members into this unit.</p>
+              </div>
+              <div className="flex flex-col gap-3 w-full max-w-xs">
+                <button onClick={onChooseFile}
+                  className="w-full py-3 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30">
+                  Choose File
+                </button>
+                <button onClick={onDownloadTemplate}
+                  className="w-full py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-300 flex items-center justify-center gap-2 transition-colors rounded-xl hover:bg-border-dark">
+                  <span className="material-symbols-outlined text-lg">download</span>
+                  Download Template
+                </button>
+              </div>
+              <details className="text-xs text-slate-600 w-full text-left">
+                <summary className="cursor-pointer hover:text-slate-400 select-none">Expected CSV format</summary>
+                <pre className="mt-2 rounded-lg bg-background-dark p-3 font-mono leading-relaxed text-slate-500 overflow-x-auto text-[10px]">
+                  {`Name,Phone,Section,Status,Birthday\nAlice Johnson,+2348001234567,Soprano,active,1990-05-14\nBob Smith,,Bass,active,1985-11-20`}
+                </pre>
+                <p className="mt-1 text-slate-600">Phone, Section, Status, and Birthday are optional. Status defaults to "active".</p>
+              </details>
+            </div>
+          )}
+
+          {/* Parse error */}
+          {importDone === null && csvFilename && importError && !csvRows.length && (
+            <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-sm text-red-400">{importError}</div>
+          )}
+
+          {/* Preview table */}
+          {importDone === null && csvRows.length > 0 && (
+            <div className="flex flex-col gap-4">
+              <p className="text-xs text-slate-500">
+                {csvRows.length} row{csvRows.length !== 1 ? 's' : ''} ready
+                {csvSkipped > 0 && <span className="text-amber-500"> · {csvSkipped} skipped (empty name)</span>}
+              </p>
+
+              {exactCount > 0 && (
+                <p className="text-xs text-red-400 bg-red-500/10 px-3 py-2 rounded-lg border border-red-500/20">
+                  {exactCount} row(s) match existing members exactly and will be skipped.
+                </p>
+              )}
+              {fuzzyCount > 0 && (
+                <p className="text-xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-lg border border-amber-500/20">
+                  {fuzzyCount} row(s) have names similar to existing members — please review.
+                </p>
+              )}
+
+              <div className="overflow-x-auto rounded-xl border border-border-dark">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-background-dark text-left text-[9px] font-bold uppercase tracking-wider text-slate-500 border-b border-border-dark">
+                      <th className="px-3 py-3">Name</th>
+                      <th className="px-3 py-3">Phone</th>
+                      <th className="px-3 py-3">Section</th>
+                      <th className="px-3 py-3">Status</th>
+                      <th className="px-3 py-3">Birthday</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border-dark">
+                    {csvRows.map((r, i) => (
+                      <tr key={i} className={`whitespace-nowrap ${
+                        r.duplicateStatus === 'exact' ? 'bg-red-500/10' :
+                        r.duplicateStatus === 'fuzzy' ? 'bg-amber-500/10' : 'hover:bg-white/[0.02]'
+                      }`}>
+                        <td className="px-3 py-2.5 text-slate-200 font-medium">
+                          {r.name}
+                          {r.duplicateStatus === 'exact' && <span className="ml-2 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase bg-red-500/20 text-red-400">Duplicate</span>}
+                          {r.duplicateStatus === 'fuzzy' && <span className="ml-2 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase bg-amber-500/20 text-amber-400">Similar</span>}
+                        </td>
+                        <td className="px-3 py-2.5 text-slate-500">{r.phone ?? '—'}</td>
+                        <td className="px-3 py-2.5 text-slate-500">{r.section ?? '—'}</td>
+                        <td className="px-3 py-2.5">
+                          <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${r.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-500'}`}>
+                            {r.status}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2.5 text-slate-500">{r.birthday ?? '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {importError && <p className="text-sm text-red-400">{importError}</p>}
+
+              <div className="flex items-center justify-between gap-3">
+                <button onClick={onChooseFile} className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+                  Choose different file
+                </button>
+                <div className="flex gap-2">
+                  <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-xl hover:bg-border-dark transition-colors">
+                    Cancel
+                  </button>
+                  <button onClick={onImport} disabled={importing || importableCount === 0}
+                    className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-40 flex items-center gap-2">
+                    {importing && <span className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                    Import {importableCount} member{importableCount !== 1 ? 's' : ''}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 type Panel = 'none' | 'add' | 'import'
 
@@ -175,35 +436,35 @@ export default function UnitMembers() {
   const { unitId } = useParams<{ unitId: string }>()
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  
-  const [isOwnerOrCreator, setIsOwnerOrCreator] = useState(false)
 
-  const [unitName, setUnitName] = useState('')
-  const [members, setMembers] = useState<Member[]>([])
-  const [loading, setLoading] = useState(true)
+  const [isOwnerOrCreator, setIsOwnerOrCreator] = useState(false)
+  const [unitName, setUnitName]   = useState('')
+  const [orgName, setOrgName]     = useState('')
+  const [members, setMembers]     = useState<Member[]>([])
+  const [loading, setLoading]     = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [search, setSearch] = useState('')
-  const [page, setPage] = useState(0)
-  const [hasMore, setHasMore] = useState(true)
-  const [panel, setPanel] = useState<Panel>('none')
+  const [search, setSearch]       = useState('')
+  const [page, setPage]           = useState(0)
+  const [hasMore, setHasMore]     = useState(true)
+  const [panel, setPanel]         = useState<Panel>('none')
 
   // Single-member form
-  const [editing, setEditing] = useState<Member | null>(null)
-  const [form, setForm] = useState(EMPTY)
-  const [saving, setSaving] = useState(false)
+  const [editing, setEditing]     = useState<Member | null>(null)
+  const [form, setForm]           = useState(EMPTY)
+  const [saving, setSaving]       = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
   // CSV import
-  const [csvRows, setCsvRows] = useState<CsvRow[]>([])
-  const [csvSkipped, setCsvSkipped] = useState(0)
+  const [csvRows, setCsvRows]         = useState<CsvRow[]>([])
+  const [csvSkipped, setCsvSkipped]   = useState(0)
   const [csvFilename, setCsvFilename] = useState('')
-  const [importing, setImporting] = useState(false)
+  const [importing, setImporting]     = useState(false)
   const [importError, setImportError] = useState<string | null>(null)
-  const [importDone, setImportDone] = useState<number | null>(null)
+  const [importDone, setImportDone]   = useState<number | null>(null)
 
   const PAGE_SIZE = 50
 
-  const fetchMembers = useCallback(async (pageToFetch: number, isNewSearch: boolean = false) => {
+  const fetchMembers = useCallback(async (pageToFetch: number, isNewSearch = false) => {
     if (!unitId) return
     if (pageToFetch === 0) setLoading(true)
     else setLoadingMore(true)
@@ -222,23 +483,19 @@ export default function UnitMembers() {
       }
 
       const { data, error } = await query
-
       if (error) throw error
 
       if (isNewSearch) {
-        setMembers(data ?? [])
-        setPage(0)
+        setMembers(data ?? []); setPage(0)
       } else {
         setMembers(prev => [...prev, ...(data ?? [])])
         setPage(pageToFetch)
       }
-      
       setHasMore((data ?? []).length === PAGE_SIZE)
     } catch (err) {
       console.error('Failed to fetch members:', err)
     } finally {
-      setLoading(false)
-      setLoadingMore(false)
+      setLoading(false); setLoadingMore(false)
     }
   }, [unitId, search])
 
@@ -246,20 +503,19 @@ export default function UnitMembers() {
     if (!unitId) return
     supabase
       .from('units')
-      .select('*, organization:organizations(*, organization_members(role, admin_id))')
+      .select('*, organization:organizations(name, organization_members(role, admin_id))')
       .eq('id', unitId)
       .single()
       .then(async ({ data }) => {
         if (data) {
           setUnitName(data.name)
+          const org = data.organization as any
+          setOrgName(org?.name ?? '')
           const { data: { user } } = await supabase.auth.getUser()
           if (user) {
-            const org = data.organization as any
-            const members = org?.organization_members as any[]
-            const myMember = members?.find(m => m.admin_id === user.id)
+            const mems = org?.organization_members as any[]
+            const myMember = mems?.find(m => m.admin_id === user.id)
             const role = myMember?.role || 'member'
-            
-            // Check if super admin, org owner, or unit creator
             const { data: isSuper } = await supabase.rpc('is_super_admin')
             setIsOwnerOrCreator(isSuper || role === 'owner' || data.created_by_admin_id === user.id)
           }
@@ -268,46 +524,26 @@ export default function UnitMembers() {
     fetchMembers(0, true)
   }, [unitId, fetchMembers])
 
-  // Refetch when search changes (debounced search would be better, but let's start simple)
+  // Debounced search
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (unitId) fetchMembers(0, true)
-    }, 400)
+    const timer = setTimeout(() => { if (unitId) fetchMembers(0, true) }, 400)
     return () => clearTimeout(timer)
   }, [search, unitId, fetchMembers])
 
-  const loadMore = () => {
-    if (!loadingMore && hasMore) {
-      fetchMembers(page + 1)
-    }
-  }
+  const loadMore = () => { if (!loadingMore && hasMore) fetchMembers(page + 1) }
 
-  // ── Single member form ──────────────────────────────────────────────────────
+  // ── Form handlers ─────────────────────────────────────────────────────────
 
-  function openCreate() {
-    setEditing(null); setForm(EMPTY); setFormError(null); setPanel('add')
-  }
-
+  function openCreate() { setEditing(null); setForm(EMPTY); setFormError(null); setPanel('add') }
   function openEdit(m: Member) {
     setEditing(m)
-    setForm({
-      name: m.name,
-      phone: m.phone ?? '',
-      section: m.section ?? '',
-      status: m.status,
-      birthday: m.birthday ?? '',
-    })
-    setFormError(null)
-    setPanel('add')
+    setForm({ name: m.name, phone: m.phone ?? '', section: m.section ?? '', status: m.status, birthday: m.birthday ?? '' })
+    setFormError(null); setPanel('add')
   }
-
-  function closeForm() {
-    setPanel('none'); setEditing(null); setFormError(null)
-  }
+  function closeForm() { setPanel('none'); setEditing(null); setFormError(null) }
 
   async function handleSave(e: FormEvent) {
-    e.preventDefault()
-    setFormError(null); setSaving(true)
+    e.preventDefault(); setFormError(null); setSaving(true)
     const payload = {
       name: form.name.trim(),
       phone: form.phone?.trim() || null,
@@ -321,35 +557,28 @@ export default function UnitMembers() {
         if (error) throw error
         setMembers(prev => prev.map(m => m.id === editing.id ? { ...m, ...payload } : m))
       } else {
-        const { data, error } = await supabase
-          .from('members').insert({ ...payload, unit_id: unitId }).select().single()
+        const { data, error } = await supabase.from('members').insert({ ...payload, unit_id: unitId }).select().single()
         if (error) throw error
-        setMembers(prev =>
-          [...prev, data].sort((a, b) =>
-            (a.section ?? '').localeCompare(b.section ?? '') || a.name.localeCompare(b.name)
-          )
-        )
+        setMembers(prev => [...prev, data].sort((a, b) =>
+          (a.section ?? '').localeCompare(b.section ?? '') || a.name.localeCompare(b.name)
+        ))
       }
       closeForm()
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Failed to save')
-    } finally {
-      setSaving(false)
-    }
+    } catch (err) { setFormError(err instanceof Error ? err.message : 'Failed to save') }
+    finally { setSaving(false) }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Remove this member?')) return
+    if (!confirm('Remove this member permanently?')) return
     await supabase.from('members').delete().eq('id', id)
     setMembers(prev => prev.filter(m => m.id !== id))
   }
 
-  // ── CSV import ──────────────────────────────────────────────────────────────
+  // ── CSV import handlers ────────────────────────────────────────────────────
 
   function openImport() {
     setImportDone(null); setImportError(null); setCsvRows([]); setCsvFilename('')
     setPanel('import')
-    // Delay so panel renders before we click the file input
     setTimeout(() => fileInputRef.current?.click(), 50)
   }
 
@@ -361,25 +590,13 @@ export default function UnitMembers() {
     reader.onload = async ev => {
       const text = ev.target?.result as string
       const { rows, skipped } = parseCsv(text)
-
-      // Fetch ALL names for this unit to check duplicates properly (paginated 'members' isn't enough)
-      const { data: allNames } = await supabase
-        .from('members')
-        .select('name')
-        .eq('unit_id', unitId)
-
+      const { data: allNames } = await supabase.from('members').select('name').eq('unit_id', unitId)
       const existingNames = (allNames ?? []).map(m => m.name)
-      const annotated = rows.map(row => ({
-        ...row,
-        duplicateStatus: detectDuplicate(row.name, existingNames),
-      }))
-
-      setCsvRows(annotated)
-      setCsvSkipped(skipped)
+      const annotated = rows.map(row => ({ ...row, duplicateStatus: detectDuplicate(row.name, existingNames) }))
+      setCsvRows(annotated); setCsvSkipped(skipped)
       setImportError(annotated.length === 0 ? 'No valid rows found in this file.' : null)
     }
     reader.readAsText(file)
-    // Reset so the same file can be re-selected after editing
     e.target.value = ''
   }
 
@@ -387,495 +604,214 @@ export default function UnitMembers() {
     if (!unitId || csvRows.length === 0) return
     setImporting(true); setImportError(null)
     try {
-      const payload = csvRows
-        .filter(r => r.duplicateStatus !== 'exact')
-        .map(r => ({
-          unit_id: unitId,
-          name: r.name,
-          phone: r.phone,
-          section: r.section,
-          status: r.status,
-          birthday: r.birthday,
-        }))
+      const payload = csvRows.filter(r => r.duplicateStatus !== 'exact').map(r => ({
+        unit_id: unitId, name: r.name, phone: r.phone, section: r.section, status: r.status, birthday: r.birthday,
+      }))
       const { data, error } = await supabase.from('members').insert(payload).select()
       if (error) throw error
       const inserted = (data ?? []) as Member[]
-      setMembers(prev =>
-        [...prev, ...inserted].sort((a, b) =>
-          (a.section ?? '').localeCompare(b.section ?? '') || a.name.localeCompare(b.name)
-        )
-      )
-      setImportDone(inserted.length)
-      setCsvRows([])
-    } catch (err) {
-      setImportError(err instanceof Error ? err.message : 'Import failed')
-    } finally {
-      setImporting(false)
-    }
+      setMembers(prev => [...prev, ...inserted].sort((a, b) =>
+        (a.section ?? '').localeCompare(b.section ?? '') || a.name.localeCompare(b.name)
+      ))
+      setImportDone(inserted.length); setCsvRows([])
+    } catch (err) { setImportError(err instanceof Error ? err.message : 'Import failed') }
+    finally { setImporting(false) }
   }
 
-  // ── Filtered / grouped list ─────────────────────────────────────────────────
+  // ── Grouped view ──────────────────────────────────────────────────────────
 
-  const filtered = members
-
-  const sections = [...new Set(filtered.map(m => m.section ?? ''))].sort((a, b) => {
-    if (!a) return 1
-    if (!b) return -1
-    return a.localeCompare(b)
+  const sections = [...new Set(members.map(m => m.section ?? ''))].sort((a, b) => {
+    if (!a) return 1; if (!b) return -1; return a.localeCompare(b)
   })
   const grouped = sections.reduce<Record<string, Member[]>>((acc, s) => {
-    acc[s] = filtered.filter(m => (m.section ?? '') === s)
+    acc[s] = members.filter(m => (m.section ?? '') === s)
     return acc
   }, {})
 
-  // ── Render ──────────────────────────────────────────────────────────────────
+  const activeCount = members.filter(m => m.status === 'active').length
+
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-brand-secondary">
-      {/* Hidden file input for CSV */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".csv,text/csv"
-        className="hidden"
-        onChange={handleFileChange}
-      />
+    <div className="relative min-h-screen w-full bg-background-dark text-slate-100 font-display antialiased">
+      {/* Hidden file input */}
+      <input ref={fileInputRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleFileChange} />
 
-      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-12 sm:pt-24 pb-12 sm:pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
-        {/* Abstract background glow */}
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
-        
-        <div className="flex items-center justify-between relative z-10 w-full max-w-7xl mx-auto">
-          <button
-            onClick={() => navigate(`/admin/units/${unitId}`)}
-            className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
-            title="Back to Unit"
-          >
-            <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
-          </button>
-          
-          <div className="flex flex-col items-center flex-1 overflow-hidden px-4 text-center">
-             <h1 className="text-2xl sm:text-3xl font-black tracking-tighter italic truncate w-full">{unitName}</h1>
-             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mt-1">
-                Roster Management
-             </p>
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-background-dark/90 backdrop-blur-md border-b border-border-dark/60">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+          {/* Top bar */}
+          <div className="flex items-center justify-between py-4">
+            <button
+              onClick={() => navigate(`/admin/units/${unitId}`)}
+              className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors"
+            >
+              <span className="material-symbols-outlined text-slate-100">arrow_back</span>
+            </button>
+            <div className="text-center">
+              <h1 className="text-base font-bold text-slate-100 leading-tight">Unit Members</h1>
+              {orgName && unitName && (
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">
+                  {unitName} · {orgName}
+                </p>
+              )}
+            </div>
+            <div className="size-10 flex items-center justify-center rounded-full bg-surface-dark/50 border border-border-dark">
+              <span className="material-symbols-outlined text-slate-500 text-lg">more_vert</span>
+            </div>
           </div>
 
-          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white/20">
-            <Users className="h-5 w-5 sm:h-6 sm:w-6" />
+          {/* Search */}
+          <div className="pb-3">
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 text-xl pointer-events-none">search</span>
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search members by name or section…"
+                className="w-full bg-surface-dark border border-border-dark rounded-xl pl-11 pr-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all"
+              />
+              {search && (
+                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 size-6 flex items-center justify-center rounded-full hover:bg-border-dark transition-colors">
+                  <span className="material-symbols-outlined text-slate-500 text-sm">close</span>
+                </button>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-3 relative z-10">
-           <div className="flex h-10 sm:h-12 items-center px-4 sm:px-6 rounded-2xl bg-white/10 border border-white/10">
-              <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                {members.filter(m => m.status === 'active').length} Active Members
-              </p>
-           </div>
-           {isOwnerOrCreator && (
-            <>
+          {/* Action buttons */}
+          {isOwnerOrCreator && (
+            <div className="flex gap-2.5 pb-3">
               <button
-                 onClick={openImport}
-                 className="flex items-center gap-3 h-10 sm:h-12 px-4 sm:px-6 rounded-2xl bg-white/10 border border-white/10 text-white font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] hover:bg-white/20 transition-all active:scale-95"
+                onClick={openImport}
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-surface-dark border border-border-dark rounded-xl text-xs font-bold text-slate-300 hover:border-primary/40 hover:text-primary active:scale-[0.98] transition-all"
               >
-                <Upload className="h-4 w-4" /> Import
+                <span className="material-symbols-outlined text-lg">upload</span>
+                Import CSV
               </button>
               <button
-                 onClick={openCreate}
-                 className="flex items-center gap-2 sm:gap-3 h-10 sm:h-12 px-6 sm:px-8 rounded-2xl bg-white text-brand-primary shadow-xl shadow-brand-primary/20 border border-white font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] hover:scale-105 transition-all active:scale-95"
+                onClick={openCreate}
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary rounded-xl text-xs font-bold text-white hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/30"
               >
-                <Plus className="h-4 w-4 sm:h-5 sm:w-5" /> Add New
+                <span className="material-symbols-outlined text-lg">person_add</span>
+                Add Member
               </button>
-            </>
+            </div>
           )}
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-5 sm:px-8 py-8 flex flex-col gap-8">
-
-        {/* ── Add / Edit form ─────────────────────────────────────────────── */}
-        {panel === 'add' && (
-          <div className="rounded-[2.5rem] bg-white p-6 sm:p-10 shadow-2xl shadow-brand-primary/5 border border-brand-border/50 animate-in fade-in slide-in-from-top-6 duration-700 relative overflow-hidden mb-8">
-            <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl"></div>
-            <form onSubmit={handleSave} className="flex flex-col gap-8 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-5">
-                  <div className="h-14 w-14 bg-brand-primary shadow-lg shadow-brand-primary/20 rounded-2xl flex items-center justify-center text-white">
-                    <Users className="h-7 w-7" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">
-                      {editing ? 'Edit Member' : 'New Member'}
-                    </h3>
-                    <p className="text-sm font-medium text-brand-slate opacity-40">Command member profile details</p>
-                  </div>
-                </div>
-                <button type="button" onClick={closeForm} className="h-10 w-10 flex items-center justify-center rounded-xl bg-brand-secondary text-brand-slate hover:text-brand-text transition-colors">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 gap-6">
-                <Input
-                  label="Full Name"
-                  placeholder="e.g. Johnathan Doe"
-                  value={form.name}
-                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                  required
-                  autoFocus
-                  className="text-lg py-6"
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Input
-                    label="Phone Number"
-                    type="tel"
-                    placeholder="+234 800 000 0000"
-                    value={form.phone ?? ''}
-                    onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                  />
-                  <Input
-                    label="Section / Group"
-                    placeholder="e.g. Soprano, Tenor, Staff"
-                    value={form.section ?? ''}
-                    onChange={e => setForm(f => ({ ...f, section: e.target.value }))}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate opacity-40 ml-1">Member Status</label>
-                    <select
-                      className="w-full rounded-2xl border border-brand-border bg-brand-secondary/30 px-6 py-4 text-sm focus:outline-none focus:ring-4 focus:ring-brand-primary/5 transition-all font-bold h-[62px] text-brand-text appearance-none cursor-pointer hover:border-brand-primary/30"
-                      value={form.status}
-                      onChange={e => setForm(f => ({ ...f, status: e.target.value as MemberStatus }))}
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Retired / Inactive</option>
-                    </select>
-                  </div>
-                  <Input
-                    label="Birthday"
-                    type="date"
-                    value={form.birthday ?? ''}
-                    onChange={e => setForm(f => ({ ...f, birthday: e.target.value }))}
-                  />
-                </div>
-              </div>
-
-              {formError && <p className="text-sm font-bold text-red-600">{formError}</p>}
-
-              <div className="flex gap-4 justify-end pt-4">
-                <Button variant="ghost" size="lg" type="button" onClick={closeForm} className="text-xs font-black uppercase tracking-[0.2em] opacity-40">
-                  Cancel
-                </Button>
-                <Button size="lg" type="submit" loading={saving} className="px-10 shadow-xl shadow-brand-primary/20 text-xs font-black uppercase tracking-[0.2em] rounded-2xl">
-                  {editing ? 'Update Profile' : 'Enlist Member'}
-                </Button>
-              </div>
-            </form>
+      {/* Content */}
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 pb-24">
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           </div>
-        )}
-
-         {/* ── CSV import panel ─────────────────────────────────────────────── */}
-        {panel === 'import' && (
-          <div className="rounded-2xl bg-white p-4 sm:p-5 border border-brand-border flex flex-col gap-4 shadow-xl shadow-brand-slate/5 animate-in fade-in slide-in-from-top-4 duration-300">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-gray-900">Import from CSV</h3>
-                {csvFilename && (
-                  <p className="text-xs text-gray-400 mt-0.5">{csvFilename}</p>
-                )}
-              </div>
-              <button
-                onClick={() => setPanel('none')}
-                className="text-gray-300 hover:text-gray-500"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Success state */}
-            {importDone !== null && (
-              <div className="flex flex-col items-center gap-0 animate-in fade-in slide-in-from-bottom-8 duration-700 rounded-[2rem] overflow-hidden">
-                {/* Dark success card */}
-                <div className="w-full bg-background-dark border border-primary/20 rounded-[2rem] overflow-hidden shadow-2xl relative">
-                  <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl"></div>
-
-                  {/* Icon + message */}
-                  <div className="flex flex-col items-center gap-6 p-10 text-center">
-                    <div className="relative flex flex-col items-center justify-center">
-                      <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150"></div>
-                      <div className="relative bg-primary text-white rounded-[2rem] p-5 shadow-[0_0_50px_rgba(82,71,230,0.5)] border border-white/20">
-                        <span className="material-symbols-outlined !text-5xl">group_add</span>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="text-white text-3xl font-black tracking-tighter uppercase italic">Transfer Complete!</h3>
-                      <p className="text-slate-400 text-sm font-medium">Roster integration successful</p>
-                    </div>
-                  </div>
-
-                  {/* Stat row */}
-                  <div className="mx-8 mb-8 p-6 bg-primary/5 border border-primary/10 rounded-[1.5rem] flex items-center gap-5">
-                    <div className="bg-primary/10 p-3 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/10">
-                      <span className="material-symbols-outlined text-2xl">people</span>
-                    </div>
-                    <div>
-                      <p className="text-slate-500 text-[9px] uppercase tracking-[0.3em] font-black mb-1">Members Integrated</p>
-                      <p className="text-white font-black uppercase italic text-xl tracking-tight">
-                        {importDone} {importDone !== 1 ? 'Members' : 'Member'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* CTA */}
-                  <div className="px-8 pb-10">
-                    <button
-                      onClick={() => setPanel('none')}
-                      className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-2xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-[0.3em] text-xs"
-                    >
-                      <span>View Roster</span>
-                      <span className="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                    </button>
-                    <p className="text-center text-slate-600 text-[10px] font-black uppercase tracking-[0.2em] mt-4">
-                      Rollcally Roster Management System
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* No file chosen yet */}
-            {importDone === null && !csvFilename && (
-              <div className="flex flex-col items-center gap-8 py-12 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-brand-primary/5 blur-3xl rounded-full translate-y-1/2"></div>
-                <div className="h-20 w-20 flex items-center justify-center rounded-[1.5rem] bg-brand-primary/5 text-brand-primary relative z-10 transition-all group-hover:scale-110">
-                   <Upload className="h-10 w-10" />
-                </div>
-                <div className="relative z-10">
-                  <h3 className="text-2xl font-black text-brand-text uppercase tracking-tighter italic">Upload Roster</h3>
-                  <p className="text-sm font-medium text-brand-slate opacity-40 mt-2 max-w-[250px] mx-auto">
-                    Select a CSV payload to mass-enlist members into this node.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-3 w-full max-w-[280px] relative z-10">
-                  <Button size="lg" onClick={() => fileInputRef.current?.click()} className="w-full h-14 rounded-2xl shadow-xl shadow-brand-primary/20 text-[10px] font-black uppercase tracking-[0.2em]">
-                    Choose Payload
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={downloadTemplate}
-                    className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40 hover:opacity-100"
-                  >
-                    <Download className="h-4 w-4 mr-2" /> Download Blueprint
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Parse error */}
-            {importDone === null && csvFilename && importError && (
-              <div className="rounded-xl bg-red-50 p-4 text-sm text-red-600">
-                {importError}
-              </div>
-            )}
-
-            {/* Preview table */}
-            {importDone === null && csvRows.length > 0 && (
-              <>
-                <div className="text-xs text-gray-500">
-                  {csvRows.length} row{csvRows.length !== 1 ? 's' : ''} ready to import
-                  {csvSkipped > 0 && (
-                    <span className="ml-1 text-amber-600">
-                      · {csvSkipped} row{csvSkipped !== 1 ? 's' : ''} skipped (empty name)
-                    </span>
-                  )}
-                </div>
-
-                 <div className="overflow-x-auto rounded-[1.5rem] border border-brand-border/50 bg-brand-secondary/30 backdrop-blur-md">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-brand-primary/5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-brand-slate/40">
-                        <th className="px-6 py-4">Structure Name</th>
-                        <th className="px-6 py-4">Protocol</th>
-                        <th className="px-6 py-4">Node</th>
-                        <th className="px-6 py-4">State</th>
-                        <th className="px-6 py-4">Timeline</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-brand-border/30">
-                       {csvRows.map((r, i) => (
-                        <tr
-                          key={i}
-                          className={`border-t border-gray-50 transition-colors whitespace-nowrap ${r.duplicateStatus === 'exact' ? 'bg-red-50' :
-                             r.duplicateStatus === 'fuzzy' ? 'bg-amber-50' : 'hover:bg-gray-50'
-                             }`}
-                        >
-                          <td className="px-4 py-3 font-medium text-gray-900 min-w-[150px]">
-                            {r.name}
-                            {r.duplicateStatus === 'exact' && (
-                              <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-600">
-                                Duplicate
-                              </span>
-                            )}
-                            {r.duplicateStatus === 'fuzzy' && (
-                              <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-700">
-                                Similar name
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-3 py-2 text-gray-500">{r.phone ?? '—'}</td>
-                          <td className="px-3 py-2 text-gray-500">{r.section ?? '—'}</td>
-                          <td className="px-3 py-1.5">
-                            <span
-                              className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${r.status === 'active'
-                                ? 'bg-green-50 text-green-700'
-                                : 'bg-gray-100 text-gray-500'
-                                }`}
-                            >
-                              {r.status}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-gray-500">{r.birthday ?? '—'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  {csvRows.filter(r => r.duplicateStatus === 'exact').length > 0 && (
-                    <p className="rounded-xl bg-red-50 px-3 py-2 text-xs text-red-700">
-                      {csvRows.filter(r => r.duplicateStatus === 'exact').length} row(s) match existing members exactly and will be skipped.
-                    </p>
-                  )}
-                  {csvRows.filter(r => r.duplicateStatus === 'fuzzy').length > 0 && (
-                    <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-700">
-                      {csvRows.filter(r => r.duplicateStatus === 'fuzzy').length} row(s) have names similar to existing members.
-                    </p>
-                  )}
-                  {importError && (
-                    <p className="text-sm text-red-600">{importError}</p>
-                  )}
-
-                  <div className="flex gap-2 justify-between">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      Choose different file
-                    </Button>
-                    <div className="flex gap-2">
-                      <Button variant="secondary" size="sm" onClick={() => setPanel('none')}>
-                        Cancel
-                      </Button>
-                      <Button
-                        size="sm"
-                        loading={importing}
-                        onClick={handleImport}
-                        disabled={csvRows.length === 0 || csvRows.filter(r => r.duplicateStatus !== 'exact').length === 0}
-                      >
-                        Import {csvRows.filter(r => r.duplicateStatus !== 'exact').length} member{csvRows.filter(r => r.duplicateStatus !== 'exact').length !== 1 ? 's' : ''}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* CSV format hint */}
-            {importDone === null && (
-              <details className="text-xs text-gray-400">
-                <summary className="cursor-pointer hover:text-gray-600 select-none">
-                  Expected CSV format
-                </summary>
-                <pre className="mt-2 rounded-lg bg-gray-50 p-3 font-mono leading-relaxed text-gray-500 overflow-x-auto">
-                  {`Name,Phone,Section,Status,Birthday
-Alice Johnson,+2348001234567,Soprano,active,1990-05-14
-Bob Smith,,Bass,active,1985-11-20`}
-                </pre>
-                <p className="mt-1">Phone, Section, Status, and Birthday are optional. Status defaults to "active".</p>
-              </details>
-            )}
-          </div>
-        )}
-
-        {/* ── Search ──────────────────────────────────────────────────────── */}
-        <div className="relative group max-w-7xl mx-auto w-full">
-          <Input
-            type="search"
-            placeholder="Search roster by name or section…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-             className="w-full rounded-3xl bg-white border-brand-border/50 px-6 sm:px-8 py-5 sm:py-7 shadow-2xl shadow-brand-primary/5 focus:border-brand-primary/50 transition-all text-lg placeholder:text-brand-slate/30"
-          />
-          <div className="absolute right-6 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-brand-primary/5 text-brand-primary opacity-40 group-focus-within:opacity-100 transition-all">
-            <Search className="h-5 w-5" />
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto w-full">
-          {/* ── Member list ─────────────────────────────────────────────────── */}
-         {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
-          </div>
-         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl bg-white p-10 text-center border border-brand-border">
-            <Users className="mx-auto mb-3 h-10 w-10 text-gray-200" />
-            <p className="font-medium text-gray-600">
-              {search ? 'No members match your search' : 'No members yet'}
+        ) : members.length === 0 ? (
+          <div className="bg-surface-dark rounded-2xl border border-dashed border-border-dark p-12 text-center mt-4">
+            <span className="material-symbols-outlined text-5xl text-slate-700 block mb-3">group</span>
+            <p className="font-bold text-slate-300 mb-1">{search ? 'No results' : 'No members yet'}</p>
+            <p className="text-sm text-slate-500 mb-5">
+              {search ? `No members match "${search}"` : 'Add your first member to get started.'}
             </p>
-            {!search && (
-              <p className="mt-1 text-sm text-gray-400">
-                Add members manually or import a CSV file.
-              </p>
+            {!search && isOwnerOrCreator && (
+              <button onClick={openCreate}
+                className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30">
+                Add Member
+              </button>
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-10">
-            {Object.entries(grouped).map(([section, sectionMembers]) => (
-              <div key={section} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="flex items-center gap-3 mb-4 px-2">
-                   <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-slate opacity-40">
-                    {section || 'Unassigned'}
-                  </h3>
-                  <div className="h-px flex-1 bg-brand-border/30"></div>
-                  <span className="text-[10px] font-black text-brand-primary/40 bg-brand-primary/5 px-2 py-0.5 rounded-md border border-brand-primary/10">{sectionMembers.length}</span>
-                </div>
-                <div className="rounded-[2rem] bg-white border border-brand-border/50 overflow-hidden shadow-2xl shadow-brand-primary/[0.02]">
-                  {sectionMembers.map(m => (
+          <>
+            {/* Section label */}
+            <div className="py-4 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-slate-300">
+                Current Members <span className="text-slate-500">({activeCount} active{members.length !== activeCount ? `, ${members.length - activeCount} retired` : ''})</span>
+              </h2>
+            </div>
+
+            {/* Grouped members */}
+            <div className="bg-surface-dark rounded-2xl border border-border-dark overflow-hidden">
+              {sections.map((section, si) => (
+                <div key={section}>
+                  {section && (
+                    <div className={`px-4 py-2.5 bg-background-dark/60 ${si > 0 ? 'border-t border-border-dark' : ''}`}>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/60">{section}</p>
+                    </div>
+                  )}
+                  {grouped[section].map(member => (
                     <MemberRow
-                      key={m.id}
-                      member={m}
+                      key={member.id}
+                      member={member}
                       canManage={isOwnerOrCreator}
                       onEdit={openEdit}
                       onDelete={handleDelete}
-                      onView={() => navigate(`/admin/units/${unitId}/members/${m.id}`)}
+                      onView={() => navigate(`/admin/units/${unitId}/members/${member.id}`)}
                     />
                   ))}
                 </div>
-              </div>
-            ))}
-            
+              ))}
+            </div>
+
+            {/* Load more */}
             {hasMore && (
-              <div className="flex justify-center pt-12">
-                <Button 
-                   onClick={loadMore} 
-                   loading={loadingMore}
-                   className="w-full h-16 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] shadow-xl shadow-brand-primary/10 border-brand-border/50 bg-white text-brand-primary hover:bg-brand-primary hover:text-white transition-all active:scale-[0.98]"
+              <div className="flex justify-center pt-6">
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="px-6 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 border border-border-dark hover:border-slate-600 rounded-xl transition-all flex items-center gap-2 disabled:opacity-40"
                 >
-                  Retrieve Further Intel
-                </Button>
+                  {loadingMore
+                    ? <><span className="size-4 border-2 border-slate-600 border-t-slate-300 rounded-full animate-spin" /> Loading…</>
+                    : 'Load more'}
+                </button>
               </div>
             )}
-          </div>
+          </>
         )}
-      </div>
+      </main>
+
+      {/* Bottom nav — mobile */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 sm:hidden bg-surface-dark/95 backdrop-blur-xl border-t border-border-dark px-2 pt-2 pb-[env(safe-area-inset-bottom,1rem)]">
+        <div className="flex items-center justify-around max-w-lg mx-auto">
+          <button onClick={() => navigate(`/admin/units/${unitId}`)} className="flex flex-col items-center gap-1 p-2 text-slate-500">
+            <span className="material-symbols-outlined">dashboard</span>
+            <span className="text-[10px] font-medium">Dashboard</span>
+          </button>
+          <button onClick={() => navigate(`/admin/units/${unitId}`)} className="flex flex-col items-center gap-1 p-2 text-slate-500">
+            <span className="material-symbols-outlined">hub</span>
+            <span className="text-[10px] font-medium">Units</span>
+          </button>
+          <button className="flex flex-col items-center gap-1 p-2 text-primary">
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>group</span>
+            <span className="text-[10px] font-bold">Members</span>
+          </button>
+          <button onClick={() => navigate(`/admin/units/${unitId}`)} className="flex flex-col items-center gap-1 p-2 text-slate-500">
+            <span className="material-symbols-outlined">event</span>
+            <span className="text-[10px] font-medium">Events</span>
+          </button>
+        </div>
+      </nav>
+
+      {/* Modals */}
+      {panel === 'add' && (
+        <MemberFormModal
+          editing={editing} form={form} setForm={setForm}
+          error={formError} saving={saving}
+          onSubmit={handleSave} onClose={closeForm}
+        />
+      )}
+      {panel === 'import' && (
+        <CsvImportModal
+          csvRows={csvRows} csvSkipped={csvSkipped} csvFilename={csvFilename}
+          importDone={importDone} importing={importing} importError={importError}
+          fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
+          onChooseFile={() => fileInputRef.current?.click()}
+          onImport={handleImport}
+          onClose={() => setPanel('none')}
+          onDownloadTemplate={downloadTemplate}
+        />
+      )}
     </div>
-  </div>
   )
 }
