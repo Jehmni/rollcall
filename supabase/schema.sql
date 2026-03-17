@@ -187,6 +187,18 @@ returns boolean language sql stable security definer as $$
   );
 $$;
 
+-- Is the current user an admin (owner or member) of the org that owns this service?
+create or replace function public.is_org_admin_by_service(p_service_id uuid)
+returns boolean language sql stable security definer as $$
+  select exists (
+    select 1 from organization_members om
+    join units u on u.org_id = om.organization_id
+    join services s on s.unit_id = u.id
+    where s.id = p_service_id
+      and om.admin_id = auth.uid()
+  );
+$$;
+
 -- Is the current user the creator of this unit, OR the org owner?
 create or replace function public.is_unit_manager(p_unit_id uuid)
 returns boolean language sql stable security definer as $$
@@ -434,19 +446,27 @@ create or replace function public.get_service_members(
   p_search     text default null
 )
 returns table (id uuid, name text, section text)
-language sql stable security definer as $$
+language plpgsql stable security definer as $$
+begin
+  -- Enforce privacy: search must be at least 3 characters to return results to anon.
+  -- This prevents "browsing" the entire roster.
+  if p_search is null or length(trim(p_search)) < 3 then
+    return;
+  end if;
+
+  return query
   select m.id, m.name, m.section
   from members m
   join services s on s.unit_id = m.unit_id
   where s.id = p_service_id
     and m.status = 'active'
     and (
-      p_search is null or
       m.name    ilike '%' || p_search || '%' or
       m.section ilike '%' || p_search || '%'
     )
   order by m.section nulls last, m.name
   limit 150;
+end;
 $$;
 
 grant execute on function public.get_service_members(uuid, text) to anon;
@@ -554,7 +574,14 @@ returns table (
   checked_in   boolean,
   checkin_time timestamptz
 )
-language sql stable security definer as $$
+language plpgsql stable security definer as $$
+begin
+  -- Restrict to super admins or organization admins
+  if not (is_super_admin() or is_org_admin_by_service(p_service_id)) then
+    raise exception 'Unauthorized';
+  end if;
+
+  return query
   select
     m.id,
     m.name,
@@ -570,6 +597,7 @@ language sql stable security definer as $$
   order by m.section nulls last, m.name
   limit p_limit
   offset p_offset;
+end;
 $$;
 
 grant execute on function public.get_service_members_full(uuid, int, int) to authenticated;

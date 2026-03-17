@@ -253,7 +253,19 @@ export default function CheckIn() {
               />
             </div>
 
-            {listLoading ? (
+            {query.length < 3 ? (
+              <div className="flex flex-col items-center gap-6 py-12 px-8 rounded-3xl bg-primary/5 border border-dashed border-primary/20 text-center animate-in fade-in duration-700">
+                <div className="size-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary/40 mb-2">
+                  <span className="material-symbols-outlined text-4xl">person_search</span>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-white font-bold text-lg uppercase italic tracking-tight">Identity Search</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed">
+                    Enter at least 3 characters of your name to locate your profile and verify attendance.
+                  </p>
+                </div>
+              </div>
+            ) : listLoading ? (
               <div className="flex justify-center py-12">
                 <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent shadow-lg shadow-primary/20" />
               </div>
