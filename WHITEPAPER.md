@@ -1,631 +1,879 @@
 # Rollcally — Engineering White Paper
-### Knowledge Transfer Document · March 2026
+
+> **Version:** 2.0 · **Date:** March 2026
+> Reverse-engineered from codebase. All claims are grounded in source code.
 
 ---
 
-Rollcally is a mobile-first Progressive Web App (PWA) for managing attendance at recurring group events — primarily church choirs, youth groups, sports teams, and similar organisations. Members check in by scanning a QR code on their phone. Administrators monitor attendance in real time, manage rosters, and export absence lists.
+## Table of Contents
 
-The system is multi-tenant: one deployment serves multiple organisations, each with one or more named units (e.g. "Main Choir", "Youth Group"). Each unit has its own manager, its own member roster, and its own events.
+1. [Product Overview](#1-product-overview)
+2. [Technology Stack](#2-technology-stack)
+3. [Architecture](#3-architecture)
+4. [Project Structure](#4-project-structure)
+5. [Database Schema](#5-database-schema)
+6. [Authentication & Authorization](#6-authentication--authorization)
+7. [Core Features](#7-core-features)
+8. [API / RPC Layer](#8-api--rpc-layer)
+9. [State Management Strategy](#9-state-management-strategy)
+10. [Realtime & Background Processing](#10-realtime--background-processing)
+11. [PWA & Offline Strategy](#11-pwa--offline-strategy)
+12. [Testing Strategy](#12-testing-strategy)
+13. [Known Limitations](#13-known-limitations)
 
-**What is fully built and tested:**
-- Full database schema with Row Level Security (RLS)
-- All four user roles: public member check-in, unit manager, org owner, and super admin
-- Complete admin page hierarchy (landing → login → admin dashboard → org detail → unit dashboard → event detail, member roster, member detail) — all with premium dark-mode UI
-- Public check-in flow (scan QR → pick name → confirm → result) with accessibility-compliant tap targets
-- Offline-capable check-in: Workbox service worker caches the member list for low-signal venues
-- Realtime attendance updates via Supabase subscriptions
-- QR code generation and PNG download
-- Absent member export in TXT, CSV (Excel, with UTF-8 BOM), and RTF (Word, with proper table layout)
-- Bulk member CSV import with client-side parsing, duplicate detection, and preview
-- Per-member attendance history, rate, and consecutive-streak tracking
-- Birthday tracking with in-app notification bell and birthday badge on member cards
-- Organisation analytics: total members, active units, pending requests, sessions in last 30 days, plus per-unit member and session counts
-- Paginated member list (50 per page, with load-more)
-- Organisation discovery and join-request flow
-- Dark-mode premium UI across all admin pages, consistent with design system
+---
+
+## 1. Product Overview
+
+Rollcally is a **multi-tenant, mobile-first attendance management PWA** for recurring group meetings — churches, choirs, sports teams, youth groups, or any organisation that holds regular sessions with a fixed membership roster.
+
+### Core Concepts
+
+| Term | Meaning |
+|---|---|
+| **Organisation** | Top-level tenant. One deployment hosts many organisations. |
+| **Unit** | A sub-group within an organisation (e.g. "Main Choir", "Youth Band"). |
+| **Member** | A person registered in a unit's roster. Not a system user — a record with name, section, phone, and optional birthday. |
+| **Service / Event** | A scheduled session (`rehearsal` or `sunday_service`) tied to a unit. |
+| **Attendance** | A record that a member was physically present at a service. |
+| **Admin** | An authenticated user who manages one or more units or organisations. |
+| **Super Admin** | A global administrator with unrestricted access across all tenants. |
+
+### What the App Solves
+
+Traditional sign-in sheets are slow, error-prone, and produce no useful analytics. Rollcally replaces them with QR-code-based check-in that:
+
+- Takes under 10 seconds per member
+- Works offline in low-signal venues (via Workbox PWA caching)
+- Feeds a live attendance dashboard visible to leaders in realtime
+- Enforces geofencing and device-locking to prevent proxy check-ins
+- Automates absence exports and birthday engagement
 
 ---
 
 ## 2. Technology Stack
 
-| Layer | Choice | Notes |
-|---|---|---|
-| Framework | React 18 + Vite | SPA, TypeScript throughout |
-| Styling | Tailwind CSS v3 + custom CSS variables | Utility-first; mobile-first breakpoints; dark design system tokens |
-| Routing | React Router v6 | `BrowserRouter`, nested `<Route>` |
-| Backend | Supabase (PostgreSQL) | Auth, REST API, Realtime, RLS |
-| Auth | Supabase Auth (magic link / password) | `signInWithOtp`, `shouldCreateUser: false` |
-| Icons | Lucide React + Material Symbols Outlined | Tree-shaken SVG icons (Lucide) + Google icon font (Material) |
-| QR Codes | qrcode.react (`QRCodeCanvas`) | Canvas-based, downloadable as PNG |
-| PWA / SW | vite-plugin-pwa + Workbox | `generateSW` mode; `NetworkFirst` for member list |
-| Testing | Playwright | E2E, full API mocking via `page.route()` |
+### Frontend
 
-**Key Supabase JS version note:** The project uses Supabase JS v2. The client is a singleton at `src/lib/supabase.ts`. Never instantiate a second client.
+| Layer | Technology | Version |
+|---|---|---|
+| Framework | React | 18.3.1 |
+| Language | TypeScript | ~5.6.2 |
+| Bundler | Vite | 5.4.10 |
+| Styling | Tailwind CSS | 3.4.14 |
+| Routing | React Router DOM | 6.27.0 |
+| Icons | Lucide React | 0.460.0 |
+| QR Generation | qrcode.react | 4.1.0 |
+| QR Scanning | html5-qrcode | 2.3.8 |
+| PWA | vite-plugin-pwa (Workbox) | 0.21.1 |
+
+### Backend
+
+| Layer | Technology |
+|---|---|
+| Database | Supabase (PostgreSQL 15+) |
+| Auth | Supabase Auth (email + password) |
+| Realtime | Supabase Realtime (`postgres_changes` subscriptions) |
+| Access Control | Row Level Security with security-definer helper functions |
+| Server Functions | PostgreSQL RPCs (security definer) |
+
+### Infrastructure
+
+- **Hosting:** Vite-built SPA, served as static files (Netlify / Vercel compatible)
+- **Service Worker:** Workbox via vite-plugin-pwa (`generateSW` mode)
+- **Database:** Supabase cloud project
 
 ---
 
-## 3. Project Structure
+## 3. Architecture
+
+### High-Level Diagram
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Client (Browser / PWA)                    │
+│                                                             │
+│  React SPA                                                  │
+│  ┌──────────┐  ┌─────────────────┐  ┌──────────────────┐  │
+│  │  Pages   │  │     Hooks       │  │    Contexts      │  │
+│  │ /admin   │  │ useAdminDash-   │  │ AuthContext      │  │
+│  │ /checkin │  │ board           │  │ (session, isSuper│  │
+│  │ /        │  │ useAttendance   │  │  adminUnits)     │  │
+│  └────┬─────┘  │ useChoristers   │  │ ToastContext     │  │
+│       │        └────────┬────────┘  └──────────────────┘  │
+│       └─────────────────┼──────────────────────────────── │
+│                         │ @supabase/supabase-js             │
+└─────────────────────────┼───────────────────────────────── ┘
+                          │  HTTPS
+          ┌───────────────▼──────────────────────┐
+          │          Supabase Cloud               │
+          │                                      │
+          │  ┌──────────┐   ┌─────────────────┐  │
+          │  │ Auth API │   │ REST API        │  │
+          │  │  (JWT)   │   │ (PostgREST)     │  │
+          │  └──────────┘   └────────┬────────┘  │
+          │                          │            │
+          │  ┌───────────────────────▼──────────┐ │
+          │  │      PostgreSQL Database          │ │
+          │  │  + RLS Policies                  │ │
+          │  │  + Security-Definer RPCs          │ │
+          │  │  + Triggers                      │ │
+          │  └──────────────────────────────────┘ │
+          │                                      │
+          │  ┌──────────────────────────────────┐ │
+          │  │  Realtime Engine                 │ │
+          │  │  (postgres_changes via WebSocket) │ │
+          │  └──────────────────────────────────┘ │
+          └──────────────────────────────────────  ┘
+
+Service Worker (Workbox)
+  ├─ Pre-cache: full app shell (JS, CSS, HTML, fonts, images)
+  └─ Runtime: NetworkFirst for /rpc/get_service_members (POST, 3 s timeout)
+```
+
+### Data Flow: Member Check-In
+
+```
+Member scans QR code
+       │
+       ▼
+/checkin?service_id=<uuid>
+       │
+       ▼
+useServiceMembers() ──► RPC get_service_members (anon, POST)
+   (≥3 char search)        returns PublicMember[]
+       │
+       ▼
+Member selects name ──► Confirmation screen
+       │
+       ▼
+"Yes, check me in" ──► useAttendance.checkIn(memberId)
+                           1. navigator.geolocation
+                           2. localStorage 'rollcally_device_id'
+                           3. RPC checkin_by_id(member, service, device, lat, lng)
+                                 │
+                                 ├─ geofence check (Haversine, server-side)
+                                 ├─ device-lock check
+                                 └─ INSERT attendance (or already_checked_in)
+       │
+       ▼
+Status: 'success' | 'already_checked_in' | 'too_far' | 'device_locked' | 'error'
+       │
+       ▼ (Supabase Realtime)
+Admin dashboard receives INSERT event ──► member card updates to "Present"
+```
+
+### Data Flow: Admin Attendance Management
+
+```
+/admin/units/:unitId/events/:serviceId
+       │
+       ▼
+useAdminDashboard(serviceId)
+  ├─ RPC get_service_members_full (paginated, 100/page)
+  │    returns: id, name, phone, section, checked_in, checkin_time
+  ├─ COUNT query on members table (for total)
+  └─ Subscribe to attendance INSERT / DELETE (Realtime)
+
+AdminServiceDetail renders:
+  ├─ QR code PNG  (/checkin?service_id=<uuid>)
+  ├─ Live stats:  total / present / absent / rate %
+  ├─ Member list  (tabs: All / Present / Absent)
+  │   └─ Toggle buttons ──► markAttendance(id, present)
+  │                              INSERT or DELETE attendance row
+  └─ Export absent list  (TXT / CSV / RTF, client-side)
+```
+
+---
+
+## 4. Project Structure
 
 ```
 rollcall/
 ├── src/
+│   ├── App.tsx                      # Route definitions + provider tree
+│   ├── main.tsx                     # React root, StrictMode
+│   │
 │   ├── contexts/
-│   │   └── AuthContext.tsx       — session, isSuper, adminUnits, signOut
+│   │   ├── AuthContext.tsx          # Session, role, adminUnits
+│   │   └── ToastContext.tsx         # Global toast notification system
+│   │
 │   ├── components/
-│   │   ├── ProtectedRoute.tsx    — AdminRoute (wraps all /admin/* routes)
-│   │   ├── NotificationBell.tsx  — birthday notification bell + dropdown
+│   │   ├── ErrorBoundary.tsx        # Class-based per-route crash recovery
+│   │   ├── ProtectedRoute.tsx       # AdminRoute: auth + role guard
+│   │   ├── QRScanner.tsx            # html5-qrcode camera modal
+│   │   ├── NotificationBell.tsx     # Birthday notification dropdown
 │   │   └── ui/
 │   │       ├── Button.tsx
-│   │       ├── Card.tsx          — StatCard used in event and member detail
-│   │       ├── ConfirmDialog.tsx — reusable destructive-action confirmation modal
-│   │       └── Input.tsx         — label + input with htmlFor wired
+│   │       ├── Card.tsx
+│   │       ├── Input.tsx
+│   │       └── Modal.tsx
+│   │
 │   ├── hooks/
-│   │   ├── useAttendance.ts           — check-in RPC call + status machine
-│   │   ├── useChoristers.ts           — useEventMembers (public, no auth)
-│   │   ├── useBirthdayNotifications.ts — fetches upcoming & today birthdays, polls every 6 hours
-│   │   └── useAdminDashboard.ts       — useOrganizations, useUnits, useUnitAdmins,
-│   │                                    useEvents, useAdminDashboard, useOrgStats,
-│   │                                    useServices
-│   ├── pages/
-│   │   ├── Landing.tsx               — public landing / marketing page
-│   │   ├── CheckIn.tsx               — public check-in flow
-│   │   ├── AdminLogin.tsx            — magic link / password login
-│   │   ├── AdminSignup.tsx           — new admin registration
-│   │   ├── AdminForgotPassword.tsx   — password reset
-│   │   ├── AdminDashboard.tsx        — super admin: org list + unit picker
-│   │   ├── AdminOrgDiscovery.tsx     — discover & request to join organisations
-│   │   ├── OrgDetail.tsx             — org dashboard with analytics + unit list
-│   │   ├── UnitDashboard.tsx         — unit hero + events + role-based actions
-│   │   ├── UnitMembers.tsx           — member roster CRUD + bulk CSV import
-│   │   ├── MemberDetail.tsx          — per-member attendance history + stats
-│   │   └── AdminEventDetail.tsx      — attendance view + QR + exports
+│   │   ├── useAdminDashboard.ts     # useOrganizations, useUnits, useUnitAdmins,
+│   │   │                            #   useServices, useAdminDashboard, useOrgStats
+│   │   ├── useAttendance.ts         # Public check-in logic + status machine
+│   │   ├── useChoristers.ts         # useServiceMembers, useMemberById, useServiceInfo
+│   │   ├── useBirthdayNotifications.ts  # 5-min polling for birthday alerts
+│   │   ├── useLocation.ts           # Haversine geofencing (client-side preview)
+│   │   └── useOrganizations.ts      # Discovery: search orgs, join requests
+│   │
 │   ├── lib/
-│   │   ├── supabase.ts          — singleton Supabase client
-│   │   └── nameUtils.ts         — detectDuplicate() for CSV import
-│   ├── types/
-│   │   └── index.ts             — all shared TypeScript interfaces
-│   └── App.tsx                  — route tree
+│   │   ├── supabase.ts              # Singleton Supabase client
+│   │   └── nameUtils.ts             # normaliseName(), detectDuplicate()
+│   │
+│   ├── pages/
+│   │   ├── Landing.tsx              # Public marketing page
+│   │   ├── CheckIn.tsx              # Public QR check-in flow (4 states)
+│   │   ├── AdminLogin.tsx
+│   │   ├── AdminSignup.tsx
+│   │   ├── AdminForgotPassword.tsx
+│   │   ├── AdminUpdatePassword.tsx
+│   │   ├── AdminDashboard.tsx       # Org list + unit quick-access
+│   │   ├── AdminOrgDiscovery.tsx    # Search + join-request flow
+│   │   ├── OrgDetail.tsx            # Org analytics + unit management
+│   │   ├── UnitDashboard.tsx        # Unit overview + service list
+│   │   ├── UnitMembers.tsx          # Roster CRUD + CSV import
+│   │   ├── MemberDetail.tsx         # Per-member attendance history & stats
+│   │   └── AdminServiceDetail.tsx   # Live attendance + QR code + exports
+│   │
+│   └── types/index.ts               # All TypeScript interfaces + enums
+│
 ├── supabase/
-│   └── schema.sql               — full schema + RLS + RPC functions
-├── tests/
-│   └── e2e/
-│       ├── helpers.ts           — mock factories for all Supabase endpoints
-│       ├── admin-auth.spec.ts
-│       ├── admin-dashboard.spec.ts
-│       └── checkin.spec.ts
-├── vite.config.ts               — Vite + VitePWA + Workbox config
-└── playwright.config.ts
+│   ├── schema.sql                   # Canonical schema (tables, RLS, RPCs, triggers)
+│   └── migrations/
+│       ├── 20260313_*.sql           # owner_id → created_by_admin_id rename
+│       └── 20260315_*.sql           # Missing functions, trigger fix, backfill
+│
+├── tests/e2e/
+│   ├── helpers.ts                   # Shared mocks, auth helpers, mock IDs
+│   ├── checkin.spec.ts
+│   ├── checkin-failures.spec.ts
+│   ├── admin-dashboard.spec.ts
+│   ├── admin-features.spec.ts
+│   ├── csv-import.spec.ts
+│   └── org-workflow.spec.ts
+│
+├── public/icons/                    # icon-192.png, icon-512.png
+├── vite.config.ts                   # Vite + VitePWA + Workbox config
+├── playwright.config.ts
+├── tailwind.config.js
+└── package.json
 ```
 
 ---
 
-## 4. Database Schema
+## 5. Database Schema
 
-All tables live in the `public` schema. UUIDs everywhere. Row Level Security is enabled on every table.
+### Entity-Relationship Overview
 
 ```
-organizations           — top-level tenants (e.g. "Grace Baptist Church")
-  id, name, created_by_admin_id (Org Owner), created_at
+organizations ──(N)── organization_members ──► auth.users (admins)
+     │
+     └──(N)── units ──(N)── unit_admins ──► auth.users
+                  │
+                  ├──(N)── members
+                  │           └──(N)── member_notifications
+                  └──(N)── services
+                               └──(N)── attendance ◄── members
+                                                   (device_id, lat, lng)
 
-organization_members    — junction table for admins belonging to an org
-  id, organization_id, admin_id, role ('owner'|'member'), joined_at
-
-join_requests           — pending requests from admins to join an org
-  id, organization_id, admin_id, status ('pending'|'approved'|'rejected'), created_at
-
-units                   — sub-groups within an org (e.g. "Main Choir")
-  id, org_id, created_by_admin_id (Unit Creator), name, description, created_at
-
-members                 — roster for a unit
-  id, unit_id → units, name, phone, section, status ('active'|'inactive'),
-  birthday (date, optional), created_at
-
-services                — a specific event/date for a unit (internally "services")
-  id, unit_id → units, date, service_type ('rehearsal'|'sunday_service'|'meeting'), created_at
-  UNIQUE (unit_id, date, service_type)
-
-attendance              — one row per check-in
-  id, service_id → services, member_id → members,
-  checked_in (bool, always true), checkin_time, created_at
-  UNIQUE (service_id, member_id)
-
-unit_admins             — maps a Supabase auth user to a unit
-  id, unit_id → units, user_id → auth.users, created_at
-  UNIQUE (unit_id, user_id)
+join_requests ──► organizations + auth.users
 ```
 
-All foreign keys have `ON DELETE CASCADE`, so deleting an organisation removes all its data.
+### Tables
+
+#### `organizations`
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| name | text NOT NULL | |
+| created_by_admin_id | uuid → auth.users | Owner reference |
+| created_at | timestamptz | |
+
+#### `organization_members`
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| organization_id | uuid FK | |
+| admin_id | uuid → auth.users | |
+| role | text | `'owner'` or `'member'` |
+| joined_at | timestamptz | |
+| UNIQUE | (organization_id, admin_id) | |
+
+#### `join_requests`
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| organization_id | uuid FK | |
+| admin_id | uuid → auth.users | Requestor |
+| status | text | `'pending'` / `'approved'` / `'rejected'` |
+| created_at | timestamptz | |
+
+#### `units`
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| org_id | uuid FK → organizations | |
+| name | text NOT NULL | |
+| description | text | |
+| latitude | float8 | Geofence centre (optional) |
+| longitude | float8 | Geofence centre (optional) |
+| radius_meters | int | Default 300 |
+| created_by_admin_id | uuid → auth.users | |
+| created_at | timestamptz | |
+
+#### `unit_admins`
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| unit_id | uuid FK → units | |
+| user_id | uuid → auth.users | |
+| created_at | timestamptz | |
+| UNIQUE | (unit_id, user_id) | |
+
+#### `members`
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| unit_id | uuid FK → units | |
+| name | text NOT NULL | |
+| phone | text | |
+| section | text | e.g. `"Soprano"`, `"Bass"` |
+| status | text | `'active'` / `'inactive'` |
+| birthday | date | Optional; used for notifications |
+| created_at | timestamptz | |
+
+#### `services`
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| unit_id | uuid FK → units | |
+| date | date NOT NULL | |
+| service_type | text | `'rehearsal'` / `'sunday_service'` |
+| created_at | timestamptz | |
+| UNIQUE | (unit_id, date, service_type) | Prevents duplicates |
+
+#### `attendance`
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| service_id | uuid FK → services | |
+| member_id | uuid FK → members | |
+| checkin_time | timestamptz | Set at check-in |
+| device_id | text | `crypto.randomUUID()` stored in localStorage |
+| latitude | float8 | Captured from device at check-in |
+| longitude | float8 | Captured from device at check-in |
+| created_at | timestamptz | |
+| UNIQUE | (service_id, member_id) | One check-in per member per service |
+
+#### `member_notifications`
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| unit_id | uuid FK → units | |
+| member_id | uuid FK → members | |
+| type | text | `'birthday_eve'` / `'birthday_day'` |
+| fire_at | timestamptz | When to surface the notification |
+| dismissed | bool | Default false |
+| created_at | timestamptz | |
+
+### Database Triggers
+
+#### `handle_new_organization()` — AFTER INSERT on `organizations`
+
+Automatically inserts the creator into `organization_members` with `role = 'owner'`. This breaks the RLS chicken-and-egg problem: without this trigger, the creator's own INSERT would fail its RLS check because they aren't a member yet.
+
+#### `handle_new_unit()` — AFTER INSERT on `units`
+
+Automatically inserts into `unit_admins`:
+1. The **org owner** (fetched via `organizations.created_by_admin_id`)
+2. The **unit creator** — if different from the org owner (handles the case where a joined member creates a unit)
+
+Both inserts use `ON CONFLICT DO NOTHING` for idempotency.
 
 ### RLS Helper Functions
 
-```sql
-is_super_admin()              — checks auth.jwt() -> user_metadata ->> 'role' = 'superadmin'
-is_org_member(p_org_id uuid)  — checks if auth.uid() is in organization_members for that org
-is_org_owner_by_unit(p_unit_id uuid) — checks if auth.uid() is 'owner' of the org owning the unit
-is_unit_manager(p_unit_id uuid)      — checks if auth.uid() is the unit creator OR org owner
-```
+All are `SECURITY DEFINER`, `STABLE`, SQL-language functions:
 
-### RPC Functions
-
-| Function | Auth | Purpose |
-|---|---|---|
-| `get_service_members(p_service_id)` | **anon** | Public: returns active member list for a service's unit |
-| `checkin_by_id(p_member_id, p_service_id, p_device_id, p_lat, p_lng)` | **anon** | Public: records check-in with location/device security |
-| `get_service_members_full(p_service_id)` | authenticated | Admin: members with `checked_in` and `checkin_time` |
-| `add_unit_admin_by_email(p_unit_id, p_email)` | authenticated | Super admin only: looks up user by email, inserts `unit_admins` row |
-
-**Critical:** `get_service_members` and `checkin_by_id` are granted to the `anon` role. This is intentional — check-in does not require authentication.
-
-**`checkin_by_id` return shape:**
-```json
-{ "success": true,  "name": "Alice Johnson" }
-{ "success": false, "error": "already_checked_in", "name": "Alice Johnson" }
-{ "success": false, "error": "not_found" }
-{ "success": false, "error": "invalid_service" }
-```
-`useAttendance.ts` reads `result.success` and `result.error` directly.
-
----
-
-## 5. Authentication Architecture
-
-There are three user types. The auth strategy differs for each.
-
-### 5.1 Public Users (Members checking in)
-
-No authentication whatsoever. The check-in page is at `/checkin?service_id={uuid}`. The `service_id` comes from scanning the QR code.
-
-The page calls two RPC functions granted to `anon`:
-1. `get_service_members` — fetch the member list
-2. `checkin_by_id` — record the check-in (validates location and device locking)
-
-### 5.2 Organization Members (Admins)
-
-Admins are authenticated via magic link or password. Their access is determined by the `organization_members` table and unit ownership.
-
-**Org Owners:** Have full CRUD access to all units in their organization.
-**Unit Creators:** Have full CRUD access to units they personally created.
-**Members:** Have Select (View Only) access to other units in their organization.
-
-**Single-unit redirect:** If an admin is the manager of exactly one unit, they are redirected to `/admin/units/{unitId}` after login.
-
-### 5.3 Super Admin
-
-A super admin has `user_metadata.role = 'superadmin'` set in the Supabase dashboard. This is checked in `AuthContext` via `session.user.user_metadata?.role === 'superadmin'`. If true, `isSuper = true` and `fetchAdminUnits` is **not** called — the super admin sees everything via RLS.
-
-**How to promote a user to super admin:**
-```sql
-UPDATE auth.users
-SET raw_user_meta_data = raw_user_meta_data || '{"role":"superadmin"}'::jsonb
-WHERE email = 'your@email.com';
-```
-
-### 5.4 Auth Context API
-
-```typescript
-const { session, isSuper, adminUnits, loading, signOut } = useAuth()
-```
-
-- `loading` — true until the initial `getSession()` resolves.
-- `session` — the raw Supabase session, or null if not logged in.
-- `isSuper` — true for super admins.
-- `adminUnits` — array of `UnitWithOrg` for unit admins; empty for super admins.
-- `signOut` — calls `supabase.auth.signOut()`.
-
-### 5.5 Route Protection
-
-`AdminRoute` (at `src/components/ProtectedRoute.tsx`) wraps every `/admin/*` route. It redirects to `/admin/login` if `loading` is true (shows spinner), `session` is null, or the user is neither a super admin nor has any admin units.
-
----
-
-## 6. Application Routes
-
-```
-/                                          → Landing page (marketing)
-/checkin                                   → CheckIn (public, no auth)
-/admin/login                               → AdminLogin
-/admin/signup                              → AdminSignup
-/admin/forgot-password                     → AdminForgotPassword
-/admin                                     → AdminRoute → AdminDashboard
-/admin/discover                            → AdminRoute → AdminOrgDiscovery
-/admin/orgs/:orgId                         → AdminRoute → OrgDetail
-/admin/units/:unitId                       → AdminRoute → UnitDashboard
-/admin/units/:unitId/members               → AdminRoute → UnitMembers
-/admin/units/:unitId/members/:memberId     → AdminRoute → MemberDetail
-/admin/units/:unitId/events/:serviceId     → AdminRoute → AdminEventDetail
-*                                          → redirect to /checkin
-```
-
----
-
-## 7. Pages — Detailed Walkthrough
-
-### 7.1 Landing (`/`)
-
-Marketing page for Rollcally. Showcases key features, pricing, and a prominent call-to-action. Links to `/admin/login` and `/admin/signup`. Styled with the premium dark design system.
-
-### 7.2 CheckIn (`/checkin`)
-
-**State machine:** `step: 'list' | 'confirm' | 'done'`
-
-1. **list** — Fetches members via `useEventMembers(serviceId)` → RPC `get_service_members`. Displayed grouped by section, searchable. Tapping a name moves to `confirm`.
-2. **confirm** — Shows the selected member's name and avatar initial. "Yes, check me in" calls `useAttendance.checkIn(memberId)` → RPC `checkin_by_id`. Moves to `done`.
-3. **done** — Renders one of four result screens:
-   - `success` — premium dark "You're In!" success card
-   - `already_checked_in` — "Already checked in"
-   - `not_found | invalid_event | error` — "Something went wrong"
-
-**Offline:** The Workbox service worker caches the `get_service_members` RPC response (7-day TTL, up to 30 events, 3-second network timeout).
-
-### 7.3 AdminLogin (`/admin/login`)
-
-Two sub-states: `email` form → `sent` confirmation. Calls `supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } })`. Only pre-existing users can sign in.
-
-On mount, if a session already exists, redirects:
-- Super admin → `/admin`
-- Unit admin (single unit) → `/admin/units/{unitId}`
-- Unit admin (multiple units) → `/admin`
-
-### 7.4 AdminDashboard (`/admin`)
-
-Rendered differently based on role:
-- **Super admin:** Full org list. Can create and delete organisations.
-- **Unit admin with 1 unit:** Immediately redirects to their unit dashboard.
-- **Unit admin with 2+ units:** Shows a unit picker card list.
-
-Uses `useOrganizations()` hook.
-
-### 7.5 AdminOrgDiscovery (`/admin/discover`)
-
-Allows admins to search for and request to join existing organisations. Displays org cards with member count. Submits a `join_requests` row; the org owner approves or rejects from the OrgDetail page.
-
-### 7.6 OrgDetail (`/admin/orgs/:orgId`)
-
-Organisation-level dashboard with four aggregate stat cards:
-- **Total Members** — sum of all active members across all units (`useOrgStats`)
-- **Active Units** — count of units in the org
-- **Pending Requests** — join requests awaiting approval
-- **Sessions (30 days)** — total sessions held across all units in the last 30 days
-
-Each unit card shows inline pills: member count and session count (last 30 days), fetched in parallel by `useOrgStats`.
-
-A full-width dashed **"+ New Unit"** CTA button at the bottom is always visible. Org owners can also delete units.
-
-Uses `useOrganizations()`, `useUnits(orgId)`, and `useOrgStats(orgId)`.
-
-### 7.7 UnitDashboard (`/admin/units/:unitId`)
-
-The main working screen for any admin. Premium dark-mode layout.
-
-**Hero header:**
-- Gradient radial glow background
-- Large unit avatar icon
-- Unit name, org name, role badge (Org Owner / Command / Observer)
-- Unit description (if set)
-- 3 quick stat pills: Upcoming sessions · Total sessions · Live Today
-
-**Sticky action bar:**
-- **Members** — primary CTA navigates to unit member roster
-- **New Event** — visible to owners/creators; opens create-event bottom-sheet modal
-- QR code icon — opens unit calendar QR
-- ⚙️ Settings — opens unit settings modal (name, description, delete unit)
-- 👤 Manage Admins — visible to super admins only
-
-**Event cards** — dark cards with colour-coded accent per status:
-- Purple = active today   |   Green = upcoming   |   Grey = past
-
-Sections: Upcoming Events and Past Events with counts. Empty state has a dashed-border placeholder with a "Create Event" CTA.
-
-Uses `useServices(unitId)`, `useUnitAdmins(unitId)`, `useUnits(orgId)`.
-
-### 7.8 UnitMembers (`/admin/units/:unitId/members`)
-
-Premium dark-mode member management. Sticky header with back button, "Unit Members" title, and unit/org subtitle.
-
-**Header toolbar:**
-- Full-width search bar (debounced 400 ms, clears on ×)
-- **Import CSV** and **Add Member** side-by-side action buttons (owner/command only)
-
-**Member list rows** (grouped by section in a dark surface card):
-- Coloured avatar initials derived from member name
-- Name + retired badge + 🎂 birthday today badge
-- Section label + phone in subdued row
-- Edit ✏️ and Delete 🗑️ icons (always visible on mobile, on hover for desktop)
-- Tap row → `MemberDetail`
-
-**Load more:** Paginated 50 per page; "Load more" button at list bottom.
-
-**Bottom nav** (mobile only): Dashboard · Units · **Members** (active) · Events
-
-**Panel state machine:** `type Panel = 'none' | 'add' | 'import'`. Both panels are bottom-sheet modals.
-
-**Add/Edit member modal:** Name, phone, section, status (`active`/`inactive`), birthday — shared form for create and update.
-
-**CSV import modal:**
-1. Choose file → client-side `parseCsv()` parses quoted fields, optional header, skips blank-name rows.
-2. **Duplicate detection** via `detectDuplicate()` (`src/lib/nameUtils.ts`):
-   - `exact` — identical name (normalised): row highlighted red, will be skipped on import.
-   - `fuzzy` — similar name (Levenshtein distance): row highlighted amber, shown as a warning.
-3. Preview table with duplicate badges and skipped-row count.
-4. **Import N members** batch-inserts all non-exact rows; success screen shows count.
-5. **Download Template** button generates a sample CSV.
-
-Expected CSV columns (phone/section/status/birthday optional):
-```
-Name,Phone,Section,Status,Birthday
-Alice Johnson,+2348001234567,Soprano,active,1990-05-14
-Bob Smith,,Bass,active,1985-11-20
-```
-
-### 7.9 MemberDetail (`/admin/units/:unitId/members/:memberId`)
-
-Per-member attendance history. Three parallel Supabase queries on mount:
-
-```typescript
-Promise.all([
-  supabase.from('members').select('*').eq('id', memberId).single(),
-  supabase.from('services').select('*').eq('unit_id', unitId).order('date', { ascending: false }),
-  supabase.from('attendance').select('service_id, checkin_time').eq('member_id', memberId),
-])
-```
-
-**Stat cards:** Attended · Total Events · Attendance Rate (colour-coded ≥75% green / ≥50% amber / <50% red) · Current Streak
-
-**Birthday badge:** If today is the member's birthday, a 🎂 celebratory banner is displayed at the top of their profile page.
-
-**Recent trend:** Last ≤10 past events as coloured dots (filled green = attended, red border = absent).
-
-**Full event history table** — all events most-recent-first with status badge and check-in time.
-
-### 7.10 AdminEventDetail (`/admin/units/:unitId/events/:serviceId`)
-
-Attendance view for one event.
-
-**Data sources:**
-- `useAdminDashboard(serviceId)` — `get_service_members_full` RPC + `attendance` table in parallel. `checked_in` is re-derived from the `attendedMap` (not from the RPC) for Realtime consistency.
-- Inline `useEffect` for the event record itself.
-
-**Realtime:** Subscribes to `postgres_changes` on `attendance` filtered by `service_id`.
-
-**Tabs:** `absent | present | all`. Default is `absent`.
-
-**Export (absent members only):**
-
-| Format | Details |
+| Function | Checks |
 |---|---|
-| TXT | Box border using `─` rules; columnar layout with `padEnd` |
-| CSV | UTF-8 BOM (`\uFEFF`); summary header block above data rows; all cells quoted |
-| RTF | Proper table with `\trowd`/`\cellx`; bold header; blue title; A4 margins |
-
-**QR Code:** Collapsed by default. Toggle shows/hides the `QRCodeCanvas`. PNG download available.
-
----
-
-## 8. Birthday Notification System
-
-`useBirthdayNotifications` (`src/hooks/useBirthdayNotifications.ts`) fetches members with birthdays in the next 7 days (or today), sorted soonest-first. It polls every 6 hours and supports client-side dismissal.
-
-`NotificationBell` (`src/components/NotificationBell.tsx`) renders a bell icon with a red badge count in the UnitDashboard header. Clicking it opens a dropdown listing upcoming birthday members. Dismissed notifications are stored in `localStorage` keyed by `memberId + year` so they re-appear next year.
-
-Birthday indicators:
-- 🎂 **list badge** — appears next to the member's name in the unit member roster
-- 🎂 **profile banner** — full-width celebration card on the member's detail page
-- 🔔 **notification bell** — in the UnitDashboard header for the next 7 days
+| `is_super_admin()` | `raw_user_meta_data->>'role' = 'superadmin'` |
+| `is_org_member(p_org_id)` | `organization_members` for `auth.uid()` |
+| `is_org_owner(p_org_id)` | `organization_members.role = 'owner'` |
+| `is_org_owner_by_unit(p_unit_id)` | Ownership via unit → org chain |
+| `is_unit_admin(p_unit_id)` | `unit_admins` for `auth.uid()` |
+| `is_org_admin_by_service(p_service_id)` | Org membership via service → unit → org |
+| `is_unit_manager(p_unit_id)` | Unit creator OR org owner |
 
 ---
 
-## 9. PWA & Offline Strategy
+## 6. Authentication & Authorization
 
-`vite-plugin-pwa` generates a Workbox service worker in `generateSW` mode.
+### Auth Strategy
 
-### Precache
-The app shell (HTML, JS bundles, CSS) is precached at install time.
+#### Public users (members checking in)
+- **No authentication required**
+- Access via two anonymous RPCs only: `get_service_members` and `checkin_by_id`
+- Both are `SECURITY DEFINER` functions granted to the `anon` Supabase role
+- Anti-enumeration: `get_service_members` enforces a minimum 3-character search query before returning results
 
-### Runtime cache: member list
-```javascript
-{
-  urlPattern: ({ url }) => url.pathname.includes('/rest/v1/rpc/get_service_members'),
-  handler: 'NetworkFirst',
-  options: {
-    cacheName: 'member-list-cache',
-    networkTimeoutSeconds: 3,
-    expiration: { maxEntries: 30, maxAgeSeconds: 604800 },
-    cacheableResponse: { statuses: [0, 200] },
-  },
+#### Admin users
+- **Email + password** via `supabase.auth.signInWithPassword()`
+- JWTs issued by Supabase Auth, stored in localStorage by the client
+- Role stored in `auth.users.raw_user_meta_data->>'role'`
+  - `'admin'` — standard unit / org admin
+  - `'superadmin'` — global admin (set manually in Supabase dashboard)
+
+### AuthContext
+
+```typescript
+interface AuthContextValue {
+  session: Session | null
+  isSuper: boolean            // true if role === 'superadmin'
+  adminUnits: UnitWithOrg[]   // units where this user appears in unit_admins
+  loading: boolean
+  signIn(email, password): Promise<void>
+  signUp(email, password): Promise<void>
+  signOut(): Promise<void>
+  resetPassword(email): Promise<void>
+  updatePassword(password): Promise<void>
+  refreshPermissions(): Promise<void>
 }
 ```
 
-**How it works in practice:** A member scans a QR code. The service worker tries the network for 3 seconds. If the venue has no signal, the cached member list is returned. The `checkin_by_id` write still requires connectivity (not cached — caching a write would cause duplicate check-ins).
+On mount, `getSession()` runs. If a session exists:
+- `isSuper` is set from `user_metadata.role`
+- If not super: `fetchAdminUnits(userId)` queries `unit_admins` joined to `units` and `organizations`
 
----
-
-## 10. Hooks Reference
-
-### `useAttendance(serviceId)` — `src/hooks/useAttendance.ts`
-Public check-in hook. Returns `{ status, checkedInName, errorMessage, checkIn, reset }`.
-Status values: `idle | loading | success | already_checked_in | not_found | invalid_service | no_service | error`
-
-### `useEventMembers(serviceId)` — `src/hooks/useChoristers.ts`
-Public. Calls `get_service_members` RPC. Returns `{ members: PublicMember[], loading, error }`.
-
-### `useOrganizations()` — `src/hooks/useAdminDashboard.ts`
-Returns `{ orgs, loading, createOrg, updateOrg, deleteOrg, refetch }`.
-
-### `useUnits(orgId)` — `src/hooks/useAdminDashboard.ts`
-Returns `{ units, loading, createUnit, deleteUnit, refetch }`.
-
-### `useOrgStats(orgId)` — `src/hooks/useAdminDashboard.ts`
-Fetches in parallel:
-- Per-unit member counts (`members` table, grouped by `unit_id`)
-- Total org active member count
-- Per-unit session counts in the last 30 days (`services` table)
-- Pending join request count
-
-Returns `{ unitMemberCounts, totalMembers, unitSessionCounts, pendingRequests, loading }`.
-
-### `useServices(unitId)` — `src/hooks/useAdminDashboard.ts`
-Fetches events for a unit ordered `date DESC`. Splits into `upcoming` (date ≥ today) and `past`. Returns `{ upcoming, past, all, loading, createService, refetch }`.
-
-### `useUnitAdmins(unitId)` — `src/hooks/useAdminDashboard.ts`
-Returns `{ admins, loading, addAdmin, removeAdmin }`.
-
-### `useAdminDashboard(serviceId)` — `src/hooks/useAdminDashboard.ts`
-Runs two parallel queries then merges. Sets up Supabase Realtime channel. Returns `{ members, present, absent, total, loading, refetch }`.
-
-### `useBirthdayNotifications(unitId)` — `src/hooks/useBirthdayNotifications.ts`
-Polls every 6 hours for upcoming birthdays (today + next 7 days). Returns `{ notifications, dismiss }`.
-
----
-
-## 11. Component Library
-
-All UI primitives are in `src/components/ui/`.
-
-**`Button`** — `variant: 'primary'|'secondary'|'ghost'`, `size: 'sm'|'md'|'lg'`, `loading` spinner.
-
-**`Input`** — Wraps `<input>` with a `<label>` linked via `htmlFor`/`id` (auto-generated from the label prop).
-
-**`StatCard`** — Used in AdminEventDetail and MemberDetail. Props: `label`, `value`, `color` (`gray | green | amber | red | blue`).
-
-**`ConfirmDialog`** — Reusable dark-mode confirmation modal for destructive actions (delete unit, delete member, etc.).
-
-**`NotificationBell`** — Birthday notification bell with badge count and dismiss support.
-
----
-
-## 12. End-to-End Testing
-
-### Infrastructure
-Tests live in `tests/e2e/`. All Supabase API calls are intercepted via Playwright's `page.route()`. The dev server (`npm run dev`) runs during tests.
+### Role Hierarchy
 
 ```
-playwright.config.ts
-  testDir: ./tests/e2e
-  fullyParallel: true
-  baseURL: http://localhost:5173
-  webServer: npm run dev (reused if already running)
+Super Admin  (raw_user_meta_data.role = 'superadmin')
+  └─ Full access to all orgs, units, members, services, and admin management
+
+Org Owner  (organization_members.role = 'owner')
+  └─ Full CRUD on all units within their org
+  └─ Can approve / reject join requests
+  └─ Sees all unit dashboards in their org
+  └─ Auto-added to unit_admins for every unit in their org (via trigger)
+
+Org Member  (organization_members.role = 'member')
+  └─ Can create new units (becomes unit admin automatically)
+  └─ Can view the org dashboard
+  └─ Cannot modify other units in the org
+
+Unit Admin  (entry in unit_admins)
+  └─ Full CRUD on that unit's members, services, and attendance
+  └─ Can manage unit settings (name, description)
+  └─ Cannot see other units unless also an org member
 ```
 
-### Mock Architecture (`tests/e2e/helpers.ts`)
+### ProtectedRoute (`AdminRoute`)
 
-**LIFO route priority:** Routes registered *later* take *higher* priority.
+Wraps all `/admin/*` routes. Renders children only if:
+- `session` exists AND
+- `user_metadata.role` is `'admin'` or `'superadmin'`
 
-**Auth injection:** `asSuperAdmin(page)` and `asUnitAdmin(page)` inject a fake session into `localStorage` and mock `auth/v1/token*` for token refreshes.
+Otherwise redirects to `/admin/login`. Renders a loading spinner while `AuthContext.loading` is true.
 
-**Smart mocks (`mockUnitsAll`, `mockServicesAll`, `mockMembersAll`):** Inspect the URL to detect single-record vs list queries; return `application/vnd.pgrst.object+json` for `.single()` queries.
+---
 
-**Critical regex for smart mocks:** Use `/[?&]id=eq\./.test(url)` — **not** `url.includes('id=eq.')` (the substring match also triggers on `unit_id=eq.`).
+## 7. Core Features
 
-**Fixed IDs in `helpers.ts`:**
+### 7.1 QR Code Check-In
+
+The primary user-facing feature. Flow:
+
+1. Admin creates a service, opens `AdminServiceDetail`, clicks the QR code to download / display it
+2. `qrcode.react` renders a QR encoding the URL `/checkin?service_id=<uuid>`
+3. Member scans with any camera app → browser opens `/checkin?service_id=<uuid>`
+4. `service_id` is saved to `sessionStorage` as `pending_service_id` (survives magic-link redirects)
+5. Member types ≥3 characters → `useServiceMembers` fires `get_service_members` RPC
+6. Member taps their name → confirmation screen ("Is this you?")
+7. Taps "Yes, check me in" → `useAttendance.checkIn(memberId)`:
+   - Acquires geolocation (non-blocking; fails gracefully if denied)
+   - Reads or creates `rollcally_device_id` in `localStorage`
+   - Calls `checkin_by_id` RPC
+8. Success screen ("You're in!") with venue name and timestamp
+
+**Return-visitor shortcut:** On successful check-in, `memberId` is stored as `rollcally_member_id` in `localStorage`. On the next visit, the welcome screen shows "Welcome back, \<name\>", skipping the search step.
+
+**Anti-abuse mechanisms:**
+
+- **Device locking:** Each device gets a UUID stored in `localStorage`. The DB tracks which member last used each device UUID. A different member attempting to check in from the same device is blocked with `device_locked`.
+- **Geofencing:** If the unit has `latitude`, `longitude`, and `radius_meters` configured, the `checkin_by_id` RPC computes a Haversine distance server-side. If the member is outside the radius, the RPC returns `{ success: false, error: 'too_far', distance }`.
+
+### 7.2 Admin Dashboard
+
+`/admin` adapts to the user's role:
+
+- **Super admin:** "System Overview" heading; sees all organisations across all tenants
+- **Org owner / member:** Sees only their own organisations with role badges
+- **Unit-only admin (no org):** If `adminUnits.length === 1` and `orgs.length === 0`, automatically redirects to `/admin/units/:id` (skip the dashboard entirely)
+
+Organisation cards show analytics from `useOrgStats`: total active members, unit count, sessions in the last 30 days.
+
+A `visibilitychange` event listener on the dashboard refetches the org list whenever the browser tab regains focus — ensuring an admin who just approved a join request in another tab sees the result immediately.
+
+### 7.3 Realtime Attendance Tracking
+
+`AdminServiceDetail` opens two Supabase Realtime channels on the `attendance` table filtered to `service_id`:
+
+- **INSERT event:** Marks the member as present, updates `checkin_time` in state
+- **DELETE event:** Marks the member as absent
+
+The `markAttendance(memberId, present)` function in `useAdminDashboard` also performs an **optimistic update** before the Realtime echo arrives, giving the admin instantaneous UI feedback. The Realtime event reconciles state for any admin who didn't perform the action themselves (e.g. a second admin on a different device).
+
+### 7.4 Member Roster & CSV Import
+
+`UnitMembers` provides:
+
+- Paginated member list (50/page) grouped alphabetically by section
+- Live search (400 ms debounce) by name or section
+- Add / edit / delete individual members via a modal form
+- **CSV bulk import:**
+  1. Client-side CSV parsing; expected columns: `Name`, `Phone`, `Section`, `Status`, `Birthday`
+  2. Each row checked against the existing roster via `detectDuplicate()` (`nameUtils.ts`):
+     - `exact` — normalised names match (accent-stripped, lowercase, whitespace-collapsed)
+     - `fuzzy` — one normalised name is a substring of the other
+  3. Preview table with colour-coded duplicate warnings shown before any data is written
+  4. On confirm: non-duplicate rows are bulk-inserted; exact duplicates are skipped silently
+  5. "Transfer Complete!" screen shows imported / skipped counts
+
+Birthday date is stored as a `date` column. A 🎂 emoji appears on member rows where today's month and day match the member's stored birthday.
+
+### 7.5 Per-Member Analytics
+
+`MemberDetail` computes attendance statistics from joined `services` + `attendance` queries:
+
+| Stat | Computation |
+|---|---|
+| Attended / Total | Count of attendance rows vs count of services for the unit |
+| Attendance Rate | `(attended / total) * 100` |
+| Current Streak | Consecutive most-recent services with an attendance record |
+| Activity heatmap | Last 10 services rendered as coloured squares (green = present) |
+| Full history | Chronological list of all services with check-in time or "Absent" |
+
+### 7.6 Birthday Notifications
+
+`useBirthdayNotifications(unitId)` polls `get_pending_notifications` every 5 minutes. The `member_notifications` table stores pre-computed rows when:
+
+- `type = 'birthday_eve'` — fire the day before a member's birthday
+- `type = 'birthday_day'` — fire on the member's birthday
+
+`NotificationBell` renders as a floating bell with a count badge. Clicking it expands a dropdown listing each upcoming birthday. Each can be dismissed individually, which sets `dismissed = true` on the row.
+
+### 7.7 Absence Export
+
+Visible from `AdminServiceDetail` when the "Absent" tab is active. Three formats generated entirely client-side:
+
+| Format | Description |
+|---|---|
+| **TXT** | Plain-text table with name and section |
+| **CSV** | UTF-8 BOM prefixed (Excel-compatible), columns: Name, Section, Phone |
+| **RTF** | Word-compatible document with a formatted table layout |
+
+All formats trigger a browser file download using a `<a>` element with an object URL.
+
+### 7.8 Organisation Discovery & Join Flow
+
+1. Admin visits `/admin/discover`
+2. Searches organisations by name (`ilike` query)
+3. Each result shows current join status (pending / not requested)
+4. "Request Access" → INSERT into `join_requests` with `status = 'pending'`
+5. Org owner sees pending requests in `OrgDetail` → "Requests" tab (via `get_org_join_requests` RPC which joins `auth.users` for email visibility)
+6. Owner approves → INSERT into `organization_members` with `role = 'member'`
+7. Approved member sees the org on their dashboard after tab refocus (via `visibilitychange` listener)
+
+---
+
+## 8. API / RPC Layer
+
+All database access uses the `supabase-js` client (PostgREST). Custom business logic lives in PostgreSQL RPC functions.
+
+### Anonymous RPCs (granted to `anon` role)
+
+#### `get_service_members(p_service_id uuid, p_search text)`
+
+Returns `PublicMember[]` — `{ id, name, section }` only. No phone, no birthday.
+**Constraint:** `p_search` must be ≥3 characters (enforced in RPC body; returns empty array otherwise).
+**Purpose:** Allows members to find themselves without exposing the full roster.
+
+#### `checkin_by_id(p_member_id uuid, p_service_id uuid, p_device_id text, p_lat float8, p_lng float8)`
+
+Returns `{ success: boolean, error?: string, distance?: float8 }`
+
+Server-side logic:
+1. Validates member is active and belongs to the service's unit
+2. If unit has geofence configured → Haversine distance check; returns `too_far` if outside
+3. Checks `attendance` table for prior device usage by a different member → returns `device_locked`
+4. `INSERT INTO attendance` → if unique violation (23505) returns `already_checked_in`
+5. On success → returns `{ success: true }`
+
+### Authenticated RPCs (granted to `authenticated` role)
+
+#### `get_service_members_full(p_service_id uuid, p_limit int, p_offset int)`
+
+Returns `DashboardMember[]` — `{ id, name, phone, section, checked_in, checkin_time }`.
+**Auth:** Verified via `is_org_admin_by_service(p_service_id)`. Returns nothing if caller has no access.
+**Pagination:** `p_limit` = 100 (PAGE_SIZE), `p_offset` increments by 100 per page.
+
+#### `get_org_join_requests(p_org_id uuid)`
+
+Returns rows with `{ id, organization_id, admin_id, admin_email, status, created_at }`.
+**Auth:** Silently returns zero rows for non-owners (`is_org_owner(p_org_id)` checked in WHERE clause).
+**Requires SECURITY DEFINER** to JOIN against `auth.users` for the email column.
+
+#### `add_unit_admin_by_email(p_unit_id uuid, p_email text)`
+
+Returns `{ success: boolean, error?: string }`.
+**Auth:** Super admin only.
+Looks up the user by email in `auth.users`, inserts into `unit_admins`.
+
+#### `get_pending_notifications(p_unit_id uuid)`
+
+Returns `MemberNotification[]` where `dismissed = false` and `fire_at <= now()`.
+**Auth:** Unit admins and org owners.
+
+---
+
+## 9. State Management Strategy
+
+Rollcally uses **React hooks + context exclusively**. No Redux, Zustand, or external state library.
+
+### Pattern: Data-fetching hook with local state
+
 ```typescript
-IDS.service     // upcoming event (date: 2026-03-10)
-IDS.servicePast // past event    (date: 2026-03-05)
-IDS.member1     // Alice Johnson — active, Soprano, with phone, with birthday
-IDS.member2     // Bob Smith    — active, Bass, no phone
+export function useUnits(orgId: string | null) {
+  const [units, setUnits] = useState<Unit[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const fetch = useCallback(async () => {
+    if (!orgId) { setUnits([]); setLoading(false); return }
+    const { data } = await supabase.from('units').select('*').eq('org_id', orgId)
+    setUnits(data ?? [])
+    setLoading(false)
+  }, [orgId])
+
+  useEffect(() => { setLoading(true); fetch() }, [fetch])
+
+  async function createUnit(name: string) {
+    const { data, error } = await supabase.from('units').insert(...).select().single()
+    if (error) throw error
+    setUnits(prev => [...prev, data].sort(...))  // optimistic local update
+    return data
+  }
+
+  return { units, loading, createUnit, refetch: fetch }
+}
 ```
 
-### Running Tests
-```bash
-npm run test           # headless
-npm run test:ui        # Playwright UI mode
-npm run test:report    # Open last HTML report
+All mutation functions:
+- Call the Supabase API
+- Throw on error (callers handle in try/catch and fire toasts)
+- Perform an optimistic local state update so the UI doesn't wait for a refetch
+
+### Global Contexts
+
+| Context | Responsibility |
+|---|---|
+| `AuthContext` | Session, `isSuper`, `adminUnits`; stable across all pages |
+| `ToastContext` | Global toast queue — `toast(message, type)` callable from any hook or component |
+
+`ToastProvider` wraps the entire app (outermost provider), making `useToast()` available everywhere, including inside hooks that need to surface silent failures.
+
+### Error surfacing
+
+Previously silent `console.error` catches in `useAdminDashboard` and `useOrganizations` now call `useToast()` directly:
+
+```typescript
+// useAdminDashboard.ts
+const { toast } = useToast()
+// ...
+if (error) {
+  toast('Failed to load attendance data. Please refresh.', 'error')
+  setLoading(false)
+  return
+}
 ```
+
+### Error Boundaries
+
+Each route is wrapped with `<ErrorBoundary label="...">`. If a page throws during render, a fallback card is displayed with "Try again" (resets boundary state) and "Go home" (navigates to `/`). The error is logged with `console.error` including the boundary label.
 
 ---
 
-## 13. Known Issues & Technical Debt
+## 10. Realtime & Background Processing
 
-### Unit Admin Email Display
-`useUnitAdmins` returns `email: '—'` for all admins because querying `auth.users` from a client-side request requires the service role key (which must never be exposed client-side). To show emails, implement a Supabase Edge Function with service role access.
+### Supabase Realtime Subscription
 
-### Check-in Write Offline
-The `checkin_by_id` RPC write requires live network connectivity. If a user is fully offline, the check-in attempt will fail. A future improvement could queue the write with a background sync service worker, but this requires careful deduplication logic.
+`useAdminDashboard(serviceId)` in `src/hooks/useAdminDashboard.ts`:
+
+```typescript
+supabase
+  .channel(`attendance-${serviceId}`)
+  .on('postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'attendance',
+      filter: `service_id=eq.${serviceId}` },
+    ({ new: rec }) => setMembers(prev =>
+      prev.map(m => m.id === rec.member_id
+        ? { ...m, checked_in: true, checkin_time: rec.checkin_time }
+        : m)
+    )
+  )
+  .on('postgres_changes',
+    { event: 'DELETE', ... },
+    ({ old }) => setMembers(prev =>
+      prev.map(m => m.id === old.member_id
+        ? { ...m, checked_in: false, checkin_time: null }
+        : m)
+    )
+  )
+  .subscribe()
+```
+
+The `useEffect` return function calls `supabase.removeChannel(channel)` to clean up on unmount.
+
+### Birthday Notification Polling
+
+`useBirthdayNotifications` uses `setInterval` with a 5-minute interval (300,000 ms). Polling is used rather than Realtime because:
+- Birthday notifications are low-frequency (at most a handful per day)
+- The `fire_at` timestamp logic is simpler to query than subscribe to
+- The interval is cleared via `clearInterval` on unmount
+
+### Tab Visibility Refresh
+
+`AdminDashboard` registers:
+```typescript
+window.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refetch()
+})
+```
+
+This catches stale org lists after a join-request approval happens in another browser tab. The listener is cleaned up in the `useEffect` return.
 
 ---
 
-## 14. Setup Instructions for a New Environment
+## 11. PWA & Offline Strategy
 
-### 1. Supabase project
+### Service Worker
 
-Create a new Supabase project. Run `supabase/schema.sql` in the SQL Editor.
+Generated by `vite-plugin-pwa` in `generateSW` mode. Configuration in `vite.config.ts`.
 
-### 2. Environment variables
+**Pre-cache (app shell):** All JS, CSS, HTML, ICO, PNG, SVG, WOFF2 assets matched by `globPatterns`. The app loads instantly from cache on every return visit.
 
-```bash
-cp .env.example .env.local
+**Runtime caching:**
+
+| URL Pattern | Strategy | Method | Max Age | Purpose |
+|---|---|---|---|---|
+| `*/rpc/get_service_members*` | NetworkFirst | **POST** | 7 days | Offline roster for check-in |
+| `fonts.googleapis.com/*` | CacheFirst | GET | 365 days | Font stylesheets |
+| `fonts.gstatic.com/*` | CacheFirst | GET | 365 days | Font files |
+
+The `method: 'POST'` field on the member-list rule is essential — Supabase RPC calls are HTTP POST. Without this field, Workbox silently ignores the rule for every check-in roster request.
+
+**NetworkFirst with 3 s timeout:** The service worker attempts the network first. If the response doesn't arrive within 3 seconds, it falls back to the cached response. If there is no cached response (first-ever visit in this context), the fetch fails and the user sees an error.
+
+### Offline Behaviour by Page
+
+| Page | Offline behaviour |
+|---|---|
+| `/checkin` | Works if the roster was previously searched on this device (cached POST response) |
+| `/` (Landing) | Fully available (pre-cached app shell) |
+| `/admin/*` | Not available offline — admin pages require live DB queries |
+
+The `checkin_by_id` RPC requires network connectivity; check-in writes cannot be queued offline.
+
+### Manifest
+
+```json
+{
+  "name": "Rollcally",
+  "short_name": "Rollcally",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#121121",
+  "background_color": "#121121",
+  "shortcuts": [
+    { "name": "Check In",        "url": "/checkin" },
+    { "name": "Admin Dashboard", "url": "/admin"   }
+  ]
+}
 ```
-Fill in:
-```
-VITE_SUPABASE_URL=https://<project-ref>.supabase.co
-VITE_SUPABASE_ANON_KEY=<anon-key>
-```
 
-### 3. Promote a super admin
-
-```sql
-UPDATE auth.users
-SET raw_user_meta_data = raw_user_meta_data || '{"role":"superadmin"}'::jsonb
-WHERE email = 'your@email.com';
-```
-
-### 4. Enable Realtime
-
-Supabase → Database → Replication → enable the `attendance` table.
-
-### 5. Install and run
-
-```bash
-npm install
-npx playwright install --with-deps chromium   # for E2E tests
-npm run dev                                    # start dev server
-npm run test                                   # run all E2E tests
-npm run build                                  # production build → dist/
-```
+Installable on iOS Safari ("Add to Home Screen") and Android Chrome. `display: standalone` removes browser chrome for a native-app feel.
 
 ---
 
-## 15. Architecture Decisions & Rationale
+## 12. Testing Strategy
 
-**Why Supabase RPC for check-in instead of a direct `INSERT`?**
-The `checkin_by_id` RPC validates member-service unit membership, checks for duplicates at the database level, and returns a structured result in a single round trip. It also keeps the `attendance` table's INSERT policy closed to `anon`.
+### E2E Tests (Playwright)
 
-**Why re-derive `checked_in` from the `attendance` table in `useAdminDashboard`?**
-The `get_service_members_full` RPC is a SQL snapshot. The Realtime subscription delivers new `attendance` rows, not a re-run of the RPC. Re-deriving from `attendedMap` keeps the update logic simple.
+All tests use **Playwright route interception** — no real Supabase instance is required. The Vite dev server is started by Playwright's `webServer` config.
 
-**Why magic link auth?**
-Target users (choir directors, church administrators) are non-developers. Magic links have one step: enter email → tap link. `shouldCreateUser: false` ensures only pre-registered addresses can authenticate.
+**Test files:**
 
-**Why `application/vnd.pgrst.object+json` for single-record mocks?**
-Supabase JS v2 reads the `Content-Type` header to decide object vs array. If a mock returns `application/json` for a `.single()` query, the client receives `null` data.
+| File | Scenarios covered |
+|---|---|
+| `checkin.spec.ts` | Member list, section grouping, search, confirmation flow, success / error / already-in screens |
+| `checkin-failures.spec.ts` | Too-far error, device-locked error, offline network abort, QR scan URL update, sessionStorage persistence |
+| `admin-dashboard.spec.ts` | Dashboard load, empty state, org creation modal, unit-admin single-unit redirect |
+| `admin-features.spec.ts` | Realtime attendance via custom window event, 100-member pagination, birthday banner, mobile tap targets (WCAG 44 px minimum), vertical scroll |
+| `csv-import.spec.ts` | Exact duplicate detection, fuzzy duplicate detection, transfer-complete screen |
+| `org-workflow.spec.ts` | Org creation → dashboard, join-request pending/approved, non-owner creates unit, org-owner CRUD access |
 
-**Why `NetworkFirst` (not `CacheFirst`) for the member list?**
-`CacheFirst` would serve a stale list indefinitely. `NetworkFirst` with a 3-second timeout always tries fresh data; the cache is only the fallback. 7-day TTL covers the weekly event cycle.
+**Total: 36 tests — all passing.**
 
-**Why merge attendance history client-side in MemberDetail?**
-Three separate RLS-scanned queries are small (typically < 200 services per unit). A dedicated RPC would require additional SQL maintenance. The client-side merge is O(n) and fully auditable in TypeScript.
+**Mock helpers (`tests/e2e/helpers.ts`):**
+- `asSuperAdmin(page)` / `asOrgMember(page)` — inject auth session via route intercept
+- `silenceRealtime(page)` — stub WebSocket connections so tests don't hang
+- `mockGetServiceMembersFull`, `mockServiceLookup`, `mockAttendanceWithAlice`, etc.
 
-**Why UTF-8 BOM in the CSV export?**
-Windows Excel detects encoding from the BOM. Without it, non-ASCII characters (accented and African names) render as mojibake.
+### Coverage Gaps
 
-**Why CSS custom properties (design tokens) for the dark theme?**
-Consistent use of `--color-background-dark`, `--color-surface-dark`, `--color-border-dark`, `--color-primary` as CSS variables allows the entire dark theme to be maintained in one place (`index.css`) rather than scattered Tailwind classes.
-
----
-
-## 16. Suggested Next Steps
-
-1. **Event close / lock:** A `closed_at` column on `services` that prevents new check-ins and shows "event closed" on the check-in page.
-
-2. **Unit admin email display:** A Supabase Edge Function (`/functions/v1/admin-users`) that uses the service role key to look up user emails by ID.
-
-3. **Background sync for offline check-in:** Register a Workbox `BackgroundSyncPlugin` on the `checkin_by_id` route so that writes made while offline are replayed when connectivity resumes.
-
-4. **Absence notifications:** Send an SMS/WhatsApp to absent members with a phone number — a Supabase Edge Function triggered after a service closes.
-
-5. **Attendance trend dashboard (org-level):** A unit-level aggregate card showing attendance rate across all members over a sliding date window — a `GROUP BY` on the attendance and services tables.
-
-6. **Push notifications:** Web Push API integration so administrators receive birthday or absence alerts even when the app is not open.
+| Gap | Risk |
+|---|---|
+| No unit tests (Jest/Vitest) for hooks or utilities | Logic errors in `nameUtils`, `useAttendance` state machine uncaught until E2E |
+| No authentication flow E2E tests | Login, signup, password reset untested end-to-end |
+| No RLS policy integration tests | Requires a live Supabase project; security posture unverifiable in CI |
+| No service worker / offline simulation tests | Workbox behaviour assumed correct |
+| No Sentry / error monitoring | Runtime failures in production are invisible |
+| No accessibility automated tests | Only tap-target size (44 px) is checked |
 
 ---
 
-*Document updated March 2026. App name: Rollcally.*
+## 13. Known Limitations
+
+### Security
+
+1. **Device ID spoofable.** `rollcally_device_id` lives in `localStorage`. Clearing browser storage generates a fresh UUID, bypassing device locking. This is a known limitation of client-side device fingerprinting.
+
+2. **Geofencing is opt-in.** Units without `latitude`/`longitude`/`radius_meters` have zero location enforcement. Admins must configure this manually per unit.
+
+3. **No server-side rate limiting on anonymous RPCs.** `get_service_members` and `checkin_by_id` are publicly callable. The 3-character search minimum reduces enumeration risk, but there is no per-IP rate limit in application code (Supabase's platform limits apply).
+
+4. **Super admin promotion is manual.** `role: 'superadmin'` must be set in Supabase dashboard `raw_user_meta_data`. There is no in-app promotion flow.
+
+### Architecture
+
+5. **`useAdminDashboard.ts` is a god-hook file.** Six unrelated hooks (`useOrganizations`, `useUnits`, `useUnitAdmins`, `useServices`, `useAdminDashboard`, `useOrgStats`) live in one file. Not a runtime bug, but increases cognitive load and import surface.
+
+6. **Offline check-in is search-dependent.** Workbox caches responses to prior search queries. A member whose name has never been searched on a given device cannot check in when offline.
+
+7. **CSV import is client-side only.** Very large CSV files could cause UI jank. There is no server-side validation or streaming.
+
+8. **No soft deletes.** Deleting a member, unit, or organisation is a hard `DELETE` with cascade. Historical attendance data is permanently destroyed with no audit trail.
+
+9. **Birthday notification population mechanism not in application code.** The `member_notifications` table is consumed by `useBirthdayNotifications`, but the rows must be created by an external cron job or database trigger. This mechanism is not visible in the app-layer source.
+
+10. **Bundle size.** The production JS bundle is ~925 KB (252 KB gzipped). No code splitting is implemented. All admin routes load eagerly even for public check-in visitors.
