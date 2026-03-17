@@ -290,6 +290,16 @@ export function useAdminDashboard(serviceId: string | null) {
           )
         },
       )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'attendance', filter: `service_id=eq.${serviceId}` },
+        (payload) => {
+          const old = payload.old as { member_id: string }
+          setMembers(prev =>
+            prev.map(m => m.id === old.member_id ? { ...m, checked_in: false, checkin_time: null } : m),
+          )
+        },
+      )
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [serviceId])
@@ -303,6 +313,33 @@ export function useAdminDashboard(serviceId: string | null) {
   const present = members.filter(m => m.checked_in)
   const absent = members.filter(m => !m.checked_in)
 
+  async function markAttendance(memberId: string, present: boolean) {
+    if (!serviceId) return
+    if (present) {
+      const { error } = await supabase
+        .from('attendance')
+        .insert({
+          service_id: serviceId,
+          member_id: memberId,
+          checkin_time: new Date().toISOString()
+        })
+      if (error && error.code !== '23505') throw error
+    } else {
+      const { error } = await supabase
+        .from('attendance')
+        .delete()
+        .eq('service_id', serviceId)
+        .eq('member_id', memberId)
+      if (error) throw error
+    }
+    // Optimistic update
+    setMembers(prev => prev.map(m => 
+      m.id === memberId 
+        ? { ...m, checked_in: present, checkin_time: present ? new Date().toISOString() : null } 
+        : m
+    ))
+  }
+
   return { 
     members, 
     present, 
@@ -312,6 +349,7 @@ export function useAdminDashboard(serviceId: string | null) {
     loadingMore, 
     hasMore, 
     loadMore, 
+    markAttendance,
     refetch: () => fetchMembers(0, true) 
   }
 }

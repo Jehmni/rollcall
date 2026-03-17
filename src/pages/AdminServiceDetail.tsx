@@ -116,7 +116,7 @@ export default function AdminServiceDetail() {
   const [tab, setTab] = useState<Tab>('all')
   const [search, setSearch] = useState('')
 
-  const { present, absent, total, loading, loadingMore, hasMore, loadMore, refetch } = useAdminDashboard(serviceId ?? null)
+  const { present, absent, total, loading, loadingMore, hasMore, loadMore, markAttendance, refetch } = useAdminDashboard(serviceId ?? null)
   const attendanceRate = total > 0 ? Math.round((present.length / total) * 100) : 0
   const qrUrl = serviceId ? `${window.location.origin}/checkin?service_id=${serviceId}` : ''
 
@@ -401,32 +401,51 @@ export default function AdminServiceDetail() {
                             <p className="text-xs text-slate-400">{m.phone ?? 'No contact'}</p>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                          {m.checked_in ? (
-                            <>
-                              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-500 uppercase">Checked In</span>
-                              {m.checkin_time && (
-                                <p className="text-[10px] text-slate-500">
-                                  {new Date(m.checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </p>
-                              )}
-                            </>
-                          ) : (
-                            <>
-                              <span className="rounded-full bg-rose-500/10 px-2 py-0.5 text-[10px] font-bold text-rose-500 uppercase">Absent</span>
-                              {m.phone ? (
-                                <a
-                                  href={`tel:${m.phone}`}
-                                  onClick={e => e.stopPropagation()}
-                                  className="text-[10px] text-primary/60 hover:text-primary transition-colors"
-                                >
-                                  Call
-                                </a>
-                              ) : (
-                                <p className="text-[10px] text-slate-600">No contact</p>
-                              )}
-                            </>
-                          )}
+                        <div className="flex items-center gap-3 flex-shrink-0">
+                          <div className="flex flex-col items-end gap-1">
+                            {m.checked_in ? (
+                              <>
+                                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-500 uppercase">Checked In</span>
+                                {m.checkin_time && (
+                                  <p className="text-[10px] text-slate-500">
+                                    {new Date(m.checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  </p>
+                                )}
+                              </>
+                            ) : (
+                              <>
+                                <span className="rounded-full bg-rose-500/10 px-2 py-0.5 text-[10px] font-bold text-rose-500 uppercase">Absent</span>
+                                {m.phone ? (
+                                  <a
+                                    href={`tel:${m.phone}`}
+                                    onClick={e => e.stopPropagation()}
+                                    className="text-[10px] text-primary/60 hover:text-primary transition-colors"
+                                  >
+                                    Call
+                                  </a>
+                                ) : (
+                                  <p className="text-[10px] text-slate-600">No contact</p>
+                                )}
+                              </>
+                            )}
+                          </div>
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              markAttendance(m.id, !m.checked_in);
+                            }}
+                            className={`size-10 flex items-center justify-center rounded-xl transition-all active:scale-95 border ${
+                              m.checked_in 
+                                ? 'bg-rose-500/10 border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white' 
+                                : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white'
+                            }`}
+                            title={m.checked_in ? "Mark Absent" : "Mark Present"}
+                          >
+                            <span className="material-symbols-outlined text-xl">
+                              {m.checked_in ? 'person_remove' : 'person_check'}
+                            </span>
+                          </button>
                         </div>
                       </div>
                     ))}
