@@ -461,14 +461,6 @@ export default function UnitDashboard() {
           )}
 
           <div className="ml-auto flex items-center gap-2">
-            {/* Unit Calendar (QR Code shortcut) */}
-            <button
-              onClick={() => navigate(`/admin/units/${unitId}/members`)}
-              className="size-11 flex items-center justify-center rounded-xl bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 active:scale-95 transition-all"
-              title="Unit Calendar"
-            >
-              <span className="material-symbols-outlined text-lg">qr_code</span>
-            </button>
 
             {/* Settings */}
             {isOwnerOrCreator && (
