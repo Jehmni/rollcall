@@ -308,9 +308,9 @@ export default function AdminDashboard() {
           >
             <span className="material-symbols-outlined text-xl">arrow_back</span>
           </button>
-          <div className="flex flex-col items-center">
-            <h1 className="text-xl font-extrabold tracking-tighter italic uppercase">ROLLCALLY ADMIN</h1>
-            <p className="text-2xs uppercase tracking-spaced opacity-60 font-medium">Management Hub</p>
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="Rollcally" className="h-8 w-8 object-contain" />
+            <h2 className="text-white text-lg font-bold tracking-tight">Admin</h2>
           </div>
           <div className="flex items-center gap-2">
             <button
