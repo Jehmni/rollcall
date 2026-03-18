@@ -10,26 +10,27 @@ function friendlyError(err: unknown): string {
   const r = raw.toLowerCase()
 
   if (r.includes('schema cache') || r.includes('could not find'))
-    return 'The database is still setting up. Please wait a few seconds and try again.'
+    return "A required database column is missing. Please contact your administrator — they need to run: ALTER TABLE members ADD COLUMN IF NOT EXISTS birthday date; then NOTIFY pgrst, 'reload schema';"
   if (r.includes('row-level security') || r.includes('permission denied') || r.includes('unauthorized'))
-    return "You don't have permission to do this. Make sure you're logged in as a unit admin."
+    return "You don't have permission to add members to this unit. Make sure you are signed in as an admin who manages this unit."
   if (r.includes('jwt expired') || r.includes('session'))
     return 'Your session has expired. Please sign out and sign back in.'
   if (r.includes('duplicate key') || r.includes('unique constraint'))
-    return 'This member already exists in the list.'
+    return 'A member with this name already exists in the list.'
   if (r.includes('null value') && r.includes('name'))
-    return "Please enter the member's full name before saving."
+    return "Full name is required. Please fill in the member's name before saving."
   if (r.includes('invalid input syntax') && r.includes('date'))
-    return 'The birthday format is invalid. Use DD/MM/YYYY or leave it blank.'
+    return 'The birthday is not a valid date. Use DD/MM/YYYY format or leave it blank.'
   if (r.includes('value too long'))
     return 'One of the fields is too long. Please shorten it and try again.'
   if (r.includes('network') || r.includes('failed to fetch') || r.includes('load failed'))
-    return 'Connection problem. Check your internet and try again.'
+    return 'Connection problem. Check your internet connection and try again.'
   if (r.includes('foreign key'))
-    return 'This record is linked to other data and cannot be changed that way.'
+    return 'This record cannot be saved because a linked record does not exist.'
+  if (r.includes('violates check constraint'))
+    return "One of the values entered is not allowed. Make sure Status is 'Active' or 'Inactive'."
 
-  // Fallback: show the raw message but strip technical prefixes
-  return raw.replace(/^error:\s*/i, '').replace(/^[A-Z0-9_]+:\s*/, '') || 'Something went wrong. Please try again.'
+  return raw || 'Something went wrong. Please try again or contact support.'
 }
 
 // ─── CSV import helpers ───────────────────────────────────────────────────────
@@ -324,7 +325,7 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
 
           {error && (
             <div className="flex items-start gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2.5 rounded-xl">
-              <span className="material-icons-round text-base mt-0.5 shrink-0">error_outline</span>
+              <span className="material-symbols-outlined text-base mt-0.5 shrink-0">error_outline</span>
               <span>{error}</span>
             </div>
           )}
@@ -503,7 +504,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
 
               {importError && (
                 <div className="flex items-start gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2.5 rounded-xl">
-                  <span className="material-icons-round text-base mt-0.5 shrink-0">error_outline</span>
+                  <span className="material-symbols-outlined text-base mt-0.5 shrink-0">error_outline</span>
                   <span>{importError}</span>
                 </div>
               )}
