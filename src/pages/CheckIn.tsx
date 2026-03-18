@@ -295,6 +295,10 @@ export default function CheckIn() {
                     <span className="material-symbols-outlined text-4xl text-slate-600">search_off</span>
                     <p className="text-sm font-semibold text-slate-400 text-center">No members match <span className="text-white">"{query}"</span></p>
                     <p className="text-2xs text-slate-600 text-center">Check the spelling or try a different name.</p>
+                    <div className="mt-4 pt-4 border-t border-primary/10 w-full text-center">
+                      <p className="text-xs text-slate-500 font-medium italic">Not in the system?</p>
+                      <p className="text-2xs text-slate-600 mt-1 max-w-[200px] mx-auto leading-relaxed">Please locate the nearest official to be added to the unit roster.</p>
+                    </div>
                   </div>
                 )}
                 {Object.entries(grouped).map(([section, sectionMembers]) => (

@@ -81,8 +81,9 @@ export default function AdminLogin() {
               <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <span className="material-symbols-outlined text-primary text-5xl relative z-10">shield_person</span>
             </div>
-            <h3 className="text-white tracking-tight text-2xl font-display font-bold leading-tight uppercase italic">
-              ROLLCALLY ADMINISTRATOR PORTAL
+            <h3 className="text-white tracking-tight text-2xl font-display font-bold leading-tight flex items-center justify-center gap-3">
+              <img src="/logo.png" alt="Rollcally" className="h-8 w-8 object-contain" />
+              <span>Admin Portal</span>
             </h3>
             <p className="text-slate-400 mt-3 text-sm font-medium tracking-tight">Secure access for organization managers</p>
           </div>
