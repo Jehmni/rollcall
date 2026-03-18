@@ -4,6 +4,34 @@ import { supabase } from '../lib/supabase'
 import type { Member, MemberStatus } from '../types'
 import { detectDuplicate, type DuplicateStatus } from '../lib/nameUtils'
 
+// ─── Friendly error translator ───────────────────────────────────────────────
+function friendlyError(err: unknown): string {
+  const raw = (err as { message?: string })?.message ?? ''
+  const r = raw.toLowerCase()
+
+  if (r.includes('schema cache') || r.includes('could not find'))
+    return 'The database is still setting up. Please wait a few seconds and try again.'
+  if (r.includes('row-level security') || r.includes('permission denied') || r.includes('unauthorized'))
+    return "You don't have permission to do this. Make sure you're logged in as a unit admin."
+  if (r.includes('jwt expired') || r.includes('session'))
+    return 'Your session has expired. Please sign out and sign back in.'
+  if (r.includes('duplicate key') || r.includes('unique constraint'))
+    return 'This member already exists in the list.'
+  if (r.includes('null value') && r.includes('name'))
+    return "Please enter the member's full name before saving."
+  if (r.includes('invalid input syntax') && r.includes('date'))
+    return 'The birthday format is invalid. Use DD/MM/YYYY or leave it blank.'
+  if (r.includes('value too long'))
+    return 'One of the fields is too long. Please shorten it and try again.'
+  if (r.includes('network') || r.includes('failed to fetch') || r.includes('load failed'))
+    return 'Connection problem. Check your internet and try again.'
+  if (r.includes('foreign key'))
+    return 'This record is linked to other data and cannot be changed that way.'
+
+  // Fallback: show the raw message but strip technical prefixes
+  return raw.replace(/^error:\s*/i, '').replace(/^[A-Z0-9_]+:\s*/, '') || 'Something went wrong. Please try again.'
+}
+
 // ─── CSV import helpers ───────────────────────────────────────────────────────
 
 interface CsvRow {
@@ -294,7 +322,12 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
             </label>
           </div>
 
-          {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
+          {error && (
+            <div className="flex items-start gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2.5 rounded-xl">
+              <span className="material-icons-round text-base mt-0.5 shrink-0">error_outline</span>
+              <span>{error}</span>
+            </div>
+          )}
 
           <div className="flex gap-3 justify-end pt-2">
             <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-xl hover:bg-border-dark transition-colors">Cancel</button>
@@ -468,7 +501,12 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
                 </table>
               </div>
 
-              {importError && <p className="text-sm text-red-400">{importError}</p>}
+              {importError && (
+                <div className="flex items-start gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2.5 rounded-xl">
+                  <span className="material-icons-round text-base mt-0.5 shrink-0">error_outline</span>
+                  <span>{importError}</span>
+                </div>
+              )}
 
               <div className="flex items-center justify-between gap-3">
                 <button onClick={onChooseFile} className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
@@ -630,8 +668,7 @@ export default function UnitMembers() {
       }
       closeForm()
     } catch (err: unknown) {
-      const msg = (err as { message?: string })?.message
-      setFormError(msg || 'Failed to save. Check your connection and try again.')
+      setFormError(friendlyError(err))
     } finally { setSaving(false) }
   }
 
@@ -683,8 +720,7 @@ export default function UnitMembers() {
       ))
       setImportDone(inserted.length); setCsvRows([])
     } catch (err: unknown) {
-      const msg = (err as { message?: string })?.message
-      setImportError(msg || 'Import failed. Check your connection and try again.')
+      setImportError(friendlyError(err))
     } finally { setImporting(false) }
   }
 

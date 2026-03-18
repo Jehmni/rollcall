@@ -755,8 +755,14 @@ $$;
 -- ============================================================
 -- REALTIME
 -- Enable realtime on attendance so the admin dashboard live-updates.
+-- Safe to re-run: silently ignores if already a member of the publication.
 -- ============================================================
-alter publication supabase_realtime add table attendance;
+do $$
+begin
+  alter publication supabase_realtime add table attendance;
+exception when others then
+  null; -- Already a member of the publication — no action needed.
+end $$;
 
 -- ============================================================
 -- PERFORMANCE INDEXES
