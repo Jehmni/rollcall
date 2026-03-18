@@ -133,6 +133,27 @@ function RoleCard({
   )
 }
 
+function CsvColumnRow({ field, required, accepted, example }: { field: string; required: boolean; accepted: string; example: string }) {
+  return (
+    <tr className="border-b border-primary/8 last:border-0 hover:bg-primary/5 transition-colors">
+      <td className="px-4 py-3 align-top">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-bold text-white font-mono">{field}</span>
+          {required && (
+            <span className="text-2xs font-black uppercase tracking-wider text-red-400 bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 rounded-full">Required</span>
+          )}
+        </div>
+      </td>
+      <td className="px-4 py-3 align-top">
+        <p className="text-xs text-slate-400 leading-relaxed">{accepted}</p>
+      </td>
+      <td className="px-4 py-3 align-top">
+        <code className="text-xs text-primary/80 bg-primary/10 px-2 py-0.5 rounded font-mono">{example}</code>
+      </td>
+    </tr>
+  )
+}
+
 function AccordionItem({ question, answer }: { question: string; answer: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   return (
@@ -314,14 +335,128 @@ function AdminsTab() {
         <SectionLabel>Bulk Import</SectionLabel>
         <h3 className="font-display text-xl font-bold italic text-white mb-4">CSV Import</h3>
         <StepFlow steps={[
-          { icon: 'upload_file', title: 'Upload your CSV file', detail: 'Use your existing spreadsheet — save as CSV first.' },
-          { icon: 'preview', title: 'Review the preview', detail: 'Rollcally highlights exact and fuzzy duplicate names before importing.' },
-          { icon: 'check_circle', title: 'Confirm', detail: 'New members are added. Exact duplicates are automatically skipped.' },
+          { icon: 'table', title: 'Prepare your spreadsheet', detail: 'Open your roster in Excel, Google Sheets, or Numbers. Make sure the first row is a header row with column names.' },
+          { icon: 'upload_file', title: 'Export as CSV', detail: 'File → Download → CSV (or Save As → .csv). Column order does not matter — Rollcally reads headers by name.' },
+          { icon: 'preview', title: 'Review the preview', detail: 'Rollcally highlights exact and near-duplicate names in the preview before anything is saved.' },
+          { icon: 'check_circle', title: 'Confirm import', detail: 'Exact duplicates are automatically skipped. New members are added in one go.' },
         ]} />
-        <div className="mt-4 bg-primary/5 border border-primary/10 rounded-2xl p-4 text-sm text-slate-400">
-          <span className="font-bold text-white">Required:</span> Name &nbsp;·&nbsp;
-          <span className="text-slate-500">Optional: Phone, Section, Status, Birthday</span>
+
+        {/* Column reference table */}
+        <div className="mt-6 rounded-2xl border border-primary/15 overflow-hidden">
+          <div className="bg-primary/10 px-4 py-3 border-b border-primary/15 flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-lg">table_chart</span>
+            <span className="text-sm font-bold text-white">Recognised Column Names</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-background-dark text-2xs font-black uppercase tracking-wider text-slate-500 border-b border-primary/10">
+                  <th className="px-4 py-2.5">Column / Field</th>
+                  <th className="px-4 py-2.5">Accepted header names</th>
+                  <th className="px-4 py-2.5">Example value</th>
+                </tr>
+              </thead>
+              <tbody className="bg-surface-dark">
+                <CsvColumnRow
+                  field="Name"
+                  required
+                  accepted={"name · full name · fullname · member · member name — any of these will be detected as the name column"}
+                  example="John Doe"
+                />
+                <CsvColumnRow
+                  field="Phone"
+                  required={false}
+                  accepted={"phone · phone number · mobile · tel · telephone · contact"}
+                  example="+2348001234567"
+                />
+                <CsvColumnRow
+                  field="Section"
+                  required={false}
+                  accepted={"section · group · voice · voice part · department · part"}
+                  example="Soprano"
+                />
+                <CsvColumnRow
+                  field="Status"
+                  required={false}
+                  accepted={"status · state — value must be 'active' or 'inactive'. Anything else defaults to 'active'"}
+                  example="active"
+                />
+                <CsvColumnRow
+                  field="Birthday"
+                  required={false}
+                  accepted={"birthday · dob · date of birth · birth date"}
+                  example="14/05/1990"
+                />
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        {/* Date formats */}
+        <div className="mt-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="material-symbols-outlined text-amber-400 text-lg">calendar_month</span>
+            <span className="text-sm font-bold text-white">Birthday Date Formats</span>
+          </div>
+          <div className="space-y-2">
+            {[
+              { fmt: 'DD/MM/YYYY', ex: '14/05/1990', ok: true },
+              { fmt: 'YYYY-MM-DD', ex: '1990-05-14', ok: true },
+              { fmt: 'MM/DD/YYYY', ex: '05/14/1990', ok: true },
+              { fmt: 'DD-MM-YY', ex: '14-05-90', ok: false },
+              { fmt: 'Month name', ex: 'May 14 1990', ok: false },
+            ].map(({ fmt, ex, ok }) => (
+              <div key={fmt} className="flex items-center gap-3">
+                <span className={`material-symbols-outlined text-base ${ok ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {ok ? 'check_circle' : 'cancel'}
+                </span>
+                <code className="text-xs font-mono text-slate-300 w-32">{fmt}</code>
+                <code className="text-xs font-mono text-slate-500">{ex}</code>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Common pitfalls */}
+        <div className="mt-4 space-y-3">
+          <p className="text-xs font-black uppercase tracking-super text-primary/60 flex items-center gap-2">
+            <span className="h-px w-4 bg-primary/40 inline-block" />
+            Common mistakes to avoid
+          </p>
+          <IssueCard
+            icon="table_rows"
+            iconColor="#f59e0b"
+            problem="No header row in the CSV"
+            resolution="Rollcally needs a header row (e.g. 'Name, Phone, Section') to map columns. Without it, the first data row is treated as headers and will be skipped or misread."
+            type="warning"
+          />
+          <IssueCard
+            icon="text_format"
+            iconColor="#f59e0b"
+            problem="Unrecognised column name for the member name"
+            resolution="If your name column is labelled something like 'Full Member Name' or 'Chorister', rename it to just 'Name' or 'Full Name' before exporting."
+            type="warning"
+          />
+          <IssueCard
+            icon="calendar_month"
+            iconColor="#f59e0b"
+            problem="Birthday saved as a formatted date in Excel (e.g. '14 May 1990')"
+            resolution="Format the birthday column as YYYY-MM-DD or DD/MM/YYYY plain text before exporting. Excel's display format does not always match the actual cell value."
+            type="warning"
+          />
+          <IssueCard
+            icon="upload_file"
+            iconColor="#ef4444"
+            problem="File saved as .xlsx instead of .csv"
+            resolution="Only .csv files are supported. In Excel: File → Save As → CSV (Comma delimited). In Google Sheets: File → Download → CSV."
+            type="warning"
+          />
+        </div>
+
+        <TipBox>
+          <strong className="text-white block mb-1">Download the built-in template.</strong>
+          Inside the Import CSV modal, tap <strong className="text-white">Download Template</strong>. It gives you a correctly-formatted CSV with example rows you can replace with your real data.
+        </TipBox>
       </div>
 
       <div>
@@ -514,6 +649,82 @@ function TroubleshootingTab() {
     {
       q: 'Check-in page not working offline',
       a: <p>Offline check-in only works if you've visited the check-in page <strong className="text-white">and searched for names</strong> on the same device while online before. If it's your first time or you're on a new device, a network connection is required.</p>,
+    },
+    {
+      q: 'CSV import — "Import failed"',
+      a: (
+        <div className="space-y-3">
+          <p>This generic error usually means one of these issues:</p>
+          <ul className="space-y-2">
+            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">Invalid date format</strong> — Birthday values must be DD/MM/YYYY, YYYY-MM-DD, or MM/DD/YYYY. Dates like "14 May 1990" or "May-90" will cause the whole import to fail. Fix the column in your spreadsheet and re-export.</span></li>
+            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">Permission denied</strong> — You must be the unit creator, org owner, or an explicitly assigned unit admin to import members. Contact your org owner to grant you access.</span></li>
+            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">Network error</strong> — Check your internet connection and try again. If importing a large roster, a brief connection drop will fail the whole batch.</span></li>
+          </ul>
+        </div>
+      ),
+    },
+    {
+      q: 'CSV import — "No valid rows found"',
+      a: (
+        <ul className="space-y-2">
+          <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> Every row in your file has an empty name column — check that the name column is correctly identified</li>
+          <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> The file may have been saved with only headers and no data rows</li>
+          <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> If your name column is headed something unusual (e.g. "Full Member"), rename it to <strong className="text-white">Name</strong> or <strong className="text-white">Full Name</strong></li>
+        </ul>
+      ),
+    },
+    {
+      q: 'CSV import — member names appear in the wrong columns in the preview',
+      a: (
+        <div className="space-y-3">
+          <p>This means Rollcally could not detect which column contains the names. It happens when:</p>
+          <ul className="space-y-2">
+            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> Your header row uses a non-standard label (e.g. "Member ID", "Chorister Name", "Full Member Name")</li>
+            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> There is no header row at all — data starts on row 1</li>
+          </ul>
+          <p><strong className="text-white">Fix:</strong> Rename the column header to <code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded text-xs font-mono">Name</code> or <code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded text-xs font-mono">Full Name</code> and re-export. Or download and use the built-in template.</p>
+        </div>
+      ),
+    },
+    {
+      q: 'CSV import — all rows flagged as duplicates',
+      a: (
+        <ul className="space-y-2">
+          <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> <strong className="text-white">Exact duplicate:</strong> A member with that exact name already exists in this unit. These rows are automatically skipped — this is intentional.</li>
+          <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> <strong className="text-white">Fuzzy (similar) duplicate:</strong> The name is very close to an existing member (e.g. "John" vs "Johnny"). Review these rows carefully — they will still be imported unless you cancel.</li>
+          <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> If your unit's roster was already imported and you're re-importing the same file, all rows will be duplicates. No action is needed.</li>
+        </ul>
+      ),
+    },
+    {
+      q: '"Failed to save" when adding a member manually',
+      a: (
+        <div className="space-y-3">
+          <p>The error message shown now includes the actual reason. Common causes:</p>
+          <ul className="space-y-2">
+            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">new row violates row-level security policy</strong> — You don't have write permission on this unit. Only the unit creator, org owner, and explicitly assigned unit admins can add members. Ask your org owner to grant you unit admin access.</span></li>
+            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">Network error</strong> — Check your internet connection and try again.</span></li>
+            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">JWT expired</strong> — Your session has timed out. Log out and log back in, then try again.</span></li>
+          </ul>
+        </div>
+      ),
+    },
+    {
+      q: '"Failed to save" when adding a member — I am the org owner',
+      a: (
+        <div className="space-y-3">
+          <p>If you created the organisation and are still seeing this error, a database migration may need to be applied. Ask your system administrator to run the following in the Supabase SQL Editor:</p>
+          <div className="bg-background-dark rounded-xl border border-primary/20 p-3 mt-2">
+            <code className="text-xs font-mono text-primary/80 leading-relaxed whitespace-pre-wrap">{`drop policy if exists "Managers: full access to members" on members;
+
+create policy "Managers: full access to members"
+  on members for all
+  using (is_super_admin() or is_unit_manager(unit_id) or is_unit_admin(unit_id))
+  with check(is_super_admin() or is_unit_manager(unit_id) or is_unit_admin(unit_id));`}</code>
+          </div>
+          <p>This updates the database permission rule to include all authorised roles.</p>
+        </div>
+      ),
     },
   ]
 
