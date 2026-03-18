@@ -25,7 +25,15 @@ function formatDate(dateStr: string) {
 }
 
 // ── Service card (dark style) ─────────────────────────────────────────────────
-function ServiceCard({ service, onClick }: { service: Service; onClick: () => void }) {
+function ServiceCard({
+  service, canManage, onClick, onEdit, onDelete,
+}: {
+  service: Service
+  canManage: boolean
+  onClick: () => void
+  onEdit: (s: Service) => void
+  onDelete: (s: Service) => void
+}) {
   const status = serviceStatus(service.date)
   const isToday = status === 'today'
   const isPast  = status === 'past'
@@ -35,21 +43,20 @@ function ServiceCard({ service, onClick }: { service: Service; onClick: () => vo
   const statusLabel = { today: 'Active Today', upcoming: 'Scheduled', past: 'Archived' }[status]
 
   return (
-    <button
-      onClick={onClick}
-      className={`w-full group rounded-xl border transition-all text-left duration-300 animate-in slide-in-from-bottom-2 overflow-hidden hover:scale-[1.01] active:scale-[0.99] ${
+    <div
+      className={`group rounded-xl border transition-all duration-300 animate-in slide-in-from-bottom-2 overflow-hidden ${
         isPast
-          ? 'bg-surface-dark border-border-dark opacity-60 hover:opacity-80'
+          ? 'bg-surface-dark border-border-dark opacity-60 hover:opacity-90'
           : 'bg-surface-dark border-border-dark hover:border-primary/40'
       }`}
     >
       {/* Top accent line */}
       <div className="h-0.5 w-full" style={{ backgroundColor: isToday ? accentColor : 'transparent' }} />
 
-      <div className="flex items-center gap-4 p-4 sm:p-5">
+      <div className="flex items-center gap-3 p-4 sm:p-5">
         {/* Icon */}
         <div
-          className="size-12 sm:size-14 flex-shrink-0 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300"
+          className="size-12 sm:size-14 flex-shrink-0 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 duration-300"
           style={{ backgroundColor: accentBg }}
         >
           <span className="material-symbols-outlined text-xl sm:text-2xl" style={{ color: accentColor }}>
@@ -57,10 +64,13 @@ function ServiceCard({ service, onClick }: { service: Service; onClick: () => vo
           </span>
         </div>
 
-        {/* Info */}
-        <div className="flex-1 min-w-0">
+        {/* Info — clickable */}
+        <button
+          onClick={onClick}
+          className="flex-1 min-w-0 text-left group/nav"
+        >
           <div className="flex flex-wrap items-center gap-2 mb-1">
-            <p className="text-sm sm:text-base font-bold text-slate-100 tracking-tight group-hover:text-primary transition-colors">
+            <p className="text-sm sm:text-base font-bold text-slate-100 tracking-tight group-hover/nav:text-primary transition-colors">
               {EVENT_LABEL[service.service_type]}
             </p>
             <span
@@ -71,21 +81,46 @@ function ServiceCard({ service, onClick }: { service: Service; onClick: () => vo
             </span>
           </div>
           <p className="text-2xs font-semibold uppercase tracking-label text-slate-500">{formatDate(service.date)}</p>
-        </div>
+        </button>
 
-        <span className="material-symbols-outlined text-slate-600 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all flex-shrink-0">
-          chevron_right
-        </span>
+        {/* Actions */}
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          {canManage && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); onEdit(service) }}
+                className="size-9 flex items-center justify-center rounded-xl text-slate-600 hover:text-primary hover:bg-primary/10 active:scale-95 transition-all sm:opacity-0 sm:group-hover:opacity-100"
+                title="Edit event"
+              >
+                <span className="material-symbols-outlined text-lg">edit</span>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onDelete(service) }}
+                className="size-9 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 active:scale-95 transition-all sm:opacity-0 sm:group-hover:opacity-100"
+                title="Delete event"
+              >
+                <span className="material-symbols-outlined text-lg">delete</span>
+              </button>
+            </>
+          )}
+          <button
+            onClick={onClick}
+            className="size-9 flex items-center justify-center rounded-xl text-slate-600 group-hover:text-slate-400 transition-all"
+          >
+            <span className="material-symbols-outlined text-lg group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+          </button>
+        </div>
       </div>
-    </button>
+    </div>
   )
 }
 
-// ── Create Event Modal ────────────────────────────────────────────────────────
-function CreateEventModal({
-  date, type, error, loading,
+// ── Create / Edit Event Modal ─────────────────────────────────────────────────
+function EventFormModal({
+  editing, date, type, error, loading,
   onChangeDate, onChangeType, onSubmit, onClose,
 }: {
+  editing: Service | null
   date: string; type: ServiceType; error: string | null; loading: boolean
   onChangeDate: (v: string) => void
   onChangeType: (v: ServiceType) => void
@@ -99,11 +134,15 @@ function CreateEventModal({
 
         <div className="flex items-center gap-4 mb-6">
           <div className="size-12 bg-primary/10 rounded-xl flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary text-xl">calendar_add_on</span>
+            <span className="material-symbols-outlined text-primary text-xl">
+              {editing ? 'edit_calendar' : 'calendar_add_on'}
+            </span>
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-100">Schedule Event</h3>
-            <p className="text-xs text-slate-500">Initialise a formal session for attendance tracking</p>
+            <h3 className="text-lg font-bold text-slate-100">{editing ? 'Edit Event' : 'Schedule Event'}</h3>
+            <p className="text-xs text-slate-500">
+              {editing ? 'Update the date or type for this session' : 'Initialise a formal session for attendance tracking'}
+            </p>
           </div>
           <button onClick={onClose} className="ml-auto size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
             <span className="material-symbols-outlined">close</span>
@@ -138,8 +177,9 @@ function CreateEventModal({
               Cancel
             </button>
             <button type="submit" disabled={loading}
-              className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50">
-              {loading ? 'Creating…' : 'Create Event'}
+              className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50 flex items-center gap-2">
+              {loading && <span className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              {loading ? (editing ? 'Saving…' : 'Creating…') : (editing ? 'Save Changes' : 'Create Event')}
             </button>
           </div>
         </form>
@@ -260,7 +300,7 @@ export default function UnitDashboard() {
   const { unitId } = useParams<{ unitId: string }>()
   const navigate = useNavigate()
   const { isSuper, signOut, session } = useAuth()
-  const { services, loading: servicesLoading, createService } = useServices(unitId ?? null)
+  const { services, loading: servicesLoading, createService, updateService, deleteService } = useServices(unitId ?? null)
   const { updateUnit, deleteUnit } = useUnits(null)
   const { admins, addAdmin, removeAdmin } = useUnitAdmins(isSuper ? unitId ?? null : null)
 
@@ -280,6 +320,10 @@ export default function UnitDashboard() {
   const [newDesc, setNewDesc] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Event edit/delete state
+  const [editingService, setEditingService] = useState<Service | null>(null)
+  const [confirmDeleteService, setConfirmDeleteService] = useState<Service | null>(null)
 
   const [newAdminEmail, setNewAdminEmail] = useState('')
   const [addingAdmin, setAddingAdmin]     = useState(false)
@@ -309,15 +353,48 @@ export default function UnitDashboard() {
       })
   }, [unitId, session?.user?.id, isSuper])
 
-  async function handleCreate(e: FormEvent) {
+  function openCreate() {
+    setEditingService(null)
+    setNewDate(new Date().toISOString().split('T')[0])
+    setNewType('rehearsal')
+    setError(null)
+    setShowCreate(true)
+  }
+
+  function openEdit(svc: Service) {
+    setEditingService(svc)
+    setNewDate(svc.date)
+    setNewType(svc.service_type)
+    setError(null)
+    setShowCreate(true)
+  }
+
+  async function handleEventSubmit(e: FormEvent) {
     e.preventDefault(); setError(null); setIsUpdating(true)
     try {
-      const svc = await createService(newDate, newType)
-      setShowCreate(false)
-      navigate(`/admin/units/${unitId}/events/${svc.id}`)
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err)
+      if (editingService) {
+        await updateService(editingService.id, newDate, newType)
+        setShowCreate(false); setEditingService(null)
+      } else {
+        const svc = await createService(newDate, newType)
+        setShowCreate(false)
+        navigate(`/admin/units/${unitId}/events/${svc.id}`)
+      }
+    } catch (err: unknown) {
+      const msg = (err as { message?: string })?.message ?? String(err)
       setError(msg.includes('unique') ? 'An event already exists for that date and type.' : msg)
+    } finally { setIsUpdating(false) }
+  }
+
+  async function handleDeleteService() {
+    if (!confirmDeleteService) return
+    setIsUpdating(true)
+    try {
+      await deleteService(confirmDeleteService.id)
+      setConfirmDeleteService(null)
+    } catch (err: unknown) {
+      const msg = (err as { message?: string })?.message ?? 'Failed to delete event'
+      setError(msg)
     } finally { setIsUpdating(false) }
   }
 
@@ -452,7 +529,7 @@ export default function UnitDashboard() {
           {/* Create Event */}
           {isOwnerOrCreator && (
             <button
-              onClick={() => setShowCreate(true)}
+              onClick={openCreate}
               className="flex items-center gap-2 px-4 py-2.5 bg-surface-dark border border-border-dark text-slate-200 text-xs font-black uppercase tracking-wider rounded-xl hover:border-primary/50 hover:text-primary active:scale-95 transition-all flex-1 sm:flex-none justify-center sm:justify-start"
             >
               <span className="material-symbols-outlined text-sm">add</span>
@@ -543,7 +620,10 @@ export default function UnitDashboard() {
                 <ServiceCard
                   key={s.id}
                   service={s}
+                  canManage={isOwnerOrCreator}
                   onClick={() => navigate(`/admin/units/${unitId}/events/${s.id}`)}
+                  onEdit={openEdit}
+                  onDelete={setConfirmDeleteService}
                 />
               ))}
             </div>
@@ -564,7 +644,10 @@ export default function UnitDashboard() {
                 <ServiceCard
                   key={s.id}
                   service={s}
+                  canManage={isOwnerOrCreator}
                   onClick={() => navigate(`/admin/units/${unitId}/events/${s.id}`)}
+                  onEdit={openEdit}
+                  onDelete={setConfirmDeleteService}
                 />
               ))}
             </div>
@@ -574,13 +657,24 @@ export default function UnitDashboard() {
 
       {/* ── Modals ─────────────────────────────────────────────────────────── */}
       {showCreate && (
-        <CreateEventModal
+        <EventFormModal
+          editing={editingService}
           date={newDate} type={newType} error={error} loading={isUpdating}
           onChangeDate={setNewDate} onChangeType={setNewType}
-          onSubmit={handleCreate}
-          onClose={() => { setShowCreate(false); setError(null) }}
+          onSubmit={handleEventSubmit}
+          onClose={() => { setShowCreate(false); setEditingService(null); setError(null) }}
         />
       )}
+      <ConfirmDialog
+        isOpen={!!confirmDeleteService}
+        onClose={() => setConfirmDeleteService(null)}
+        onConfirm={handleDeleteService}
+        title="Delete Event"
+        description={confirmDeleteService ? `Delete the ${EVENT_LABEL[confirmDeleteService.service_type]} on ${formatDate(confirmDeleteService.date)}? All attendance records for this event will be permanently removed.` : ''}
+        confirmText="Delete Event"
+        variant="danger"
+        isLoading={isUpdating}
+      />
       {showSettings && (
         <SettingsModal
           name={newName} desc={newDesc} error={error} loading={isUpdating}

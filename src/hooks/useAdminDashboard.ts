@@ -206,11 +206,29 @@ export function useServices(unitId: string | null) {
       .select()
       .single()
     if (error) throw error
-    setServices(prev => [data, ...prev])
+    setServices(prev => [data, ...prev].sort((a, b) => b.date.localeCompare(a.date)))
     return data
   }
 
-  return { services, loading, createService, refetch: fetch }
+  async function updateService(id: string, date: string, service_type: ServiceType): Promise<Service> {
+    const { data, error } = await supabase
+      .from('services')
+      .update({ date, service_type })
+      .eq('id', id)
+      .select()
+      .single()
+    if (error) throw error
+    setServices(prev => prev.map(s => s.id === id ? data : s).sort((a, b) => b.date.localeCompare(a.date)))
+    return data
+  }
+
+  async function deleteService(id: string): Promise<void> {
+    const { error } = await supabase.from('services').delete().eq('id', id)
+    if (error) throw error
+    setServices(prev => prev.filter(s => s.id !== id))
+  }
+
+  return { services, loading, createService, updateService, deleteService, refetch: fetch }
 }
 
 // ── Dashboard (attendance for a service) ─────────────────────────────────────

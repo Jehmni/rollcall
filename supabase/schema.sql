@@ -302,11 +302,13 @@ create policy "Unit admins: read their own row"
 
 -- ---- members ----
 
+-- Full write access: org owner, unit creator, explicit unit admin, or super admin.
 create policy "Managers: full access to members"
   on members for all
-  using     (is_unit_manager(unit_id))
-  with check(is_unit_manager(unit_id));
+  using     (is_super_admin() or is_unit_manager(unit_id) or is_unit_admin(unit_id))
+  with check(is_super_admin() or is_unit_manager(unit_id) or is_unit_admin(unit_id));
 
+-- Org members (including non-admin members) can read all members in their org.
 create policy "Admins: view all members in their orgs"
   on members for select
   using (is_org_member((select org_id from units where id = unit_id)));

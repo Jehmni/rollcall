@@ -15,45 +15,111 @@ interface CsvRow {
   duplicateStatus: DuplicateStatus
 }
 
+function splitCsvLine(line: string): string[] {
+  const cells: string[] = []
+  let cur = ''
+  let inQuote = false
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i]
+    if (ch === '"') {
+      if (inQuote && line[i + 1] === '"') { cur += '"'; i++ }
+      else inQuote = !inQuote
+    } else if (ch === ',' && !inQuote) {
+      cells.push(cur.trim()); cur = ''
+    } else {
+      cur += ch
+    }
+  }
+  cells.push(cur.trim())
+  return cells
+}
+
+/** Normalise a date string to ISO YYYY-MM-DD. Handles DD/MM/YYYY and MM/DD/YYYY heuristically. */
+function normaliseDate(raw: string): string | null {
+  if (!raw) return null
+  const s = raw.trim()
+  // Already ISO: YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
+  // DD/MM/YYYY or MM/DD/YYYY  →  prefer DD/MM/YYYY (common outside US)
+  const slashMatch = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/)
+  if (slashMatch) {
+    const [, d, m, y] = slashMatch
+    const year = y.length === 2 ? `20${y}` : y
+    return `${year}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
+  }
+  return null
+}
+
+/** Detect which column index corresponds to each logical field from a header row. */
+function detectColumns(headers: string[]): Record<string, number> {
+  const h = headers.map(c => c.toLowerCase().trim())
+  const find = (...needles: string[]): number => {
+    for (const needle of needles) {
+      const idx = h.findIndex(col => col.includes(needle))
+      if (idx !== -1) return idx
+    }
+    return -1
+  }
+  return {
+    name:     find('full name', 'fullname', 'name', 'member'),
+    phone:    find('phone', 'mobile', 'tel', 'contact'),
+    section:  find('section', 'group', 'voice', 'department', 'part'),
+    status:   find('status', 'state'),
+    birthday: find('birthday', 'dob', 'birth date', 'date of birth'),
+  }
+}
+
+/** Returns true if the row looks like a header (more than half the cells are non-numeric text). */
+function isHeaderRow(cells: string[]): boolean {
+  const nonNumeric = cells.filter(c => c && !/^\d/.test(c)).length
+  return nonNumeric >= Math.ceil(cells.length / 2)
+}
+
 function parseCsv(text: string): { rows: CsvRow[]; skipped: number } {
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean)
   if (lines.length === 0) return { rows: [], skipped: 0 }
 
-  function splitLine(line: string): string[] {
-    const cells: string[] = []
-    let cur = ''
-    let inQuote = false
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i]
-      if (ch === '"') {
-        if (inQuote && line[i + 1] === '"') { cur += '"'; i++ }
-        else inQuote = !inQuote
-      } else if (ch === ',' && !inQuote) {
-        cells.push(cur.trim()); cur = ''
-      } else {
-        cur += ch
-      }
-    }
-    cells.push(cur.trim())
-    return cells
+  const firstCells = splitCsvLine(lines[0])
+  let colMap: Record<string, number> | null = null
+  let startIdx = 0
+
+  if (isHeaderRow(firstCells)) {
+    colMap = detectColumns(firstCells)
+    startIdx = 1
   }
 
-  const firstCell = splitLine(lines[0])[0].toLowerCase()
-  const startIdx = (firstCell === 'name' || firstCell === 'full name' || firstCell === 'member') ? 1 : 0
   const rows: CsvRow[] = []
   let skipped = 0
 
   for (let i = startIdx; i < lines.length; i++) {
-    const cols = splitLine(lines[i])
-    const name = cols[0]?.trim()
+    const cols = splitCsvLine(lines[i])
+
+    let name: string, phone: string | null, section: string | null, rawStatus: string, rawBirthday: string
+
+    if (colMap && colMap.name !== -1) {
+      // Header-guided mapping
+      name        = (colMap.name    !== -1 ? cols[colMap.name]    : '')?.trim() ?? ''
+      phone       = (colMap.phone   !== -1 ? cols[colMap.phone]   : null)?.trim() || null
+      section     = (colMap.section !== -1 ? cols[colMap.section] : null)?.trim() || null
+      rawStatus   = (colMap.status  !== -1 ? cols[colMap.status]  : '')?.trim().toLowerCase() ?? ''
+      rawBirthday = (colMap.birthday !== -1 ? cols[colMap.birthday] : '')?.trim() ?? ''
+    } else {
+      // Positional fallback: Name, Phone, Section, Status, Birthday
+      name        = cols[0]?.trim() ?? ''
+      phone       = cols[1]?.trim() || null
+      section     = cols[2]?.trim() || null
+      rawStatus   = cols[3]?.trim().toLowerCase() ?? ''
+      rawBirthday = cols[4]?.trim() ?? ''
+    }
+
     if (!name) { skipped++; continue }
-    const rawStatus = cols[3]?.trim().toLowerCase()
+
     rows.push({
       name,
-      phone: cols[1]?.trim() || null,
-      section: cols[2]?.trim() || null,
+      phone,
+      section,
       status: rawStatus === 'inactive' ? 'inactive' : 'active',
-      birthday: cols[4]?.trim() || null,
+      birthday: normaliseDate(rawBirthday),
       duplicateStatus: 'ok',
     })
   }
@@ -563,13 +629,16 @@ export default function UnitMembers() {
         ))
       }
       closeForm()
-    } catch (err) { setFormError(err instanceof Error ? err.message : 'Failed to save') }
-    finally { setSaving(false) }
+    } catch (err: unknown) {
+      const msg = (err as { message?: string })?.message
+      setFormError(msg || 'Failed to save. Check your connection and try again.')
+    } finally { setSaving(false) }
   }
 
   async function handleDelete(id: string) {
     if (!confirm('Remove this member permanently?')) return
-    await supabase.from('members').delete().eq('id', id)
+    const { error } = await supabase.from('members').delete().eq('id', id)
+    if (error) { alert(`Failed to remove member: ${error.message}`); return }
     setMembers(prev => prev.filter(m => m.id !== id))
   }
 
@@ -613,8 +682,10 @@ export default function UnitMembers() {
         (a.section ?? '').localeCompare(b.section ?? '') || a.name.localeCompare(b.name)
       ))
       setImportDone(inserted.length); setCsvRows([])
-    } catch (err) { setImportError(err instanceof Error ? err.message : 'Import failed') }
-    finally { setImporting(false) }
+    } catch (err: unknown) {
+      const msg = (err as { message?: string })?.message
+      setImportError(msg || 'Import failed. Check your connection and try again.')
+    } finally { setImporting(false) }
   }
 
   // ── Grouped view ──────────────────────────────────────────────────────────
