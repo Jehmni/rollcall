@@ -1,7 +1,11 @@
 -- ============================================================
 -- Rollcally — Canonical Schema (single source of truth)
 -- Incorporates all migrations through 20260315.
--- Run this on a fresh Supabase project via SQL Editor.
+--
+-- ⚠️  MANUAL BOOTSTRAP ONLY — DO NOT AUTOMATE
+-- Run once on a fresh Supabase project via the SQL Editor.
+-- After initial setup, use migration files for all schema changes.
+-- Never run this against an existing production database.
 -- ============================================================
 
 -- Enable UUID extension
@@ -215,26 +219,30 @@ $$;
 
 -- ---- organizations ----
 
+drop policy if exists "Super admin: full access to organizations" on organizations;
 create policy "Super admin: full access to organizations"
   on organizations for all
   using     (is_super_admin())
   with check(is_super_admin());
 
+drop policy if exists "Owners: full access to organizations they created" on organizations;
 create policy "Owners: full access to organizations they created"
   on organizations for all
   using     (created_by_admin_id = auth.uid())
   with check(created_by_admin_id = auth.uid());
 
+drop policy if exists "Members: read organizations they belong to" on organizations;
 create policy "Members: read organizations they belong to"
   on organizations for select
   using (is_org_member(id));
 
--- Allow any authenticated user to discover all orgs (for the join-org workflow).
+drop policy if exists "Authenticated: discover organizations" on organizations;
 create policy "Authenticated: discover organizations"
   on organizations for select
   to authenticated
   using (true);
 
+drop policy if exists "Authenticated: create organizations" on organizations;
 create policy "Authenticated: create organizations"
   on organizations for insert
   to authenticated
@@ -242,43 +250,48 @@ create policy "Authenticated: create organizations"
 
 -- ---- organization_members ----
 
+drop policy if exists "Owners: full access to org members" on organization_members;
 create policy "Owners: full access to org members"
   on organization_members for all
   using (is_org_owner(organization_id));
 
+drop policy if exists "Members: read colleagues" on organization_members;
 create policy "Members: read colleagues"
   on organization_members for select
   using (is_org_member(organization_id));
 
 -- ---- join_requests ----
 
+drop policy if exists "Admins: create and read own requests" on join_requests;
 create policy "Admins: create and read own requests"
   on join_requests for all
   using (admin_id = auth.uid());
 
+drop policy if exists "Owners: manage requests for their org" on join_requests;
 create policy "Owners: manage requests for their org"
   on join_requests for all
   using (is_org_owner(organization_id));
 
 -- ---- units ----
 
+drop policy if exists "Super admin: full access to units" on units;
 create policy "Super admin: full access to units"
   on units for all
   using     (is_super_admin())
   with check(is_super_admin());
 
--- Org members can create units in their org.
+drop policy if exists "Members: create units in their organizations" on units;
 create policy "Members: create units in their organizations"
   on units for insert
   to authenticated
   with check (is_org_member(org_id));
 
--- Org members can read all units in their org.
+drop policy if exists "Members: read all units in their organizations" on units;
 create policy "Members: read all units in their organizations"
   on units for select
   using (is_org_member(org_id));
 
--- Unit creator + org owner have full CRUD.
+drop policy if exists "Managers: full access to units" on units;
 create policy "Managers: full access to units"
   on units for all
   using     (is_unit_manager(id))
@@ -286,15 +299,18 @@ create policy "Managers: full access to units"
 
 -- ---- unit_admins ----
 
+drop policy if exists "Super admin: full access to unit_admins" on unit_admins;
 create policy "Super admin: full access to unit_admins"
   on unit_admins for all
   using     (is_super_admin())
   with check(is_super_admin());
 
+drop policy if exists "Owners: manage unit_admins for their units" on unit_admins;
 create policy "Owners: manage unit_admins for their units"
   on unit_admins for all
   using (is_org_owner_by_unit(unit_id));
 
+drop policy if exists "Unit admins: read their own row" on unit_admins;
 create policy "Unit admins: read their own row"
   on unit_admins for select
   to authenticated
@@ -302,30 +318,33 @@ create policy "Unit admins: read their own row"
 
 -- ---- members ----
 
--- Full write access: org owner, unit creator, explicit unit admin, or super admin.
+drop policy if exists "Managers: full access to members" on members;
 create policy "Managers: full access to members"
   on members for all
   using     (is_super_admin() or is_unit_manager(unit_id) or is_unit_admin(unit_id))
   with check(is_super_admin() or is_unit_manager(unit_id) or is_unit_admin(unit_id));
 
--- Org members (including non-admin members) can read all members in their org.
+drop policy if exists "Admins: view all members in their orgs" on members;
 create policy "Admins: view all members in their orgs"
   on members for select
   using (is_org_member((select org_id from units where id = unit_id)));
 
 -- ---- services ----
 
+drop policy if exists "Managers: full access to services" on services;
 create policy "Managers: full access to services"
   on services for all
   using     (is_unit_manager(unit_id))
   with check(is_unit_manager(unit_id));
 
+drop policy if exists "Admins: view all services in their orgs" on services;
 create policy "Admins: view all services in their orgs"
   on services for select
   using (is_org_member((select org_id from units where id = unit_id)));
 
 -- ---- attendance ----
 
+drop policy if exists "Managers: full access to attendance" on attendance;
 create policy "Managers: full access to attendance"
   on attendance for all
   using (
@@ -336,6 +355,7 @@ create policy "Managers: full access to attendance"
     )
   );
 
+drop policy if exists "Admins: view all attendance in their orgs" on attendance;
 create policy "Admins: view all attendance in their orgs"
   on attendance for select
   using (
@@ -347,7 +367,7 @@ create policy "Admins: view all attendance in their orgs"
     )
   );
 
--- Allow anonymous check-ins via RPC (the function itself enforces all security).
+drop policy if exists "Anon: insert attendance via RPC" on attendance;
 create policy "Anon: insert attendance via RPC"
   on attendance for insert
   to anon
@@ -355,6 +375,7 @@ create policy "Anon: insert attendance via RPC"
 
 -- ---- member_notifications ----
 
+drop policy if exists "Managers: full access to notifications in their unit" on member_notifications;
 create policy "Managers: full access to notifications in their unit"
   on member_notifications for all
   to authenticated
@@ -485,35 +506,41 @@ create or replace function public.checkin_by_id(
 )
 returns json language plpgsql security definer as $$
 declare
-  v_member   members;
-  v_service  services;
-  v_unit     units;
-  v_existing attendance;
-  v_dist     float;
+  v_member       members;
+  v_service      services;
+  v_unit_lat     numeric;
+  v_unit_lng     numeric;
+  v_unit_radius  int;
+  v_existing     attendance;
+  v_dist         float;
 begin
-  -- 1. Validate service and unit
-  select s.*, u.latitude, u.longitude, u.radius_meters
-    into v_service, v_unit
-    from services s
-    join units u on u.id = s.unit_id
-   where s.id = p_service_id;
+  -- 1. Validate service
+  select * into v_service
+  from services
+  where id = p_service_id;
 
   if not found then
     return json_build_object('success', false, 'error', 'invalid_service');
   end if;
 
+  -- Fetch unit location settings separately (avoids multi-record INTO limitation)
+  select latitude, longitude, radius_meters
+    into v_unit_lat, v_unit_lng, v_unit_radius
+    from units
+   where id = v_service.unit_id;
+
   -- 2. Location check (mandatory when unit has coordinates)
-  if v_unit.latitude is not null and v_unit.longitude is not null then
+  if v_unit_lat is not null and v_unit_lng is not null then
     if p_lat is null or p_lng is null then
       return json_build_object('success', false, 'error', 'location_required');
     end if;
 
     v_dist := 111320 * sqrt(
-      pow(p_lat - v_unit.latitude, 2) +
-      pow(cos(v_unit.latitude * pi() / 180) * (p_lng - v_unit.longitude), 2)
+      pow(p_lat - v_unit_lat, 2) +
+      pow(cos(v_unit_lat * pi() / 180) * (p_lng - v_unit_lng), 2)
     );
 
-    if v_dist > v_unit.radius_meters then
+    if v_dist > v_unit_radius then
       return json_build_object('success', false, 'error', 'too_far', 'distance', floor(v_dist));
     end if;
   end if;
