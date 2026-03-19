@@ -114,7 +114,12 @@ function parseCsv(text: string): { rows: CsvRow[]; skipped: number } {
 
   if (isHeaderRow(firstCells)) {
     colMap = detectColumns(firstCells)
-    startIdx = 1
+    if (colMap.name !== -1) {
+      startIdx = 1
+    } else {
+      // First row looks like text but couldn't detect known column headers — treat as data
+      colMap = null
+    }
   }
 
   const rows: CsvRow[] = []

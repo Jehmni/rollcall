@@ -121,7 +121,8 @@ export default function AdminServiceDetail() {
   const [search, setSearch] = useState('')
 
   const { present, absent, total, loading, loadingMore, hasMore, loadMore, markAttendance, refetch } = useAdminDashboard(serviceId ?? null)
-  const attendanceRate = total > 0 ? Math.round((present.length / total) * 100) : 0
+  const effectiveTotal = total > 0 ? total : present.length + absent.length
+  const attendanceRate = effectiveTotal > 0 ? Math.round((present.length / effectiveTotal) * 100) : 0
   const qrUrl = serviceId ? `${window.location.origin}/checkin?service_id=${serviceId}` : ''
 
   useEffect(() => {

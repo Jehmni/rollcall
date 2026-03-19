@@ -2,6 +2,9 @@
  * Check-in failure states and edge cases.
  *
  * Covers: too_far, device_locked, offline fallback, QR scan flow.
+ *
+ * NOTE: The check-in page requires ≥3 characters in the search box before
+ * showing the member list. Tests must type at least 3 chars first.
  */
 import { test, expect } from '@playwright/test'
 import {
@@ -21,9 +24,10 @@ test.describe('Check-in: too far from venue', () => {
     await mockGetServiceMembers(page)
     await mockCheckinTooFar(page, 350)
     await page.goto(`/checkin?service_id=${IDS.service}`)
+    await page.getByPlaceholder('Search your name…').fill('Ali')
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await expect(page.getByText('Sync Denied')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Sync Denied' })).toBeVisible()
     await expect(page.getByText(/too far/i)).toBeVisible()
   })
 
@@ -32,9 +36,10 @@ test.describe('Check-in: too far from venue', () => {
     await mockGetServiceMembers(page)
     await mockCheckinTooFar(page)
     await page.goto(`/checkin?service_id=${IDS.service}`)
+    await page.getByPlaceholder('Search your name…').fill('Ali')
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await expect(page.getByText('Sync Denied')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Sync Denied' })).toBeVisible()
     await page.getByRole('button', { name: 'Re-verify Identity' }).click()
     await expect(page.getByPlaceholder('Search your name…')).toBeVisible()
   })
@@ -48,9 +53,10 @@ test.describe('Check-in: device locked', () => {
     await mockGetServiceMembers(page)
     await mockCheckinDeviceLocked(page)
     await page.goto(`/checkin?service_id=${IDS.service}`)
+    await page.getByPlaceholder('Search your name…').fill('Ali')
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await expect(page.getByText('Sync Denied')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Sync Denied' })).toBeVisible()
     await expect(page.getByText(/device.*linked|linked.*device/i)).toBeVisible()
   })
 
@@ -59,6 +65,7 @@ test.describe('Check-in: device locked', () => {
     await mockGetServiceMembers(page)
     await mockCheckinDeviceLocked(page)
     await page.goto(`/checkin?service_id=${IDS.service}`)
+    await page.getByPlaceholder('Search your name…').fill('Ali')
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, check me in' }).click()
     await page.getByRole('button', { name: 'Re-verify Identity' }).click()
@@ -74,6 +81,7 @@ test.describe('Check-in: offline fallback', () => {
     // Mock members to load before going offline
     await mockGetServiceMembers(page)
     await page.goto(`/checkin?service_id=${IDS.service}`)
+    await page.getByPlaceholder('Search your name…').fill('Ali')
     await expect(page.getByText('Alice Johnson')).toBeVisible()
 
     // Simulate network failure for the check-in RPC
@@ -84,7 +92,7 @@ test.describe('Check-in: offline fallback', () => {
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, check me in' }).click()
     // Should show error state (not loading indefinitely)
-    await expect(page.getByText('Sync Denied')).toBeVisible({ timeout: 10000 })
+    await expect(page.getByRole('heading', { name: 'Sync Denied' })).toBeVisible({ timeout: 10000 })
   })
 })
 
@@ -110,6 +118,8 @@ test.describe('Check-in: QR scan flow', () => {
     // Simulate the result of a QR scan by navigating to the URL with service_id
     await page.goto(`/checkin?service_id=${IDS.service}`)
     await expect(page.getByPlaceholder('Search your name…')).toBeVisible()
+    // Must type ≥3 chars to see member list
+    await page.getByPlaceholder('Search your name…').fill('Ali')
     await expect(page.getByText('Alice Johnson')).toBeVisible()
   })
 
@@ -117,10 +127,12 @@ test.describe('Check-in: QR scan flow', () => {
     silenceRealtime(page)
     await mockGetServiceMembers(page)
     await page.goto(`/checkin?service_id=${IDS.service}`)
+    await page.getByPlaceholder('Search your name…').fill('Ali')
     await expect(page.getByText('Alice Johnson')).toBeVisible()
 
     // Reload without the param — sessionStorage should carry it
     await page.reload()
+    await page.getByPlaceholder('Search your name…').fill('Ali')
     await expect(page.getByText('Alice Johnson')).toBeVisible()
   })
 })

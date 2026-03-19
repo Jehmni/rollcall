@@ -1,8 +1,8 @@
 /**
- * Admin authentication — magic link login.
+ * Admin authentication — password login.
  *
  * Users: super admin, unit admins (choir director, youth leader, etc.)
- * Both use the same login page. Role is determined by Supabase user_metadata after sign-in.
+ * Both use the same login page with email + password.
  */
 import { test, expect } from '@playwright/test'
 import {
@@ -15,44 +15,35 @@ import {
 test.describe('Login page', () => {
   test('renders the admin login form', async ({ page }) => {
     await page.goto('/admin/login')
-    await expect(page.getByText('Admin Login')).toBeVisible()
+    await expect(page.getByText('Admin Portal').first()).toBeVisible()
     await expect(page.getByLabel('Email')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Send sign-in link' })).toBeVisible()
+    await expect(page.getByLabel('PASSWORD')).toBeVisible()
+    await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible()
   })
 
-  test('submitting a valid email shows "check your email" screen', async ({ page }) => {
-    await page.route(`${SUPABASE_URL}/auth/v1/otp*`, route =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: '{}' }),
+  test('wrong credentials shows error message', async ({ page }) => {
+    await page.route(`${SUPABASE_URL}/auth/v1/token*`, route =>
+      route.fulfill({
+        status: 400,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'invalid_grant', error_description: 'Invalid login credentials' }),
+      }),
     )
     await page.goto('/admin/login')
-    await page.getByLabel('Email').fill('admin@example.com')
-    await page.getByRole('button', { name: 'Send sign-in link' }).click()
-    await expect(page.getByText('Check your email')).toBeVisible()
-    await expect(page.getByText('admin@example.com')).toBeVisible()
-    await expect(page.getByText('Use a different email')).toBeVisible()
+    await page.getByLabel('Email').fill('wrong@example.com')
+    await page.getByLabel('PASSWORD').fill('wrongpassword')
+    await page.getByRole('button', { name: /sign in/i }).click()
+    await expect(page.getByText('Invalid email or password')).toBeVisible()
   })
 
-  test('"Use a different email" returns to the email form', async ({ page }) => {
-    await page.route(`${SUPABASE_URL}/auth/v1/otp*`, route =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: '{}' }),
-    )
+  test('password visibility toggle reveals the password', async ({ page }) => {
     await page.goto('/admin/login')
-    await page.getByLabel('Email').fill('admin@example.com')
-    await page.getByRole('button', { name: 'Send sign-in link' }).click()
-    await page.getByText('Use a different email').click()
-    await expect(page.getByLabel('Email')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Send sign-in link' })).toBeVisible()
-  })
-
-  test('unregistered email shows error message', async ({ page }) => {
-    await page.route(`${SUPABASE_URL}/auth/v1/otp*`, route =>
-      route.fulfill({ status: 422, contentType: 'application/json',
-        body: JSON.stringify({ error: 'Signup disabled' }) }),
-    )
-    await page.goto('/admin/login')
-    await page.getByLabel('Email').fill('unknown@example.com')
-    await page.getByRole('button', { name: 'Send sign-in link' }).click()
-    await expect(page.getByText('Could not send link')).toBeVisible()
+    const passwordField = page.getByLabel('PASSWORD')
+    await passwordField.fill('mysecret')
+    await expect(passwordField).toHaveAttribute('type', 'password')
+    // Toggle visibility button (eye icon)
+    await page.locator('button[type="button"]').last().click()
+    await expect(passwordField).toHaveAttribute('type', 'text')
   })
 })
 
@@ -81,6 +72,10 @@ test.describe('Auth-based redirects', () => {
     silenceRealtime(page)
     // asUnitAdmin mocks unit_admins — DO NOT call mockUnitAdmins after this (LIFO would override)
     await asUnitAdmin(page, 1)
+    // Unit admin has no org memberships — AdminDashboard uses this to decide on redirect
+    await page.route(`${SUPABASE_URL}/rest/v1/organizations*`, route =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+    )
     await mockUnitLookup(page)
     await mockServices(page)
     await page.goto('/admin/login')

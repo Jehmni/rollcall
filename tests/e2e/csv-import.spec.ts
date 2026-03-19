@@ -4,6 +4,7 @@ import {
     asSuperAdmin,
     mockUnitName,
     mockMembers,
+    mockIsSuperAdminRpc,
     silenceRealtime,
     SUPABASE_URL,
 } from './helpers'
@@ -12,6 +13,7 @@ test.describe('CSV Import Duplicate Detection', () => {
     test.beforeEach(async ({ page }) => {
         silenceRealtime(page)
         await asSuperAdmin(page)
+        await mockIsSuperAdminRpc(page)
         // Mock existing members: Alice Johnson and Bob Smith
         await mockMembers(page)
         await mockUnitName(page)
@@ -24,7 +26,7 @@ test.describe('CSV Import Duplicate Detection', () => {
         await expect(page.getByText('Alice Johnson')).toBeVisible()
 
         // Open import panel
-        await page.locator('header').getByRole('button', { name: 'Import' }).click()
+        await page.getByRole('button', { name: /Import CSV/i }).click()
 
         // CSV Content:
         // Name,Phone,Section,Status
@@ -60,7 +62,7 @@ test.describe('CSV Import Duplicate Detection', () => {
 
         // Verify summary warnings
         await expect(page.getByText('1 row(s) match existing members exactly and will be skipped.')).toBeVisible()
-        await expect(page.getByText('1 row(s) have names similar to existing members.')).toBeVisible()
+        await expect(page.getByText(/1 row\(s\) have names similar to existing members/)).toBeVisible()
 
         // Import button shows filtered count (3 rows in CSV - 1 exact = 2 members to import)
         await expect(page.getByRole('button', { name: 'Import 2 members' })).toBeVisible()
@@ -72,7 +74,7 @@ test.describe('CSV Import Duplicate Detection', () => {
         // Wait for members to load
         await expect(page.getByText('Alice Johnson')).toBeVisible()
 
-        await page.locator('header').getByRole('button', { name: 'Import' }).click()
+        await page.getByRole('button', { name: /Import CSV/i }).click()
 
         const csvContent = [
             'Name,Phone,Section,Status',
@@ -109,7 +111,11 @@ test.describe('CSV Import Duplicate Detection', () => {
 
         const importBtn = page.getByRole('button', { name: 'Import 1 member' })
         await expect(importBtn).toBeEnabled()
+        const csvPostResponse = page.waitForResponse(
+            resp => resp.url().includes('/rest/v1/members') && resp.request().method() === 'POST'
+        )
         await importBtn.click()
+        await csvPostResponse
 
         // Verify the payload only contains Dave Miller
         expect(capturedPayload).toHaveLength(1)

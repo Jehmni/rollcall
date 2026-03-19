@@ -14,12 +14,9 @@ export default function AdminLogin() {
 
   const successMessage = (location.state as { message?: string })?.message
 
-  // If already signed in as admin, go straight to dashboard
+  // If already signed in, go straight to dashboard
   useEffect(() => {
-    const role = session?.user.user_metadata?.role
-    const isAdmin = role === 'admin' || role === 'superadmin'
-    
-    if (session && isAdmin) {
+    if (session) {
       navigate('/admin', { replace: true })
     }
   }, [session, navigate])
@@ -104,10 +101,11 @@ export default function AdminLogin() {
             )}
 
             <div className="flex flex-col gap-2">
-              <label className="text-slate-400 text-2xs font-black uppercase tracking-spread">Email</label>
+              <label htmlFor="email" className="text-slate-400 text-2xs font-black uppercase tracking-spread">Email</label>
               <div className="relative group">
                 <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">mail</span>
-                <input 
+                <input
+                  id="email"
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -120,7 +118,7 @@ export default function AdminLogin() {
 
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <label className="text-slate-400 text-2xs font-black uppercase tracking-spread">PASSWORD</label>
+                <label htmlFor="password" className="text-slate-400 text-2xs font-black uppercase tracking-spread">PASSWORD</label>
                 <button 
                   type="button"
                   onClick={() => navigate('/admin/forgot-password')}
@@ -131,7 +129,8 @@ export default function AdminLogin() {
               </div>
               <div className="relative group">
                 <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">lock</span>
-                <input 
+                <input
+                  id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}

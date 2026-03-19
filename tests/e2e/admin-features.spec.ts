@@ -127,7 +127,9 @@ test.describe('Birthday notifications', () => {
     )
 
     await page.goto(`/admin/units/${IDS.unit}`)
-    // Birthday notification should be visible
+    // Click bell button to open notification panel (button title="Birthday alerts")
+    await page.locator('button[title="Birthday alerts"]').click()
+    // Birthday notification should show Alice Johnson's name
     await expect(page.getByText(/Alice Johnson/i)).toBeVisible()
   })
 
@@ -166,7 +168,11 @@ test.describe('Mobile: tap targets and scroll', () => {
       }),
     )
     await page.goto(`/checkin?service_id=${IDS.service}`)
-    const memberBtn = page.getByText('Alice Johnson').locator('..')
+    // Must type ≥3 chars to show the member list
+    await page.getByPlaceholder('Search your name…').fill('Ali')
+    await expect(page.getByText('Alice Johnson')).toBeVisible()
+    // The button is Alice's row button (direct parent of the name span)
+    const memberBtn = page.getByText('Alice Johnson').locator('../..')
     const box = await memberBtn.boundingBox()
     // Tap target must be at least 44px tall (WCAG 2.5.5)
     expect(box?.height).toBeGreaterThanOrEqual(44)
@@ -178,7 +184,9 @@ test.describe('Mobile: tap targets and scroll', () => {
     await mockMembers(page)
     await mockUnitName(page)
     await page.goto(`/admin/units/${IDS.unit}/members`)
-    const memberRow = page.getByText('Alice Johnson').locator('..')
+    await expect(page.getByText('Alice Johnson')).toBeVisible()
+    // The member row is 2 levels up from the name <p>
+    const memberRow = page.locator('.group').filter({ has: page.getByText('Alice Johnson', { exact: true }) })
     const box = await memberRow.boundingBox()
     expect(box?.height).toBeGreaterThanOrEqual(44)
   })
@@ -191,8 +199,9 @@ test.describe('Mobile: tap targets and scroll', () => {
     await page.goto(`/checkin?service_id=${IDS.service}`)
     const nav = page.locator('nav').last()
     await expect(nav).toBeVisible()
-    await expect(nav.getByText('Home')).toBeVisible()
-    await expect(nav.getByText('Check-in')).toBeVisible()
+    // Use exact: true to avoid matching the "home" icon text vs "Home" label
+    await expect(nav.getByText('Home', { exact: true })).toBeVisible()
+    await expect(nav.getByText('Check-in', { exact: true })).toBeVisible()
   })
 
   test('member list scrolls vertically when many members', async ({ page }) => {
@@ -208,10 +217,10 @@ test.describe('Mobile: tap targets and scroll', () => {
     )
     await mockUnitName(page)
     await page.goto(`/admin/units/${IDS.unit}/members`)
-    // The list container should be scrollable
-    await expect(page.getByText('Member 1')).toBeVisible()
+    // The list container should be scrollable — use exact: true to avoid Member 10-19 matching "Member 1"
+    await expect(page.getByText('Member 1', { exact: true })).toBeVisible()
     // Scroll to bottom to reach Member 30
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
-    await expect(page.getByText('Member 30')).toBeVisible()
+    await expect(page.getByText('Member 30', { exact: true })).toBeVisible()
   })
 })

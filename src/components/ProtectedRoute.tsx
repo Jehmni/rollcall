@@ -21,10 +21,7 @@ export function AdminRoute({ children }: { children: ReactNode }) {
   const { session, loading } = useAuth()
   if (loading) return <Spinner />
   
-  const role = session?.user.user_metadata?.role
-  const isAdmin = role === 'admin' || role === 'superadmin'
-
-  if (!session || !isAdmin) {
+  if (!session) {
     return <Navigate to="/admin/login" replace />
   }
   return <>{children}</>

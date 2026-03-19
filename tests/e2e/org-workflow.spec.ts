@@ -6,10 +6,10 @@
  */
 import { test, expect } from '@playwright/test'
 import {
-  IDS, IDS_ORG2, IDS_MEMBER_ADMIN,
+  IDS, IDS_ORG2,
   SUPABASE_URL,
   asSuperAdmin, asOrgMember,
-  mockOrgs, mockOrgsWithRole, mockUnitsAll, mockUnits, mockUnitAdmins,
+  mockOrgsWithRole, mockUnitsAll, mockUnits, mockUnitAdmins,
   mockOrganizationMembers, mockJoinRequest, mockGetOrgJoinRequests, mockOrgCreation,
   mockServicesAll,
   silenceRealtime,
@@ -35,27 +35,31 @@ test.describe('Org creation → appears on dashboard', () => {
     await expect(page.getByText('Welcome to Rollcally')).toBeVisible()
 
     // Click "New" to open the create form
-    await page.getByRole('button', { name: /^New$/i }).click()
+    await page.getByRole('button', { name: /New/i }).click()
     await page.getByLabel('Name of Organization').fill('New Test Church')
 
-    // After create, org list returns the new org
-    await page.route(`${SUPABASE_URL}/rest/v1/organizations*`, route =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([{
-          id: IDS_ORG2,
-          name: 'New Test Church',
-          created_by_admin_id: IDS.superAdmin,
-          created_at: new Date().toISOString(),
-          organization_members: [{ role: 'owner' }],
-        }]),
-      }),
-    )
+    // After create, org list returns the new org (GET only — do not intercept POST)
+    await page.route(`${SUPABASE_URL}/rest/v1/organizations*`, async route => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify([{
+            id: IDS_ORG2,
+            name: 'New Test Church',
+            created_by_admin_id: IDS.superAdmin,
+            created_at: new Date().toISOString(),
+            organization_members: [{ role: 'owner' }],
+          }]),
+        })
+      } else {
+        await route.fallback()
+      }
+    })
 
     await page.getByRole('button', { name: 'Create' }).click()
     // Success screen shows the org name
-    await expect(page.getByText('New Test Church')).toBeVisible()
+    await expect(page.getByText('New Test Church').first()).toBeVisible()
   })
 
   test('newly created org can be opened', async ({ page }) => {
@@ -79,7 +83,7 @@ test.describe('Org creation → appears on dashboard', () => {
     // Navigate directly to org detail after creation
     await mockUnits(page)
     await page.goto(`/admin/orgs/${IDS_ORG2}`)
-    await expect(page.getByText('New Test Church')).toBeVisible()
+    await expect(page.getByText('New Test Church').first()).toBeVisible()
   })
 })
 
@@ -105,7 +109,7 @@ test.describe('Join request → approval → org visible', () => {
 
     await page.goto(`/admin/orgs/${IDS.org}`)
     // Owner can see the org detail
-    await expect(page.getByText('Grace Baptist Church')).toBeVisible()
+    await expect(page.getByText('Grace Baptist Church').first()).toBeVisible()
   })
 
   test('org owner sees pending join request in org detail', async ({ page }) => {
@@ -130,7 +134,7 @@ test.describe('Join request → approval → org visible', () => {
     await mockOrganizationMembers(page)
 
     await page.goto(`/admin/orgs/${IDS.org}`)
-    await expect(page.getByText('Grace Baptist Church')).toBeVisible()
+    await expect(page.getByText('Grace Baptist Church').first()).toBeVisible()
   })
 })
 

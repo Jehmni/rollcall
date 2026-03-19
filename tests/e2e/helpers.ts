@@ -20,13 +20,19 @@ export const IDS = {
 // Canned data
 const UNIT_SINGLE = {
   id: IDS.unit, org_id: IDS.org, name: 'Main Choir', description: null,
-  created_at: '2024-01-01T00:00:00Z',
-  organization: { name: 'Grace Baptist Church' },
+  created_at: '2024-01-01T00:00:00Z', created_by_admin_id: IDS.superAdmin,
+  organization: {
+    id: IDS.org, name: 'Grace Baptist Church',
+    created_by_admin_id: IDS.superAdmin, created_at: '2024-01-01T00:00:00Z',
+    organization_members: [{ role: 'owner', admin_id: IDS.superAdmin }],
+  },
 }
 const UNIT_LIST = [
   { id: IDS.unit, org_id: IDS.org, name: 'Main Choir', description: 'Sunday choir', created_at: '2024-01-01T00:00:00Z' },
 ]
-const SERVICE_SINGLE = { id: IDS.service, unit_id: IDS.unit, date: '2026-03-10', service_type: 'rehearsal', created_at: '2024-01-01T00:00:00Z' }
+// SERVICE_SINGLE uses a future date (2026-12-10, Wednesday) so it appears in "Upcoming" sections.
+// SERVICE_PAST remains in the past for historical data.
+const SERVICE_SINGLE = { id: IDS.service, unit_id: IDS.unit, date: '2026-12-10', service_type: 'rehearsal', created_at: '2024-01-01T00:00:00Z' }
 const SERVICE_LIST = [SERVICE_SINGLE]
 const SERVICE_PAST = { id: IDS.servicePast, unit_id: IDS.unit, date: '2026-03-05', service_type: 'rehearsal', created_at: '2024-01-01T00:00:00Z' }
 const SERVICE_LIST_WITH_PAST = [SERVICE_SINGLE, SERVICE_PAST] // upcoming first, then past (desc order)
@@ -58,6 +64,10 @@ export async function asSuperAdmin(page: Page) {
   await page.route(`${SUPABASE_URL}/auth/v1/token*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(session) }),
   )
+  // auth.getUser() calls /auth/v1/user — must return the user object
+  await page.route(`${SUPABASE_URL}/auth/v1/user*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(session.user) }),
+  )
 }
 
 /**
@@ -84,6 +94,10 @@ export async function asUnitAdmin(page: Page, unitCount: 1 | 2 = 1) {
         { unit: { id: IDS.unit2, org_id: IDS.org, name: 'Youth Choir', description: null, created_at: '2024-01-01T00:00:00Z', organization: { name: 'Grace Baptist Church' } } },
       ]
 
+  // auth.getUser() calls /auth/v1/user — must return the user object
+  await page.route(`${SUPABASE_URL}/auth/v1/user*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(session.user) }),
+  )
   // Register LAST so it has highest priority (Playwright routes are LIFO)
   await page.route(`${SUPABASE_URL}/rest/v1/unit_admins*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(rows) }),
@@ -92,9 +106,13 @@ export async function asUnitAdmin(page: Page, unitCount: 1 | 2 = 1) {
 
 // ── Table mocks ───────────────────────────────────────────────────────────────
 
-/** Mock organizations list */
+/** Mock organizations list (with organization_members for the useOrganizations hook join) */
 export async function mockOrgs(page: Page) {
-  const data = [{ id: IDS.org, name: 'Grace Baptist Church', created_at: '2024-01-01T00:00:00Z' }]
+  const data = [{
+    id: IDS.org, name: 'Grace Baptist Church',
+    created_by_admin_id: IDS.superAdmin, created_at: '2024-01-01T00:00:00Z',
+    organization_members: [{ role: 'owner' }],
+  }]
   await page.route(`${SUPABASE_URL}/rest/v1/organizations*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) }),
   )
@@ -134,10 +152,20 @@ export async function mockUnitLookup(page: Page) {
   )
 }
 
-/** Mock unit name lookup for UnitMembers (.single() → object) */
+/** Mock unit name lookup for UnitMembers (.single() → object with org + org_members) */
 export async function mockUnitName(page: Page) {
   await page.route(`${SUPABASE_URL}/rest/v1/units*`, route =>
-    route.fulfill({ status: 200, contentType: 'application/vnd.pgrst.object+json', body: JSON.stringify({ name: 'Main Choir' }) }),
+    route.fulfill({
+      status: 200,
+      contentType: 'application/vnd.pgrst.object+json',
+      body: JSON.stringify({
+        ...UNIT_SINGLE,
+        organization: {
+          name: 'Grace Baptist Church',
+          organization_members: [{ role: 'owner', admin_id: IDS.superAdmin }],
+        },
+      }),
+    }),
   )
 }
 
@@ -189,15 +217,30 @@ export async function mockServiceLookup(page: Page) {
   )
 }
 
-/** Mock members list for UnitMembers page */
+/** Mock members list for UnitMembers page (handles both GET and HEAD) */
 export async function mockMembers(page: Page) {
   const data = [
     { id: IDS.member1, unit_id: IDS.unit, name: 'Alice Johnson', phone: '+2348001234567', section: 'Soprano', status: 'active', created_at: '2024-01-01T00:00:00Z' },
     { id: IDS.member2, unit_id: IDS.unit, name: 'Bob Smith',    phone: null,             section: 'Bass',    status: 'active', created_at: '2024-01-01T00:00:00Z' },
   ]
-  await page.route(`${SUPABASE_URL}/rest/v1/members*`, route =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) }),
-  )
+  await page.route(`${SUPABASE_URL}/rest/v1/members*`, async route => {
+    if (route.request().method() === 'HEAD') {
+      await route.fulfill({ status: 200, headers: { 'Content-Range': '0-1/2' }, body: '' })
+    } else {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) })
+    }
+  })
+}
+
+/** Mock members count HEAD request (for AdminServiceDetail total count) */
+export async function mockMembersHead(page: Page, count = 2) {
+  await page.route(`${SUPABASE_URL}/rest/v1/members*`, async route => {
+    if (route.request().method() === 'HEAD') {
+      await route.fulfill({ status: 200, headers: { 'Content-Range': `0-${count - 1}/${count}` }, body: '' })
+    } else {
+      await route.continue()
+    }
+  })
 }
 
 /**
@@ -228,15 +271,26 @@ export async function mockMemberSingle(page: Page) {
 
 // ── RPC mocks ─────────────────────────────────────────────────────────────────
 
-/** Mock get_service_members (public check-in page) */
+/** Mock get_service_members (public check-in page) — filters by p_search from POST body */
 export async function mockGetServiceMembers(page: Page) {
-  const data = [
+  const allMembers = [
     { id: IDS.member1, name: 'Alice Johnson', section: 'Soprano' },
     { id: IDS.member2, name: 'Bob Smith',     section: 'Bass' },
   ]
-  await page.route(`${SUPABASE_URL}/rest/v1/rpc/get_service_members*`, route =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) }),
-  )
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/get_service_members*`, async route => {
+    let members = allMembers
+    try {
+      const body = route.request().postData()
+      if (body) {
+        const params = JSON.parse(body)
+        if (params.p_search) {
+          const search = params.p_search.toLowerCase()
+          members = allMembers.filter(m => m.name.toLowerCase().includes(search))
+        }
+      }
+    } catch { /* ignore parse errors */ }
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(members) })
+  })
 }
 
 /**
@@ -248,6 +302,17 @@ export async function mockGetServiceMembersFull(page: Page) {
   const data = [
     { id: IDS.member1, name: 'Alice Johnson', phone: '+2348001234567', section: 'Soprano', checked_in: true,  checkin_time: '2026-03-10T09:15:00Z' },
     { id: IDS.member2, name: 'Bob Smith',     phone: null,             section: 'Bass',    checked_in: false, checkin_time: null },
+  ]
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/get_service_members_full*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) }),
+  )
+}
+
+/** Mock get_service_members_full with both members checked in (for 100% rate tests) */
+export async function mockGetServiceMembersBothPresent(page: Page) {
+  const data = [
+    { id: IDS.member1, name: 'Alice Johnson', phone: '+2348001234567', section: 'Soprano', checked_in: true, checkin_time: '2026-03-10T09:00:00Z' },
+    { id: IDS.member2, name: 'Bob Smith',     phone: null,             section: 'Bass',    checked_in: true, checkin_time: '2026-03-10T09:05:00Z' },
   ]
   await page.route(`${SUPABASE_URL}/rest/v1/rpc/get_service_members_full*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) }),
@@ -345,9 +410,19 @@ export async function asOrgMember(page: Page) {
   await page.route(`${SUPABASE_URL}/auth/v1/token*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(session) }),
   )
+  await page.route(`${SUPABASE_URL}/auth/v1/user*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(session.user) }),
+  )
   // Return unit_admins — member has no direct unit access yet
   await page.route(`${SUPABASE_URL}/rest/v1/unit_admins*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
+  )
+}
+
+/** Mock the is_super_admin() RPC — call before navigating to pages that check this */
+export async function mockIsSuperAdminRpc(page: Page, result = true) {
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/is_super_admin*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(result) }),
   )
 }
 
