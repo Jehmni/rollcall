@@ -204,7 +204,7 @@ export default function MemberDetail() {
                   </span>
                 )}
                 {member.status === 'inactive' && (
-                  <span className="text-2xs font-black uppercase tracking-widest text-white/40">Retired</span>
+                  <span className="text-2xs font-black uppercase tracking-widest text-white/60">Retired</span>
                 )}
              </div>
           </div>

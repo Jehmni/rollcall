@@ -111,7 +111,7 @@ export default function AdminLogin() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
-                  className="w-full rounded-2xl text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-primary/20 bg-primary/5 h-16 pl-14 placeholder:text-slate-600 text-base font-medium transition-all"
+                  className="w-full rounded-2xl text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-primary/20 bg-primary/5 h-16 pl-14 placeholder:text-slate-500 text-base font-medium transition-all"
                 />
               </div>
             </div>
@@ -136,7 +136,7 @@ export default function AdminLogin() {
                   onChange={e => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
-                  className="w-full rounded-2xl text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-primary/20 bg-primary/5 h-16 pl-14 pr-14 placeholder:text-slate-600 text-base font-medium transition-all"
+                  className="w-full rounded-2xl text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-primary/20 bg-primary/5 h-16 pl-14 pr-14 placeholder:text-slate-500 text-base font-medium transition-all"
                 />
                 <button 
                   type="button"

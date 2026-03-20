@@ -412,7 +412,7 @@ export default function AdminServiceDetail() {
                   <div key={section}>
                     {/* Section header — only show if there are named sections */}
                     {(section || Object.keys(grouped).length > 1) && (
-                      <p className="px-2 pt-4 pb-2 text-2xs font-bold uppercase tracking-spaced text-primary/60">
+                      <p className="px-2 pt-4 pb-2 text-2xs font-bold uppercase tracking-spaced text-primary/80">
                         {section || 'General'}
                       </p>
                     )}
@@ -454,12 +454,12 @@ export default function AdminServiceDetail() {
                                   <a
                                     href={`tel:${m.phone}`}
                                     onClick={e => e.stopPropagation()}
-                                    className="text-2xs text-primary/60 hover:text-primary transition-colors"
+                                    className="text-2xs text-primary/80 hover:text-primary transition-colors"
                                   >
                                     Call
                                   </a>
                                 ) : (
-                                  <p className="text-2xs text-slate-600">No contact</p>
+                                  <p className="text-2xs text-slate-500">No contact</p>
                                 )}
                               </>
                             )}

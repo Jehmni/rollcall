@@ -217,9 +217,9 @@ function SettingsModal({
               className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Description <span className="normal-case font-normal text-slate-600">(optional)</span></span>
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Description <span className="normal-case font-normal text-slate-500">(optional)</span></span>
             <input value={desc} onChange={e => onChangeDesc(e.target.value)} placeholder="Purpose of this unit…"
-              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
+              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
           </label>
           {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
           <div className="flex items-center justify-between pt-2">
@@ -265,7 +265,7 @@ function AdminsModal({
         <form onSubmit={onSubmit} className="flex gap-2 mb-5">
           <input
             type="email" value={newEmail} onChange={e => onChangeEmail(e.target.value)} placeholder="admin@email.com" required
-            className="flex-1 bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
+            className="flex-1 bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
           />
           <button type="submit" disabled={loading}
             className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50 flex-shrink-0">
@@ -452,7 +452,7 @@ export default function UnitDashboard() {
               <span className="material-symbols-outlined text-white">arrow_back</span>
             </button>
 
-            <span className="text-xs font-bold uppercase tracking-widest text-white/40">Rollcally</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-white/60">Rollcally</span>
 
             <div className="flex items-center gap-2">
               {unitId && <NotificationBell unitId={unitId} />}
@@ -480,8 +480,8 @@ export default function UnitDashboard() {
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-1">{unit?.name ?? 'Unit'}</h1>
             <div className="flex items-center gap-2 flex-wrap justify-center">
-              {orgName && <span className="text-xs font-medium text-white/40 uppercase tracking-wider">{orgName}</span>}
-              {orgName && <span className="text-white/20">·</span>}
+              {orgName && <span className="text-xs font-medium text-white/60 uppercase tracking-wider">{orgName}</span>}
+              {orgName && <span className="text-white/40">·</span>}
               <span
                 className="text-2xs font-black uppercase tracking-widest px-2.5 py-1 rounded-full border"
                 style={{ color: roleBadgeColor, borderColor: `${roleBadgeColor}40`, backgroundColor: `${roleBadgeColor}15` }}
@@ -490,7 +490,7 @@ export default function UnitDashboard() {
               </span>
             </div>
             {unit?.description && (
-              <p className="text-sm text-white/40 mt-2 max-w-xs">{unit.description}</p>
+              <p className="text-sm text-white/65 mt-2 max-w-xs">{unit.description}</p>
             )}
           </div>
 
@@ -498,17 +498,17 @@ export default function UnitDashboard() {
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
               <p className="text-xl sm:text-2xl font-extrabold text-white">{servicesLoading ? '–' : upcoming.length}</p>
-              <p className="text-2xs font-bold uppercase tracking-wider text-white/50 mt-0.5">Upcoming</p>
+              <p className="text-2xs font-bold uppercase tracking-wider text-white/65 mt-0.5">Upcoming</p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
               <p className="text-xl sm:text-2xl font-extrabold text-white">{servicesLoading ? '–' : totalSessions}</p>
-              <p className="text-2xs font-bold uppercase tracking-wider text-white/50 mt-0.5">Total</p>
+              <p className="text-2xs font-bold uppercase tracking-wider text-white/65 mt-0.5">Total</p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
               <p className={`text-xl sm:text-2xl font-extrabold ${todaySessions > 0 ? 'text-emerald-300' : 'text-white'}`}>
                 {servicesLoading ? '–' : todaySessions > 0 ? 'Live' : '—'}
               </p>
-              <p className="text-2xs font-bold uppercase tracking-wider text-white/50 mt-0.5">Today</p>
+              <p className="text-2xs font-bold uppercase tracking-wider text-white/65 mt-0.5">Today</p>
             </div>
           </div>
         </div>

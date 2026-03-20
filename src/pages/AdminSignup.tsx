@@ -102,7 +102,7 @@ export default function AdminSignup() {
                   Email Address
                 </label>
                 <input 
-                  className="w-full px-5 py-5 rounded-[1.5rem] border border-primary/10 bg-primary/5 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all duration-200 outline-none text-base font-medium" 
+                  className="w-full px-5 py-5 rounded-[1.5rem] border border-primary/10 bg-primary/5 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all duration-200 outline-none text-base font-medium" 
                   id="email" 
                   type="email"
                   value={email}
@@ -119,7 +119,7 @@ export default function AdminSignup() {
                 </label>
                 <div className="relative">
                   <input 
-                    className="w-full px-5 py-5 rounded-[1.5rem] border border-primary/10 bg-primary/5 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all duration-200 outline-none text-base font-medium pr-14" 
+                    className="w-full px-5 py-5 rounded-[1.5rem] border border-primary/10 bg-primary/5 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all duration-200 outline-none text-base font-medium pr-14" 
                     id="password" 
                     type={showPassword ? 'text' : 'password'}
                     value={password}
@@ -145,7 +145,7 @@ export default function AdminSignup() {
                   Confirm Password
                 </label>
                 <input 
-                  className="w-full px-5 py-5 rounded-[1.5rem] border border-primary/10 bg-primary/5 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all duration-200 outline-none text-base font-medium" 
+                  className="w-full px-5 py-5 rounded-[1.5rem] border border-primary/10 bg-primary/5 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all duration-200 outline-none text-base font-medium" 
                   id="confirm-password" 
                   type="password"
                   value={confirmPassword}

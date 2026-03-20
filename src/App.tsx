@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { ToastProvider } from './contexts/ToastContext'
 import { ErrorBoundary } from './components/ErrorBoundary'
-import { AdminRoute } from './components/ProtectedRoute'
+import { AdminRoute, SuperRoute } from './components/ProtectedRoute'
 import CheckIn from './pages/CheckIn'
 import Landing from './pages/Landing'
 import AdminLogin from './pages/AdminLogin'
@@ -17,6 +17,7 @@ import AdminServiceDetail from './pages/AdminServiceDetail'
 import MemberDetail from './pages/MemberDetail'
 import AdminOrgDiscovery from './pages/AdminOrgDiscovery'
 import HelpCentre from './pages/HelpCentre'
+import SuperAdminDashboard from './pages/SuperAdminDashboard'
 
 export default function App() {
   return (
@@ -48,6 +49,9 @@ export default function App() {
             <Route path="/admin/units/:unitId/members" element={<AdminRoute><ErrorBoundary label="Unit Members"><UnitMembers /></ErrorBoundary></AdminRoute>} />
             <Route path="/admin/units/:unitId/members/:memberId" element={<AdminRoute><ErrorBoundary label="Member Detail"><MemberDetail /></ErrorBoundary></AdminRoute>} />
             <Route path="/admin/units/:unitId/events/:serviceId" element={<AdminRoute><ErrorBoundary label="Service Detail"><AdminServiceDetail /></ErrorBoundary></AdminRoute>} />
+
+            {/* Superadmin — founder only, not linked anywhere */}
+            <Route path="/__rc_super" element={<SuperRoute><SuperAdminDashboard /></SuperRoute>} />
 
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

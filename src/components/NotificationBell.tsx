@@ -37,19 +37,19 @@ export function NotificationBell({ unitId }: { unitId: string }) {
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-surface-dark border border-border-dark p-2 shadow-2xl shadow-black/40 z-50 animate-in fade-in zoom-in-95 duration-150">
                     <div className="flex items-center justify-between px-3 py-2 border-b border-border-dark mb-1">
-                        <h3 className="text-2xs font-bold uppercase tracking-spaced text-slate-500">
+                        <h3 className="text-2xs font-bold uppercase tracking-spaced text-slate-400">
                             Birthday Alerts
                         </h3>
                         {count === 0 && (
-                            <span className="text-2xs text-slate-600">All clear</span>
+                            <span className="text-2xs text-slate-500">All clear</span>
                         )}
                     </div>
 
                     <div className="max-h-80 overflow-y-auto flex flex-col gap-0.5">
                         {notifications.length === 0 ? (
                             <div className="py-8 text-center">
-                                <Cake className="mx-auto h-8 w-8 text-slate-700 mb-2" />
-                                <p className="text-sm text-slate-500">No new alerts</p>
+                                <Cake className="mx-auto h-8 w-8 text-slate-600 mb-2" />
+                                <p className="text-sm text-slate-400">No new alerts</p>
                             </div>
                         ) : (
                             notifications.map((n) => (
@@ -64,13 +64,13 @@ export function NotificationBell({ unitId }: { unitId: string }) {
                                         <p className="text-sm font-semibold text-slate-100 truncate">
                                             {n.member_name}
                                         </p>
-                                        <p className="text-xs text-slate-500">
+                                        <p className="text-xs text-slate-400">
                                             {n.type === 'birthday_eve' ? 'Birthday tomorrow!' : 'Birthday today! 🎉'}
                                         </p>
                                     </div>
                                     <button
                                         onClick={() => dismissNotification(n.id)}
-                                        className="absolute right-1.5 top-1.5 p-1 text-slate-600 hover:text-slate-300 rounded-lg hover:bg-white/5 transition-colors"
+                                        className="absolute right-1.5 top-1.5 p-1 text-slate-500 hover:text-slate-300 rounded-lg hover:bg-white/5 transition-colors"
                                         title="Dismiss"
                                     >
                                         <X className="h-3.5 w-3.5" />

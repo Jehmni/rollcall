@@ -20,9 +20,19 @@ function Spinner() {
 export function AdminRoute({ children }: { children: ReactNode }) {
   const { session, loading } = useAuth()
   if (loading) return <Spinner />
-  
+
   if (!session) {
     return <Navigate to="/admin/login" replace />
+  }
+  return <>{children}</>
+}
+
+export function SuperRoute({ children }: { children: ReactNode }) {
+  const { session, isSuper, loading } = useAuth()
+  if (loading) return <Spinner />
+
+  if (!session || !isSuper) {
+    return <Navigate to="/" replace />
   }
   return <>{children}</>
 }

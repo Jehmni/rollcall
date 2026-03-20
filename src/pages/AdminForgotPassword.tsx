@@ -135,7 +135,7 @@ export default function AdminForgotPassword() {
                     <span className="material-symbols-outlined text-slate-500 group-focus-within:text-primary transition-colors text-xl">alternate_email</span>
                   </div>
                   <input 
-                    className="block w-full pl-14 pr-4 py-5 bg-primary/5 border border-primary/10 rounded-[1.5rem] focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all outline-none text-white placeholder:text-slate-600 text-base font-medium" 
+                    className="block w-full pl-14 pr-4 py-5 bg-primary/5 border border-primary/10 rounded-[1.5rem] focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all outline-none text-white placeholder:text-slate-500 text-base font-medium" 
                     id="email" 
                     type="email"
                     value={email}

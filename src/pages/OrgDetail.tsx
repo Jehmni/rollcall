@@ -20,7 +20,7 @@ function StatPill({ icon, label, value, color = '#5247e6' }: { icon: string; lab
   return (
     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
       <span className="material-symbols-outlined text-[14px]" style={{ color }}>{icon}</span>
-      <span className="text-2xs font-semibold text-slate-400 leading-none">{value} <span className="text-slate-600">{label}</span></span>
+      <span className="text-2xs font-semibold text-slate-400 leading-none">{value} <span className="text-slate-500">{label}</span></span>
     </div>
   )
 }
@@ -121,12 +121,12 @@ function UnitFormModal({ editing, name, desc, error, loading, onChangeName, onCh
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Unit Name</span>
-            <input className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
+            <input className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
               placeholder="e.g. Volunteers, Backend Team…" value={name} onChange={e => onChangeName(e.target.value)} required autoFocus />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Description <span className="text-slate-600 normal-case font-normal">(optional)</span></span>
-            <input className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Description <span className="text-slate-500 normal-case font-normal">(optional)</span></span>
+            <input className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
               placeholder="Purpose of this group…" value={desc} onChange={e => onChangeDesc(e.target.value)} />
           </label>
           {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}

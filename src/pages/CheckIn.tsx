@@ -254,7 +254,7 @@ export default function CheckIn() {
                 placeholder="Search your name…"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                className="w-full rounded-2xl border border-primary/10 bg-primary/5 py-5 pl-12 pr-6 text-lg font-bold transition-all focus:border-primary/50 focus:ring-8 focus:ring-primary/5 placeholder:text-slate-600 shadow-xl"
+                className="w-full rounded-2xl border border-primary/10 bg-primary/5 py-5 pl-12 pr-6 text-lg font-bold transition-all focus:border-primary/50 focus:ring-8 focus:ring-primary/5 placeholder:text-slate-500 text-white shadow-xl"
                 autoFocus
               />
             </div>
@@ -292,12 +292,12 @@ export default function CheckIn() {
                 )}
                 {members.length === 0 && query && (
                   <div className="flex flex-col items-center gap-3 py-10 px-4 rounded-2xl bg-primary/5 border border-primary/10">
-                    <span className="material-symbols-outlined text-4xl text-slate-600">search_off</span>
+                    <span className="material-symbols-outlined text-4xl text-slate-500">search_off</span>
                     <p className="text-sm font-semibold text-slate-400 text-center">No members match <span className="text-white">"{query}"</span></p>
-                    <p className="text-2xs text-slate-600 text-center">Check the spelling or try a different name.</p>
+                    <p className="text-2xs text-slate-500 text-center">Check the spelling or try a different name.</p>
                     <div className="mt-4 pt-4 border-t border-primary/10 w-full text-center">
                       <p className="text-xs text-slate-500 font-medium italic">Not in the system?</p>
-                      <p className="text-2xs text-slate-600 mt-1 max-w-[200px] mx-auto leading-relaxed">Please locate the nearest official to be added to the unit roster.</p>
+                      <p className="text-2xs text-slate-500 mt-1 max-w-[200px] mx-auto leading-relaxed">Please locate the nearest official to be added to the unit roster.</p>
                     </div>
                   </div>
                 )}
@@ -436,7 +436,7 @@ export default function CheckIn() {
                     <span>Done</span>
                     <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
                   </button>
-                  <p className="text-center text-slate-600 text-2xs font-black uppercase tracking-spaced mt-6">
+                  <p className="text-center text-slate-500 text-2xs font-black uppercase tracking-spaced mt-6">
                     Rollcally Identity Verification System
                   </p>
                 </div>
@@ -464,7 +464,7 @@ export default function CheckIn() {
         ) : null}
 
         <div className="mt-auto pt-10 text-center pb-20">
-          <p className="text-slate-600 text-2xs font-black tracking-spaced uppercase">
+          <p className="text-slate-500 text-2xs font-black tracking-spaced uppercase">
             Not a visitor?
             <button
               onClick={() => navigate('/admin')}

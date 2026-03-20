@@ -232,7 +232,7 @@ function MemberRow({ member, canManage, onEdit, onDelete, onView }: {
           {member.section && (
             <span className="text-2xs font-semibold text-primary/70">{member.section}</span>
           )}
-          {member.section && member.phone && <span className="text-slate-700 text-2xs">·</span>}
+          {member.section && member.phone && <span className="text-slate-500 text-2xs">·</span>}
           {member.phone && (
             <span className="text-2xs text-slate-500">{member.phone}</span>
           )}
@@ -259,7 +259,7 @@ function MemberRow({ member, canManage, onEdit, onDelete, onView }: {
             </button>
           </>
         )}
-        <span className="material-symbols-outlined text-slate-700 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all text-lg">chevron_right</span>
+        <span className="material-symbols-outlined text-slate-600 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all text-lg">chevron_right</span>
       </div>
     </div>
   )
@@ -294,7 +294,7 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Full Name *</span>
             <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required autoFocus
               placeholder="e.g. Johnathan Doe"
-              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
+              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
           </label>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -302,13 +302,13 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Phone</span>
               <input type="tel" value={form.phone ?? ''} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                 placeholder="+234 800 000 0000"
-                className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
+                className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Section / Group</span>
               <input value={form.section ?? ''} onChange={e => setForm(f => ({ ...f, section: e.target.value }))}
                 placeholder="e.g. Soprano, Staff"
-                className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
+                className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
             </label>
           </div>
 
@@ -437,12 +437,12 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
                   Download Template
                 </button>
               </div>
-              <details className="text-xs text-slate-600 w-full text-left">
+              <details className="text-xs text-slate-500 w-full text-left">
                 <summary className="cursor-pointer hover:text-slate-400 select-none">Expected CSV format</summary>
                 <pre className="mt-2 rounded-lg bg-background-dark p-3 font-mono leading-relaxed text-slate-500 overflow-x-auto text-2xs">
                   {`Name,Phone,Section,Status,Birthday\nAlice Johnson,+2348001234567,Soprano,active,1990-05-14\nBob Smith,,Bass,active,1985-11-20`}
                 </pre>
-                <p className="mt-1 text-slate-600">Phone, Section, Status, and Birthday are optional. Status defaults to "active".</p>
+                <p className="mt-1 text-slate-500">Phone, Section, Status, and Birthday are optional. Status defaults to "active".</p>
               </details>
             </div>
           )}
@@ -837,7 +837,7 @@ export default function UnitMembers() {
           </div>
         ) : members.length === 0 ? (
           <div className="bg-surface-dark rounded-2xl border border-dashed border-border-dark p-12 text-center mt-4">
-            <span className="material-symbols-outlined text-5xl text-slate-700 block mb-3">group</span>
+            <span className="material-symbols-outlined text-5xl text-slate-600 block mb-3">group</span>
             <p className="font-bold text-slate-300 mb-1">{search ? 'No results' : 'No members yet'}</p>
             <p className="text-sm text-slate-500 mb-5">
               {search ? `No members match "${search}"` : 'Add your first member to get started.'}

@@ -20,6 +20,8 @@ export default {
         },
         'background-light': '#f6f6f8',
         'background-dark': '#121121',
+        'surface-dark': '#1e1b38',
+        'border-dark': '#2d2a52',
       },
       fontFamily: {
         // Body & UI: Plus Jakarta Sans — refined geometric sans used by premium global brands
