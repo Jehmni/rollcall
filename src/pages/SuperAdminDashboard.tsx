@@ -91,8 +91,9 @@ export default function SuperAdminDashboard() {
         .limit(20)
 
       if (orgData) {
+        type OrgWithCounts = { id: string; name: string; created_at: string; units: { count: number }[]; organization_members: { count: number }[] }
         setOrgs(
-          orgData.map((o: any) => ({
+          (orgData as OrgWithCounts[]).map((o) => ({
             id: o.id,
             name: o.name,
             created_at: o.created_at,
@@ -114,12 +115,13 @@ export default function SuperAdminDashboard() {
         .limit(10)
 
       if (signupData) {
+        type SignupRow = { id: string; created_at: string; organizations: { name: string }[] | null }
         setRecentSignups(
-          signupData.map((s: any, i: number) => ({
+          (signupData as unknown as SignupRow[]).map((s, i) => ({
             id: s.id ?? String(i),
             email: '—',
             created_at: s.created_at,
-            org_name: s.organizations?.name ?? null,
+            org_name: s.organizations?.[0]?.name ?? null,
           }))
         )
       }

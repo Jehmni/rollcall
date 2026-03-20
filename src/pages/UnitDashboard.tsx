@@ -245,7 +245,7 @@ function AdminsModal({
   admins, newEmail, error, loading,
   onChangeEmail, onSubmit, onRemove, onClose,
 }: {
-  admins: any[]; newEmail: string; error: string | null; loading: boolean
+  admins: { id: string; user_id: string; email: string; created_at: string }[]; newEmail: string; error: string | null; loading: boolean
   onChangeEmail: (v: string) => void; onSubmit: (e: FormEvent) => void
   onRemove: (id: string) => void; onClose: () => void
 }) {
@@ -341,7 +341,7 @@ export default function UnitDashboard() {
       .then(({ data }) => {
         if (data) {
           setUnit(data)
-          const org = data.organization as any
+          const org = data.organization as { name: string; id: string; organization_members: { role: OrgRole }[] } | null
           setOrgName(org?.name ?? '')
           setOrgId(org?.id ?? '')
           setNewName(data.name)

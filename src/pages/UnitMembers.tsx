@@ -70,7 +70,7 @@ function normaliseDate(raw: string): string | null {
   // Already ISO: YYYY-MM-DD
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
   // DD/MM/YYYY or MM/DD/YYYY  →  prefer DD/MM/YYYY (common outside US)
-  const slashMatch = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/)
+  const slashMatch = s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})$/)
   if (slashMatch) {
     const [, d, m, y] = slashMatch
     const year = y.length === 2 ? `20${y}` : y
@@ -618,11 +618,11 @@ export default function UnitMembers() {
       .then(async ({ data }) => {
         if (data) {
           setUnitName(data.name)
-          const org = data.organization as any
+          const org = data.organization as { name: string; organization_members: { role: string; admin_id: string }[] } | null
           setOrgName(org?.name ?? '')
           const { data: { user } } = await supabase.auth.getUser()
           if (user) {
-            const mems = org?.organization_members as any[]
+            const mems = org?.organization_members
             const myMember = mems?.find(m => m.admin_id === user.id)
             const role = myMember?.role || 'member'
             const { data: isSuper } = await supabase.rpc('is_super_admin')

@@ -194,7 +194,7 @@ export default function OrgDetail() {
   const { getOrgJoinRequests, respondToJoinRequest } = useOrganizations()
 
   const org = orgs.find(o => o.id === orgId)
-  const isOwner = isSuper || (org && (org as any).userRole === 'owner')
+  const isOwner = isSuper || org?.userRole === 'owner'
 
   // Analytics
   const unitIds = units.map(u => u.id)
@@ -206,7 +206,7 @@ export default function OrgDetail() {
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
   const [createdUnit, setCreatedUnit] = useState<Unit | null>(null)
 
-  const [joinRequests, setJoinRequests] = useState<any[]>([])
+  const [joinRequests, setJoinRequests] = useState<{ id: string; admin_id: string; admin_email: string; status: string; created_at: string }[]>([])
   const [loadingRequests, setLoadingRequests] = useState(false)
 
   const [newName, setNewName] = useState('')

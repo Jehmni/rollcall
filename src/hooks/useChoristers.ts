@@ -80,7 +80,7 @@ export function useServiceInfo(serviceId: string | null) {
       .single()
       .then(({ data, error }) => {
         if (!error && data) {
-          setUnitName((data.units as any)?.name || null)
+          setUnitName(((data.units as unknown) as { name: string } | null)?.name || null)
         }
         setLoading(false)
       })

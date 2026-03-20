@@ -23,7 +23,7 @@ export function useOrganizations() {
       .eq('organization_members.admin_id', user.id)
       .order('name')
     
-    const transformed = (data ?? []).map((o: any) => ({
+    const transformed = (data ?? []).map((o: Organization & { organization_members: { role: OrgRole }[] }) => ({
       ...o,
       userRole: o.organization_members[0]?.role || 'member'
     }))

@@ -55,7 +55,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
             if (serviceId) {
               scanner.stop().then(() => onScan(serviceId))
             }
-          } catch (e) {
+          } catch {
             console.error('Invalid QR URL', decodedText)
             setError('Not a valid Rollcally service QR code')
           }
@@ -63,7 +63,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
         () => {} // Silent frame errors
       )
       setPermissionState('granted')
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
       setPermissionState('denied')
       setError('Camera access failed. Please enable permissions in your browser settings.')

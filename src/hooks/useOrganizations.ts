@@ -23,8 +23,8 @@ export function useOrganizations() {
       
       if (err) throw err
       return data as Organization[]
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError((err as Error).message)
       return []
     } finally {
       setLoading(false)
@@ -44,8 +44,8 @@ export function useOrganizations() {
           status: 'pending'
         })
       if (err) throw err
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError((err as Error).message)
       throw err
     } finally {
       setLoading(false)
@@ -62,7 +62,7 @@ export function useOrganizations() {
       
       if (err) throw err
       return data as JoinRequest[]
-    } catch (err) {
+    } catch {
       toast('Failed to load join requests.', 'error')
       return []
     }
@@ -87,7 +87,7 @@ export function useOrganizations() {
         throw err
       }
       return data
-    } catch (err) {
+    } catch {
       toast('Failed to load pending requests.', 'error')
       return []
     }
@@ -103,8 +103,8 @@ export function useOrganizations() {
         .eq('id', requestId)
       
       if (err) throw err
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError((err as Error).message)
       throw err
     } finally {
       setLoading(false)
@@ -120,7 +120,7 @@ export function useOrganizations() {
       
       if (err) throw err
       return data as OrganizationMember[]
-    } catch (err) {
+    } catch {
       toast('Failed to load organisation members.', 'error')
       return []
     }
