@@ -558,7 +558,7 @@ export default function OrgDetail() {
                           <span className="material-symbols-outlined text-primary text-xl">person</span>
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-bold text-slate-100 truncate">{req.admin_email || req.admin?.email || 'Unknown'}</p>
+                          <p className="text-sm font-bold text-slate-100 truncate">{req.admin_email || 'Unknown'}</p>
                           <p className="text-xs text-slate-500 truncate">
                             {req.status === 'pending'
                               ? `Requested ${new Date(req.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
