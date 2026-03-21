@@ -14,7 +14,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
   useEffect(() => {
     const scanner = new Html5Qrcode('qr-reader')
     scannerRef.current = scanner
-    
+
     // Check if permissions might already be granted
     Html5Qrcode.getCameras()
       .then(devices => {
@@ -32,6 +32,8 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
         scanner.stop().catch(console.error)
       }
     }
+  // startScanner intentionally omitted — runs once on mount only
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const startScanner = async (existingScanner?: Html5Qrcode) => {

@@ -292,7 +292,7 @@ export function useAdminDashboard(serviceId: string | null) {
     setHasMore(newMembers.length === PAGE_SIZE)
     setLoading(false)
     setLoadingMore(false)
-  }, [serviceId, fetchCount])
+  }, [serviceId, fetchCount, toast])
 
   useEffect(() => { fetchMembers(0, true) }, [fetchMembers])
 
