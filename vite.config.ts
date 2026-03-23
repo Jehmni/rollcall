@@ -7,49 +7,12 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       includeAssets: ['icons/icon-192.png', 'icons/icon-512.png'],
-      workbox: {
-        // Pre-cache the app shell for reliable offline loading
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        // Cache the member list RPC so check-in works in low-signal venues.
-        // NetworkFirst: tries network (3 s timeout), falls back to cache.
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) =>
-              url.pathname.includes('/rest/v1/rpc/get_service_members'),
-            handler: 'NetworkFirst',
-            method: 'POST',
-            options: {
-              cacheName: 'member-list-cache',
-              networkTimeoutSeconds: 3,
-              expiration: {
-                maxEntries: 30,
-                maxAgeSeconds: 60 * 60 * 24 * 7,
-              },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
-            // Cache Google Fonts stylesheets
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-cache',
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
-            // Cache Google Fonts webfonts
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'gstatic-fonts-cache',
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-        ],
       },
       manifest: {
         name: 'Rollcally',

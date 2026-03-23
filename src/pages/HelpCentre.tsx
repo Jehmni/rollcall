@@ -263,6 +263,29 @@ function MembersTab() {
       </div>
 
       <div>
+        <SectionLabel>Instant Check-In</SectionLabel>
+        <h3 className="font-display text-xl font-bold italic text-white mb-4">One-Tap via Notification</h3>
+        <p className="text-sm text-slate-400 leading-relaxed mb-4">
+          After your first check-in, you may see a prompt asking if you'd like to receive session notifications. Saying yes lets you check in with a single tap — no scanning needed.
+        </p>
+        <div className="bg-primary/5 border border-primary/15 rounded-2xl p-5 space-y-3 mb-4">
+          {[
+            { icon: 'notifications', text: 'When your admin starts a session, a notification appears on your phone' },
+            { icon: 'touch_app', text: 'Tap the notification — you\'re checked in instantly, no QR needed' },
+            { icon: 'qr_code_scanner', text: 'QR code is always available as a fallback' },
+          ].map(({ icon, text }) => (
+            <div key={icon} className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-primary text-lg shrink-0">{icon}</span>
+              <span className="text-sm text-slate-300">{text}</span>
+            </div>
+          ))}
+        </div>
+        <TipBox>
+          Tapping <strong className="text-white">Not now</strong> skips the prompt — your QR code flow works exactly as before. Notifications are tied to the device and browser you used to opt in.
+        </TipBox>
+      </div>
+
+      <div>
         <SectionLabel>Issues</SectionLabel>
         <h3 className="font-display text-xl font-bold italic text-white mb-4">If Something Goes Wrong</h3>
         <div className="space-y-3">
@@ -306,6 +329,12 @@ function AdminsTab() {
             <p>→ TXT — plain text table</p>
             <p>→ CSV — Excel compatible</p>
             <p>→ RTF — Word document</p>
+          </FeatureCard>
+          <FeatureCard icon="cell_tower" title="Go Live — Push Notifications">
+            <p>Tap <strong className="text-white">Notify Members — Go Live</strong> on any event</p>
+            <p>→ Subscribed members get an instant push notification</p>
+            <p>→ One tap on the notification checks them in</p>
+            <p className="text-2xs text-slate-500 mt-2">Works alongside QR — both run at the same time</p>
           </FeatureCard>
         </CardGrid>
       </div>
