@@ -24,12 +24,10 @@ export default {
         'border-dark': '#2d2a52',
       },
       fontFamily: {
-        // Body & UI: Plus Jakarta Sans — refined geometric sans used by premium global brands
-        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-        // Display & headings: Cormorant Garamond — prestige serif used by FT, The Economist,
-        // luxury event programmes, and global cultural institutions.
-        // The italic variant is exceptional — built for formal event typography.
-        display: ['Cormorant Garamond', 'Georgia', 'serif'],
+        // Body & UI: Raleway
+        sans: ['Raleway', 'system-ui', 'sans-serif'],
+        // Display & headings: Aileron
+        display: ['Aileron', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         // Micro label — replaces all arbitrary text-[9px] / text-[10px] usage
