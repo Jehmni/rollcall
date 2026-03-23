@@ -67,7 +67,6 @@ export function useMemberById(memberId: string | null) {
 
 export function useServiceInfo(serviceId: string | null) {
   const [unitName, setUnitName] = useState<string | null>(null)
-  const [unitId, setUnitId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -76,17 +75,16 @@ export function useServiceInfo(serviceId: string | null) {
     setLoading(true)
     supabase
       .from('services')
-      .select('unit_id, units(name)')
+      .select('units(name)')
       .eq('id', serviceId)
       .single()
       .then(({ data, error }) => {
         if (!error && data) {
           setUnitName(((data.units as unknown) as { name: string } | null)?.name || null)
-          setUnitId((data as unknown as { unit_id: string }).unit_id ?? null)
         }
         setLoading(false)
       })
   }, [serviceId])
 
-  return { unitName, unitId, loading }
+  return { unitName, loading }
 }

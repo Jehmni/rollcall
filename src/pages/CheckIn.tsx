@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useAttendance } from '../hooks/useAttendance'
 import { useServiceMembers, useMemberById, useServiceInfo, type PublicMember } from '../hooks/useChoristers'
-import { usePushNotifications } from '../hooks/usePushNotifications'
 import { QRScanner } from '../components/QRScanner'
 
 type Step = 'welcome' | 'list' | 'confirm' | 'done'
@@ -16,15 +15,12 @@ export default function CheckIn() {
   const [successTime, setSuccessTime] = useState<string | null>(null)
   const [showScanner, setShowScanner] = useState(false)
 
-  const [pushOptInState, setPushOptInState] = useState<'idle' | 'asking' | 'done'>('idle')
-  const { isSupported: pushSupported, currentPermission, subscribe: pushSubscribe } = usePushNotifications()
-
   const storedMemberId = localStorage.getItem('rollcally_member_id')
   const { member: recognizedMember } = useMemberById(storedMemberId)
 
   const paramServiceId = searchParams.get('service_id')
   const serviceId = paramServiceId ?? sessionStorage.getItem('pending_service_id')
-  const { unitName, unitId } = useServiceInfo(serviceId)
+  const { unitName } = useServiceInfo(serviceId)
 
   // All check-in state lives in the hook
   const { status, checkedInName, errorMessage, checkIn, reset } = useAttendance(serviceId)
@@ -39,13 +35,6 @@ export default function CheckIn() {
       setSelected(recognizedMember)
     }
   }, [recognizedMember, step])
-
-  // Show push opt-in prompt after a successful first check-in
-  useEffect(() => {
-    if (status === 'success' && pushSupported && currentPermission === 'default') {
-      setPushOptInState('asking')
-    }
-  }, [status, pushSupported, currentPermission])
 
   const { members, loading: listLoading, error: listError } = useServiceMembers(serviceId, query)
 
@@ -438,40 +427,6 @@ export default function CheckIn() {
                     </div>
                   </div>
                 </div>
-
-                {/* Push opt-in prompt — shown once after first successful check-in */}
-                {pushOptInState === 'asking' && unitId && selected && (
-                  <div className="w-full mt-8 p-5 rounded-3xl bg-primary/8 border border-primary/20 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex items-start gap-4">
-                      <div className="size-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary shrink-0 mt-0.5">
-                        <span className="material-symbols-outlined text-xl">notifications</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-white leading-snug">Skip the QR next time</p>
-                        <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                          Get a tap-to-check-in notification when your next session starts.
-                        </p>
-                        <div className="flex gap-3 mt-4">
-                          <button
-                            onClick={async () => {
-                              const result = await pushSubscribe(selected.id, unitId)
-                              setPushOptInState(result === 'granted' ? 'done' : 'done')
-                            }}
-                            className="flex-1 bg-primary text-white text-xs font-black uppercase tracking-spaced py-3 rounded-2xl shadow-lg shadow-primary/30 active:scale-95 transition-all"
-                          >
-                            Enable
-                          </button>
-                          <button
-                            onClick={() => setPushOptInState('done')}
-                            className="flex-1 text-xs font-black uppercase tracking-spaced text-slate-500 hover:text-white py-3 rounded-2xl border border-primary/10 active:scale-95 transition-all"
-                          >
-                            Not now
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 <div className="w-full mt-10">
                   <button
