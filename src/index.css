@@ -1,14 +1,13 @@
 /*
  * Typography — Rollcally
  *
- * Display / Headings: Aileron
- *   Modern geometric sans with a clean precision.
+ * Display / Headings: Cormorant Garamond
+ *   Elegant, premium serif for high-end organization aesthetic.
  *
  * Body / UI: Raleway
  *   Elegant layout font for readability.
  */
-@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap');
-@import url('https://fonts.cdnfonts.com/css/aileron');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Raleway:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;

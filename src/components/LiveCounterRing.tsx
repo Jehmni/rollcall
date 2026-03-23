@@ -154,7 +154,7 @@ export default function LiveCounterRing() {
           letterSpacing: '0.1em',
           margin: '0 0 20px 0'
         }}>
-          Recent check-ins
+          Member Check-Ins
         </h3>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
@@ -173,7 +173,7 @@ export default function LiveCounterRing() {
                   alignItems: 'center',
                   padding: '12px 16px',
                   borderRadius: '12px',
-                  backgroundColor: isNewest ? 'rgba(52, 199, 89, 0.08)' : 'transparent',
+                  backgroundColor: isNewest ? '#34C759' : 'transparent',
                   opacity: Math.max(0.2, opacity),
                   transition: 'all 0.3s ease',
                   animation: 'slideInDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
@@ -182,9 +182,9 @@ export default function LiveCounterRing() {
                     width: '8px',
                     height: '8px',
                     borderRadius: '50%',
-                    backgroundColor: isNewest ? '#34C759' : '#5B8CD4',
+                    backgroundColor: isNewest ? '#FFFFFF' : '#5B8CD4',
                     marginRight: '12px',
-                    boxShadow: isNewest ? '0 0 8px rgba(52, 199, 89, 0.5)' : 'none'
+                    boxShadow: isNewest ? '0 0 8px rgba(255, 255, 255, 0.8)' : 'none'
                   }} />
                   <span style={{ 
                     fontSize: '15px', 

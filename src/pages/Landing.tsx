@@ -7,46 +7,32 @@ export default function Landing() {
   
   // Live Insights Animation State
   const [presenceRate, setPresenceRate] = useState(0)
-  const [chartBars, setChartBars] = useState([10, 15, 12, 20, 18, 25, 10])
+  const [chartBars, setChartBars] = useState([42, 65, 58, 85, 74, 94, 48])
+  const [activeIndex, setActiveIndex] = useState(0)
 
   useEffect(() => {
-    let frame: number;
-    let start = performance.now();
-    const duration = 2000; // 2s to climb
-    const targetBars = [40, 60, 55, 80, 70, 95, 30];
-    
-    const animate = (time: number) => {
-      const progress = Math.min((time - start) / duration, 1);
-      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      
-      setPresenceRate(Math.floor(easeProgress * 94));
-      
-      setChartBars(targetBars.map((target) => Math.floor(10 + (target - 10) * easeProgress)));
-      
-      if (progress < 1) {
-        frame = requestAnimationFrame(animate);
-      }
-    };
-    frame = requestAnimationFrame(animate);
-    
-    // Live fluctuation loop
+    // Generate initial random values for the bars (40 to 94%)
+    const initialBars = Array.from({length: 7}, () => Math.floor(Math.random() * 55) + 40);
+    setChartBars([...initialBars]);
+    setPresenceRate(initialBars[0]);
+
     const interval = setInterval(() => {
-      setPresenceRate(prev => {
-        if (prev < 90) return prev;
-        return 92 + Math.floor(Math.random() * 5); // fluctuate 92-96
+      setActiveIndex(prev => {
+        const next = (prev + 1) % 7;
+        // Update presence rate to exactly match the target bar height
+        setPresenceRate(initialBars[next]);
+        return next;
       });
       
-      setChartBars(prev => prev.map((_, i) => {
-        const base = targetBars[i];
-        const fluctuation = Math.floor(Math.random() * 14) - 7;
-        return Math.max(10, Math.min(100, base + fluctuation));
-      }));
-    }, 2500);
+      // Randomly fluctuate a bar slightly in the background
+      if (Math.random() > 0.5) {
+         const idxToChange = Math.floor(Math.random() * 7);
+         initialBars[idxToChange] = Math.max(40, Math.min(94, initialBars[idxToChange] + (Math.floor(Math.random() * 14) - 7)));
+         setChartBars([...initialBars]);
+      }
+    }, 600); // Move quickly!
 
-    return () => {
-      cancelAnimationFrame(frame);
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -55,7 +41,7 @@ export default function Landing() {
       <nav className="fixed top-0 w-full z-50 flex items-center bg-[#020617]/50 backdrop-blur-xl px-6 py-4 border-b border-white/5 justify-between transition-all duration-300">
         <div className="flex items-center gap-3 group cursor-pointer" onClick={() => navigate('/')}>
           <img src="/logo.png" alt="Rollcally" className="h-10 w-10 object-contain z-10 transition-transform group-hover:scale-110 drop-shadow-lg" />
-          <h2 className="text-white text-2xl font-display font-black tracking-tight">Rollcally</h2>
+          <h2 className="text-white text-2xl font-display font-black italic tracking-tight">Rollcally</h2>
         </div>
         <div className="flex items-center gap-6">
           <button onClick={() => navigate('/help')} className="hidden sm:block text-slate-400 hover:text-white transition-colors font-medium text-sm">User Guide</button>
@@ -71,11 +57,17 @@ export default function Landing() {
       <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none z-0"></div>
       <div className="fixed bottom-[-10%] right-[-10%] w-[30%] h-[40%] bg-purple-600/10 blur-[100px] rounded-full mix-blend-screen pointer-events-none z-0"></div>
 
-      <main className="flex flex-col min-h-screen pt-24 pb-24 sm:pb-0 relative z-10">
+      <main className="flex flex-col min-h-screen pt-24 pb-24 sm:pb-0 relative z-10 w-full max-w-[100vw]">
+        {/* Full Page Background Image */}
+        <div className="fixed inset-0 w-full h-full z-0 pointer-events-none select-none">
+          <div className="absolute inset-0 bg-[url('/images/hero_bg.jpg')] bg-cover bg-center opacity-[0.25] mix-blend-screen"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/40 via-[#020617]/70 to-[#020617]/95"></div>
+        </div>
+
         {/* Hero Section */}
-        <section className="relative flex flex-col items-center justify-center text-center px-4 pt-16 pb-20 max-w-5xl mx-auto w-full">
-          <h1 className="font-display text-5xl sm:text-7xl font-black leading-[1.1] tracking-[0.05em] mb-8 drop-shadow-md">
-            Attendance <span className="text-primary drop-shadow-xl">Reimagined</span><br />
+        <section className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-16 pb-20 max-w-5xl mx-auto w-full">
+          <h1 className="font-display italic text-5xl sm:text-7xl font-black leading-[1.1] tracking-[0.02em] mb-8 drop-shadow-sm">
+            Attendance <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600 drop-shadow-md">Reimagined</span><br />
             for Elite Organizations
           </h1>
           <p className="text-slate-400 text-lg sm:text-xl font-medium leading-relaxed max-w-2xl mb-10">
@@ -108,7 +100,7 @@ export default function Landing() {
               <div className="bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 p-4 rounded-2xl mb-8 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(82,71,230,0.2)]">
                 <span className="material-symbols-outlined text-primary-light text-3xl">person_check</span>
               </div>
-              <h3 className="font-display text-white text-3xl font-bold mb-4">I'm Here</h3>
+              <h3 className="font-display italic text-white text-3xl font-extrabold mb-4">I'm Here</h3>
               <p className="text-slate-400 text-base mb-10 leading-relaxed font-medium">
                 Joining a meeting? Tap here to record your attendance securely in seconds using biometrics or NFC.
               </p>
@@ -127,7 +119,7 @@ export default function Landing() {
               <div className="bg-gradient-to-br from-purple-500/20 to-purple-500/5 border border-purple-500/20 p-4 rounded-2xl mb-8 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(168,85,247,0.2)]">
                 <span className="material-symbols-outlined text-purple-400 text-3xl">verified_user</span>
               </div>
-              <h3 className="font-display text-white text-3xl font-bold mb-4">Admin Portal</h3>
+              <h3 className="font-display italic text-white text-3xl font-extrabold mb-4">Admin Portal</h3>
               <p className="text-slate-400 text-base mb-10 leading-relaxed font-medium">
                 Manage your units, members, and events with powerful analytics, real-time tracking, and deep insights.
               </p>
@@ -140,15 +132,15 @@ export default function Landing() {
         </section>
 
         {/* Feature Grid */}
-        <section className="px-4 py-20 max-w-6xl mx-auto w-full">
+        <section className="px-4 py-20 max-w-6xl mx-auto w-full z-10 relative">
           <div className="text-center mb-16 relative">
-            <h2 className="font-display text-white text-4xl sm:text-5xl font-bold tracking-[0.05em] mb-4">Core Security & Features</h2>
+            <h2 className="font-display italic text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600 text-4xl sm:text-5xl font-extrabold tracking-[0.05em] mb-4 drop-shadow-sm">Core Security & Features</h2>
             <p className="text-slate-400 font-medium max-w-2xl mx-auto text-lg">Architected for environments where security and precision are non-negotiable.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
             {/* Feature 1 */}
-            <div className="flex gap-6 rounded-3xl p-8 bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300 shadow-xl">
-              <div className="bg-white/5 border border-white/10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+            <div className="flex gap-6 rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-primary/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(82,71,230,0.4)] group">
+              <div className="bg-white/5 border border-white/10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)] group-hover:scale-110 transition-transform duration-300">
                 <span className="material-symbols-outlined text-3xl text-primary-light">fingerprint</span>
               </div>
               <div>
@@ -159,8 +151,8 @@ export default function Landing() {
               </div>
             </div>
             {/* Feature 2 */}
-            <div className="flex gap-6 rounded-3xl p-8 bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300 shadow-xl">
-              <div className="bg-white/5 border border-white/10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+            <div className="flex gap-6 rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-purple-500/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(168,85,247,0.4)] group">
+              <div className="bg-white/5 border border-white/10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)] group-hover:scale-110 transition-transform duration-300">
                 <span className="material-symbols-outlined text-3xl text-purple-400">security</span>
               </div>
               <div>
@@ -171,8 +163,8 @@ export default function Landing() {
               </div>
             </div>
             {/* Feature 3 */}
-            <div className="flex gap-6 rounded-3xl p-8 bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300 shadow-xl">
-              <div className="bg-white/5 border border-white/10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+            <div className="flex gap-6 rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-indigo-400/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(129,140,248,0.4)] group">
+              <div className="bg-white/5 border border-white/10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)] group-hover:scale-110 transition-transform duration-300">
                 <span className="material-symbols-outlined text-3xl text-indigo-400">distance</span>
               </div>
               <div>
@@ -183,8 +175,8 @@ export default function Landing() {
               </div>
             </div>
             {/* Feature 4 */}
-            <div className="flex gap-6 rounded-3xl p-8 bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300 shadow-xl">
-              <div className="bg-white/5 border border-white/10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+            <div className="flex gap-6 rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-amber-400/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(251,191,36,0.4)] group">
+              <div className="bg-white/5 border border-white/10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)] group-hover:scale-110 transition-transform duration-300">
                 <span className="material-symbols-outlined text-3xl text-amber-400">bolt</span>
               </div>
               <div>
@@ -203,7 +195,7 @@ export default function Landing() {
           <div className="max-w-4xl mx-auto relative">
             <div className="flex flex-col sm:flex-row items-end justify-between mb-10 gap-4">
               <div>
-                <h2 className="font-display text-white text-4xl font-bold mb-2 tracking-[0.05em]">Live Insights</h2>
+                <h2 className="font-display italic text-white text-4xl font-extrabold mb-2 tracking-[0.05em]">Live Insights</h2>
                 <p className="text-slate-400 text-lg">Real-time attendance dashboard</p>
               </div>
               <div className="text-left sm:text-right">
@@ -229,14 +221,9 @@ export default function Landing() {
                 {chartBars.map((height, i) => (
                   <div key={i} className="relative w-full group h-full flex items-end">
                     <div 
-                      className={`w-full rounded-t-lg transition-all duration-[1000ms] ease-out group-hover:bg-primary ${i === 5 ? 'bg-gradient-to-t from-primary to-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.4)]' : 'bg-white/10'} origin-bottom`} 
+                      className={`w-full rounded-t-lg transition-all duration-500 ease-out group-hover:bg-primary ${i === activeIndex ? 'bg-gradient-to-t from-primary to-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.4)] scale-y-[1.05]' : 'bg-white/10'} origin-bottom`} 
                       style={{ height: `${height}%` }}
                     ></div>
-                    {i === 5 && (
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-slate-900 text-xs font-bold px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                        Today
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
@@ -248,12 +235,14 @@ export default function Landing() {
         </section>
 
         {/* Built for Every Group */}
-        <section className="px-4 py-24 text-center max-w-6xl mx-auto w-full">
-          <h2 className="font-display text-white text-4xl sm:text-5xl font-bold tracking-[0.05em] mb-6">Built for Every Elite Group</h2>
-          <p className="text-slate-400 text-lg sm:text-xl mb-16 max-w-2xl mx-auto font-medium">Rollcally adapts perfectly to your organizational hierarchy, whether you're a global titan or a specialized task force.</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
+        <section className="px-4 py-24 text-center max-w-6xl mx-auto w-full relative z-10">
+          <div className="text-center mb-16 relative">
+            <h2 className="font-display italic text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600 text-4xl sm:text-5xl font-extrabold tracking-[0.05em] mb-4 drop-shadow-sm">Built for Every Elite Group</h2>
+            <p className="text-slate-400 font-medium max-w-2xl mx-auto text-lg">Rollcally adapts perfectly to your organizational hierarchy, whether you're a global titan or a specialized task force.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left relative z-10">
             {/* Elite Group 1 */}
-            <div className="group rounded-3xl p-8 bg-white/5 border border-white/10 hover:bg-white/10 backdrop-blur-md transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] hover:-translate-y-2 relative overflow-hidden flex flex-col h-full cursor-pointer">
+            <div className="group rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-primary/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(82,71,230,0.4)] flex flex-col h-full cursor-pointer hover:-translate-y-2 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
                 <span className="material-symbols-outlined text-8xl text-white">domain</span>
               </div>
@@ -262,7 +251,7 @@ export default function Landing() {
                   <span className="material-symbols-outlined">domain</span>
                 </div>
               </div>
-              <h3 className="font-display text-white text-3xl font-bold mb-4 tracking-[0.05em] relative z-10">Corporations</h3>
+              <h3 className="font-display italic text-white text-3xl font-extrabold mb-4 tracking-[0.05em] relative z-10">Corporations</h3>
               <p className="text-slate-400 text-lg mb-8 relative z-10 flex-grow">
                 Perfectly scaled attendance and geo-tracking for massive global enterprises.
               </p>
@@ -272,7 +261,7 @@ export default function Landing() {
             </div>
             
             {/* Elite Group 2 */}
-            <div className="group rounded-3xl p-8 bg-white/5 border border-white/10 hover:bg-white/10 backdrop-blur-md transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] hover:-translate-y-2 relative overflow-hidden flex flex-col h-full cursor-pointer">
+            <div className="group rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-purple-500/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(168,85,247,0.4)] flex flex-col h-full cursor-pointer hover:-translate-y-2 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
                 <span className="material-symbols-outlined text-8xl text-purple-400">volunteer_activism</span>
               </div>
@@ -281,7 +270,7 @@ export default function Landing() {
                   <span className="material-symbols-outlined">volunteer_activism</span>
                 </div>
               </div>
-              <h3 className="font-display text-white text-3xl font-bold mb-4 tracking-[0.05em] relative z-10">Non-profits</h3>
+              <h3 className="font-display italic text-white text-3xl font-extrabold mb-4 tracking-[0.05em] relative z-10">Non-profits</h3>
               <p className="text-slate-400 text-lg mb-8 relative z-10 flex-grow">
                 Engage volunteers and track event participation with effortless precision.
               </p>
@@ -291,7 +280,7 @@ export default function Landing() {
             </div>
             
             {/* Elite Group 3 */}
-            <div className="group rounded-3xl p-8 bg-white/5 border border-white/10 hover:bg-white/10 backdrop-blur-md transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] hover:-translate-y-2 relative overflow-hidden flex flex-col h-full cursor-pointer">
+            <div className="group rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-blue-400/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(96,165,250,0.4)] flex flex-col h-full cursor-pointer hover:-translate-y-2 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
                 <span className="material-symbols-outlined text-8xl text-blue-400">groups</span>
               </div>
@@ -300,7 +289,7 @@ export default function Landing() {
                   <span className="material-symbols-outlined">groups</span>
                 </div>
               </div>
-              <h3 className="font-display text-white text-3xl font-bold mb-4 tracking-[0.05em] relative z-10">Large Groups</h3>
+              <h3 className="font-display italic text-white text-3xl font-extrabold mb-4 tracking-[0.05em] relative z-10">Large Groups</h3>
               <p className="text-slate-400 text-lg mb-8 relative z-10 flex-grow">
                 Handle thousands of members simultaneously without breaking a sweat.
               </p>
@@ -312,12 +301,12 @@ export default function Landing() {
         </section>
 
         {/* Final CTA */}
-        <section className="px-4 py-20 max-w-5xl mx-auto w-full">
-          <div className="relative bg-gradient-to-br from-primary to-purple-600 rounded-[3rem] p-12 sm:p-20 text-center text-white flex flex-col items-center gap-8 shadow-[0_20px_50px_-10px_rgba(82,71,230,0.5)] overflow-hidden">
-            <div className="absolute inset-0 bg-[url('/images/hero_bg.jpg')] bg-cover opacity-10 mix-blend-screen"></div>
-            <h2 className="relative z-10 font-display text-5xl sm:text-6xl font-bold leading-tight tracking-[0.05em]">Elevate Your<br/>Organization</h2>
-            <p className="relative z-10 text-white/90 max-w-lg text-lg sm:text-xl font-medium">Join the elite groups who have already transformed their accountability and engagement with Rollcally.</p>
-            <button onClick={() => navigate('/admin/signup')} className="relative z-10 w-full max-w-sm bg-white text-slate-900 rounded-full h-16 font-bold text-lg shadow-2xl hover:scale-105 active:scale-95 transition-all tracking-wide">
+        <section className="w-full relative py-14 sm:py-20 bg-gradient-to-br from-primary to-purple-600 text-center text-white flex flex-col items-center shadow-[0_20px_50px_-10px_rgba(82,71,230,0.5)] overflow-hidden border-y border-white/10 mt-12 mb-[-40px]">
+          <div className="absolute inset-0 bg-[url('/images/hero_bg.jpg')] bg-cover bg-center opacity-15 mix-blend-screen pointer-events-none"></div>
+          <div className="relative z-10 max-w-5xl mx-auto px-4 flex flex-col items-center gap-8">
+            <h2 className="font-display italic text-5xl sm:text-7xl font-black leading-tight tracking-[0.05em] drop-shadow-lg">Elevate Your<br/>Organization</h2>
+            <p className="text-white/90 max-w-xl text-lg sm:text-xl font-medium drop-shadow">Join the elite groups who have already transformed their accountability and engagement with Rollcally.</p>
+            <button onClick={() => navigate('/admin/signup')} className="w-full max-w-md bg-white text-slate-900 rounded-full h-[72px] font-bold text-xl shadow-2xl hover:scale-105 active:scale-95 transition-all tracking-wide mt-4">
               Create Your Workspace
             </button>
           </div>
@@ -329,7 +318,7 @@ export default function Landing() {
             <div className="flex flex-col gap-6 max-w-xs">
               <div className="flex items-center gap-3">
                 <img src="/logo.png" alt="Rollcally" className="h-8 w-8 object-contain" />
-                <h2 className="text-white text-xl font-display font-black tracking-tight">Rollcally</h2>
+                <h2 className="text-white text-xl font-display italic font-black tracking-tight">Rollcally</h2>
               </div>
               <p className="text-slate-400 text-sm leading-relaxed font-medium">The premium standard for organizational attendance and member engagement analytics.</p>
               <div className="flex gap-4 pt-2">
@@ -341,7 +330,7 @@ export default function Landing() {
 
             <div className="grid grid-cols-2 sm:flex sm:gap-24">
               <div className="flex flex-col gap-6">
-                <h4 className="font-bold text-white uppercase tracking-widest text-xs">Product</h4>
+                <h4 className="font-display italic font-extrabold text-white text-lg tracking-wide">Product</h4>
                 <ul className="flex flex-col gap-4 text-slate-400 text-sm font-medium">
                   <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
                   <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
@@ -349,7 +338,7 @@ export default function Landing() {
                 </ul>
               </div>
               <div className="flex flex-col gap-6">
-                <h4 className="font-bold text-white uppercase tracking-widest text-xs">Company</h4>
+                <h4 className="font-display italic font-extrabold text-white text-lg tracking-wide">Company</h4>
                 <ul className="flex flex-col gap-4 text-slate-400 text-sm font-medium">
                   <li><a href="#" className="hover:text-white transition-colors">About</a></li>
                   <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>

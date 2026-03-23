@@ -26,8 +26,8 @@ export default {
       fontFamily: {
         // Body & UI: Raleway
         sans: ['Raleway', 'system-ui', 'sans-serif'],
-        // Display & headings: Aileron
-        display: ['Aileron', 'system-ui', 'sans-serif'],
+        // Display & headings: Cormorant Garamond
+        display: ['"Cormorant Garamond"', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         // Micro label — replaces all arbitrary text-[9px] / text-[10px] usage
