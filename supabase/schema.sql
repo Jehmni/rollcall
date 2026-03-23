@@ -97,7 +97,7 @@ create table if not exists services (
   id                   uuid primary key default gen_random_uuid(),
   unit_id              uuid not null references units(id) on delete cascade,
   date                 date not null,
-  service_type         text not null check (service_type in ('rehearsal', 'sunday_service')),
+  service_type         text not null,
   notification_sent_at timestamptz,
   created_at           timestamptz not null default now()
 );

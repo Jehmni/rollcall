@@ -92,11 +92,6 @@ const AVATAR_COLORS = ['#5247e6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#
 function avatarColor(name: string) { return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length] }
 function getInitials(name: string) { return name.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase() }
 
-const EVENT_LABEL: Record<string, string> = {
-  rehearsal:      'Regular Meeting',
-  sunday_service: 'Main Event',
-  meeting:        'Meeting',
-}
 
 
 function formatTime(dateStr: string) {
@@ -228,7 +223,7 @@ export default function AdminServiceDetail() {
   const grouped = groupBySection(displayMembers)
 
   const eventLabel = service
-    ? `${EVENT_LABEL[service.service_type] ?? 'Event'} ${service.date}`
+    ? `${service.service_type} ${service.date}`
     : 'event'
 
   if (serviceLoading) {
@@ -263,7 +258,7 @@ export default function AdminServiceDetail() {
             <span className="material-symbols-outlined text-2xl">arrow_back</span>
           </button>
           <div>
-            <h1 className="text-base font-bold leading-tight">{EVENT_LABEL[service.service_type] ?? 'Event'}</h1>
+            <h1 className="text-base font-bold leading-tight">{service.service_type}</h1>
             <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">
               {formatTime(service.date)}
             </p>
