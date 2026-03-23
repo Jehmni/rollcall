@@ -2,18 +2,12 @@
  * Typography — Rollcally
  *
  * Display / Headings: Cormorant Garamond
- *   A classical high-contrast serif used by The Financial Times, The Economist,
- *   luxury event programmes, and global cultural institutions. The italic cut is
- *   exceptional — designed specifically for formal event typography.
- *   Weights loaded: 400 (body copy in display), 600 (sub-headings), 700 (titles)
+ *   Elegant, premium serif for high-end organization aesthetic.
  *
- * Body / UI: Plus Jakarta Sans
- *   A refined geometric sans-serif designed for premium digital products.
- *   Cleaner and more authoritative than Inter. Used by top-tier fintech,
- *   enterprise, and event-management platforms globally.
- *   Weights loaded: 400, 500, 600, 700, 800
+ * Body / UI: Raleway
+ *   Elegant layout font for readability.
  */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Raleway:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -27,18 +21,21 @@
   }
 
   body {
-    @apply bg-background-dark text-slate-100 antialiased font-sans;
+    @apply text-slate-100 antialiased font-sans selection:bg-primary/30 selection:text-white;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100svh;
     min-height: 100dvh;
+    background-color: #020617; /* deeply dark slate */
+    background-image: radial-gradient(circle at top center, #1b173f 0%, #020617 100%);
+    background-attachment: fixed;
   }
 
   /* Extend background behind the notch/status bar on iOS PWA */
   #root {
     min-height: 100svh;
     min-height: 100dvh;
-    @apply bg-background-dark;
+    /* Transparent enough to let body gradient show */
   }
 
   /* Custom dark scrollbars for desktop browsers */
@@ -55,6 +52,16 @@
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-slate-500;
   }
+}
+
+/* Custom Utilities */
+@keyframes growUp {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+.animate-grow {
+  animation: growUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform: scaleY(0);
 }
 
 @keyframes scan {
