@@ -99,7 +99,7 @@ export default function LiveCounterRing() {
             }}>
               {count}
             </span>
-            <span style={{ fontSize: '13px', color: '#7A8BA8', marginTop: '4px', fontWeight: 500 }}>of {TOTAL}</span>
+            <span style={{ fontSize: '13px', color: '#94a3b8', marginTop: '4px', fontWeight: 500 }}>of {TOTAL}</span>
           </div>
         </div>
 
@@ -117,13 +117,13 @@ export default function LiveCounterRing() {
 
       {/* Feed */}
       <div style={{ display: 'flex', flexDirection: 'column', padding: '16px', width: '100%', maxWidth: '320px', minHeight: '280px' }}>
-        <h3 style={{ fontSize: '12px', fontWeight: 700, color: '#7A8BA8', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 20px 0' }}>
+        <h3 style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 20px 0' }}>
           Member Check-Ins
         </h3>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
           {feed.length === 0 ? (
-            <div style={{ color: '#7A8BA8', fontSize: '14px', fontStyle: 'italic', marginTop: '10px' }}>
+            <div style={{ color: '#94a3b8', fontSize: '14px', fontStyle: 'italic', marginTop: '10px' }}>
               Waiting for check-ins...
             </div>
           ) : (
@@ -163,7 +163,7 @@ export default function LiveCounterRing() {
                   <span style={{
                     fontSize: '15px',
                     fontWeight: isNewest ? 700 : 500,
-                    color: isNewest ? '#FFFFFF' : '#E2E8F0',
+                    color: isNewest ? '#FFFFFF' : '#f1f5f9',
                   }}>
                     {item.name}
                   </span>
