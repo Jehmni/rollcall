@@ -1,4 +1,4 @@
-export type ServiceType = string
+export type ServiceType = 'rehearsal' | 'sunday_service'
 export type MemberStatus = 'active' | 'inactive'
 
 export interface Organization {
@@ -67,7 +67,6 @@ export interface Service {
   unit_id: string
   date: string
   service_type: ServiceType
-  notification_sent_at: string | null
   created_at: string
 }
 

@@ -4,9 +4,13 @@ import { supabase } from '../lib/supabase'
 import { useServices, useUnitAdmins, useUnits } from '../hooks/useAdminDashboard'
 import { useAuth } from '../contexts/AuthContext'
 import { ConfirmDialog } from '../components/ui/Modal'
-import type { Service, Unit, OrgRole } from '../types'
+import type { Service, ServiceType, Unit, OrgRole } from '../types'
 import { NotificationBell } from '../components/NotificationBell'
 
+const EVENT_LABEL: Record<ServiceType, string> = {
+  rehearsal: 'Regular Meeting',
+  sunday_service: 'Main Event',
+}
 
 function serviceStatus(dateStr: string): 'today' | 'upcoming' | 'past' {
   const today = new Date().toISOString().split('T')[0]
@@ -67,7 +71,7 @@ function ServiceCard({
         >
           <div className="flex flex-wrap items-center gap-2 mb-1">
             <p className="text-sm sm:text-base font-bold text-slate-100 tracking-tight group-hover/nav:text-primary transition-colors">
-              {service.service_type}
+              {EVENT_LABEL[service.service_type]}
             </p>
             <span
               className="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-black uppercase tracking-wider border"
@@ -117,9 +121,9 @@ function EventFormModal({
   onChangeDate, onChangeType, onSubmit, onClose,
 }: {
   editing: Service | null
-  date: string; type: string; error: string | null; loading: boolean
+  date: string; type: ServiceType; error: string | null; loading: boolean
   onChangeDate: (v: string) => void
-  onChangeType: (v: string) => void
+  onChangeType: (v: ServiceType) => void
   onSubmit: (e: FormEvent) => void
   onClose: () => void
 }) {
@@ -158,14 +162,14 @@ function EventFormModal({
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Event Type</span>
-            <input
-              type="text"
+            <select
               value={type}
-              onChange={e => onChangeType(e.target.value)}
-              required
-              placeholder="e.g. Rehearsal, Sunday Service, Practice…"
-              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
-            />
+              onChange={e => onChangeType(e.target.value as ServiceType)}
+              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
+            >
+              <option value="rehearsal">Regular Meeting</option>
+              <option value="sunday_service">Main Event</option>
+            </select>
           </label>
           {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
           <div className="flex gap-3 justify-end pt-2">
@@ -311,7 +315,7 @@ export default function UnitDashboard() {
 
   // Forms state
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0])
-  const [newType, setNewType] = useState('')
+  const [newType, setNewType] = useState<ServiceType>('rehearsal')
   const [newName, setNewName] = useState('')
   const [newDesc, setNewDesc] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
@@ -352,7 +356,7 @@ export default function UnitDashboard() {
   function openCreate() {
     setEditingService(null)
     setNewDate(new Date().toISOString().split('T')[0])
-    setNewType('')
+    setNewType('rehearsal')
     setError(null)
     setShowCreate(true)
   }
@@ -666,7 +670,7 @@ export default function UnitDashboard() {
         onClose={() => setConfirmDeleteService(null)}
         onConfirm={handleDeleteService}
         title="Delete Event"
-        description={confirmDeleteService ? `Delete "${confirmDeleteService.service_type}" on ${formatDate(confirmDeleteService.date)}? All attendance records for this event will be permanently removed.` : ''}
+        description={confirmDeleteService ? `Delete the ${EVENT_LABEL[confirmDeleteService.service_type]} on ${formatDate(confirmDeleteService.date)}? All attendance records for this event will be permanently removed.` : ''}
         confirmText="Delete Event"
         variant="danger"
         isLoading={isUpdating}

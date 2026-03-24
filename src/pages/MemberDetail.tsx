@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Phone, Cake, Users } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import type { Member } from '../types'
+import type { Member, ServiceType } from '../types'
+
+const EVENT_LABEL: Record<ServiceType, string> = {
+  rehearsal: 'Regular Meeting',
+  sunday_service: 'Main Event',
+}
 
 function formatDate(dateStr: string) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-GB', {
@@ -28,7 +33,7 @@ type AttendanceStatus = 'attended' | 'absent' | 'upcoming'
 interface ServiceRecord {
   serviceId: string
   date: string
-  serviceType: string
+  serviceType: ServiceType
   status: AttendanceStatus
   checkinTime: string | null
 }
@@ -84,7 +89,7 @@ export default function MemberDetail() {
         (svcs ?? []).map((s: { id: string; date: string; service_type: string }) => ({
           serviceId: s.id,
           date: s.date,
-          serviceType: s.service_type as string,
+          serviceType: s.service_type as ServiceType,
           status: (s.date > today
             ? 'upcoming'
             : attended.has(s.id)
@@ -254,7 +259,7 @@ export default function MemberDetail() {
                 {recentTrend.map(r => (
                   <div
                     key={r.serviceId}
-                    title={`${r.serviceType} · ${r.date}`}
+                    title={`${EVENT_LABEL[r.serviceType]} · ${r.date}`}
                     className={`h-7 w-7 rounded-lg border-2 flex-shrink-0 transition-all hover:scale-125 hover:rotate-6 cursor-help ${r.status === 'attended'
                         ? 'bg-green-500 border-green-500 shadow-md shadow-green-500/20'
                         : 'bg-white border-brand-border/50'
@@ -313,7 +318,7 @@ export default function MemberDetail() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 flex-wrap">
                       <p className="text-lg font-bold text-brand-text uppercase tracking-tight italic group-hover:text-brand-primary transition-colors">
-                        {r.serviceType}
+                        {EVENT_LABEL[r.serviceType]}
                       </p>
                       <span
                         className={`rounded-full px-3 py-1 text-2xs font-black uppercase tracking-widest border ${r.status === 'attended'

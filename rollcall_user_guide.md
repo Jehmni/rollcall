@@ -22,7 +22,7 @@
 
 Rollcally is a **digital attendance system** for groups that meet regularly — choirs, churches, sports teams, youth organisations, and more.
 
-Instead of passing around a clipboard, members simply **scan a QR code** (or tap a notification) and they're recorded in seconds. The group leader sees a live dashboard that updates in real time.
+Instead of passing around a clipboard, members simply **scan a QR code** and tap their name. The group leader sees a live dashboard that updates in real time.
 
 **What Rollcally replaces:**
 - Paper sign-in sheets
@@ -31,7 +31,6 @@ Instead of passing around a clipboard, members simply **scan a QR code** (or tap
 
 **What Rollcally gives you:**
 - Instant check-in via QR code
-- One-tap check-in via push notification (for returning members who opt in)
 - A live dashboard showing who's present and who's absent
 - Individual attendance history per member
 - Exportable absence lists
@@ -96,20 +95,6 @@ After your first check-in, Rollcally remembers you on that device. Next time you
 
 ---
 
-### One-Tap Check-In via Notification
-
-After your first successful check-in, you may see a prompt asking if you'd like to receive session notifications. If you agree:
-
-1. Your device is registered for that unit
-2. When your leader starts the session and taps **"Go Live"**, a notification appears on your phone
-3. Tap the notification — you're checked in instantly, no scanning required
-
-> **Prefer QR?** Tap **"Not now"** at the prompt. The QR code flow works exactly as before.
->
-> Notifications are linked to the device and browser you used to opt in. They won't arrive on a different phone.
-
----
-
 ### What if Check-In Is Blocked?
 
 | Message | What it means |
@@ -161,22 +146,6 @@ Open any event from your unit dashboard. The **QR code section** is at the top o
 - Display it on a screen, print it, or send it to members before the event
 
 The QR code links to the check-in page for **that specific event only**. Each event has its own unique code.
-
----
-
-### 4.3a Going Live — Instant Push Notifications
-
-On the same attendance page, below the QR code section, you'll find the **Go Live** panel. This lets you send a one-tap check-in notification to members who have opted in.
-
-1. Check how many members are subscribed (shown as "X subscribers")
-2. Tap **"Notify Members — Go Live"**
-3. All subscribed members receive a push notification on their phone immediately
-4. They tap the notification and are checked in — no QR scanning needed
-5. The button updates to show **"Notified at HH:MM"** with a Re-send option for latecomers
-
-> **Use both together.** QR code covers first-time visitors and anyone who hasn't opted in. Go Live covers your regular subscribed members. Both run side by side.
->
-> Members opt in automatically after their first QR check-in when they tap "Enable" on the notification prompt.
 
 ---
 

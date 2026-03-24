@@ -17,6 +17,8 @@
     "*.{ts,tsx}": "eslint"
   },
   "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.2.11",
+    "@fontsource/raleway": "^5.2.8",
     "@sentry/react": "^10.45.0",
     "@supabase/supabase-js": "^2.45.4",
     "html5-qrcode": "^2.3.8",
@@ -45,7 +47,6 @@
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.11.0",
     "vite": "^5.4.10",
-    "vite-plugin-pwa": "^0.21.1",
-    "web-push": "^3.6.7"
+    "vite-plugin-pwa": "^0.21.1"
   }
 }
