@@ -6,30 +6,30 @@ export default function Landing() {
   const navigate = useNavigate()
   
   // Live Insights Animation State
-  const [presenceRate, setPresenceRate] = useState(0)
   const [chartBars, setChartBars] = useState([42, 65, 58, 85, 74, 94, 48])
   const [activeIndex, setActiveIndex] = useState(0)
 
+  // Derive presenceRate from state instead of setting it separately
+  const presenceRate = chartBars[activeIndex]
+
   useEffect(() => {
-    // Generate initial random values for the bars (40 to 94%)
+    // Generate initial values for the bars (40 to 94%)
     const initialBars = Array.from({length: 7}, () => Math.floor(Math.random() * 55) + 40);
-    setChartBars([...initialBars]);
-    setPresenceRate(initialBars[0]);
+    setChartBars(initialBars);
 
     const interval = setInterval(() => {
-      setActiveIndex(prev => {
-        const next = (prev + 1) % 7;
-        // Update presence rate to exactly match the target bar height
-        setPresenceRate(initialBars[next]);
-        return next;
-      });
+      // 1. Update active index cycling
+      setActiveIndex(prev => (prev + 1) % 7);
       
-      // Randomly fluctuate a bar slightly in the background
-      if (Math.random() > 0.5) {
-         const idxToChange = Math.floor(Math.random() * 7);
-         initialBars[idxToChange] = Math.max(40, Math.min(94, initialBars[idxToChange] + (Math.floor(Math.random() * 14) - 7)));
-         setChartBars([...initialBars]);
-      }
+      // 2. Randomly fluctuate a bar slightly in the background
+      setChartBars(currentBars => {
+        const nextBars = [...currentBars];
+        if (Math.random() > 0.5) {
+          const idxToChange = Math.floor(Math.random() * 7);
+          nextBars[idxToChange] = Math.max(40, Math.min(94, nextBars[idxToChange] + (Math.floor(Math.random() * 14) - 7)));
+        }
+        return nextBars;
+      });
     }, 600); // Move quickly!
 
     return () => clearInterval(interval);

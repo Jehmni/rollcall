@@ -54,12 +54,12 @@
 }
 
 /* Custom Utilities */
-@keyframes growUp {
+@keyframes grow-up {
   from { transform: scaleY(0); }
   to { transform: scaleY(1); }
 }
 .animate-grow {
-  animation: growUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: grow-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   transform: scaleY(0);
 }
 
