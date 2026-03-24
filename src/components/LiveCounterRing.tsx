@@ -4,6 +4,9 @@ const NAMES = [
   'Sarah Mitchell', 'James Okonkwo', 'Priya Sharma', 'Marcus Chen',
   'Amara Diallo', 'Liam Novak', 'Fatima Al-Rashid', 'Kenji Tanaka',
   'Elena Volkov', 'David Park', 'Aisha Bello', 'Thomas Wright',
+  'Chloe Mensah', 'Rafael Santos', 'Yuki Nakamura', 'Blessing Eze',
+  'Connor Walsh', 'Naledi Dlamini', 'Omar Khalil', 'Isabelle Dupont',
+  'Tariq Osei', 'Nina Petrov', 'Kofi Asante', 'Hannah Johansson',
 ]
 
 const TOTAL = 24
@@ -31,7 +34,7 @@ export default function LiveCounterRing() {
     }
 
     const t = setTimeout(() => {
-      const name = NAMES[count % NAMES.length]
+      const name = NAMES[count]
       const item: FeedItem = { id: idRef.current++, name }
       setFeed(prev => [item, ...prev].slice(0, 4))
       setCount(c => c + 1)
