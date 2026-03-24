@@ -94,11 +94,12 @@ alter table members enable row level security;
 
 -- ---- services ----
 create table if not exists services (
-  id           uuid primary key default gen_random_uuid(),
-  unit_id      uuid not null references units(id) on delete cascade,
-  date         date not null,
-  service_type text not null check (service_type in ('rehearsal', 'sunday_service')),
-  created_at   timestamptz not null default now()
+  id                   uuid primary key default gen_random_uuid(),
+  unit_id              uuid not null references units(id) on delete cascade,
+  date                 date not null,
+  service_type         text not null,
+  notification_sent_at timestamptz,
+  created_at           timestamptz not null default now()
 );
 
 alter table services enable row level security;
@@ -133,6 +134,34 @@ create unique index if not exists member_notifications_unique_type_time
   on member_notifications (member_id, type, fire_at);
 
 alter table member_notifications enable row level security;
+
+-- ---- member_push_subscriptions ----
+-- Stores Web Push subscriptions for members who opted in after check-in.
+-- Members have no accounts so insert is allowed anon; reads are admin-only.
+create table if not exists member_push_subscriptions (
+  id         uuid primary key default gen_random_uuid(),
+  member_id  uuid not null references members(id) on delete cascade,
+  unit_id    uuid not null references units(id) on delete cascade,
+  endpoint   text not null,
+  p256dh     text not null,
+  auth       text not null,
+  created_at timestamptz not null default now(),
+  unique(member_id, endpoint)
+);
+
+alter table member_push_subscriptions enable row level security;
+
+drop policy if exists "Anyone: insert push subscription" on member_push_subscriptions;
+create policy "Anyone: insert push subscription"
+  on member_push_subscriptions for insert
+  to anon, authenticated
+  with check (true);
+
+drop policy if exists "Admins: read push subscriptions for their units" on member_push_subscriptions;
+create policy "Admins: read push subscriptions for their units"
+  on member_push_subscriptions for select
+  to authenticated
+  using (is_super_admin() or is_unit_admin(unit_id) or is_org_owner_by_unit(unit_id));
 
 -- ============================================================
 -- HELPER FUNCTIONS (security definer — called inside RLS policies)
@@ -784,6 +813,8 @@ create index if not exists idx_attendance_service_id     on attendance(service_i
 create index if not exists idx_attendance_member_id      on attendance(member_id);
 create index if not exists idx_attendance_service_member on attendance(service_id, member_id);
 create index if not exists idx_notifications_unit_fire   on member_notifications(unit_id, dismissed, fire_at desc);
+create index if not exists idx_push_subs_unit_id         on member_push_subscriptions(unit_id);
+create index if not exists idx_push_subs_member_id       on member_push_subscriptions(member_id);
 
 -- ============================================================
 -- SUPER ADMIN SETUP

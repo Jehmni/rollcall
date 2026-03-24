@@ -5,6 +5,83 @@ import { supabase } from '../lib/supabase'
 import { useAdminDashboard } from '../hooks/useAdminDashboard'
 import type { DashboardMember, Service } from '../types'
 
+// ─── Go Live Button ───────────────────────────────────────────────────────────
+
+function GoLiveButton({ service }: { service: Service }) {
+  const [sending, setSending] = useState(false)
+  const [sentAt, setSentAt] = useState<string | null>(
+    service.notification_sent_at
+      ? new Date(service.notification_sent_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+      : null
+  )
+  const [subCount, setSubCount] = useState(0)
+
+  useEffect(() => {
+    supabase
+      .from('member_push_subscriptions')
+      .select('id', { count: 'exact', head: true })
+      .eq('unit_id', service.unit_id)
+      .then(({ count }) => setSubCount(count ?? 0))
+  }, [service.unit_id])
+
+  async function goLive() {
+    setSending(true)
+    try {
+      const { error } = await supabase.functions.invoke('send-push', {
+        body: { service_id: service.id, unit_id: service.unit_id },
+      })
+      if (!error) {
+        const now = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+        setSentAt(now)
+      }
+    } finally {
+      setSending(false)
+    }
+  }
+
+  if (sentAt) {
+    return (
+      <div className="rounded-xl bg-surface-dark border border-emerald-500/20 px-4 py-3.5 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="material-symbols-outlined text-emerald-400 text-2xl">cell_tower</span>
+          <div>
+            <p className="text-sm font-bold text-white">Notified at {sentAt}</p>
+            <p className="text-2xs text-slate-500 font-medium">Members were sent a push notification</p>
+          </div>
+        </div>
+        <button
+          onClick={goLive}
+          disabled={sending}
+          className="text-2xs font-black uppercase tracking-spaced text-emerald-400 hover:text-white transition-colors disabled:opacity-40"
+        >
+          Re-send
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <button
+      onClick={goLive}
+      disabled={sending || subCount === 0}
+      className="w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/40 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed group"
+    >
+      <div className="flex items-center gap-3">
+        <span className="material-symbols-outlined text-primary text-2xl group-disabled:text-slate-500">cell_tower</span>
+        <div className="text-left">
+          <p className="text-sm font-bold text-white">
+            {sending ? 'Sending notifications…' : 'Notify Members — Go Live'}
+          </p>
+          <p className="text-2xs text-slate-500 font-medium">
+            {subCount === 0 ? 'No subscribers yet — members opt in after check-in' : `${subCount} subscriber${subCount !== 1 ? 's' : ''}`}
+          </p>
+        </div>
+      </div>
+      <span className="material-symbols-outlined text-primary text-xl group-disabled:text-slate-600">chevron_right</span>
+    </button>
+  )
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const AVATAR_COLORS = ['#5247e6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899']
@@ -261,6 +338,11 @@ export default function AdminServiceDetail() {
               )}
             </div>
           </div>
+        </section>
+
+        {/* ── Go Live ────────────────────────────────────────────────────── */}
+        <section className="px-4">
+          <GoLiveButton service={service} />
         </section>
 
         {/* ── Real-time Stats ────────────────────────────────────────────── */}

@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useAttendance } from '../hooks/useAttendance'
 import { useServiceMembers, useMemberById, useServiceInfo, type PublicMember } from '../hooks/useChoristers'
 import { QRScanner } from '../components/QRScanner'
+import { usePushNotifications } from '../hooks/usePushNotifications'
 
 type Step = 'welcome' | 'list' | 'confirm' | 'done'
 
@@ -20,10 +21,27 @@ export default function CheckIn() {
 
   const paramServiceId = searchParams.get('service_id')
   const serviceId = paramServiceId ?? sessionStorage.getItem('pending_service_id')
-  const { unitName } = useServiceInfo(serviceId)
+  const { unitName, unitId } = useServiceInfo(serviceId)
 
   // All check-in state lives in the hook
   const { status, checkedInName, errorMessage, checkIn, reset } = useAttendance(serviceId)
+
+  // Push notification opt-in
+  const { isSupported: pushSupported, currentPermission, subscribe } = usePushNotifications()
+  const [pushOptIn, setPushOptIn] = useState<'idle' | 'asking' | 'done'>('idle')
+
+  useEffect(() => {
+    if (status === 'success' && pushSupported && currentPermission === 'default') {
+      setPushOptIn('asking')
+    }
+  }, [status, pushSupported, currentPermission])
+
+  async function handlePushEnable() {
+    const memberId = selected?.id ?? localStorage.getItem('rollcally_member_id')
+    if (!memberId || !unitId) { setPushOptIn('done'); return }
+    await subscribe(memberId, unitId)
+    setPushOptIn('done')
+  }
 
   useEffect(() => {
     if (paramServiceId) sessionStorage.setItem('pending_service_id', paramServiceId)
@@ -427,6 +445,33 @@ export default function CheckIn() {
                     </div>
                   </div>
                 </div>
+
+                {/* Push opt-in card */}
+                {pushOptIn === 'asking' && (
+                  <div className="w-full mt-6 rounded-2xl bg-primary/10 border border-primary/30 p-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex items-start gap-4">
+                      <span className="material-symbols-outlined text-primary text-3xl flex-shrink-0">notifications</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-white mb-1">Get instant check-in next time</p>
+                        <p className="text-2xs text-slate-400 leading-relaxed">Enable notifications so your admin can alert you when a session starts — one tap and you're checked in.</p>
+                        <div className="flex gap-2 mt-4">
+                          <button
+                            onClick={handlePushEnable}
+                            className="flex-1 bg-primary text-white text-2xs font-black uppercase tracking-spaced py-2.5 rounded-xl hover:opacity-90 active:scale-95 transition-all"
+                          >
+                            Enable
+                          </button>
+                          <button
+                            onClick={() => setPushOptIn('done')}
+                            className="flex-1 text-slate-400 text-2xs font-black uppercase tracking-spaced py-2.5 rounded-xl border border-border-dark hover:text-white hover:border-slate-500 active:scale-95 transition-all"
+                          >
+                            Not now
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="w-full mt-10">
                   <button
