@@ -133,7 +133,7 @@ export default function CheckIn() {
   return (
     <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased">
       {/* Top Navigation Header */}
-      <header className="grid grid-cols-3 items-center p-4 sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-primary/10">
+      <header className="grid grid-cols-3 items-center p-4 sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <button
             onClick={() => step === 'confirm' ? handleBack() : navigate('/')}
@@ -313,7 +313,7 @@ export default function CheckIn() {
                     <span className="material-symbols-outlined text-4xl text-slate-500">search_off</span>
                     <p className="text-sm font-semibold text-slate-400 text-center">No members match <span className="text-white">"{query}"</span></p>
                     <p className="text-2xs text-slate-500 text-center">Check the spelling or try a different name.</p>
-                    <div className="mt-4 pt-4 border-t border-primary/10 w-full text-center">
+                    <div className="mt-6 pt-2 w-full text-center">
                       <p className="text-xs text-slate-500 font-medium italic">Not in the system?</p>
                       <p className="text-2xs text-slate-500 mt-1 max-w-[200px] mx-auto leading-relaxed">Please locate the nearest official to be added to the unit roster.</p>
                     </div>
@@ -408,7 +408,7 @@ export default function CheckIn() {
                 <div className="w-full bg-primary/5 border border-primary/20 rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
                   <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl"></div>
 
-                  <div className="p-8 text-center border-b border-primary/10">
+                  <div className="p-8 text-center pb-0">
                     <div className="inline-block size-24 rounded-full border-2 border-primary p-2 mb-6 group relative">
                       <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       <div className="relative w-full h-full rounded-full bg-background-dark border border-primary/30 flex items-center justify-center text-3xl font-black text-primary italic">
@@ -523,7 +523,7 @@ export default function CheckIn() {
 
       {/* Bottom Navigation Bar — mobile focused */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-primary/20 bg-background-dark/90 backdrop-blur-xl px-4 pt-4 sm:hidden"
+        className="fixed bottom-0 left-0 right-0 z-50 flex bg-background-dark/90 backdrop-blur-xl px-4 pt-4 sm:hidden"
         style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
       >
         <button

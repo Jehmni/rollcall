@@ -1,11 +1,14 @@
 /*
  * Typography — Rollcally
  *
- * Display / Headings: Cormorant Garamond
- *   Elegant, premium serif for high-end organization aesthetic.
+ * Display / Headlines: Manrope
+ *   Modern geometric sans — authoritative, editorial precision.
  *
- * Body / UI: Raleway
- *   Elegant layout font for readability.
+ * Body / UI: Inter
+ *   Maximum legibility in data-heavy environments.
+ *
+ * Prestige Accent: Cormorant Garamond (sparingly)
+ *   Bespoke serif for "Reimagined" or "Elite" headline accents only.
  */
 
 @tailwind base;

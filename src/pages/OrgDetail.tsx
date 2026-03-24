@@ -278,7 +278,7 @@ export default function OrgDetail() {
   if (createdUnit) {
     return (
       <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased">
-        <header className="grid grid-cols-3 items-center px-4 py-4 sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-border-dark/60">
+        <header className="grid grid-cols-3 items-center px-4 py-4 sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md">
           <button onClick={() => navigate(`/admin/units/${createdUnit.id}`)} className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors">
             <span className="material-symbols-outlined text-white">close</span>
           </button>
@@ -300,7 +300,7 @@ export default function OrgDetail() {
               </div>
               <div className="w-full bg-primary/5 border border-primary/20 rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl" />
-                <div className="p-8 text-center border-b border-primary/10">
+                <div className="p-8 text-center pb-0">
                   <div className="inline-flex size-20 rounded-[2rem] bg-primary/10 border border-primary/20 items-center justify-center mb-4">
                     <span className="material-symbols-outlined text-primary text-4xl">groups</span>
                   </div>
@@ -352,7 +352,7 @@ export default function OrgDetail() {
     <div className="relative flex min-h-screen w-full flex-col bg-background-dark text-slate-100 font-display antialiased">
 
       {/* Header */}
-      <header className="sticky top-0 z-50 flex items-center justify-between bg-background-dark/90 px-4 py-4 backdrop-blur-md border-b border-border-dark/60">
+      <header className="sticky top-0 z-50 flex items-center justify-between bg-background-dark/90 px-4 py-4 backdrop-blur-md">
         <button onClick={() => navigate('/admin')} className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors">
           <span className="material-symbols-outlined text-slate-100">arrow_back</span>
         </button>
@@ -550,7 +550,7 @@ export default function OrgDetail() {
               </div>
             ) : (
               <div className="bg-surface-dark rounded-xl border border-border-dark overflow-hidden">
-                <div className="divide-y divide-border-dark">
+                <div className="flex flex-col gap-1 p-1">
                   {joinRequests.map(req => (
                     <div key={req.id} className="p-4 flex items-center justify-between gap-4 hover:bg-border-dark/30 transition-colors">
                       <div className="flex items-center gap-3 min-w-0">
@@ -596,7 +596,7 @@ export default function OrgDetail() {
       </main>
 
       {/* Bottom Nav — mobile only */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-surface-dark/95 backdrop-blur-xl border-t border-border-dark px-2 pt-2 pb-[env(safe-area-inset-bottom,1rem)]">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-surface-dark/95 backdrop-blur-xl px-2 pt-2 pb-[env(safe-area-inset-bottom,1rem)]">
         <div className="flex items-center justify-around max-w-lg mx-auto">
           <button onClick={() => setActiveTab('units')} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeTab === 'units' ? 'text-primary' : 'text-slate-500'}`}>
             <span className="material-symbols-outlined" style={activeTab === 'units' ? { fontVariationSettings: "'FILL' 1" } : {}}>dashboard</span>

@@ -52,7 +52,7 @@ export default function AdminLogin() {
     <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased">
       <div className="relative flex min-h-screen w-full flex-col bg-background-dark overflow-x-hidden">
         {/* Header */}
-        <header className="flex items-center bg-background-dark p-4 justify-between border-b border-primary/20 sticky top-0 z-50 backdrop-blur-md">
+        <header className="flex items-center bg-background-dark p-4 justify-between sticky top-0 z-50 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => navigate('/')}

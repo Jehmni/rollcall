@@ -203,7 +203,7 @@ function MemberRow({ member, canManage, onEdit, onDelete, onView }: {
 
   return (
     <div
-      className="group flex items-center gap-3 sm:gap-4 px-4 py-4 cursor-pointer hover:bg-primary/[0.04] active:bg-primary/[0.07] transition-all duration-150 border-b border-border-dark last:border-0"
+      className="group flex items-center gap-3 sm:gap-4 px-4 py-4 cursor-pointer hover:bg-primary/[0.04] active:bg-primary/[0.07] transition-all duration-150"
       onClick={onView}
     >
       {/* Avatar */}
@@ -282,7 +282,7 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
         <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mt-4 mb-1 sm:hidden" />
-        <div className="sticky top-0 bg-surface-dark border-b border-border-dark/60 px-5 py-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-surface-dark border-b border-white/[0.06] px-5 py-4 flex items-center justify-between">
           <h3 className="text-base font-bold text-slate-100">{editing ? 'Edit Member' : 'Add Member'}</h3>
           <button onClick={onClose} className="size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
             <span className="material-symbols-outlined">close</span>
@@ -368,7 +368,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
         <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mt-4 mb-1 sm:hidden" />
 
         {/* Header */}
-        <div className="sticky top-0 bg-surface-dark border-b border-border-dark/60 px-5 py-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-surface-dark border-b border-white/[0.06] px-5 py-4 flex items-center justify-between">
           <div>
             <h3 className="text-base font-bold text-slate-100">Import CSV</h3>
             {csvFilename && <p className="text-xs text-slate-500 mt-0.5">{csvFilename}</p>}
@@ -474,7 +474,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
               <div className="overflow-x-auto rounded-xl border border-border-dark">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-background-dark text-left text-2xs font-bold uppercase tracking-wider text-slate-500 border-b border-border-dark">
+                    <tr className="bg-background-dark text-left text-2xs font-bold uppercase tracking-wider text-slate-500 border-b border-white/[0.06]">
                       <th className="px-3 py-3">Name</th>
                       <th className="px-3 py-3">Phone</th>
                       <th className="px-3 py-3">Section</th>
@@ -750,7 +750,7 @@ export default function UnitMembers() {
       <input ref={fileInputRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleFileChange} />
 
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-background-dark/90 backdrop-blur-md border-b border-border-dark/60">
+      <header className="sticky top-0 z-40 bg-background-dark/90 backdrop-blur-md">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           {/* Top bar */}
           <div className="flex items-center justify-between py-4">
@@ -824,7 +824,7 @@ export default function UnitMembers() {
             <div className="h-4 w-36 animate-pulse rounded-lg bg-white/[0.06]" />
             <div className="bg-surface-dark rounded-2xl border border-border-dark overflow-hidden">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-3 px-4 py-3.5 border-b border-border-dark last:border-0">
+                <div key={i} className="flex items-center gap-3 px-4 py-3.5">
                   <div className="size-10 rounded-full flex-shrink-0 animate-pulse bg-white/[0.06]" />
                   <div className="flex-1 space-y-2">
                     <div className="h-3.5 w-32 animate-pulse rounded-lg bg-white/[0.06]" />
@@ -863,7 +863,7 @@ export default function UnitMembers() {
               {sections.map((section, si) => (
                 <div key={section}>
                   {section && (
-                    <div className={`px-4 py-2.5 bg-background-dark/60 ${si > 0 ? 'border-t border-border-dark' : ''}`}>
+                    <div className={`px-4 py-2.5 bg-background-dark/60 ${si > 0 ? 'mt-2' : ''}`}>
                       <p className="text-2xs font-bold uppercase tracking-spaced text-primary/60">{section}</p>
                     </div>
                   )}
@@ -900,7 +900,7 @@ export default function UnitMembers() {
       </main>
 
       {/* Bottom nav — mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 sm:hidden bg-surface-dark/95 backdrop-blur-xl border-t border-border-dark px-2 pt-2 pb-[env(safe-area-inset-bottom,1rem)]">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 sm:hidden bg-surface-dark/95 backdrop-blur-xl px-2 pt-2 pb-[env(safe-area-inset-bottom,1rem)]">
         <div className="flex items-center justify-around max-w-lg mx-auto">
           <button onClick={() => navigate(`/admin/units/${unitId}`)} className="flex flex-col items-center gap-1 p-2 text-slate-500">
             <span className="material-symbols-outlined">dashboard</span>

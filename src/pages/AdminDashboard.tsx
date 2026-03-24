@@ -165,7 +165,7 @@ export default function AdminDashboard() {
   if (createdOrg) {
     return (
       <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased">
-        <header className="grid grid-cols-3 items-center p-4 sticky top-0 z-50 bg-background-dark/90 backdrop-blur-md border-b border-primary/10">
+        <header className="grid grid-cols-3 items-center p-4 sticky top-0 z-50 bg-background-dark/90 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(`/admin/orgs/${createdOrg.id}`)}
@@ -195,7 +195,7 @@ export default function AdminDashboard() {
               </div>
               <div className="w-full bg-primary/5 border border-primary/20 rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl" />
-                <div className="p-8 text-center border-b border-primary/10">
+                <div className="p-8 text-center pb-0">
                   <div className="inline-flex size-20 rounded-[2rem] bg-primary/10 border border-primary/20 items-center justify-center mb-4">
                     <span className="material-symbols-outlined text-primary text-4xl">corporate_fare</span>
                   </div>
@@ -252,8 +252,8 @@ export default function AdminDashboard() {
     <div className="bg-background-dark min-h-screen text-white antialiased font-display">
 
       {/* Desktop Sidebar */}
-      <aside className="hidden sm:flex fixed inset-y-0 left-0 z-30 w-64 flex-col bg-background-dark border-r border-primary/10">
-        <div className="flex items-center gap-3 px-6 py-6 border-b border-primary/10">
+      <aside className="hidden sm:flex fixed inset-y-0 left-0 z-30 w-64 flex-col bg-background-dark">
+        <div className="flex items-center gap-3 px-6 py-6">
           <img src="/logo.png" alt="Rollcally" className="h-8 w-8 object-contain" />
           <h2 className="text-white text-lg font-extrabold tracking-tight">Rollcally</h2>
         </div>
@@ -270,7 +270,7 @@ export default function AdminDashboard() {
             Explore
           </button>
         </nav>
-        <div className="px-4 py-4 border-t border-primary/10">
+        <div className="px-4 py-4 mt-auto">
           <button
             onClick={signOut}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-primary/5 font-medium text-sm transition-colors"
@@ -284,7 +284,7 @@ export default function AdminDashboard() {
       <div className="sm:ml-64">
 
         {/* Hero Header */}
-        <header className="relative overflow-hidden bg-background-dark pt-12 pb-10 px-6 border-b border-primary/10">
+        <header className="relative overflow-hidden bg-background-dark pt-12 pb-10 px-6">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none" />
           <div className="absolute top-0 right-0 w-72 h-72 bg-primary/10 rounded-full -mr-36 -mt-36 blur-3xl pointer-events-none" />
 
@@ -446,15 +446,8 @@ export default function AdminDashboard() {
           {/* Direct Unit Access */}
           {adminUnits.length > 0 && (
             <>
-              <div className="relative my-8">
-                <div aria-hidden="true" className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-primary/10" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-background-dark px-4 text-2xs font-black uppercase tracking-spaced text-slate-500">
-                    Direct Unit Access
-                  </span>
-                </div>
+              <div className="my-12">
+                <p className="text-2xs font-black uppercase tracking-spaced text-slate-500 mb-6">Direct Unit Access</p>
               </div>
 
               <div className="space-y-3">
@@ -488,7 +481,7 @@ export default function AdminDashboard() {
         </button>
 
         {/* Mobile Bottom Nav */}
-        <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-background-dark/90 backdrop-blur-md border-t border-primary/10 px-8 py-3 pb-8 flex justify-between items-center z-10">
+        <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-background-dark/90 backdrop-blur-md px-8 py-3 pb-8 flex justify-between items-center z-10">
           <button className="flex flex-col items-center gap-1 text-primary">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
             <span className="text-2xs font-black uppercase tracking-widest">Dash</span>

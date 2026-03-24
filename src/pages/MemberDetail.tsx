@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Phone, Cake, Users } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { Member, ServiceType } from '../types'
 
@@ -44,18 +43,18 @@ function StatCard({
   label, value, color = 'gray',
 }: { label: string; value: string | number; color?: 'gray' | 'green' | 'amber' | 'red' | 'blue' }) {
   const valueClass = {
-    gray: 'text-brand-text',
-    green: 'text-green-600',
-    amber: 'text-brand-gold',
-    red: 'text-red-500',
-    blue: 'text-brand-primary',
+    gray:  'text-white',
+    green: 'text-green-400',
+    amber: 'text-amber-400',
+    red:   'text-red-400',
+    blue:  'text-primary-light',
   }[color]
 
   return (
-    <div className="rounded-[1.5rem] bg-white p-6 border border-brand-border/50 text-center shadow-xl shadow-brand-primary/[0.02] hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 group">
-      <p className={`text-4xl font-black tracking-tighter italic ${valueClass} group-hover:scale-110 transition-transform duration-500`}>{value}</p>
-      <div className="h-px w-8 bg-brand-border/30 mx-auto my-3"></div>
-      <p className="text-2xs font-black uppercase tracking-spaced text-brand-slate opacity-40 leading-tight">{label}</p>
+    <div className="rounded-[1.5rem] bg-surface-low p-6 text-center shadow-[0_20px_40px_rgba(7,13,31,0.4)] hover:-translate-y-1 transition-all group">
+      <p className={`text-4xl font-display font-black tracking-tighter italic ${valueClass} group-hover:scale-110 transition-transform duration-500`}>{value}</p>
+      <div className="h-px w-8 bg-white/5 mx-auto my-3" aria-hidden="true"></div>
+      <p className="text-2xs font-black uppercase tracking-spaced text-slate-500 leading-tight">{label}</p>
     </div>
   )
 }
@@ -118,7 +117,7 @@ export default function MemberDetail() {
     else break
   }
 
-  // Last ≤10 past services displayed oldest→newest (left = older)
+  // Last ≤10 past services displayed oldest→newest
   const recentTrend = pastRecords.slice(0, 10).reverse()
 
   const rateColor = rate >= 75 ? 'green' : rate >= 50 ? 'amber' : pastRecords.length === 0 ? 'gray' : 'red'
@@ -127,36 +126,26 @@ export default function MemberDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-brand-secondary">
-        {/* Skeleton header */}
-        <div className="px-5 sm:px-8 pt-24 pb-24 bg-brand-primary relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]" />
+      <div className="min-h-screen bg-background-dark font-display">
+        <div className="px-5 sm:px-8 pt-24 pb-24 bg-surface-low relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-primary/10 blur-[80px]" aria-hidden="true" />
           <div className="flex items-center justify-between relative z-10 w-full">
-            <div className="h-12 w-12 rounded-2xl bg-white/10 animate-pulse" />
+            <div className="h-12 w-12 rounded-2xl bg-white/5 animate-pulse" />
             <div className="flex-1 mx-4 space-y-2 flex flex-col items-center">
-              <div className="h-5 w-36 rounded-lg bg-white/10 animate-pulse" />
-              <div className="h-3 w-20 rounded-full bg-white/10 animate-pulse" />
+              <div className="h-5 w-36 rounded-lg bg-white/5 animate-pulse" />
+              <div className="h-3 w-20 rounded-full bg-white/5 animate-pulse" />
             </div>
-            <div className="h-12 w-12 rounded-2xl bg-white/10 animate-pulse" />
+            <div className="h-12 w-12 rounded-2xl bg-white/5 animate-pulse" />
           </div>
         </div>
-        {/* Skeleton content */}
         <div className="px-5 sm:px-8 py-8 space-y-4">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-2xl bg-white p-6 shadow-sm space-y-2">
-                <div className="h-3 w-12 rounded animate-pulse bg-slate-200" />
-                <div className="h-7 w-10 rounded animate-pulse bg-slate-200" />
+              <div key={i} className="rounded-2xl bg-surface-low p-6 space-y-2">
+                <div className="h-3 w-12 rounded animate-pulse bg-white/5" />
+                <div className="h-7 w-10 rounded animate-pulse bg-white/5" />
               </div>
             ))}
-          </div>
-          <div className="rounded-2xl bg-white p-6 shadow-sm space-y-3">
-            <div className="h-3 w-24 rounded animate-pulse bg-slate-200" />
-            <div className="flex flex-wrap gap-2">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="h-4 w-4 rounded animate-pulse bg-slate-200" />
-              ))}
-            </div>
           </div>
         </div>
       </div>
@@ -165,11 +154,11 @@ export default function MemberDetail() {
 
   if (!member) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 bg-brand-secondary text-center">
-        <p className="text-brand-slate">Member not found.</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 bg-background-dark text-center font-display">
+        <p className="text-slate-500">Member not found.</p>
         <button
           onClick={() => navigate(`/admin/units/${unitId}/members`)}
-          className="text-sm text-brand-primary font-semibold hover:underline"
+          className="text-sm text-primary-light font-semibold hover:text-white transition-colors"
         >
           Back to members
         </button>
@@ -180,41 +169,42 @@ export default function MemberDetail() {
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-brand-secondary">
+    <div className="min-h-screen bg-background-dark font-display">
 
       {/* Header */}
-      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-24 pb-24 bg-brand-primary text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/5 blur-[80px]"></div>
-        
+      <header className="flex flex-col gap-8 px-5 sm:px-8 pt-24 pb-24 bg-surface-low text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none" aria-hidden="true" />
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-primary/10 blur-[80px] pointer-events-none" aria-hidden="true"></div>
+
         <div className="flex items-center justify-between relative z-10 w-full">
           <button
             onClick={() => navigate(`/admin/units/${unitId}/members`)}
-            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 transition-all text-white border border-white/10 active:scale-95"
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 hover:bg-primary/20 transition-all text-white active:scale-95"
             title="Back to Roster"
           >
-            <ArrowLeft className="h-6 w-6" />
+            <span className="material-symbols-outlined text-xl" aria-hidden="true">arrow_back</span>
           </button>
-          
+
           <div className="flex flex-col items-center flex-1 overflow-hidden px-4 text-center">
-             <h1 className="text-3xl font-black tracking-tighter italic truncate w-full">{member.name}</h1>
-             <div className="flex items-center gap-2 mt-1">
-                {member.section && (
-                  <span className="text-2xs font-black uppercase tracking-spaced bg-white/10 px-3 py-0.5 rounded-full border border-white/10">
-                    {member.section}
-                  </span>
-                )}
-                {member.status === 'inactive' && (
-                  <span className="text-2xs font-black uppercase tracking-widest text-white/60">Retired</span>
-                )}
-             </div>
+            <h1 className="text-3xl font-black tracking-tighter italic truncate w-full">{member.name}</h1>
+            <div className="flex items-center gap-2 mt-1">
+              {member.section && (
+                <span className="text-2xs font-black uppercase tracking-spaced bg-primary/10 text-primary-light px-3 py-0.5 rounded-full">
+                  {member.section}
+                </span>
+              )}
+              {member.status === 'inactive' && (
+                <span className="text-2xs font-black uppercase tracking-widest text-slate-500">Retired</span>
+              )}
+            </div>
           </div>
 
           <button
             onClick={() => navigate('/help')}
-            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 hover:bg-primary/20 transition-all active:scale-95"
             title="User Guide"
           >
-            <span className="material-symbols-outlined text-white text-xl">help</span>
+            <span className="material-symbols-outlined text-slate-400 hover:text-white transition-colors text-xl" aria-hidden="true">help</span>
           </button>
         </div>
 
@@ -222,14 +212,15 @@ export default function MemberDetail() {
           {member.phone && (
             <a
               href={`tel:${member.phone}`}
-              className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white text-brand-primary shadow-xl shadow-brand-primary/20 border border-white font-black text-2xs uppercase tracking-spaced hover:scale-105 transition-all active:scale-95"
+              className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-primary/10 text-primary-light border border-primary/20 font-black text-2xs uppercase tracking-spaced hover:bg-primary/20 hover:scale-105 transition-all active:scale-95"
             >
-              <Phone className="h-4 w-4" /> {member.phone}
+              <span className="material-symbols-outlined text-base" aria-hidden="true">phone</span>
+              {member.phone}
             </a>
           )}
           {member.birthday && (
-            <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl border font-black text-2xs uppercase tracking-spaced transition-all ${isBirthday(member.birthday) ? 'bg-pink-600 border-pink-500 text-white shadow-xl shadow-pink-500/20' : 'bg-white/10 border-white/10 text-white'}`}>
-              <Cake className="h-4 w-4" /> 
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-black text-2xs uppercase tracking-spaced transition-all ${isBirthday(member.birthday) ? 'bg-pink-600/20 border border-pink-500/30 text-pink-300' : 'bg-white/5 text-slate-400'}`}>
+              <span className="material-symbols-outlined text-base" aria-hidden="true">cake</span>
               {formatDate(member.birthday)}
               {isBirthday(member.birthday) && <span className="ml-2">🎂 Anniversary</span>}
             </div>
@@ -237,7 +228,7 @@ export default function MemberDetail() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl px-5 sm:px-8 py-8 flex flex-col gap-8">
+      <div className="mx-auto max-w-2xl px-5 sm:px-8 py-12 flex flex-col gap-12">
 
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard label="Attended" value={attendedCount} color="gray" />
@@ -248,10 +239,10 @@ export default function MemberDetail() {
 
         {/* ── Recent trend ─────────────────────────────────────────────────── */}
         {recentTrend.length > 0 && (
-          <section className="rounded-[2.5rem] bg-white p-6 sm:p-10 border border-brand-border/50 shadow-2xl shadow-brand-primary/[0.02] relative overflow-hidden">
-            <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-brand-primary/5 rounded-full blur-3xl"></div>
+          <section className="rounded-[2.5rem] bg-surface-low p-8 sm:p-10 shadow-[0_20px_40px_rgba(7,13,31,0.4)] relative overflow-hidden">
+            <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-primary/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
             <div className="relative z-10">
-              <h2 className="text-2xs font-black uppercase tracking-spread text-brand-slate opacity-40 mb-6">
+              <h2 className="text-2xs font-black uppercase tracking-spread text-slate-500 mb-8">
                 Activity Score · Last {recentTrend.length} Events
               </h2>
 
@@ -260,23 +251,24 @@ export default function MemberDetail() {
                   <div
                     key={r.serviceId}
                     title={`${EVENT_LABEL[r.serviceType]} · ${r.date}`}
-                    className={`h-7 w-7 rounded-lg border-2 flex-shrink-0 transition-all hover:scale-125 hover:rotate-6 cursor-help ${r.status === 'attended'
-                        ? 'bg-green-500 border-green-500 shadow-md shadow-green-500/20'
-                        : 'bg-white border-brand-border/50'
+                    className={`h-7 w-7 rounded-lg flex-shrink-0 transition-all hover:scale-125 hover:rotate-6 cursor-help ${r.status === 'attended'
+                        ? 'bg-green-500 shadow-md shadow-green-500/20'
+                        : 'bg-white/5'
                       }`}
+                    aria-hidden="true"
                   />
                 ))}
-                <p className="ml-3 text-2xs font-display font-bold uppercase tracking-spaced text-brand-slate opacity-20 italic">Timeline</p>
+                <p className="ml-3 text-2xs font-display font-bold uppercase tracking-spaced text-slate-600 italic">Timeline</p>
               </div>
 
               <div className="mt-8 flex items-center gap-6">
                 <span className="flex items-center gap-2.5">
-                  <span className="h-3 w-3 rounded-md bg-green-500 shadow-sm" />
-                  <span className="text-2xs font-black uppercase tracking-widest text-brand-text">Check-in</span>
+                  <span className="h-3 w-3 rounded-md bg-green-500 shadow-sm" aria-hidden="true" />
+                  <span className="text-2xs font-black uppercase tracking-widest text-white">Check-in</span>
                 </span>
                 <span className="flex items-center gap-2.5">
-                  <span className="h-3 w-3 rounded-md border-2 border-brand-border/50 bg-white" />
-                  <span className="text-2xs font-black uppercase tracking-widest text-brand-slate opacity-40">Missed</span>
+                  <span className="h-3 w-3 rounded-md bg-white/10" aria-hidden="true" />
+                  <span className="text-2xs font-black uppercase tracking-widest text-slate-500">Missed</span>
                 </span>
               </div>
             </div>
@@ -285,47 +277,44 @@ export default function MemberDetail() {
 
         {/* ── Event history ───────────────────────────────────────────────── */}
         <section className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-           <div className="flex items-center gap-3 mb-6 px-2">
-             <h2 className="text-2xs font-black uppercase tracking-spread text-brand-slate opacity-40">
-               Historical Log
-             </h2>
-             <div className="h-px flex-1 bg-brand-border/30"></div>
+          <div className="mb-8 px-2">
+            <h2 className="text-2xs font-black uppercase tracking-spread text-slate-500">Historical Log</h2>
           </div>
 
           {records.length === 0 ? (
-            <div className="rounded-[2.5rem] bg-white p-16 text-center border border-brand-border/50 shadow-xl shadow-brand-primary/[0.02]">
-               <Users className="h-16 w-16 text-brand-primary/5 mx-auto mb-6" />
-               <h3 className="text-xl font-display font-bold text-brand-text uppercase tracking-tighter italic">No History Found</h3>
-               <p className="text-sm font-medium text-brand-slate opacity-40 mt-2">This member hasn't participated in any events yet.</p>
+            <div className="rounded-[2.5rem] bg-surface-low p-16 text-center shadow-[0_20px_40px_rgba(7,13,31,0.4)]">
+              <span className="material-symbols-outlined text-6xl text-primary/10 mb-6 block" aria-hidden="true">groups</span>
+              <h3 className="text-xl font-display font-bold text-white uppercase tracking-tighter italic">No History Found</h3>
+              <p className="text-sm font-medium text-slate-500 mt-2">This member hasn't participated in any events yet.</p>
             </div>
           ) : (
-            <div className="rounded-[2rem] bg-white border border-brand-border/50 overflow-hidden shadow-2xl shadow-brand-primary/[0.02]">
-              {records.map((r, i) => (
+            <div className="flex flex-col gap-3">
+              {records.map(r => (
                 <div
                   key={r.serviceId}
-                  className={`flex items-center gap-6 px-6 sm:px-8 py-6 group hover:bg-brand-primary/[0.02] transition-colors ${i < records.length - 1 ? 'border-b border-brand-border/30' : ''
-                    }`}
+                  className="flex items-center gap-6 px-6 sm:px-8 py-6 rounded-2xl bg-surface-low hover:bg-surface-highest transition-colors group"
                 >
                   <div
                     className={`h-4 w-4 rounded-full flex-shrink-0 shadow-lg ${r.status === 'attended'
                         ? 'bg-green-500 ring-4 ring-green-500/10'
                         : r.status === 'absent'
                           ? 'bg-red-400 ring-4 ring-red-400/10'
-                          : 'bg-brand-secondary border border-brand-border/50'
+                          : 'bg-white/10'
                       }`}
+                    aria-hidden="true"
                   />
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <p className="text-lg font-bold text-brand-text uppercase tracking-tight italic group-hover:text-brand-primary transition-colors">
+                      <p className="text-lg font-bold text-white uppercase tracking-tight italic group-hover:text-primary-light transition-colors">
                         {EVENT_LABEL[r.serviceType]}
                       </p>
                       <span
-                        className={`rounded-full px-3 py-1 text-2xs font-black uppercase tracking-widest border ${r.status === 'attended'
-                            ? 'bg-green-50 text-green-700 border-green-100'
+                        className={`rounded-full px-3 py-1 text-2xs font-black uppercase tracking-widest ${r.status === 'attended'
+                            ? 'bg-green-500/10 text-green-400'
                             : r.status === 'absent'
-                              ? 'bg-red-50 text-red-600 border-red-100'
-                              : 'bg-brand-secondary text-brand-slate border-brand-border/50'
+                              ? 'bg-red-500/10 text-red-400'
+                              : 'bg-white/5 text-slate-400'
                           }`}
                       >
                         {r.status === 'attended'
@@ -335,13 +324,13 @@ export default function MemberDetail() {
                             : 'On Orders'}
                       </span>
                     </div>
-                    <p className="mt-1 text-2xs font-black uppercase tracking-spaced text-brand-slate opacity-30">{formatDate(r.date)}</p>
+                    <p className="mt-1 text-2xs font-black uppercase tracking-spaced text-slate-600">{formatDate(r.date)}</p>
                   </div>
 
                   {r.checkinTime && (
                     <div className="flex flex-col items-end flex-shrink-0">
-                       <p className="text-xs font-black text-brand-text">{formatTime(r.checkinTime)}</p>
-                       <p className="text-2xs font-bold text-brand-slate opacity-20 uppercase tracking-widest">Logged</p>
+                      <p className="text-xs font-black text-white">{formatTime(r.checkinTime)}</p>
+                      <p className="text-2xs font-bold text-slate-600 uppercase tracking-widest">Logged</p>
                     </div>
                   )}
                 </div>

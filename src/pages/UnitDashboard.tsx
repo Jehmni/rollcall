@@ -515,7 +515,7 @@ export default function UnitDashboard() {
       </header>
 
       {/* ── Action Bar ─────────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-40 bg-background-dark/90 backdrop-blur-md border-b border-border-dark/60">
+      <div className="sticky top-0 z-40 bg-background-dark/90 backdrop-blur-md">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-2 sm:gap-3">
           {/* Members — always visible */}
           <button

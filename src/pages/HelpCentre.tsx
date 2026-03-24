@@ -7,8 +7,7 @@ type Tab = 'overview' | 'members' | 'admins' | 'organisations' | 'troubleshootin
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-2xs font-black uppercase tracking-super text-primary/60 mb-4 flex items-center gap-2">
-      <span className="h-px w-4 bg-primary/40 inline-block"></span>
+    <p className="text-2xs font-black uppercase tracking-super text-primary/60 mb-4">
       {children}
     </p>
   )
@@ -28,7 +27,7 @@ function CardGrid({ children }: { children: React.ReactNode }) {
 
 function FeatureCard({ icon, title, children }: { icon: string; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-primary/5 border border-primary/10 rounded-2xl p-5 hover:border-primary/30 transition-colors">
+    <div className="bg-surface-low rounded-2xl p-5 transition-colors">
       <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
         <span className="material-symbols-outlined text-xl">{icon}</span>
       </div>
@@ -97,7 +96,7 @@ function IssueCard({
 
 function TipBox({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-primary/8 border border-primary/20 rounded-2xl p-5 flex gap-3">
+    <div className="bg-surface-low rounded-2xl p-5 flex gap-3">
       <div className="size-8 rounded-xl bg-primary/15 flex items-center justify-center text-primary shrink-0">
         <span className="material-symbols-outlined text-lg">lightbulb</span>
       </div>
@@ -110,12 +109,12 @@ function RoleCard({
   icon, role, badge, description, permissions,
 }: { icon: string; role: string; badge: string; description: string; permissions: string[] }) {
   return (
-    <div className="bg-primary/5 border border-primary/10 rounded-2xl p-5 hover:border-primary/30 transition-colors">
+    <div className="bg-surface-low rounded-2xl p-5 transition-colors">
       <div className="flex items-start justify-between mb-3">
         <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
           <span className="material-symbols-outlined">{icon}</span>
         </div>
-        <span className="text-2xs font-black uppercase tracking-spaced text-primary/70 bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full">
+        <span className="text-2xs font-black uppercase tracking-spaced text-primary/70 bg-primary/10 px-2.5 py-1 rounded-full">
           {badge}
         </span>
       </div>
@@ -135,7 +134,7 @@ function RoleCard({
 
 function CsvColumnRow({ field, required, accepted, example }: { field: string; required: boolean; accepted: string; example: string }) {
   return (
-    <tr className="border-b border-primary/8 last:border-0 hover:bg-primary/5 transition-colors">
+    <tr className="border-b border-white/[0.06] last:border-0 hover:bg-white/[0.03] transition-colors">
       <td className="px-4 py-3 align-top">
         <div className="flex items-center gap-2">
           <span className="text-sm font-bold text-white font-mono">{field}</span>
@@ -157,7 +156,7 @@ function CsvColumnRow({ field, required, accepted, example }: { field: string; r
 function AccordionItem({ question, answer }: { question: string; answer: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className={`border rounded-2xl overflow-hidden transition-colors ${open ? 'border-primary/30 bg-primary/5' : 'border-primary/10 bg-white/[0.02]'}`}>
+    <div className={`rounded-2xl overflow-hidden transition-colors border ${open ? 'border-white/[0.08] bg-surface-low' : 'border-white/[0.04] bg-white/[0.02]'}`}>
       <button
         onClick={() => setOpen(v => !v)}
         className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-primary/5 transition-colors"
@@ -168,7 +167,7 @@ function AccordionItem({ question, answer }: { question: string; answer: React.R
         </span>
       </button>
       {open && (
-        <div className="px-5 pb-5 text-sm text-slate-400 leading-relaxed border-t border-primary/10 pt-4">
+        <div className="px-5 pb-5 text-sm text-slate-400 leading-relaxed pt-4">
           {answer}
         </div>
       )}
@@ -248,7 +247,7 @@ function MembersTab() {
       <div>
         <SectionLabel>Return Visits</SectionLabel>
         <h3 className="font-display text-xl font-bold italic text-white mb-4">Faster Every Time</h3>
-        <div className="bg-primary/5 border border-primary/15 rounded-2xl p-5 space-y-3">
+        <div className="bg-surface-low rounded-2xl p-5 space-y-3">
           {[
             { icon: 'memory', text: 'Your name is remembered on this device after your first check-in' },
             { icon: 'bolt', text: 'On your next visit, just confirm — no searching needed' },
@@ -313,14 +312,14 @@ function AdminsTab() {
       <div>
         <SectionLabel>Roster</SectionLabel>
         <h3 className="font-display text-xl font-bold italic text-white mb-4">Managing Members</h3>
-        <div className="overflow-hidden rounded-2xl border border-primary/10">
+        <div className="bg-surface-low overflow-hidden rounded-2xl flex flex-col gap-1 p-1">
           {[
             { action: 'Add', icon: 'person_add', detail: 'Enter name, section, phone, birthday', color: 'text-emerald-400' },
             { action: 'Edit', icon: 'edit', detail: 'Update any detail at any time', color: 'text-blue-400' },
             { action: 'Deactivate', icon: 'person_off', detail: 'Hides from roster, preserves history', color: 'text-amber-400' },
             { action: 'Delete', icon: 'delete', detail: 'Permanent — removes all history', color: 'text-red-400' },
-          ].map(({ action, icon, detail, color }, i) => (
-            <div key={action} className={`flex items-center gap-4 px-5 py-4 ${i < 3 ? 'border-b border-primary/8' : ''} hover:bg-primary/5 transition-colors`}>
+          ].map(({ action, icon, detail, color }) => (
+            <div key={action} className="flex items-center gap-4 px-5 py-4 rounded-xl hover:bg-white/[0.04] transition-colors">
               <span className={`material-symbols-outlined text-xl ${color}`}>{icon}</span>
               <div className="flex-1">
                 <span className="text-sm font-bold text-white">{action}</span>
@@ -342,21 +341,21 @@ function AdminsTab() {
         ]} />
 
         {/* Column reference table */}
-        <div className="mt-6 rounded-2xl border border-primary/15 overflow-hidden">
-          <div className="bg-primary/10 px-4 py-3 border-b border-primary/15 flex items-center gap-2">
+        <div className="mt-6 rounded-2xl bg-surface-low overflow-hidden">
+          <div className="bg-surface-high px-4 py-3 flex items-center gap-2">
             <span className="material-symbols-outlined text-primary text-lg">table_chart</span>
             <span className="text-sm font-bold text-white">Recognised Column Names</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-background-dark text-2xs font-black uppercase tracking-wider text-slate-500 border-b border-primary/10">
+                <tr className="bg-surface-highest text-2xs font-black uppercase tracking-wider text-slate-500 border-b border-white/[0.06]">
                   <th className="px-4 py-2.5">Column / Field</th>
                   <th className="px-4 py-2.5">Accepted header names</th>
                   <th className="px-4 py-2.5">Example value</th>
                 </tr>
               </thead>
-              <tbody className="bg-surface-dark">
+              <tbody>
                 <CsvColumnRow
                   field="Name"
                   required
@@ -393,7 +392,7 @@ function AdminsTab() {
         </div>
 
         {/* Date formats */}
-        <div className="mt-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
+        <div className="mt-4 rounded-2xl bg-amber-500/5 p-5">
           <div className="flex items-center gap-2 mb-3">
             <span className="material-symbols-outlined text-amber-400 text-lg">calendar_month</span>
             <span className="text-sm font-bold text-white">Birthday Date Formats</span>
@@ -419,8 +418,7 @@ function AdminsTab() {
 
         {/* Common pitfalls */}
         <div className="mt-4 space-y-3">
-          <p className="text-xs font-black uppercase tracking-super text-primary/60 flex items-center gap-2">
-            <span className="h-px w-4 bg-primary/40 inline-block" />
+          <p className="text-xs font-black uppercase tracking-super text-primary/60">
             Common mistakes to avoid
           </p>
           <IssueCard
@@ -563,7 +561,7 @@ function OrgsTab() {
             { icon: 'tune', label: 'Edit unit', detail: 'Rename or update description' },
             { icon: 'remove_circle', label: 'Delete unit', detail: 'Removes all members and attendance history' },
           ].map(({ icon, label, detail }) => (
-            <div key={icon} className="flex items-center gap-4 p-4 bg-white/[0.02] border border-primary/8 rounded-xl hover:border-primary/20 transition-colors">
+            <div key={icon} className="flex items-center gap-4 p-4 bg-surface-low rounded-xl hover:bg-surface-high transition-colors">
               <span className="material-symbols-outlined text-slate-500 text-lg">{icon}</span>
               <div>
                 <p className="text-sm font-bold text-white">{label}</p>
@@ -714,7 +712,7 @@ function TroubleshootingTab() {
       a: (
         <div className="space-y-3">
           <p>If you created the organisation and are still seeing this error, a database migration may need to be applied. Ask your system administrator to run the following in the Supabase SQL Editor:</p>
-          <div className="bg-background-dark rounded-xl border border-primary/20 p-3 mt-2">
+          <div className="bg-surface-highest rounded-xl p-3 mt-2">
             <code className="text-xs font-mono text-primary/80 leading-relaxed whitespace-pre-wrap">{`drop policy if exists "Managers: full access to members" on members;
 
 create policy "Managers: full access to members"
@@ -764,18 +762,18 @@ create policy "Managers: full access to members"
       </div>
 
       {/* Need help CTA */}
-      <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-3xl p-8 text-center">
+      <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl p-8 text-center">
         <div className="size-14 rounded-2xl bg-primary/20 flex items-center justify-center text-primary mx-auto mb-4">
           <span className="material-symbols-outlined text-3xl">support_agent</span>
         </div>
         <h3 className="font-display text-xl font-bold italic text-white mb-2">Still need help?</h3>
         <p className="text-sm text-slate-400 mb-6">Contact your organisation admin or reach us via the Rollcally website.</p>
         <div className="flex gap-3 justify-center flex-wrap">
-          <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-xl px-4 py-2.5">
+          <div className="flex items-center gap-2 bg-surface-low rounded-xl px-4 py-2.5">
             <span className="material-symbols-outlined text-primary text-lg">admin_panel_settings</span>
             <span className="text-sm font-bold text-white">Contact your admin</span>
           </div>
-          <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-xl px-4 py-2.5">
+          <div className="flex items-center gap-2 bg-surface-low rounded-xl px-4 py-2.5">
             <span className="material-symbols-outlined text-primary text-lg">language</span>
             <span className="text-sm font-bold text-white">rollcally.com</span>
           </div>
@@ -803,11 +801,11 @@ export default function HelpCentre() {
     <div className="bg-background-dark text-slate-100 min-h-screen flex flex-col antialiased">
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 bg-background-dark/90 backdrop-blur-md border-b border-primary/15">
+      <header className="sticky top-0 z-50 bg-background-dark/90 backdrop-blur-md">
         <div className="max-w-3xl mx-auto flex items-center gap-4 px-4 py-3">
           <button
             onClick={() => navigate(-1)}
-            className="size-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-primary/20 border border-white/10 transition-all active:scale-95 shrink-0"
+            className="size-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-primary/20 transition-all active:scale-95 shrink-0"
           >
             <span className="material-symbols-outlined text-white">arrow_back</span>
           </button>
@@ -846,8 +844,7 @@ export default function HelpCentre() {
           <div className="max-w-3xl mx-auto px-6 py-12 relative">
             <div className="flex items-center gap-3 mb-6">
               <img src="/logo.png" alt="Rollcally" className="h-12 w-12 object-contain" />
-              <p className="text-2xs font-black uppercase tracking-super text-primary/60 flex items-center gap-2">
-                <span className="h-px w-4 bg-primary/40 inline-block"></span>
+              <p className="text-2xs font-black uppercase tracking-super text-primary/60">
                 Rollcally Help Centre
               </p>
             </div>
@@ -871,7 +868,7 @@ export default function HelpCentre() {
       </main>
 
       {/* ── Quick-switch footer ─────────────────────────────────────────────── */}
-      <div className="sticky bottom-0 z-40 bg-background-dark/95 backdrop-blur-md border-t border-primary/10 px-4 py-3">
+      <div className="sticky bottom-0 z-40 bg-background-dark/95 backdrop-blur-md px-4 py-3">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <button
             onClick={() => {

@@ -38,7 +38,7 @@ export default function AdminForgotPassword() {
       </div>
 
       {/* Top Navigation Bar */}
-      <header className="flex items-center justify-between p-4 bg-background-dark/80 backdrop-blur-md sticky top-0 z-50 border-b border-primary/10">
+      <header className="flex items-center justify-between p-4 bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
         <button 
           onClick={() => navigate('/admin/login')}
           className="flex items-center text-slate-300 transition-all hover:text-primary group"

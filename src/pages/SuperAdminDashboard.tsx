@@ -33,7 +33,7 @@ interface AttendanceTrend {
 
 function StatCard({ icon, label, value, sub }: { icon: string; label: string; value: number | string; sub?: string }) {
   return (
-    <div className="bg-primary/5 border border-primary/10 rounded-2xl p-5 flex flex-col gap-2">
+    <div className="bg-surface-low rounded-2xl p-5 flex flex-col gap-2">
       <div className="flex items-center gap-2 text-slate-400">
         <span className="material-symbols-outlined text-base">{icon}</span>
         <span className="text-2xs font-black uppercase tracking-spaced">{label}</span>
@@ -173,7 +173,7 @@ export default function SuperAdminDashboard() {
   return (
     <div className="min-h-screen bg-background-dark font-display text-white antialiased">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-background-dark/90 backdrop-blur border-b border-primary/10 px-6 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-30 bg-background-dark/90 backdrop-blur px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
             <span className="material-symbols-outlined text-white text-base">shield_person</span>
@@ -209,7 +209,7 @@ export default function SuperAdminDashboard() {
         {/* Attendance trend — last 14 days */}
         <section>
           <h2 className="text-2xs font-black uppercase tracking-spaced text-slate-500 mb-4">Check-ins — Last 14 Days</h2>
-          <div className="bg-primary/5 border border-primary/10 rounded-2xl p-5">
+          <div className="bg-surface-low rounded-2xl p-5">
             {attendanceTrend.every((t) => t.count === 0) ? (
               <p className="text-slate-500 text-sm text-center py-4">No check-ins in the last 14 days.</p>
             ) : (
@@ -234,10 +234,10 @@ export default function SuperAdminDashboard() {
         {/* Organizations table */}
         <section>
           <h2 className="text-2xs font-black uppercase tracking-spaced text-slate-500 mb-4">Organizations</h2>
-          <div className="bg-primary/5 border border-primary/10 rounded-2xl overflow-hidden">
+          <div className="bg-surface-low rounded-2xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-primary/10">
+                <tr className="border-b border-white/[0.06]">
                   <th className="text-left px-5 py-3 text-2xs font-black uppercase tracking-spaced text-slate-500">Name</th>
                   <th className="text-center px-3 py-3 text-2xs font-black uppercase tracking-spaced text-slate-500">Units</th>
                   <th className="text-center px-3 py-3 text-2xs font-black uppercase tracking-spaced text-slate-500">Admins</th>
@@ -251,7 +251,7 @@ export default function SuperAdminDashboard() {
                   </tr>
                 )}
                 {orgs.map((org) => (
-                  <tr key={org.id} className="border-b border-primary/5 last:border-0 hover:bg-primary/5 transition-colors">
+                  <tr key={org.id} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.03] transition-colors">
                     <td className="px-5 py-3.5 font-semibold text-white">{org.name}</td>
                     <td className="px-3 py-3.5 text-center text-slate-400 tabular-nums">{org.unit_count}</td>
                     <td className="px-3 py-3.5 text-center text-slate-400 tabular-nums">{org.member_count}</td>
@@ -268,10 +268,10 @@ export default function SuperAdminDashboard() {
         {/* Recent admin activity */}
         <section>
           <h2 className="text-2xs font-black uppercase tracking-spaced text-slate-500 mb-4">Recent Admin Enrollments</h2>
-          <div className="bg-primary/5 border border-primary/10 rounded-2xl overflow-hidden">
+          <div className="bg-surface-low rounded-2xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-primary/10">
+                <tr className="border-b border-white/[0.06]">
                   <th className="text-left px-5 py-3 text-2xs font-black uppercase tracking-spaced text-slate-500">Organization</th>
                   <th className="text-right px-5 py-3 text-2xs font-black uppercase tracking-spaced text-slate-500">Date</th>
                 </tr>
@@ -283,7 +283,7 @@ export default function SuperAdminDashboard() {
                   </tr>
                 )}
                 {recentSignups.map((s) => (
-                  <tr key={s.id} className="border-b border-primary/5 last:border-0 hover:bg-primary/5 transition-colors">
+                  <tr key={s.id} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.03] transition-colors">
                     <td className="px-5 py-3.5 text-slate-300 font-medium">{s.org_name ?? '—'}</td>
                     <td className="px-5 py-3.5 text-right text-slate-500 text-xs">
                       {new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}

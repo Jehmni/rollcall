@@ -42,7 +42,7 @@ export default function Landing() {
       <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[40%] bg-purple-600/10 blur-[100px] rounded-full mix-blend-screen pointer-events-none z-0" aria-hidden="true"></div>
 
       {/* Top Navigation Bar */}
-      <nav className="fixed top-0 w-full z-50 flex items-center bg-[#020617]/50 backdrop-blur-xl px-6 py-4 border-b border-white/5 justify-between transition-all duration-300" aria-label="Main navigation">
+      <nav className="fixed top-0 w-full z-50 flex items-center bg-[#020617]/50 backdrop-blur-xl px-6 py-4 justify-between transition-all duration-300" aria-label="Main navigation">
         <button
           className="flex items-center gap-3 group cursor-pointer bg-transparent border-0 p-0"
           onClick={() => navigate('/')}
@@ -143,7 +143,7 @@ export default function Landing() {
             <p className="text-slate-300 font-medium max-w-2xl mx-auto text-lg">Architected for environments where security and precision are non-negotiable.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-            <div className="flex gap-6 rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-primary/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(82,71,230,0.4)] group">
+            <div className="flex gap-6 rounded-3xl p-8 bg-surface-low/80 backdrop-blur-xl border border-white/10 hover:bg-surface-highest/90 hover:border-primary/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(82,71,230,0.4)] group">
               <div className="bg-white/5 border border-white/10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)] group-hover:scale-110 transition-transform duration-300" aria-hidden="true">
                 <span className="material-symbols-outlined text-3xl text-primary-light">fingerprint</span>
               </div>
@@ -152,7 +152,7 @@ export default function Landing() {
                 <p className="text-slate-300 text-base leading-relaxed">One-tap NFC, biometric verification, and dynamic QR codes for secure, fraud-proof entries.</p>
               </div>
             </div>
-            <div className="flex gap-6 rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-purple-500/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(168,85,247,0.4)] group">
+            <div className="flex gap-6 rounded-3xl p-8 bg-surface-low/80 backdrop-blur-xl border border-white/10 hover:bg-surface-highest/90 hover:border-purple-500/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(168,85,247,0.4)] group">
               <div className="bg-white/5 border border-white/10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)] group-hover:scale-110 transition-transform duration-300" aria-hidden="true">
                 <span className="material-symbols-outlined text-3xl text-purple-400">security</span>
               </div>
@@ -161,7 +161,7 @@ export default function Landing() {
                 <p className="text-slate-300 text-base leading-relaxed">Tie attendance to specific hardware. Prevent buddy-punching with deep location verification.</p>
               </div>
             </div>
-            <div className="flex gap-6 rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-indigo-400/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(129,140,248,0.4)] group">
+            <div className="flex gap-6 rounded-3xl p-8 bg-surface-low/80 backdrop-blur-xl border border-white/10 hover:bg-surface-highest/90 hover:border-indigo-400/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(129,140,248,0.4)] group">
               <div className="bg-white/5 border border-white/10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)] group-hover:scale-110 transition-transform duration-300" aria-hidden="true">
                 <span className="material-symbols-outlined text-3xl text-indigo-400">distance</span>
               </div>
@@ -170,7 +170,7 @@ export default function Landing() {
                 <p className="text-slate-300 text-base leading-relaxed">Automated check-ins the exact moment members enter your physical site or event perimeter.</p>
               </div>
             </div>
-            <div className="flex gap-6 rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-amber-400/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(251,191,36,0.4)] group">
+            <div className="flex gap-6 rounded-3xl p-8 bg-surface-low/80 backdrop-blur-xl border border-white/10 hover:bg-surface-highest/90 hover:border-amber-400/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(251,191,36,0.4)] group">
               <div className="bg-white/5 border border-white/10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)] group-hover:scale-110 transition-transform duration-300" aria-hidden="true">
                 <span className="material-symbols-outlined text-3xl text-amber-400">bolt</span>
               </div>
@@ -246,7 +246,7 @@ export default function Landing() {
               onClick={() => navigate('/admin/signup')}
               onKeyDown={e => handleCardKey(e, () => navigate('/admin/signup'))}
               aria-label="Corporations — explore Rollcally for large enterprises"
-              className="group rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-primary/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(82,71,230,0.4)] flex flex-col h-full cursor-pointer hover:-translate-y-2 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary/60"
+              className="group rounded-3xl p-8 bg-surface-low/80 backdrop-blur-xl border border-white/10 hover:bg-surface-highest/90 hover:border-primary/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(82,71,230,0.4)] flex flex-col h-full cursor-pointer hover:-translate-y-2 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary/60"
             >
               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none" aria-hidden="true">
                 <span className="material-symbols-outlined text-8xl text-white">domain</span>
@@ -270,7 +270,7 @@ export default function Landing() {
               onClick={() => navigate('/admin/signup')}
               onKeyDown={e => handleCardKey(e, () => navigate('/admin/signup'))}
               aria-label="Non-profits — explore Rollcally for volunteer organizations"
-              className="group rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-purple-500/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(168,85,247,0.4)] flex flex-col h-full cursor-pointer hover:-translate-y-2 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-purple-500/60"
+              className="group rounded-3xl p-8 bg-surface-low/80 backdrop-blur-xl border border-white/10 hover:bg-surface-highest/90 hover:border-purple-500/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(168,85,247,0.4)] flex flex-col h-full cursor-pointer hover:-translate-y-2 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-purple-500/60"
             >
               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none" aria-hidden="true">
                 <span className="material-symbols-outlined text-8xl text-purple-400">volunteer_activism</span>
@@ -294,7 +294,7 @@ export default function Landing() {
               onClick={() => navigate('/admin/signup')}
               onKeyDown={e => handleCardKey(e, () => navigate('/admin/signup'))}
               aria-label="Large groups — explore Rollcally for high-volume membership"
-              className="group rounded-3xl p-8 bg-[#0D1526]/80 backdrop-blur-xl border border-white/10 hover:bg-[#1A2642]/90 hover:border-blue-400/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(96,165,250,0.4)] flex flex-col h-full cursor-pointer hover:-translate-y-2 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-400/60"
+              className="group rounded-3xl p-8 bg-surface-low/80 backdrop-blur-xl border border-white/10 hover:bg-surface-highest/90 hover:border-blue-400/50 transition-all duration-300 shadow-[0_15px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(96,165,250,0.4)] flex flex-col h-full cursor-pointer hover:-translate-y-2 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-400/60"
             >
               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none" aria-hidden="true">
                 <span className="material-symbols-outlined text-8xl text-blue-400">groups</span>
@@ -314,7 +314,7 @@ export default function Landing() {
         </section>
 
         {/* Final CTA — reuses preloaded hero bg via shared constant */}
-        <section className="w-full relative py-14 sm:py-20 bg-gradient-to-br from-primary to-purple-600 text-center text-white flex flex-col items-center shadow-[0_20px_50px_-10px_rgba(82,71,230,0.5)] overflow-hidden border-y border-white/10 mt-12 mb-[-40px]">
+        <section className="w-full relative py-14 sm:py-20 bg-gradient-to-br from-primary to-purple-600 text-center text-white flex flex-col items-center shadow-[0_20px_50px_-10px_rgba(82,71,230,0.5)] overflow-hidden mt-12 mb-[-40px]">
           <div className={`absolute inset-0 ${HERO_BG_CLASS} bg-cover bg-center opacity-15 mix-blend-screen pointer-events-none`} aria-hidden="true"></div>
           <div className="relative z-10 max-w-5xl mx-auto px-4 flex flex-col items-center gap-8">
             <h2 className="font-display italic text-5xl sm:text-7xl font-black leading-tight tracking-[0.05em] drop-shadow-lg">Elevate Your<br />Organization</h2>
@@ -326,7 +326,7 @@ export default function Landing() {
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-white/10 px-6 pt-20 pb-32 md:pb-16 mt-10 bg-[#020617]/50 backdrop-blur-md relative z-10">
+        <footer className="px-6 pt-20 pb-32 md:pb-16 mt-10 bg-[#020617]/50 backdrop-blur-md relative z-10">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 md:gap-8">
             <div className="flex flex-col gap-6 max-w-xs">
               <div className="flex items-center gap-3">
@@ -360,7 +360,7 @@ export default function Landing() {
               </div>
             </div>
           </div>
-          <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="max-w-7xl mx-auto mt-20 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-slate-400 text-xs font-bold tracking-widest uppercase">© {new Date().getFullYear()} Rollcally Inc. All rights reserved.</p>
             <div className="flex gap-8 text-xs font-bold tracking-widest uppercase text-slate-400">
               <span className="cursor-default">Status</span>
@@ -372,7 +372,7 @@ export default function Landing() {
       </main>
 
       {/* Mobile bottom nav — Home navigates, others are visual placeholders */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 flex border-t border-white/10 bg-[#020617]/80 backdrop-blur-3xl px-4 pb-8 pt-4 justify-around" aria-label="Mobile navigation">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 flex bg-[#020617]/80 backdrop-blur-3xl px-4 pb-8 pt-4 justify-around" aria-label="Mobile navigation">
         <button className="flex flex-col items-center gap-1 text-primary-light bg-transparent border-0" onClick={() => navigate('/')} aria-label="Home">
           <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">home</span>
           <span className="text-[10px] font-bold uppercase tracking-widest">Home</span>

@@ -250,7 +250,7 @@ export default function AdminServiceDetail() {
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-background-dark text-slate-100 font-display antialiased">
 
       {/* ── Sticky Header ──────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 flex items-center justify-between bg-background-dark/80 backdrop-blur-md p-4 border-b border-primary/20">
+      <header className="sticky top-0 z-50 flex items-center justify-between bg-background-dark/80 backdrop-blur-md p-4">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate(`/admin/units/${unitId}`)}
@@ -318,7 +318,7 @@ export default function AdminServiceDetail() {
 
               {/* Expanded QR */}
               {showQR && (
-                <div className="border-t border-primary/20 bg-background-dark px-6 py-8 flex flex-col items-center gap-5 animate-in fade-in zoom-in-95 duration-300">
+                <div className="mt-2 bg-background-dark px-6 py-8 flex flex-col items-center gap-5 animate-in fade-in zoom-in-95 duration-300">
                   {/* QR canvas — white bg required for scanning */}
                   <div className="p-4 bg-white rounded-2xl shadow-2xl shadow-primary/30 ring-1 ring-primary/20">
                     <QRCodeCanvas id="service-qr" value={qrUrl} size={220} marginSize={2} level="H" />

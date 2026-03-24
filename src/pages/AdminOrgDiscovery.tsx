@@ -52,7 +52,7 @@ export default function AdminOrgDiscovery() {
   }
 
   return (
-    <div className="bg-background-light dark:bg-[#0B0E14] text-slate-900 dark:text-slate-100 min-h-screen font-display antialiased selection:bg-primary/30">
+    <div className="bg-background-dark text-slate-100 min-h-screen font-display antialiased selection:bg-primary/30">
       {/* Header Section */}
       <header className="bg-[#172554] pt-12 pb-16 px-6 relative overflow-hidden">
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
@@ -79,11 +79,11 @@ export default function AdminOrgDiscovery() {
 
       <main className="px-6 -mt-8 relative z-20 max-w-2xl mx-auto w-full">
         {/* Search Bar */}
-        <form onSubmit={handleSearch} className="bg-white dark:bg-[#1E293B] p-2 rounded-2xl shadow-xl flex items-center gap-2 border border-slate-200 dark:border-slate-800 focus-within:ring-2 focus-within:ring-primary/50 transition-all">
+        <form onSubmit={handleSearch} className="bg-surface-low p-2 rounded-2xl shadow-xl flex items-center gap-2 focus-within:ring-2 focus-within:ring-primary/30 transition-all">
           <div className="flex-1 flex items-center px-4">
             <span className="material-symbols-outlined text-slate-400 mr-2 text-xl">search</span>
-            <input 
-              className="w-full bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 py-3 font-medium" 
+            <input
+              className="w-full bg-transparent border-none focus:ring-0 text-white placeholder-slate-500 py-3 font-medium"
               placeholder="Organization name..." 
               type="text"
               value={query}
@@ -109,13 +109,13 @@ export default function AdminOrgDiscovery() {
         <div className="mt-10 grid gap-4">
           {loading ? (
             Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} className="bg-white dark:bg-[#1E293B] p-6 rounded-3xl border border-slate-100 dark:border-slate-800 flex items-center gap-4">
-                <div className="size-16 rounded-2xl flex-shrink-0 animate-pulse bg-slate-200 dark:bg-white/[0.06]" />
+              <div key={i} className="bg-surface-low p-6 rounded-3xl flex items-center gap-4">
+                <div className="size-16 rounded-2xl flex-shrink-0 animate-pulse bg-white/[0.06]" />
                 <div className="flex-1 space-y-2.5">
-                  <div className="h-5 w-40 animate-pulse rounded-lg bg-slate-200 dark:bg-white/[0.06]" />
-                  <div className="h-3 w-24 animate-pulse rounded-lg bg-slate-200 dark:bg-white/[0.06]" />
+                  <div className="h-5 w-40 animate-pulse rounded-lg bg-white/[0.06]" />
+                  <div className="h-3 w-24 animate-pulse rounded-lg bg-white/[0.06]" />
                 </div>
-                <div className="h-10 w-28 rounded-xl animate-pulse bg-slate-200 dark:bg-white/[0.06] hidden sm:block" />
+                <div className="h-10 w-28 rounded-xl animate-pulse bg-white/[0.06] hidden sm:block" />
               </div>
             ))
           ) : results.length > 0 ? (
@@ -124,14 +124,14 @@ export default function AdminOrgDiscovery() {
               const isRequested = requestedIds.has(org.id)
 
               return (
-                <div key={org.id} className="bg-white dark:bg-[#1E293B] p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 group hover:shadow-xl transition-all animate-in slide-in-from-bottom-4">
+                <div key={org.id} className="bg-surface-low p-6 rounded-3xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 group hover:bg-surface-highest transition-all animate-in slide-in-from-bottom-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                    <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                       <span className="material-symbols-outlined text-3xl">corporate_fare</span>
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-slate-900 dark:text-white uppercase italic tracking-tighter">{org.name}</h3>
-                      <p className="text-2xs font-bold text-slate-400 dark:text-slate-500 tracking-spaced mt-1 uppercase">Node · {org.id.split('-')[0]}</p>
+                      <h3 className="text-xl font-bold text-white uppercase italic tracking-tighter">{org.name}</h3>
+                      <p className="text-2xs font-bold text-slate-500 tracking-spaced mt-1 uppercase">Node · {org.id.split('-')[0]}</p>
                     </div>
                   </div>
                   
@@ -160,43 +160,41 @@ export default function AdminOrgDiscovery() {
               )
             })
           ) : query && (
-            <div className="bg-white dark:bg-[#1E293B] p-12 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-center animate-in zoom-in-95">
-              <span className="material-symbols-outlined text-6xl text-slate-200 dark:text-slate-700 mb-4 block">search_off</span>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 uppercase italic">No Match Found</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">The registry reflections no match for "{query}"</p>
+            <div className="bg-surface-low p-12 rounded-3xl border border-dashed border-white/10 text-center animate-in zoom-in-95">
+              <span className="material-symbols-outlined text-6xl text-primary/10 mb-4 block">search_off</span>
+              <h3 className="text-lg font-bold text-white mb-1 uppercase italic">No Match Found</h3>
+              <p className="text-sm text-slate-500">The registry reflections no match for "{query}"</p>
             </div>
           )}
         </div>
 
         {/* Separator */}
-        <div className="mt-12 mb-6 flex items-center">
-          <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
-          <span className="px-4 text-2xs font-bold text-slate-400 dark:text-slate-500 tracking-widest uppercase">OR</span>
-          <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
+        <div className="mt-16 mb-8">
+          <span className="text-2xs font-bold text-slate-500 tracking-widest uppercase">OR</span>
         </div>
 
         {/* Create Path */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-[#1E293B] border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl p-8 flex flex-col items-center text-center group transition-all hover:border-primary/50">
-            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary/10 transition-colors">
+          <div className="bg-surface-low border border-dashed border-white/10 rounded-3xl p-8 flex flex-col items-center text-center group transition-all hover:border-primary/30">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
               <span className="material-symbols-outlined text-3xl text-primary">add</span>
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 uppercase italic">Create New Organization</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 max-w-[280px]">
+            <h3 className="text-lg font-bold text-white mb-2 uppercase italic">Create New Organization</h3>
+            <p className="text-sm text-slate-500 mb-8 max-w-[280px]">
               Create a new space for your team and start managing everything in one place.
             </p>
-            <button 
+            <button
               onClick={() => navigate('/admin', { state: { openCreate: true } })}
-              className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white dark:text-slate-300 py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 group-hover:shadow-lg"
+              className="w-full bg-surface-highest hover:bg-primary hover:text-white text-slate-300 py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2"
             >
               Get Started
               <span className="material-symbols-outlined text-base">chevron_right</span>
             </button>
           </div>
 
-          <div className="flex items-start gap-3 p-4 bg-blue-50/50 dark:bg-primary/5 rounded-2xl border border-blue-100/50 dark:border-primary/10 mb-12">
+          <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-2xl mb-12">
             <span className="material-symbols-outlined text-primary text-xl">info</span>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+            <p className="text-xs text-slate-400 leading-relaxed font-medium">
               Can't find your organization? It might not be registered yet. You can create a new one in less than a minute.
             </p>
           </div>
@@ -204,24 +202,20 @@ export default function AdminOrgDiscovery() {
           {/* Operational Log (Requests) */}
           {myRequests.length > 0 && (
             <div className="mt-12 pb-20">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
-                <h2 className="text-2xs font-bold uppercase tracking-super text-slate-400 dark:text-slate-500">Operational Log</h2>
-                <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
-              </div>
+              <h2 className="text-2xs font-bold uppercase tracking-super text-slate-500 mb-8">Operational Log</h2>
               
-              <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 border border-slate-100 dark:border-slate-800 shadow-xl space-y-4">
+              <div className="bg-surface-low rounded-3xl p-6 shadow-[0_20px_40px_rgba(7,13,31,0.4)] flex flex-col gap-1">
                 {myRequests.map((req) => (
-                  <div key={req.id} className="flex justify-between items-center py-4 border-b border-slate-100 dark:border-slate-800 last:border-0 group">
+                  <div key={req.id} className="flex justify-between items-center py-4 group">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                      <div className="w-10 h-10 rounded-xl bg-surface-high flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
                         <span className="material-symbols-outlined text-xl">history</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-900 dark:text-white uppercase italic tracking-tighter">
+                        <span className="text-sm font-bold text-white uppercase italic tracking-tighter">
                           {req.organization?.name || 'Authorized Hub'}
                         </span>
-                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-0.5">
+                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-500 mt-0.5">
                           Deployment {new Date(req.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
                       </div>
@@ -241,7 +235,7 @@ export default function AdminOrgDiscovery() {
         </div>
       </main>
 
-      <div className="fixed bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+      <div className="fixed bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-surface-high rounded-full"></div>
     </div>
   )
 }
