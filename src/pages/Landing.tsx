@@ -83,15 +83,6 @@ export default function Landing() {
             <LiveCounterRing />
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 relative z-30">
-            <button onClick={() => navigate('/admin/signup')} className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary hover:to-primary text-white px-8 py-4 rounded-full text-base font-bold shadow-[0_0_30px_rgba(82,71,230,0.4)] hover:shadow-[0_0_40px_rgba(82,71,230,0.6)] hover:-translate-y-1 transition-all duration-300 border border-white/10 relative overflow-hidden group">
-              <span className="relative z-10">Admin Sign In / Sign Up</span>
-              <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300" aria-hidden="true"></div>
-            </button>
-            <button onClick={() => navigate('/checkin')} className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-full text-base font-bold backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]">
-              Member Check-In
-            </button>
-          </div>
         </section>
 
         {/* Main Action Cards */}
