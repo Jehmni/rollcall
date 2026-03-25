@@ -10,13 +10,17 @@ const NAMES = [
 ]
 
 const TOTAL = 24
-const TICK_MS = 1600  // time between each check-in
-const PAUSE_MS = 2800 // pause at completion before reset
+const TICK_MS = 1600
+const PAUSE_MS = 2800
 
 interface FeedItem {
   id: number
   name: string
 }
+
+const PRIMARY_LIGHT = '#c3c0ff'      // lavender
+const PRIMARY_CONTAINER = '#5247e6' // indigo
+const TRACK = '#151b2d'             // surface-low
 
 export default function LiveCounterRing() {
   const [count, setCount] = useState(0)
@@ -56,7 +60,6 @@ export default function LiveCounterRing() {
       gap: '40px',
       justifyContent: 'center',
       alignItems: 'center',
-      fontFamily: '"DM Sans", sans-serif',
       color: '#FFFFFF',
       width: '100%',
       maxWidth: '700px',
@@ -64,10 +67,8 @@ export default function LiveCounterRing() {
       padding: '20px 0',
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=DM+Sans:wght@400;500;700&display=swap');
-
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateY(-14px); }
+        @keyframes slideInFeed {
+          from { opacity: 0; transform: translateY(-12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
@@ -75,61 +76,128 @@ export default function LiveCounterRing() {
       {/* Ring */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px', width: '100%', maxWidth: '280px' }}>
         <div style={{ position: 'relative', width: '160px', height: '160px' }}>
-          <svg width="160" height="160" viewBox="0 0 160 160" style={{ transform: 'rotate(-90deg)' }}>
-            <circle cx="80" cy="80" r={radius} fill="transparent" stroke="#1B2D5B" strokeWidth={strokeWidth} />
-            <circle
-              cx="80" cy="80" r={radius}
+
+          {/* Ambient glow behind ring */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '50%',
+            backgroundColor: PRIMARY_CONTAINER,
+            opacity: isComplete ? 0.22 : 0.1,
+            filter: 'blur(20px)',
+            transform: 'scale(0.72)',
+            transition: 'opacity 0.6s ease',
+          }} />
+
+          <svg width="160" height="160" viewBox="0 0 160 160"
+            style={{ transform: 'rotate(-90deg)', position: 'relative', zIndex: 1 }}>
+            <defs>
+              <filter id="ringGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="2.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            {/* Track */}
+            <circle cx="80" cy="80" r={radius}
               fill="transparent"
-              stroke={isComplete ? '#34C759' : '#5B8CD4'}
+              stroke={TRACK}
+              strokeWidth={strokeWidth}
+            />
+
+            {/* Progress arc */}
+            <circle cx="80" cy="80" r={radius}
+              fill="transparent"
+              stroke={isComplete ? PRIMARY_LIGHT : PRIMARY_CONTAINER}
               strokeWidth={strokeWidth}
               strokeDasharray={circumference}
               strokeDashoffset={dashOffset}
               strokeLinecap="round"
-              style={{ transition: `stroke-dashoffset ${TICK_MS * 0.6}ms cubic-bezier(0.4,0,0.2,1), stroke 0.4s ease` }}
+              filter="url(#ringGlow)"
+              style={{
+                transition: `stroke-dashoffset ${TICK_MS * 0.6}ms cubic-bezier(0.4,0,0.2,1), stroke 0.4s ease`,
+              }}
             />
           </svg>
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+
+          {/* Center count */}
+          <div style={{
+            position: 'absolute', inset: 0, zIndex: 2,
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+          }}>
             <span style={{
-              fontFamily: '"DM Mono", monospace',
+              fontFamily: 'Manrope, sans-serif',
               fontSize: '48px',
-              fontWeight: 500,
+              fontWeight: 800,
               lineHeight: 1,
-              color: isComplete ? '#34C759' : '#FFFFFF',
+              letterSpacing: '-0.03em',
+              color: isComplete ? PRIMARY_LIGHT : '#FFFFFF',
               transition: 'color 0.4s ease',
             }}>
               {count}
             </span>
-            <span style={{ fontSize: '13px', color: '#94a3b8', marginTop: '4px', fontWeight: 500 }}>of {TOTAL}</span>
+            <span style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '12px',
+              fontWeight: 500,
+              color: '#475569',
+              marginTop: '4px',
+            }}>
+              of {TOTAL}
+            </span>
           </div>
         </div>
 
+        {/* Status label */}
         <div style={{
           marginTop: '24px',
-          fontSize: '12px',
+          fontFamily: 'Inter, sans-serif',
+          fontSize: '11px',
           fontWeight: 700,
           letterSpacing: '0.15em',
-          color: isComplete ? '#34C759' : '#5B8CD4',
+          textTransform: 'uppercase',
+          color: isComplete ? PRIMARY_LIGHT : PRIMARY_CONTAINER,
           transition: 'color 0.4s ease',
         }}>
-          {isComplete ? 'COMPLETE' : 'MARKING...'}
+          {isComplete ? 'Complete' : 'Marking...'}
         </div>
       </div>
 
       {/* Feed */}
-      <div style={{ display: 'flex', flexDirection: 'column', padding: '16px', width: '100%', maxWidth: '320px', minHeight: '280px' }}>
-        <h3 style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 20px 0' }}>
+      <div style={{
+        display: 'flex', flexDirection: 'column',
+        padding: '16px', width: '100%', maxWidth: '320px', minHeight: '280px',
+      }}>
+        <h3 style={{
+          fontFamily: 'Manrope, sans-serif',
+          fontSize: '11px',
+          fontWeight: 700,
+          color: '#475569',
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+          margin: '0 0 20px 0',
+        }}>
           Member Check-Ins
         </h3>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
           {feed.length === 0 ? (
-            <div style={{ color: '#94a3b8', fontSize: '14px', fontStyle: 'italic', marginTop: '10px' }}>
+            <div style={{
+              fontFamily: 'Inter, sans-serif',
+              color: '#334155',
+              fontSize: '14px',
+              marginTop: '10px',
+            }}>
               Waiting for check-ins...
             </div>
           ) : (
             feed.map((item, index) => {
               const isNewest = index === 0
-              // Newest: green + slide-in animation. Older: tick + fade.
+              const opacity = isNewest ? 1 : Math.max(0.2, 1 - index * 0.25)
               return (
                 <div
                   key={item.id}
@@ -137,33 +205,48 @@ export default function LiveCounterRing() {
                     display: 'flex',
                     alignItems: 'center',
                     padding: '12px 16px',
-                    borderRadius: '12px',
-                    backgroundColor: isNewest ? '#34C759' : 'transparent',
-                    opacity: isNewest ? 1 : Math.max(0.25, 1 - index * 0.22),
-                    // Only the newest row animates in; older rows hold their position
-                    animation: isNewest ? `slideIn 0.35s cubic-bezier(0.22,1,0.36,1) both` : 'none',
-                    transition: 'background-color 0.4s ease, opacity 0.4s ease',
+                    borderRadius: '14px',
+                    backgroundColor: isNewest
+                      ? PRIMARY_CONTAINER
+                      : 'rgba(82, 71, 230, 0.06)',
+                    opacity,
+                    boxShadow: isNewest
+                      ? '0 0 24px rgba(82,71,230,0.45), 0 0 48px rgba(195,192,255,0.1)'
+                      : 'none',
+                    animation: isNewest
+                      ? 'slideInFeed 0.35s cubic-bezier(0.22,1,0.36,1) both'
+                      : 'none',
+                    transition: 'background-color 0.4s ease, opacity 0.5s ease, box-shadow 0.4s ease',
                   }}
                 >
-                  {/* Bullet / tick */}
                   {isNewest ? (
+                    /* Glowing dot for newest */
                     <div style={{
-                      width: '8px', height: '8px', borderRadius: '50%',
-                      backgroundColor: '#FFFFFF',
+                      width: '7px',
+                      height: '7px',
+                      borderRadius: '50%',
+                      backgroundColor: PRIMARY_LIGHT,
+                      boxShadow: `0 0 8px ${PRIMARY_LIGHT}`,
                       marginRight: '12px',
-                      boxShadow: '0 0 8px rgba(255,255,255,0.8)',
                       flexShrink: 0,
                     }} />
                   ) : (
-                    <svg width="16" height="16" viewBox="0 0 16 16" style={{ marginRight: '10px', flexShrink: 0 }}>
-                      <circle cx="8" cy="8" r="7" fill="none" stroke="#5B8CD4" strokeWidth="1.5" />
-                      <polyline points="4.5,8 7,10.5 11.5,5.5" fill="none" stroke="#5B8CD4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    /* Tick circle for older items */
+                    <svg width="16" height="16" viewBox="0 0 16 16"
+                      style={{ marginRight: '10px', flexShrink: 0 }}>
+                      <circle cx="8" cy="8" r="7"
+                        fill="none" stroke={PRIMARY_CONTAINER} strokeWidth="1.5" />
+                      <polyline points="4.5,8 7,10.5 11.5,5.5"
+                        fill="none" stroke={PRIMARY_CONTAINER}
+                        strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
                   <span style={{
-                    fontSize: '15px',
-                    fontWeight: isNewest ? 700 : 500,
-                    color: isNewest ? '#FFFFFF' : '#f1f5f9',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: isNewest ? 600 : 400,
+                    color: isNewest ? '#FFFFFF' : '#64748b',
+                    letterSpacing: isNewest ? '-0.01em' : '0',
                   }}>
                     {item.name}
                   </span>
