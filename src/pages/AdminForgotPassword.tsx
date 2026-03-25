@@ -66,7 +66,7 @@ export default function AdminForgotPassword() {
 
             {/* Content */}
             <div className="text-center space-y-4 mb-10">
-              <h1 className="text-3xl font-bold text-white tracking-tight uppercase italic">Check Your Inbox</h1>
+              <h1 className="text-3xl font-bold text-white tracking-tight uppercase">Check Your Inbox</h1>
               <div className="space-y-4 text-slate-400">
                 <p className="text-lg leading-relaxed font-medium">
                   We have sent a password reset link to <br/>
@@ -115,7 +115,7 @@ export default function AdminForgotPassword() {
                 <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <span className="material-symbols-outlined text-primary text-4xl relative z-10">fingerprint</span>
               </div>
-              <h1 className="text-white text-5xl font-display font-bold leading-tight tracking-tighter mb-4 uppercase italic">Reset Your Password</h1>
+              <h1 className="text-white text-5xl font-display font-bold leading-tight tracking-tighter mb-4 uppercase">Reset Your Password</h1>
               <p className="text-slate-400 text-lg font-medium leading-relaxed tracking-tight">Enter your email address below, and we’ll send you a link to securely reset your password.</p>
             </div>
 

@@ -150,7 +150,7 @@ export default function CheckIn() {
         </div>
 
         <div className="text-center">
-          <span className="font-black text-white uppercase italic tracking-tighter text-sm">
+          <span className="font-black text-white uppercase tracking-tighter text-sm">
             {headerTitle}
           </span>
         </div>
@@ -209,7 +209,7 @@ export default function CheckIn() {
                 </div>
                 <div>
                   <p className="text-2xs text-slate-500 uppercase tracking-spaced font-black">Venue Status</p>
-                  <p className="font-extrabold text-white text-lg tracking-tight uppercase italic">
+                  <p className="font-extrabold text-white text-lg tracking-tight uppercase">
                     {unitName || 'Will update after you scan qrcode'}
                   </p>
                 </div>
@@ -221,11 +221,11 @@ export default function CheckIn() {
             <div className="text-center">
               <div className="group relative mx-auto mb-10 inline-block">
                 <div className="absolute inset-0 bg-primary blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                <div className="relative flex h-36 w-36 items-center justify-center rounded-[3rem] bg-background-dark border border-primary/30 shadow-2xl text-6xl font-black text-primary italic">
+                <div className="relative flex h-36 w-36 items-center justify-center rounded-[3rem] bg-background-dark border border-primary/30 shadow-2xl text-6xl font-black text-primary">
                   {selected.name.charAt(0)}
                 </div>
               </div>
-              <h2 className="font-display text-4xl font-bold text-white leading-tight uppercase tracking-tighter italic">
+              <h2 className="font-display text-4xl font-bold text-white leading-tight uppercase tracking-tighter">
                 Hi, {selected.name.split(' ')[0]}!
               </h2>
               <div className="h-1.5 w-16 bg-primary mx-auto mt-4 rounded-full shadow-[0_0_10px_rgba(82,71,230,0.5)]"></div>
@@ -253,14 +253,14 @@ export default function CheckIn() {
               </div>
               <div>
                 <p className="text-2xs font-black uppercase tracking-spaced text-slate-500">Venue Verified</p>
-                <p className="font-extrabold text-white text-lg uppercase italic tracking-tight">{unitName ?? 'Main Venue Node'}</p>
+                <p className="font-extrabold text-white text-lg uppercase tracking-tight">{unitName ?? 'Main Venue Node'}</p>
               </div>
             </div>
           </div>
         ) : step === 'list' ? (
           <div className="w-full max-w-sm flex flex-col gap-8 animate-in fade-in duration-500">
             <div className="text-center">
-              <h1 className="font-display text-4xl font-bold mb-3 tracking-tighter italic uppercase">Check In</h1>
+              <h1 className="font-display text-4xl font-bold mb-3 tracking-tighter uppercase">Check In</h1>
               <p className="text-slate-400">Locate your credentials in the roster.</p>
             </div>
 
@@ -283,7 +283,7 @@ export default function CheckIn() {
                   <span className="material-symbols-outlined text-4xl">person_search</span>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-white font-bold text-lg uppercase italic tracking-tight">Identity Search</h3>
+                  <h3 className="text-white font-bold text-lg uppercase tracking-tight">Identity Search</h3>
                   <p className="text-slate-500 text-sm leading-relaxed">
                     Enter at least 3 characters of your name to locate your profile and verify attendance.
                   </p>
@@ -314,7 +314,7 @@ export default function CheckIn() {
                     <p className="text-sm font-semibold text-slate-400 text-center">No members match <span className="text-white">"{query}"</span></p>
                     <p className="text-2xs text-slate-500 text-center">Check the spelling or try a different name.</p>
                     <div className="mt-6 pt-2 w-full text-center">
-                      <p className="text-xs text-slate-500 font-medium italic">Not in the system?</p>
+                      <p className="text-xs text-slate-500 font-medium">Not in the system?</p>
                       <p className="text-2xs text-slate-500 mt-1 max-w-[200px] mx-auto leading-relaxed">Please locate the nearest official to be added to the unit roster.</p>
                     </div>
                   </div>
@@ -330,7 +330,7 @@ export default function CheckIn() {
                         onClick={() => handleSelect(m)}
                         className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-primary/5 border border-primary/10 hover:border-primary/40 hover:bg-primary/10 hover:shadow-2xl active:scale-[0.98] active:bg-primary/15 transition-all duration-150 text-left group"
                       >
-                        <span className="font-extrabold text-white text-lg tracking-tight uppercase italic">{m.name}</span>
+                        <span className="font-extrabold text-white text-lg tracking-tight uppercase">{m.name}</span>
                         <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">
                           <span className="material-symbols-outlined text-primary group-hover:text-white rotate-180">arrow_back</span>
                         </div>
@@ -346,15 +346,15 @@ export default function CheckIn() {
             <div className="text-center">
               <div className="group relative mx-auto mb-10 inline-block">
                 <div className="absolute inset-0 bg-primary blur-3xl opacity-20"></div>
-                <div className="relative flex h-36 w-36 items-center justify-center rounded-[3rem] bg-background-dark border border-primary/30 shadow-2xl text-6xl font-black text-primary italic">
+                <div className="relative flex h-36 w-36 items-center justify-center rounded-[3rem] bg-background-dark border border-primary/30 shadow-2xl text-6xl font-black text-primary">
                   {selected.name.charAt(0)}
                 </div>
               </div>
               <h3 className="text-2xs font-black uppercase tracking-super text-slate-500 mb-4">Biometric Verification</h3>
-              <h2 className="font-display text-4xl font-bold text-white uppercase tracking-tighter italic">Is this you?</h2>
+              <h2 className="font-display text-4xl font-bold text-white uppercase tracking-tighter">Is this you?</h2>
               <div className="mt-10 p-8 rounded-[2.5rem] bg-primary/5 border border-primary/20 shadow-[0_0_50px_rgba(82,71,230,0.1)] w-full relative overflow-hidden">
                 <div className="absolute top-0 right-0 -mt-8 -mr-8 h-24 w-24 bg-primary/10 rounded-full blur-2xl"></div>
-                <p className="text-3xl font-black text-white uppercase italic tracking-tighter relative z-10">{selected.name}</p>
+                <p className="text-3xl font-black text-white uppercase tracking-tighter relative z-10">{selected.name}</p>
                 {selected.section && (
                   <p className="text-2xs font-black uppercase tracking-spread text-primary mt-3 relative z-10">
                     {selected.section} Control Node
@@ -389,7 +389,7 @@ export default function CheckIn() {
                     <img src="/logo.png" alt="" className="w-full h-full object-contain opacity-70" />
                   </div>
                 </div>
-                <p className="text-xs font-black uppercase tracking-super text-primary animate-pulse italic">Securing Protocols...</p>
+                <p className="text-xs font-black uppercase tracking-super text-primary animate-pulse">Securing Protocols...</p>
               </div>
             ) : status === 'success' ? (
               <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-12 duration-1000">
@@ -401,7 +401,7 @@ export default function CheckIn() {
                 </div>
 
                 <div className="text-center space-y-3 mb-12">
-                  <h1 className="font-display text-white text-5xl font-bold tracking-tighter uppercase italic">You're in!</h1>
+                  <h1 className="font-display text-white text-5xl font-bold tracking-tighter uppercase">You're in!</h1>
                   <p className="text-slate-400 text-lg font-medium tracking-tight">Check-in Successful</p>
                 </div>
 
@@ -411,11 +411,11 @@ export default function CheckIn() {
                   <div className="p-8 text-center pb-0">
                     <div className="inline-block size-24 rounded-full border-2 border-primary p-2 mb-6 group relative">
                       <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <div className="relative w-full h-full rounded-full bg-background-dark border border-primary/30 flex items-center justify-center text-3xl font-black text-primary italic">
+                      <div className="relative w-full h-full rounded-full bg-background-dark border border-primary/30 flex items-center justify-center text-3xl font-black text-primary">
                         {selected?.name.charAt(0)}
                       </div>
                     </div>
-                    <h2 className="font-display text-white text-3xl font-bold uppercase italic tracking-tighter mb-1">
+                    <h2 className="font-display text-white text-3xl font-bold uppercase tracking-tighter mb-1">
                       Welcome, {selected?.name}
                     </h2>
                     <p className="text-primary font-black uppercase tracking-spaced text-2xs">Confirmed Attendee</p>
@@ -428,7 +428,7 @@ export default function CheckIn() {
                       </div>
                       <div>
                         <p className="text-slate-500 text-2xs uppercase tracking-spread font-black mb-1">Venue</p>
-                        <p className="text-white font-black uppercase italic text-lg tracking-tight">
+                        <p className="text-white font-black uppercase text-lg tracking-tight">
                           {unitName || 'Main Conference Hall'}
                         </p>
                       </div>

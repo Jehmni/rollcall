@@ -60,7 +60,7 @@ export default function Login() {
             </div>
           </div>
           <div>
-            <h1 className="text-5xl font-display font-black tracking-tighter text-white italic">Rollcally</h1>
+            <h1 className="text-5xl font-display font-black tracking-tighter text-white">Rollcally</h1>
             <p className="mt-2 text-2xs font-black uppercase tracking-super text-primary/60">Smart Entry Protocol</p>
           </div>
         </div>
@@ -70,7 +70,7 @@ export default function Login() {
           {step === 'enter_email' ? (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="mb-10">
-                <h2 className="text-3xl font-display font-black text-white uppercase tracking-tighter italic">Authorize Entry</h2>
+                <h2 className="text-3xl font-display font-black text-white uppercase tracking-tighter">Authorize Entry</h2>
                 <p className="mt-3 text-slate-400 font-medium leading-relaxed text-sm">
                   Enter your registered credentials to establish a secure session link.
                 </p>
@@ -97,7 +97,7 @@ export default function Login() {
               <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-primary/10 border border-primary/20 shadow-[0_0_30px_rgba(82,71,230,0.2)]">
                 <span className="material-symbols-outlined text-primary-light text-4xl" aria-hidden="true">mark_email_read</span>
               </div>
-              <h2 className="text-3xl font-display font-black text-white uppercase tracking-tighter italic">Signal Sent</h2>
+              <h2 className="text-3xl font-display font-black text-white uppercase tracking-tighter">Signal Sent</h2>
               <p className="mt-4 text-slate-400 font-medium leading-relaxed text-sm max-w-[200px] mx-auto">
                 A secure transmission has been sent to <span className="font-bold text-white uppercase">{email}</span>.
               </p>

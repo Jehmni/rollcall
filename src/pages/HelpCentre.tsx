@@ -15,7 +15,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="font-display text-3xl font-bold italic tracking-tighter text-white mb-8">
+    <h2 className="font-display text-3xl font-bold tracking-tighter text-white mb-8">
       {children}
     </h2>
   )
@@ -204,7 +204,7 @@ function OverviewTab() {
       {/* Quick start - Members */}
       <div>
         <SectionLabel>Quick Start — Members</SectionLabel>
-        <h3 className="font-display text-xl font-bold italic text-white mb-6">No account needed</h3>
+        <h3 className="font-display text-xl font-bold text-white mb-6">No account needed</h3>
         <StepFlow steps={[
           { icon: 'qr_code_scanner', title: 'Scan QR code', detail: 'Use your phone camera and tap the link that appears.' },
           { icon: 'search', title: 'Find your name', detail: 'Type at least 3 letters of your name to find yourself.' },
@@ -216,7 +216,7 @@ function OverviewTab() {
       {/* Quick start - Admins */}
       <div>
         <SectionLabel>Quick Start — Admins</SectionLabel>
-        <h3 className="font-display text-xl font-bold italic text-white mb-6">Your dashboard in 3 steps</h3>
+        <h3 className="font-display text-xl font-bold text-white mb-6">Your dashboard in 3 steps</h3>
         <StepFlow steps={[
           { icon: 'person_add', title: 'Sign up via Admin Portal', detail: 'Create an account from the landing page.' },
           { icon: 'dashboard', title: 'Set up your organisation', detail: 'Create an organisation, then add a unit (your specific group).' },
@@ -246,7 +246,7 @@ function MembersTab() {
 
       <div>
         <SectionLabel>Return Visits</SectionLabel>
-        <h3 className="font-display text-xl font-bold italic text-white mb-4">Faster Every Time</h3>
+        <h3 className="font-display text-xl font-bold text-white mb-4">Faster Every Time</h3>
         <div className="bg-surface-low rounded-2xl p-5 space-y-3">
           {[
             { icon: 'memory', text: 'Your name is remembered on this device after your first check-in' },
@@ -263,7 +263,7 @@ function MembersTab() {
 
       <div>
         <SectionLabel>Issues</SectionLabel>
-        <h3 className="font-display text-xl font-bold italic text-white mb-4">If Something Goes Wrong</h3>
+        <h3 className="font-display text-xl font-bold text-white mb-4">If Something Goes Wrong</h3>
         <div className="space-y-3">
           <IssueCard icon="check_circle" iconColor="#10b981" problem="Already checked in" resolution="You're already recorded for this event. Nothing to do." type="success" />
           <IssueCard icon="location_off" iconColor="#f59e0b" problem="Too far away" resolution="Enable location access and make sure you're physically at the venue." type="warning" />
@@ -311,7 +311,7 @@ function AdminsTab() {
 
       <div>
         <SectionLabel>Roster</SectionLabel>
-        <h3 className="font-display text-xl font-bold italic text-white mb-4">Managing Members</h3>
+        <h3 className="font-display text-xl font-bold text-white mb-4">Managing Members</h3>
         <div className="bg-surface-low overflow-hidden rounded-2xl flex flex-col gap-1 p-1">
           {[
             { action: 'Add', icon: 'person_add', detail: 'Enter name, section, phone, birthday', color: 'text-emerald-400' },
@@ -332,7 +332,7 @@ function AdminsTab() {
 
       <div>
         <SectionLabel>Bulk Import</SectionLabel>
-        <h3 className="font-display text-xl font-bold italic text-white mb-4">CSV Import</h3>
+        <h3 className="font-display text-xl font-bold text-white mb-4">CSV Import</h3>
         <StepFlow steps={[
           { icon: 'table', title: 'Prepare your spreadsheet', detail: 'Open your roster in Excel, Google Sheets, or Numbers. Make sure the first row is a header row with column names.' },
           { icon: 'upload_file', title: 'Export as CSV', detail: 'File → Download → CSV (or Save As → .csv). Column order does not matter — Rollcally reads headers by name.' },
@@ -511,7 +511,7 @@ function OrgsTab() {
 
       <div>
         <SectionLabel>Roles</SectionLabel>
-        <h3 className="font-display text-xl font-bold italic text-white mb-6">Who Can Do What</h3>
+        <h3 className="font-display text-xl font-bold text-white mb-6">Who Can Do What</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <RoleCard
             icon="person"
@@ -553,7 +553,7 @@ function OrgsTab() {
 
       <div>
         <SectionLabel>Settings</SectionLabel>
-        <h3 className="font-display text-xl font-bold italic text-white mb-4">Manage Your Organisation</h3>
+        <h3 className="font-display text-xl font-bold text-white mb-4">Manage Your Organisation</h3>
         <div className="space-y-2">
           {[
             { icon: 'edit', label: 'Rename organisation', detail: 'Tap settings on the org page' },
@@ -740,7 +740,7 @@ create policy "Managers: full access to members"
 
       <div>
         <SectionLabel>Best Practices</SectionLabel>
-        <h3 className="font-display text-xl font-bold italic text-white mb-4">Tips to Avoid Issues</h3>
+        <h3 className="font-display text-xl font-bold text-white mb-4">Tips to Avoid Issues</h3>
         <div className="space-y-3">
           <TipBox>
             <strong className="text-white block mb-1">Print QR codes ahead of time.</strong>
@@ -766,7 +766,7 @@ create policy "Managers: full access to members"
         <div className="size-14 rounded-2xl bg-primary/20 flex items-center justify-center text-primary mx-auto mb-4">
           <span className="material-symbols-outlined text-3xl">support_agent</span>
         </div>
-        <h3 className="font-display text-xl font-bold italic text-white mb-2">Still need help?</h3>
+        <h3 className="font-display text-xl font-bold text-white mb-2">Still need help?</h3>
         <p className="text-sm text-slate-400 mb-6">Contact your organisation admin or reach us via the Rollcally website.</p>
         <div className="flex gap-3 justify-center flex-wrap">
           <div className="flex items-center gap-2 bg-surface-low rounded-xl px-4 py-2.5">
@@ -810,7 +810,7 @@ export default function HelpCentre() {
             <span className="material-symbols-outlined text-white">arrow_back</span>
           </button>
           <div className="flex-1 min-w-0">
-            <h1 className="font-display text-base font-bold italic tracking-tight text-white">Help Centre</h1>
+            <h1 className="font-display text-base font-bold tracking-tight text-white">Help Centre</h1>
             <p className="text-2xs text-slate-500 uppercase tracking-spaced font-bold">Rollcally</p>
           </div>
           <img src="/logo.png" alt="Rollcally" className="h-8 w-8 object-contain shrink-0" />
@@ -848,7 +848,7 @@ export default function HelpCentre() {
                 Rollcally Help Centre
               </p>
             </div>
-            <h1 className="font-display text-5xl font-bold italic tracking-tighter text-white mb-4">
+            <h1 className="font-display text-5xl font-bold tracking-tighter text-white mb-4">
               How can we help?
             </h1>
             <p className="text-slate-400 text-lg leading-relaxed max-w-lg">

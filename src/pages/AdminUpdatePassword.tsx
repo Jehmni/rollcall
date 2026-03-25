@@ -64,7 +64,7 @@ export default function AdminUpdatePassword() {
             <span className="material-symbols-outlined text-primary-light text-5xl" aria-hidden="true">key</span>
           </div>
           <div>
-            <h1 className="text-5xl font-display font-black tracking-tighter italic text-white">
+            <h1 className="text-5xl font-display font-black tracking-tighter text-white">
               UPDATE SECURITY
             </h1>
             <p className="mt-2 text-2xs font-black uppercase tracking-spread text-primary/60">
@@ -80,7 +80,7 @@ export default function AdminUpdatePassword() {
                 <span className="material-symbols-outlined text-primary-light text-5xl" aria-hidden="true">check_circle</span>
               </div>
               <div className="space-y-4">
-                <h2 className="text-2xl font-display font-bold text-white uppercase tracking-tighter italic">Security Updated</h2>
+                <h2 className="text-2xl font-display font-bold text-white uppercase tracking-tighter">Security Updated</h2>
                 <p className="text-xs font-bold text-slate-500 uppercase tracking-spaced leading-loose px-4">
                   New credentials have been successfully authorized. <br/>
                   <span className="text-primary-light font-black">Redirecting to headquarters...</span>

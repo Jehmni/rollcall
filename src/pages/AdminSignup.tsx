@@ -80,7 +80,7 @@ export default function AdminSignup() {
               <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
               <span className="material-symbols-outlined text-white text-3xl">corporate_fare</span>
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight mb-3 uppercase italic">
+            <h1 className="text-3xl font-extrabold tracking-tight mb-3 uppercase">
               Create Your Account
             </h1>
             <p className="text-slate-400 text-sm px-4 leading-relaxed font-medium">

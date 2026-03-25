@@ -282,7 +282,7 @@ export default function OrgDetail() {
           <button onClick={() => navigate(`/admin/units/${createdUnit.id}`)} className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors">
             <span className="material-symbols-outlined text-white">close</span>
           </button>
-          <span className="text-center font-display font-bold text-white uppercase italic tracking-tighter text-sm">Unit Created</span>
+          <span className="text-center font-display font-bold text-white uppercase tracking-tighter text-sm">Unit Created</span>
           <div />
         </header>
         <main className="flex-1 flex flex-col items-center px-5 pt-8 pb-12">
@@ -295,7 +295,7 @@ export default function OrgDetail() {
                 </div>
               </div>
               <div className="text-center space-y-3 mb-12">
-                <h1 className="text-white text-5xl font-display font-bold tracking-tighter uppercase italic">Unit Launched!</h1>
+                <h1 className="text-white text-5xl font-display font-bold tracking-tighter uppercase">Unit Launched!</h1>
                 <p className="text-slate-400 text-lg font-medium tracking-tight">New unit is online and ready</p>
               </div>
               <div className="w-full bg-primary/5 border border-primary/20 rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
@@ -304,7 +304,7 @@ export default function OrgDetail() {
                   <div className="inline-flex size-20 rounded-[2rem] bg-primary/10 border border-primary/20 items-center justify-center mb-4">
                     <span className="material-symbols-outlined text-primary text-4xl">groups</span>
                   </div>
-                  <h2 className="text-white text-3xl font-display font-bold uppercase italic tracking-tighter mb-1">{createdUnit.name}</h2>
+                  <h2 className="text-white text-3xl font-display font-bold uppercase tracking-tighter mb-1">{createdUnit.name}</h2>
                   <p className="text-primary font-black uppercase tracking-spaced text-2xs">Active Unit Node</p>
                 </div>
                 <div className="p-8 space-y-6">
@@ -314,7 +314,7 @@ export default function OrgDetail() {
                     </div>
                     <div>
                       <p className="text-slate-500 text-2xs uppercase tracking-spread font-black mb-1">Organisation</p>
-                      <p className="text-white font-display font-bold uppercase italic text-lg tracking-tight">{org?.name || 'Hub'}</p>
+                      <p className="text-white font-display font-bold uppercase text-lg tracking-tight">{org?.name || 'Hub'}</p>
                     </div>
                   </div>
                   {createdUnit.description && (

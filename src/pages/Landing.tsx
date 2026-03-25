@@ -49,7 +49,7 @@ export default function Landing() {
           aria-label="Rollcally — go to homepage"
         >
           <img src="/logo.png" alt="" className="h-10 w-10 object-contain z-10 transition-transform group-hover:scale-110 drop-shadow-lg" aria-hidden="true" />
-          <span className="text-white text-2xl font-display font-black italic tracking-tight">Rollcally</span>
+          <span className="text-white text-2xl font-display font-black tracking-tight">Rollcally</span>
         </button>
         <div className="flex items-center gap-6">
           <button onClick={() => navigate('/help')} className="hidden sm:block text-slate-400 hover:text-white transition-colors font-medium text-sm">User Guide</button>
@@ -70,7 +70,7 @@ export default function Landing() {
 
         {/* Hero Section */}
         <section className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-16 pb-20 max-w-5xl mx-auto w-full">
-          <h1 className="font-display italic text-5xl sm:text-7xl font-black leading-[1.1] tracking-[0.02em] mb-8 drop-shadow-sm">
+          <h1 className="font-display text-5xl sm:text-7xl font-black leading-[1.1] tracking-[0.02em] mb-8 drop-shadow-sm">
             Attendance{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600 drop-shadow-md">Reimagined</span>
             <br />
@@ -101,7 +101,7 @@ export default function Landing() {
               <div className="bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 p-4 rounded-2xl mb-8 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(82,71,230,0.2)]" aria-hidden="true">
                 <span className="material-symbols-outlined text-primary-light text-3xl">person_check</span>
               </div>
-              <h3 className="font-display italic text-white text-3xl font-extrabold mb-4">I'm Here</h3>
+              <h3 className="font-display text-white text-3xl font-extrabold mb-4">I'm Here</h3>
               <p className="text-slate-300 text-base mb-10 leading-relaxed font-medium">
                 Joining a meeting? Tap here to record your attendance securely in seconds using biometrics or NFC.
               </p>
@@ -124,7 +124,7 @@ export default function Landing() {
               <div className="bg-gradient-to-br from-purple-500/20 to-purple-500/5 border border-purple-500/20 p-4 rounded-2xl mb-8 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(168,85,247,0.2)]" aria-hidden="true">
                 <span className="material-symbols-outlined text-purple-400 text-3xl">verified_user</span>
               </div>
-              <h3 className="font-display italic text-white text-3xl font-extrabold mb-4">Admin Portal</h3>
+              <h3 className="font-display text-white text-3xl font-extrabold mb-4">Admin Portal</h3>
               <p className="text-slate-300 text-base mb-10 leading-relaxed font-medium">
                 Manage your units, members, and events with powerful analytics, real-time tracking, and deep insights.
               </p>
@@ -139,7 +139,7 @@ export default function Landing() {
         {/* Feature Grid */}
         <section className="px-4 py-20 max-w-6xl mx-auto w-full z-10 relative" aria-labelledby="features-heading">
           <div className="text-center mb-16 relative">
-            <h2 id="features-heading" className="font-display italic text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600 text-4xl sm:text-5xl font-extrabold tracking-[0.05em] mb-4 drop-shadow-sm">Core Security &amp; Features</h2>
+            <h2 id="features-heading" className="font-display text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600 text-4xl sm:text-5xl font-extrabold tracking-[0.05em] mb-4 drop-shadow-sm">Core Security &amp; Features</h2>
             <p className="text-slate-300 font-medium max-w-2xl mx-auto text-lg">Architected for environments where security and precision are non-negotiable.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
@@ -188,7 +188,7 @@ export default function Landing() {
           <div className="max-w-4xl mx-auto relative">
             <div className="flex flex-col sm:flex-row items-end justify-between mb-10 gap-4">
               <div>
-                <h2 id="insights-heading" className="font-display italic text-white text-4xl font-extrabold mb-2 tracking-[0.05em]">Live Insights</h2>
+                <h2 id="insights-heading" className="font-display text-white text-4xl font-extrabold mb-2 tracking-[0.05em]">Live Insights</h2>
                 <p className="text-slate-300 text-lg">Real-time attendance dashboard</p>
               </div>
               <div className="text-left sm:text-right" aria-live="polite" aria-atomic="true">
@@ -235,7 +235,7 @@ export default function Landing() {
         {/* Built for Every Group */}
         <section className="px-4 py-24 text-center max-w-6xl mx-auto w-full relative z-10" aria-labelledby="groups-heading">
           <div className="text-center mb-16 relative">
-            <h2 id="groups-heading" className="font-display italic text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600 text-4xl sm:text-5xl font-extrabold tracking-[0.05em] mb-4 drop-shadow-sm">Built for Every Elite Group</h2>
+            <h2 id="groups-heading" className="font-display text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600 text-4xl sm:text-5xl font-extrabold tracking-[0.05em] mb-4 drop-shadow-sm">Built for Every Elite Group</h2>
             <p className="text-slate-300 font-medium max-w-2xl mx-auto text-lg">Rollcally adapts perfectly to your organizational hierarchy, whether you're a global titan or a specialized task force.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left relative z-10">
@@ -256,7 +256,7 @@ export default function Landing() {
                   <span className="material-symbols-outlined">domain</span>
                 </div>
               </div>
-              <h3 className="font-display italic text-white text-3xl font-extrabold mb-4 tracking-[0.05em] relative z-10">Corporations</h3>
+              <h3 className="font-display text-white text-3xl font-extrabold mb-4 tracking-[0.05em] relative z-10">Corporations</h3>
               <p className="text-slate-300 text-lg mb-8 relative z-10 flex-grow">Perfectly scaled attendance and geo-tracking for massive global enterprises.</p>
               <div className="flex items-center text-primary font-bold group-hover:text-purple-400 transition-colors relative z-10 mt-auto">
                 Explore Solutions <span className="material-symbols-outlined ml-2 group-hover:translate-x-2 transition-transform" aria-hidden="true">arrow_forward</span>
@@ -280,7 +280,7 @@ export default function Landing() {
                   <span className="material-symbols-outlined">volunteer_activism</span>
                 </div>
               </div>
-              <h3 className="font-display italic text-white text-3xl font-extrabold mb-4 tracking-[0.05em] relative z-10">Non-profits</h3>
+              <h3 className="font-display text-white text-3xl font-extrabold mb-4 tracking-[0.05em] relative z-10">Non-profits</h3>
               <p className="text-slate-300 text-lg mb-8 relative z-10 flex-grow">Engage volunteers and track event participation with effortless precision.</p>
               <div className="flex items-center text-purple-400 font-bold group-hover:text-purple-300 transition-colors relative z-10 mt-auto">
                 Explore Solutions <span className="material-symbols-outlined ml-2 group-hover:translate-x-2 transition-transform" aria-hidden="true">arrow_forward</span>
@@ -304,7 +304,7 @@ export default function Landing() {
                   <span className="material-symbols-outlined">groups</span>
                 </div>
               </div>
-              <h3 className="font-display italic text-white text-3xl font-extrabold mb-4 tracking-[0.05em] relative z-10">Large Groups</h3>
+              <h3 className="font-display text-white text-3xl font-extrabold mb-4 tracking-[0.05em] relative z-10">Large Groups</h3>
               <p className="text-slate-300 text-lg mb-8 relative z-10 flex-grow">Handle thousands of members simultaneously without breaking a sweat.</p>
               <div className="flex items-center text-blue-400 font-bold group-hover:text-blue-300 transition-colors relative z-10 mt-auto">
                 Explore Solutions <span className="material-symbols-outlined ml-2 group-hover:translate-x-2 transition-transform" aria-hidden="true">arrow_forward</span>
@@ -317,7 +317,7 @@ export default function Landing() {
         <section className="w-full relative py-14 sm:py-20 bg-gradient-to-br from-primary to-purple-600 text-center text-white flex flex-col items-center shadow-[0_20px_50px_-10px_rgba(82,71,230,0.5)] overflow-hidden mt-12 mb-[-40px]">
           <div className={`absolute inset-0 ${HERO_BG_CLASS} bg-cover bg-center opacity-15 mix-blend-screen pointer-events-none`} aria-hidden="true"></div>
           <div className="relative z-10 max-w-5xl mx-auto px-4 flex flex-col items-center gap-8">
-            <h2 className="font-display italic text-5xl sm:text-7xl font-black leading-tight tracking-[0.05em] drop-shadow-lg">Elevate Your<br />Organization</h2>
+            <h2 className="font-display text-5xl sm:text-7xl font-black leading-tight tracking-[0.05em] drop-shadow-lg">Elevate Your<br />Organization</h2>
             <p className="text-white/90 max-w-xl text-lg sm:text-xl font-medium drop-shadow">Join the elite groups who have already transformed their accountability and engagement with Rollcally.</p>
             <button onClick={() => navigate('/admin/signup')} className="w-full max-w-md bg-white text-slate-900 rounded-full h-[72px] font-bold text-xl shadow-2xl hover:scale-105 active:scale-95 transition-all tracking-wide mt-4">
               Create Your Workspace
@@ -331,7 +331,7 @@ export default function Landing() {
             <div className="flex flex-col gap-6 max-w-xs">
               <div className="flex items-center gap-3">
                 <img src="/logo.png" alt="" className="h-8 w-8 object-contain" aria-hidden="true" />
-                <span className="text-white text-xl font-display italic font-black tracking-tight">Rollcally</span>
+                <span className="text-white text-xl font-display font-black tracking-tight">Rollcally</span>
               </div>
               <p className="text-slate-300 text-sm leading-relaxed font-medium">The premium standard for organizational attendance and member engagement analytics.</p>
               <div className="flex gap-4 pt-2">
@@ -343,7 +343,7 @@ export default function Landing() {
 
             <div className="grid grid-cols-2 sm:flex sm:gap-24">
               <div className="flex flex-col gap-6">
-                <h4 className="font-display italic font-extrabold text-white text-lg tracking-wide">Product</h4>
+                <h4 className="font-display font-extrabold text-white text-lg tracking-wide">Product</h4>
                 <ul className="flex flex-col gap-4 text-slate-400 text-sm font-medium">
                   <li><span className="cursor-default">Features</span></li>
                   <li><span className="cursor-default">Security</span></li>
@@ -351,7 +351,7 @@ export default function Landing() {
                 </ul>
               </div>
               <div className="flex flex-col gap-6">
-                <h4 className="font-display italic font-extrabold text-white text-lg tracking-wide">Company</h4>
+                <h4 className="font-display font-extrabold text-white text-lg tracking-wide">Company</h4>
                 <ul className="flex flex-col gap-4 text-slate-400 text-sm font-medium">
                   <li><span className="cursor-default">About</span></li>
                   <li><span className="cursor-default">Contact</span></li>

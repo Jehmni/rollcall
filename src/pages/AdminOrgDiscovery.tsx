@@ -71,7 +71,7 @@ export default function AdminOrgDiscovery() {
             <span className="material-symbols-outlined text-xl leading-none">help</span>
           </button>
           <div className="text-center animate-in fade-in slide-in-from-top-4 duration-700">
-            <h1 className="text-3xl font-extrabold tracking-tighter text-white mb-2 uppercase italic">Find your organization</h1>
+            <h1 className="text-3xl font-extrabold tracking-tighter text-white mb-2 uppercase">Find your organization</h1>
             <p className="text-sm text-white/60 font-medium">Search for your team or company to join them</p>
           </div>
         </div>
@@ -130,7 +130,7 @@ export default function AdminOrgDiscovery() {
                       <span className="material-symbols-outlined text-3xl">corporate_fare</span>
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-white uppercase italic tracking-tighter">{org.name}</h3>
+                      <h3 className="text-xl font-bold text-white uppercase tracking-tighter">{org.name}</h3>
                       <p className="text-2xs font-bold text-slate-500 tracking-spaced mt-1 uppercase">Node · {org.id.split('-')[0]}</p>
                     </div>
                   </div>
@@ -162,7 +162,7 @@ export default function AdminOrgDiscovery() {
           ) : query && (
             <div className="bg-surface-low p-12 rounded-3xl border border-dashed border-white/10 text-center animate-in zoom-in-95">
               <span className="material-symbols-outlined text-6xl text-primary/10 mb-4 block">search_off</span>
-              <h3 className="text-lg font-bold text-white mb-1 uppercase italic">No Match Found</h3>
+              <h3 className="text-lg font-bold text-white mb-1 uppercase">No Match Found</h3>
               <p className="text-sm text-slate-500">The registry reflections no match for "{query}"</p>
             </div>
           )}
@@ -179,7 +179,7 @@ export default function AdminOrgDiscovery() {
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
               <span className="material-symbols-outlined text-3xl text-primary">add</span>
             </div>
-            <h3 className="text-lg font-bold text-white mb-2 uppercase italic">Create New Organization</h3>
+            <h3 className="text-lg font-bold text-white mb-2 uppercase">Create New Organization</h3>
             <p className="text-sm text-slate-500 mb-8 max-w-[280px]">
               Create a new space for your team and start managing everything in one place.
             </p>
@@ -212,7 +212,7 @@ export default function AdminOrgDiscovery() {
                         <span className="material-symbols-outlined text-xl">history</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-white uppercase italic tracking-tighter">
+                        <span className="text-sm font-bold text-white uppercase tracking-tighter">
                           {req.organization?.name || 'Authorized Hub'}
                         </span>
                         <span className="text-2xs font-bold uppercase tracking-wider text-slate-500 mt-0.5">

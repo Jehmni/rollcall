@@ -31,7 +31,7 @@ function OrgCard({
           <span className="material-symbols-outlined text-3xl">corporate_fare</span>
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="text-base font-extrabold italic text-white uppercase tracking-tight truncate">{org.name}</h4>
+          <h4 className="text-base font-extrabold text-white uppercase tracking-tight truncate">{org.name}</h4>
           <p className="text-xs font-medium text-slate-500 uppercase mt-0.5">
             {new Date(org.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
           </p>
@@ -175,7 +175,7 @@ export default function AdminDashboard() {
             </button>
           </div>
           <div className="text-center">
-            <span className="font-display font-bold text-white uppercase italic tracking-tighter text-sm">Organisation Live</span>
+            <span className="font-display font-bold text-white uppercase tracking-tighter text-sm">Organisation Live</span>
           </div>
           <div />
         </header>
@@ -190,7 +190,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="text-center space-y-3 mb-12">
-                <h1 className="text-white text-5xl font-display font-bold tracking-tighter uppercase italic">Connected!</h1>
+                <h1 className="text-white text-5xl font-display font-bold tracking-tighter uppercase">Connected!</h1>
                 <p className="text-slate-400 text-lg font-medium tracking-tight">Organisation is live and active</p>
               </div>
               <div className="w-full bg-primary/5 border border-primary/20 rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
@@ -199,7 +199,7 @@ export default function AdminDashboard() {
                   <div className="inline-flex size-20 rounded-[2rem] bg-primary/10 border border-primary/20 items-center justify-center mb-4">
                     <span className="material-symbols-outlined text-primary text-4xl">corporate_fare</span>
                   </div>
-                  <h2 className="text-white text-3xl font-display font-bold uppercase italic tracking-tighter mb-1">{createdOrg.name}</h2>
+                  <h2 className="text-white text-3xl font-display font-bold uppercase tracking-tighter mb-1">{createdOrg.name}</h2>
                   <p className="text-primary font-black uppercase tracking-spaced text-2xs">Established Organisation</p>
                 </div>
                 <div className="p-8 space-y-6">
@@ -220,7 +220,7 @@ export default function AdminDashboard() {
                     </div>
                     <div>
                       <p className="text-slate-500 text-2xs uppercase tracking-spread font-black mb-1">Your Role</p>
-                      <p className="text-white font-display font-bold uppercase italic text-lg tracking-tight">Owner</p>
+                      <p className="text-white font-display font-bold uppercase text-lg tracking-tight">Owner</p>
                     </div>
                   </div>
                 </div>
@@ -317,7 +317,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="relative z-10 text-center animate-in fade-in slide-in-from-top-4 duration-700">
-            <h1 className="text-3xl font-extrabold italic uppercase tracking-tighter text-white mb-1">
+            <h1 className="text-3xl font-extrabold uppercase tracking-tighter text-white mb-1">
               {isSuper ? 'System Overview' : 'My Organizations'}
             </h1>
             <p className="text-slate-400 text-sm font-medium">
@@ -332,7 +332,7 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-end mb-6">
             <div>
               <p className="text-2xs font-black tracking-spaced text-slate-500 uppercase mb-1">Dashboard</p>
-              <h3 className="text-2xl font-extrabold italic text-white uppercase tracking-tighter">Directory</h3>
+              <h3 className="text-2xl font-extrabold text-white uppercase tracking-tighter">Directory</h3>
             </div>
             <div className="flex gap-2">
               <button
@@ -363,7 +363,7 @@ export default function AdminDashboard() {
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-display font-bold text-white uppercase tracking-tighter italic">
+                    <h3 className="text-xl font-display font-bold text-white uppercase tracking-tighter">
                       {editingOrg ? 'Rename' : 'Launch New'}
                     </h3>
                     <p className="text-sm font-medium text-slate-400">
@@ -419,7 +419,7 @@ export default function AdminDashboard() {
             <div className="rounded-2xl bg-primary/5 border border-primary/10 p-10 sm:p-20 text-center shadow-2xl relative overflow-hidden group">
               <div className="absolute -top-10 -right-10 h-40 w-40 bg-primary/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000 pointer-events-none" />
               <span className="material-symbols-outlined text-8xl text-primary/20 group-hover:text-primary/30 transition-colors mb-6 block">corporate_fare</span>
-              <h3 className="text-2xl font-display font-bold text-white uppercase tracking-tighter italic">Welcome to Rollcally</h3>
+              <h3 className="text-2xl font-display font-bold text-white uppercase tracking-tighter">Welcome to Rollcally</h3>
               <p className="text-sm font-medium text-slate-400 mb-10 max-w-sm mx-auto mt-3">
                 Ready to start tracking? Launch your first organization to begin managing units and take attendance.
               </p>
@@ -461,7 +461,7 @@ export default function AdminDashboard() {
                       <span className="material-symbols-outlined text-3xl">groups</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base font-extrabold italic text-white uppercase tracking-tight truncate">{u.name}</h4>
+                      <h4 className="text-base font-extrabold text-white uppercase tracking-tight truncate">{u.name}</h4>
                       <p className="text-xs font-medium text-slate-500 uppercase mt-0.5">{u.organization.name}</p>
                     </div>
                     <span className="material-symbols-outlined text-slate-600 group-hover:text-slate-400 group-hover:translate-x-1 transition-all">chevron_right</span>

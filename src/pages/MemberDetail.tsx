@@ -52,7 +52,7 @@ function StatCard({
 
   return (
     <div className="rounded-[1.5rem] bg-surface-low p-6 text-center shadow-[0_20px_40px_rgba(7,13,31,0.4)] hover:-translate-y-1 transition-all group">
-      <p className={`text-4xl font-display font-black tracking-tighter italic ${valueClass} group-hover:scale-110 transition-transform duration-500`}>{value}</p>
+      <p className={`text-4xl font-display font-black tracking-tighter ${valueClass} group-hover:scale-110 transition-transform duration-500`}>{value}</p>
       <div className="h-px w-8 bg-white/5 mx-auto my-3" aria-hidden="true"></div>
       <p className="text-2xs font-black uppercase tracking-spaced text-slate-500 leading-tight">{label}</p>
     </div>
@@ -186,7 +186,7 @@ export default function MemberDetail() {
           </button>
 
           <div className="flex flex-col items-center flex-1 overflow-hidden px-4 text-center">
-            <h1 className="text-3xl font-black tracking-tighter italic truncate w-full">{member.name}</h1>
+            <h1 className="text-3xl font-black tracking-tighter truncate w-full">{member.name}</h1>
             <div className="flex items-center gap-2 mt-1">
               {member.section && (
                 <span className="text-2xs font-black uppercase tracking-spaced bg-primary/10 text-primary-light px-3 py-0.5 rounded-full">
@@ -258,7 +258,7 @@ export default function MemberDetail() {
                     aria-hidden="true"
                   />
                 ))}
-                <p className="ml-3 text-2xs font-display font-bold uppercase tracking-spaced text-slate-600 italic">Timeline</p>
+                <p className="ml-3 text-2xs font-display font-bold uppercase tracking-spaced text-slate-600">Timeline</p>
               </div>
 
               <div className="mt-8 flex items-center gap-6">
@@ -284,7 +284,7 @@ export default function MemberDetail() {
           {records.length === 0 ? (
             <div className="rounded-[2.5rem] bg-surface-low p-16 text-center shadow-[0_20px_40px_rgba(7,13,31,0.4)]">
               <span className="material-symbols-outlined text-6xl text-primary/10 mb-6 block" aria-hidden="true">groups</span>
-              <h3 className="text-xl font-display font-bold text-white uppercase tracking-tighter italic">No History Found</h3>
+              <h3 className="text-xl font-display font-bold text-white uppercase tracking-tighter">No History Found</h3>
               <p className="text-sm font-medium text-slate-500 mt-2">This member hasn't participated in any events yet.</p>
             </div>
           ) : (
@@ -306,7 +306,7 @@ export default function MemberDetail() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <p className="text-lg font-bold text-white uppercase tracking-tight italic group-hover:text-primary-light transition-colors">
+                      <p className="text-lg font-bold text-white uppercase tracking-tight group-hover:text-primary-light transition-colors">
                         {EVENT_LABEL[r.serviceType]}
                       </p>
                       <span
