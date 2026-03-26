@@ -229,7 +229,9 @@ export default function OrgDetail() {
     doFetch()
   }, [isOwner, orgId, getOrgJoinRequests])
 
-  if (org && !orgName && !isUpdating) setOrgName(org.name)
+  useEffect(() => {
+    if (org?.name && !orgName) setOrgName(org.name)
+  }, [org?.name])
 
   const pendingCount = joinRequests.filter(r => r.status === 'pending').length
 

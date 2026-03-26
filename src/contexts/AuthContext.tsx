@@ -53,8 +53,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAdminUnits([])
       return
     }
-    const role = session.user.user_metadata?.role as string | undefined
-    const super_ = role === 'superadmin'
+    const { data: superRow } = await supabase
+      .from('super_admins')
+      .select('user_id')
+      .eq('user_id', session.user.id)
+      .maybeSingle()
+    const super_ = !!superRow
     setIsSuper(super_)
     if (!super_) {
       const units = await fetchAdminUnits(session.user.id)

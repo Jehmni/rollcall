@@ -167,13 +167,13 @@ create policy "Admins: read push subscriptions for their units"
 -- HELPER FUNCTIONS (security definer — called inside RLS policies)
 -- ============================================================
 
--- Super admin: checks raw_user_meta_data so it works with a stale JWT.
+-- Super admin: checks the super_admins table (service-role only writes).
+-- This prevents metadata spoofing during signup.
 create or replace function public.is_super_admin()
 returns boolean language sql stable security definer as $$
   select exists (
-    select 1 from auth.users
-    where id = auth.uid()
-      and raw_user_meta_data->>'role' = 'superadmin'
+    select 1 from public.super_admins
+    where user_id = auth.uid()
   );
 $$;
 

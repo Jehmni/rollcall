@@ -38,9 +38,6 @@ export default function AdminSignup() {
       email: email.trim().toLowerCase(),
       password,
       options: {
-        data: {
-          role: 'admin' // Default role for new signups
-        },
         emailRedirectTo: `${window.location.origin}/admin`
       }
     })

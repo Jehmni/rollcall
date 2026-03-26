@@ -151,6 +151,7 @@ export default function AdminDashboard() {
       setConfirmDelete(null)
     } catch {
       setError('Failed to delete organization')
+    } finally {
       setIsUpdating(false)
     }
   }
