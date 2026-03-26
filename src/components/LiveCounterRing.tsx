@@ -10,17 +10,55 @@ const NAMES = [
 ]
 
 const TOTAL = 24
-const TICK_MS = 1600
-const PAUSE_MS = 2800
+const TICK_MS = 2000   // total time per person
+const DOT_TO_TICK = 1200  // when dot morphs into tick
+const PAUSE_MS = 3000
+
+const PRIMARY_LIGHT = '#c3c0ff'
+const PRIMARY_CONTAINER = '#5247e6'
+const TRACK = '#151b2d'
+
+type Phase = 'entering' | 'active' | 'ticked'
 
 interface FeedItem {
   id: number
   name: string
+  phase: Phase
 }
 
-const PRIMARY_LIGHT = '#c3c0ff'      // lavender
-const PRIMARY_CONTAINER = '#5247e6' // indigo
-const TRACK = '#151b2d'             // surface-low
+// Animated tick checkmark
+function Tick({ visible }: { visible: boolean }) {
+  return (
+    <svg
+      width="18" height="18" viewBox="0 0 18 18"
+      style={{
+        marginRight: '10px',
+        flexShrink: 0,
+        opacity: visible ? 1 : 0,
+        transition: 'opacity 0.2s ease',
+      }}
+    >
+      <circle
+        cx="9" cy="9" r="8"
+        fill="none"
+        stroke={PRIMARY_LIGHT}
+        strokeWidth="1.5"
+        opacity="0.4"
+      />
+      <polyline
+        points="5,9 7.5,11.5 13,6"
+        fill="none"
+        stroke={PRIMARY_LIGHT}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray="20"
+        strokeDashoffset={visible ? 0 : 20}
+        style={{ transition: 'stroke-dashoffset 0.35s cubic-bezier(0.22,1,0.36,1)' }}
+      />
+    </svg>
+  )
+}
 
 export default function LiveCounterRing() {
   const [count, setCount] = useState(0)
@@ -37,14 +75,32 @@ export default function LiveCounterRing() {
       return () => clearTimeout(t)
     }
 
-    const t = setTimeout(() => {
-      const name = NAMES[count]
-      const item: FeedItem = { id: idRef.current++, name }
-      setFeed(prev => [item, ...prev].slice(0, 4))
+    const id = idRef.current++
+    const newItem: FeedItem = { id, name: NAMES[count], phase: 'entering' }
+
+    // Prepend new item
+    setFeed(prev => [newItem, ...prev].slice(0, 6))
+
+    // Settle into active (dot starts pulsing)
+    const t1 = setTimeout(() => {
+      setFeed(prev => prev.map(item =>
+        item.id === id ? { ...item, phase: 'active' } : item
+      ))
+    }, 80)
+
+    // Morph dot → tick
+    const t2 = setTimeout(() => {
+      setFeed(prev => prev.map(item =>
+        item.id === id ? { ...item, phase: 'ticked' } : item
+      ))
+    }, DOT_TO_TICK)
+
+    // Advance to next person
+    const t3 = setTimeout(() => {
       setCount(c => c + 1)
     }, TICK_MS)
 
-    return () => clearTimeout(t)
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, [count])
 
   const radius = 70
@@ -67,20 +123,26 @@ export default function LiveCounterRing() {
       padding: '20px 0',
     }}>
       <style>{`
-        @keyframes slideInFeed {
-          from { opacity: 0; transform: translateY(-12px); }
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-16px); }
           to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes dotPulse {
+          0%, 100% { transform: scale(1);   opacity: 1; }
+          50%       { transform: scale(1.5); opacity: 0.7; }
         }
       `}</style>
 
-      {/* Ring */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px', width: '100%', maxWidth: '280px' }}>
+      {/* ── Ring ── */}
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        padding: '16px', width: '100%', maxWidth: '280px',
+      }}>
         <div style={{ position: 'relative', width: '160px', height: '160px' }}>
 
-          {/* Ambient glow behind ring */}
+          {/* Ambient glow */}
           <div style={{
-            position: 'absolute',
-            inset: 0,
+            position: 'absolute', inset: 0,
             borderRadius: '50%',
             backgroundColor: PRIMARY_CONTAINER,
             opacity: isComplete ? 0.22 : 0.1,
@@ -100,15 +162,8 @@ export default function LiveCounterRing() {
                 </feMerge>
               </filter>
             </defs>
-
-            {/* Track */}
             <circle cx="80" cy="80" r={radius}
-              fill="transparent"
-              stroke={TRACK}
-              strokeWidth={strokeWidth}
-            />
-
-            {/* Progress arc */}
+              fill="transparent" stroke={TRACK} strokeWidth={strokeWidth} />
             <circle cx="80" cy="80" r={radius}
               fill="transparent"
               stroke={isComplete ? PRIMARY_LIGHT : PRIMARY_CONTAINER}
@@ -118,7 +173,7 @@ export default function LiveCounterRing() {
               strokeLinecap="round"
               filter="url(#ringGlow)"
               style={{
-                transition: `stroke-dashoffset ${TICK_MS * 0.6}ms cubic-bezier(0.4,0,0.2,1), stroke 0.4s ease`,
+                transition: `stroke-dashoffset ${TICK_MS * 0.5}ms cubic-bezier(0.4,0,0.2,1), stroke 0.4s ease`,
               }}
             />
           </svg>
@@ -152,7 +207,6 @@ export default function LiveCounterRing() {
           </div>
         </div>
 
-        {/* Status label */}
         <div style={{
           marginTop: '24px',
           fontFamily: 'Inter, sans-serif',
@@ -167,10 +221,10 @@ export default function LiveCounterRing() {
         </div>
       </div>
 
-      {/* Feed */}
+      {/* ── Feed ── */}
       <div style={{
         display: 'flex', flexDirection: 'column',
-        padding: '16px', width: '100%', maxWidth: '320px', minHeight: '280px',
+        padding: '16px', width: '100%', maxWidth: '320px', minHeight: '300px',
       }}>
         <h3 style={{
           fontFamily: 'Manrope, sans-serif',
@@ -179,12 +233,12 @@ export default function LiveCounterRing() {
           color: '#475569',
           textTransform: 'uppercase',
           letterSpacing: '0.12em',
-          margin: '0 0 20px 0',
+          margin: '0 0 16px 0',
         }}>
           Member Check-Ins
         </h3>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {feed.length === 0 ? (
             <div style={{
               fontFamily: 'Inter, sans-serif',
@@ -196,31 +250,39 @@ export default function LiveCounterRing() {
             </div>
           ) : (
             feed.map((item, index) => {
-              const isNewest = index === 0
-              const opacity = isNewest ? 1 : Math.max(0.2, 1 - index * 0.25)
+              const isActive = item.phase === 'active'
+              const isTicked = item.phase === 'ticked'
+              const isEntering = item.phase === 'entering'
+
+              // Opacity recedes as items age below the active one
+              const ageOpacity = index === 0
+                ? 1
+                : Math.max(0.18, 1 - index * 0.2)
+
               return (
                 <div
                   key={item.id}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    padding: '12px 16px',
+                    padding: '11px 14px',
                     borderRadius: '14px',
-                    backgroundColor: isNewest
+                    // Active = solid indigo pill. Ticked/older = ghost tint.
+                    backgroundColor: (isEntering || isActive)
                       ? PRIMARY_CONTAINER
-                      : 'rgba(82, 71, 230, 0.06)',
-                    opacity,
-                    boxShadow: isNewest
-                      ? '0 0 24px rgba(82,71,230,0.45), 0 0 48px rgba(195,192,255,0.1)'
+                      : 'rgba(82, 71, 230, 0.07)',
+                    opacity: ageOpacity,
+                    boxShadow: (isEntering || isActive)
+                      ? '0 0 24px rgba(82,71,230,0.5), 0 0 48px rgba(195,192,255,0.08)'
                       : 'none',
-                    animation: isNewest
-                      ? 'slideInFeed 0.35s cubic-bezier(0.22,1,0.36,1) both'
+                    animation: isEntering
+                      ? 'slideDown 0.32s cubic-bezier(0.22,1,0.36,1) both'
                       : 'none',
-                    transition: 'background-color 0.4s ease, opacity 0.5s ease, box-shadow 0.4s ease',
+                    transition: 'background-color 0.5s ease, box-shadow 0.5s ease, opacity 0.5s ease',
                   }}
                 >
-                  {isNewest ? (
-                    /* Glowing dot for newest */
+                  {/* Left indicator: pulsing dot (active) or tick (ticked) */}
+                  {(isEntering || isActive) ? (
                     <div style={{
                       width: '7px',
                       height: '7px',
@@ -229,24 +291,19 @@ export default function LiveCounterRing() {
                       boxShadow: `0 0 8px ${PRIMARY_LIGHT}`,
                       marginRight: '12px',
                       flexShrink: 0,
+                      animation: isActive ? 'dotPulse 1s ease-in-out infinite' : 'none',
                     }} />
                   ) : (
-                    /* Tick circle for older items */
-                    <svg width="16" height="16" viewBox="0 0 16 16"
-                      style={{ marginRight: '10px', flexShrink: 0 }}>
-                      <circle cx="8" cy="8" r="7"
-                        fill="none" stroke={PRIMARY_CONTAINER} strokeWidth="1.5" />
-                      <polyline points="4.5,8 7,10.5 11.5,5.5"
-                        fill="none" stroke={PRIMARY_CONTAINER}
-                        strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                    <Tick visible={isTicked} />
                   )}
+
                   <span style={{
                     fontFamily: 'Inter, sans-serif',
                     fontSize: '14px',
-                    fontWeight: isNewest ? 600 : 400,
-                    color: isNewest ? '#FFFFFF' : '#64748b',
-                    letterSpacing: isNewest ? '-0.01em' : '0',
+                    fontWeight: (isEntering || isActive) ? 600 : 400,
+                    color: (isEntering || isActive) ? '#FFFFFF' : '#64748b',
+                    letterSpacing: (isEntering || isActive) ? '-0.01em' : '0',
+                    transition: 'color 0.4s ease, font-weight 0.3s ease',
                   }}>
                     {item.name}
                   </span>
