@@ -20,6 +20,7 @@ create table if not exists organizations (
   id                  uuid primary key default gen_random_uuid(),
   name                text not null,
   created_by_admin_id uuid not null default auth.uid() references auth.users(id),
+  blocked_at          timestamptz,
   created_at          timestamptz not null default now()
 );
 
@@ -102,6 +103,29 @@ create table if not exists services (
   require_location     boolean not null default false,
   created_at           timestamptz not null default now()
 );
+
+-- ---- blocked_admins ----
+-- Super admin can block individual admin accounts.
+-- Blocked admins can authenticate but are shown a suspended screen.
+create table if not exists blocked_admins (
+  user_id    uuid primary key references auth.users(id) on delete cascade,
+  reason     text,
+  blocked_at timestamptz not null default now()
+);
+
+alter table blocked_admins enable row level security;
+
+drop policy if exists "Super admin: manage blocked admins" on blocked_admins;
+create policy "Super admin: manage blocked admins"
+  on blocked_admins for all to authenticated
+  using (is_super_admin()) with check (is_super_admin());
+
+-- Also allow any authenticated user to read their own block row
+-- so AuthContext can detect they are blocked.
+drop policy if exists "User: read own block" on blocked_admins;
+create policy "User: read own block"
+  on blocked_admins for select to authenticated
+  using (auth.uid() = user_id);
 
 alter table services enable row level security;
 
@@ -816,6 +840,39 @@ create index if not exists idx_attendance_service_member on attendance(service_i
 create index if not exists idx_notifications_unit_fire   on member_notifications(unit_id, dismissed, fire_at desc);
 create index if not exists idx_push_subs_unit_id         on member_push_subscriptions(unit_id);
 create index if not exists idx_push_subs_member_id       on member_push_subscriptions(member_id);
+
+-- Returns all admin users (org members + unit admins) with email.
+-- Uses security definer to access auth.users; only super admins should call this.
+create or replace function public.list_admin_users()
+returns table(
+  user_id    uuid,
+  email      text,
+  created_at timestamptz,
+  org_name   text,
+  blocked    boolean
+) language sql security definer stable as $$
+  select distinct
+    u.id                        as user_id,
+    u.email                     as email,
+    u.created_at                as created_at,
+    coalesce(
+      (select o.name from public.organization_members om
+       join public.organizations o on o.id = om.organization_id
+       where om.admin_id = u.id limit 1),
+      (select o.name from public.unit_admins ua
+       join public.units ut on ut.id = ua.unit_id
+       join public.organizations o on o.id = ut.org_id
+       where ua.user_id = u.id limit 1)
+    )                           as org_name,
+    exists(select 1 from public.blocked_admins ba where ba.user_id = u.id) as blocked
+  from auth.users u
+  where
+    exists(select 1 from public.organization_members om where om.admin_id = u.id)
+    or exists(select 1 from public.unit_admins ua where ua.user_id = u.id)
+  order by u.created_at desc;
+$$;
+
+grant execute on function public.list_admin_users() to authenticated;
 
 -- ============================================================
 -- SUPER ADMIN SETUP

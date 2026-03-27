@@ -18,6 +18,7 @@ import MemberDetail from './pages/MemberDetail'
 import AdminOrgDiscovery from './pages/AdminOrgDiscovery'
 import HelpCentre from './pages/HelpCentre'
 import SuperAdminDashboard from './pages/SuperAdminDashboard'
+import Blocked from './pages/Blocked'
 import TermsOfService from './pages/TermsOfService'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 
@@ -53,6 +54,9 @@ export default function App() {
             <Route path="/admin/units/:unitId/members" element={<AdminRoute><ErrorBoundary label="Unit Members"><UnitMembers /></ErrorBoundary></AdminRoute>} />
             <Route path="/admin/units/:unitId/members/:memberId" element={<AdminRoute><ErrorBoundary label="Member Detail"><MemberDetail /></ErrorBoundary></AdminRoute>} />
             <Route path="/admin/units/:unitId/events/:serviceId" element={<AdminRoute><ErrorBoundary label="Service Detail"><AdminServiceDetail /></ErrorBoundary></AdminRoute>} />
+
+            {/* Blocked — shown to suspended admins regardless of route */}
+            <Route path="/blocked" element={<Blocked />} />
 
             {/* Superadmin — founder only, not linked anywhere */}
             <Route path="/__rc_super" element={<SuperRoute><SuperAdminDashboard /></SuperRoute>} />

@@ -18,12 +18,11 @@ function Spinner() {
 }
 
 export function AdminRoute({ children }: { children: ReactNode }) {
-  const { session, loading } = useAuth()
+  const { session, isBlocked, loading } = useAuth()
   if (loading) return <Spinner />
 
-  if (!session) {
-    return <Navigate to="/admin/login" replace />
-  }
+  if (!session) return <Navigate to="/admin/login" replace />
+  if (isBlocked) return <Navigate to="/blocked" replace />
   return <>{children}</>
 }
 

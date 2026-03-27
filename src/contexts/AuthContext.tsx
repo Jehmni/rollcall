@@ -12,6 +12,8 @@ import type { UnitWithOrg } from '../types'
 interface AuthContextValue {
   session: Session | null
   isSuper: boolean
+  isBlocked: boolean
+  blockReason: string | null
   adminUnits: UnitWithOrg[]
   loading: boolean
   signIn: (credentials: SignInWithPasswordCredentials) => Promise<{ error: AuthError | null }>
@@ -43,6 +45,8 @@ async function fetchAdminUnits(userId: string): Promise<UnitWithOrg[]> {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [isSuper, setIsSuper] = useState(false)
+  const [isBlocked, setIsBlocked] = useState(false)
+  const [blockReason, setBlockReason] = useState<string | null>(null)
   const [adminUnits, setAdminUnits] = useState<UnitWithOrg[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -50,9 +54,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(session)
     if (!session) {
       setIsSuper(false)
+      setIsBlocked(false)
+      setBlockReason(null)
       setAdminUnits([])
       return
     }
+
+    // 1. Check super admin status first
     const { data: superRow } = await supabase
       .from('super_admins')
       .select('user_id')
@@ -60,12 +68,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle()
     const super_ = !!superRow
     setIsSuper(super_)
-    if (!super_) {
-      const units = await fetchAdminUnits(session.user.id)
-      setAdminUnits(units)
-    } else {
+
+    // Super admins are never blocked
+    if (super_) {
+      setIsBlocked(false)
+      setBlockReason(null)
       setAdminUnits([])
+      return
     }
+
+    // 2. Check if this admin is individually blocked
+    const { data: blockedRow } = await supabase
+      .from('blocked_admins')
+      .select('reason')
+      .eq('user_id', session.user.id)
+      .maybeSingle()
+
+    if (blockedRow) {
+      setIsBlocked(true)
+      setBlockReason(blockedRow.reason ?? 'Your account has been suspended by the platform administrator.')
+      setAdminUnits([])
+      return
+    }
+
+    // 3. Check if any organisation this admin belongs to is blocked
+    const { data: blockedOrg } = await supabase
+      .from('organization_members')
+      .select('organizations(blocked_at, name)')
+      .eq('admin_id', session.user.id)
+      .not('organizations.blocked_at', 'is', null)
+      .maybeSingle()
+
+    if (blockedOrg) {
+      setIsBlocked(true)
+      setBlockReason('Your organisation has been suspended by the platform administrator.')
+      setAdminUnits([])
+      return
+    }
+
+    // 4. Normal admin — load units
+    setIsBlocked(false)
+    setBlockReason(null)
+    const units = await fetchAdminUnits(session.user.id)
+    setAdminUnits(units)
   }
 
   useEffect(() => {
@@ -115,15 +160,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ 
-      session, 
-      isSuper, 
-      adminUnits, 
-      loading, 
-      signIn, 
-      signUp, 
-      signOut, 
-      resetPassword, 
+    <AuthContext.Provider value={{
+      session,
+      isSuper,
+      isBlocked,
+      blockReason,
+      adminUnits,
+      loading,
+      signIn,
+      signUp,
+      signOut,
+      resetPassword,
       updatePassword,
       refreshPermissions
     }}>
