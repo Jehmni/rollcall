@@ -355,7 +355,7 @@ export default function Landing() {
                 <ul className="flex flex-col gap-4 text-slate-400 text-sm font-medium">
                   <li><span className="cursor-default">About</span></li>
                   <li><span className="cursor-default">Contact</span></li>
-                  <li><span className="cursor-default">Privacy</span></li>
+                  <li><button onClick={() => navigate('/privacy')} className="hover:text-white transition-colors bg-transparent border-0 p-0 text-sm font-medium">Privacy</button></li>
                 </ul>
               </div>
             </div>
@@ -365,7 +365,7 @@ export default function Landing() {
             <div className="flex gap-8 text-xs font-bold tracking-widest uppercase text-slate-400">
               <span className="cursor-default">Status</span>
               <button onClick={() => navigate('/help')} className="hover:text-white transition-colors">User Guide</button>
-              <span className="cursor-default">Terms</span>
+              <button onClick={() => navigate('/terms')} className="hover:text-white transition-colors bg-transparent border-0 p-0 text-xs font-bold tracking-widest uppercase">Terms</button>
             </div>
           </div>
         </footer>

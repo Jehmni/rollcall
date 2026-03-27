@@ -165,8 +165,8 @@ test.describe('UnitDashboard', () => {
 
   test('shows upcoming services', async ({ page }) => {
     await page.goto(`/admin/units/${IDS.unit}`)
-    // service_type 'rehearsal' is displayed as 'Regular Meeting'
-    await expect(page.getByText('Regular Meeting')).toBeVisible()
+    // service_type is now displayed as-is (free-form text)
+    await expect(page.getByText('rehearsal')).toBeVisible()
   })
 
   test('"New Event" button toggles create form', async ({ page }) => {
@@ -174,6 +174,7 @@ test.describe('UnitDashboard', () => {
     await page.getByRole('button', { name: /New Event/i }).click()
     await expect(page.getByText('Schedule Event')).toBeVisible()
     await expect(page.getByLabel('Event Date')).toBeVisible()
+    await expect(page.getByLabel('Event Type')).toBeVisible()
   })
 
   test('cancel hides service create form', async ({ page }) => {
@@ -198,7 +199,7 @@ test.describe('UnitDashboard', () => {
     await mockGetServiceMembersFull(page)
     await mockAttendanceWithAlice(page)
     await page.goto(`/admin/units/${IDS.unit}`)
-    await page.getByText('Regular Meeting').click()
+    await page.getByText('rehearsal').click()
     await expect(page).toHaveURL(`/admin/units/${IDS.unit}/events/${IDS.service}`)
   })
 })
@@ -309,8 +310,8 @@ test.describe('AdminServiceDetail', () => {
 
   test('shows service type and formatted date', async ({ page }) => {
     await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
-    // service_type 'rehearsal' → 'Regular Meeting'; date 2026-12-10 → "DECEMBER 10, 2026"
-    await expect(page.getByText('Regular Meeting')).toBeVisible()
+    // service_type now displays as-is (free-form); date 2026-12-10 → "DECEMBER 10, 2026"
+    await expect(page.getByText('rehearsal')).toBeVisible()
     await expect(page.getByText(/December/i)).toBeVisible()
   })
 

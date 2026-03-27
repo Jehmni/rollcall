@@ -526,6 +526,36 @@ export async function mockOrgCreation(page: Page, name = 'New Test Church') {
   })
 }
 
+/** Mock member_push_subscriptions — HEAD returns Content-Range count, GET returns array */
+export async function mockPushSubscriptions(page: Page, count = 0) {
+  const rows = Array.from({ length: count }, (_, i) => ({ id: `sub-${i}`, unit_id: IDS.unit }))
+  await page.route(`${SUPABASE_URL}/rest/v1/member_push_subscriptions*`, async route => {
+    if (route.request().method() === 'HEAD') {
+      await route.fulfill({
+        status: 200,
+        headers: { 'Content-Range': count > 0 ? `0-${count - 1}/${count}` : '*/0' },
+        body: '',
+      })
+    } else {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(rows) })
+    }
+  })
+}
+
+/** Mock the send-push edge function — success or error */
+export async function mockSendPush(page: Page, success = true) {
+  await page.route(`${SUPABASE_URL.replace(/\/$/, '')}/functions/v1/send-push*`, route => {
+    if (success) {
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ sent: 1 }) })
+    }
+    return route.fulfill({
+      status: 500,
+      contentType: 'application/json',
+      body: JSON.stringify({ error: 'VAPID keys not configured' }),
+    })
+  })
+}
+
 /** Silence WebSocket console noise from Supabase Realtime */
 export function silenceRealtime(page: Page) {
   page.on('console', () => {})

@@ -228,7 +228,7 @@ test.describe('4 · Create event (service)', () => {
 
     const newService = {
       id: 'new-svc-001', unit_id: IDS.unit,
-      date: '2026-12-06', service_type: 'sunday_service',
+      date: '2026-12-06', service_type: 'Sunday Service',
       created_at: new Date().toISOString(),
     }
 
@@ -243,14 +243,14 @@ test.describe('4 · Create event (service)', () => {
     await page.goto(`/admin/units/${IDS.unit}`)
     await page.getByRole('button', { name: /New Event/i }).click()
     await page.getByLabel('Event Date').fill('2026-12-06')
-    // Select service type
-    await page.locator('select').selectOption('sunday_service')
+    // service_type is now a free-form text input
+    await page.getByLabel('Event Type').fill('Sunday Service')
     await page.getByRole('button', { name: 'Create Event' }).click()
     // After create, navigate to service detail — check URL changed to events page
     await expect(page).toHaveURL(/\/events\/new-svc-001/)
   })
 
-  test('service type defaults are selectable', async ({ page }) => {
+  test('service type text input accepts free-form values', async ({ page }) => {
     silenceRealtime(page)
     await asSuperAdmin(page)
     await mockUnitAdmins(page)
@@ -258,12 +258,12 @@ test.describe('4 · Create event (service)', () => {
     await mockUnitLookup(page)
     await page.goto(`/admin/units/${IDS.unit}`)
     await page.getByRole('button', { name: /New Event/i }).click()
-    const typeSelect = page.locator('select')
-    await expect(typeSelect).toBeVisible()
-    await typeSelect.selectOption('rehearsal')
-    await expect(typeSelect).toHaveValue('rehearsal')
-    await typeSelect.selectOption('sunday_service')
-    await expect(typeSelect).toHaveValue('sunday_service')
+    const typeInput = page.getByLabel('Event Type')
+    await expect(typeInput).toBeVisible()
+    await typeInput.fill('Monthly Review')
+    await expect(typeInput).toHaveValue('Monthly Review')
+    await typeInput.fill('Standup Meeting')
+    await expect(typeInput).toHaveValue('Standup Meeting')
   })
 })
 
