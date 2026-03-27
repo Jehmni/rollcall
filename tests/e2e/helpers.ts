@@ -68,6 +68,10 @@ export async function asSuperAdmin(page: Page) {
   await page.route(`${SUPABASE_URL}/auth/v1/user*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(session.user) }),
   )
+  // Mock the super_admins table check (new requirement)
+  await page.route(`${SUPABASE_URL}/rest/v1/super_admins*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([{ user_id: IDS.superAdmin }]) }),
+  )
 }
 
 /**
@@ -97,6 +101,10 @@ export async function asUnitAdmin(page: Page, unitCount: 1 | 2 = 1) {
   // auth.getUser() calls /auth/v1/user — must return the user object
   await page.route(`${SUPABASE_URL}/auth/v1/user*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(session.user) }),
+  )
+  // Mock the super_admins table check returning empty
+  await page.route(`${SUPABASE_URL}/rest/v1/super_admins*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
   )
   // Register LAST so it has highest priority (Playwright routes are LIFO)
   await page.route(`${SUPABASE_URL}/rest/v1/unit_admins*`, route =>
@@ -172,6 +180,13 @@ export async function mockUnitName(page: Page) {
 /** Mock unit_admins table returning empty (super admin panel) */
 export async function mockUnitAdmins(page: Page) {
   await page.route(`${SUPABASE_URL}/rest/v1/unit_admins*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
+  )
+}
+
+/** Mock super_admins table check returning empty */
+export async function mockNoSuperAdmin(page: Page) {
+  await page.route(`${SUPABASE_URL}/rest/v1/super_admins*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
   )
 }
