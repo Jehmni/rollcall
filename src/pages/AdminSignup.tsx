@@ -187,7 +187,7 @@ export default function AdminSignup() {
           <div className="mt-10 text-center px-8 animate-in fade-in duration-1000 delay-500">
             <p className="text-2xs uppercase tracking-spaced text-slate-500 font-bold leading-relaxed">
               By signing up, you agree to our <br/>
-              <a className="underline hover:text-slate-300 transition-colors" href="#">Terms of Service</a> and <a className="underline hover:text-slate-300 transition-colors" href="#">Privacy Policy</a>
+              <Link className="underline hover:text-slate-300 transition-colors" to="/terms">Terms of Service</Link> and <Link className="underline hover:text-slate-300 transition-colors" to="/privacy">Privacy Policy</Link>
             </p>
           </div>
         </div>

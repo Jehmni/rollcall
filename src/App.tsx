@@ -18,6 +18,8 @@ import MemberDetail from './pages/MemberDetail'
 import AdminOrgDiscovery from './pages/AdminOrgDiscovery'
 import HelpCentre from './pages/HelpCentre'
 import SuperAdminDashboard from './pages/SuperAdminDashboard'
+import TermsOfService from './pages/TermsOfService'
+import PrivacyPolicy from './pages/PrivacyPolicy'
 
 export default function App() {
   return (
@@ -34,6 +36,8 @@ export default function App() {
             <Route path="/" element={<ErrorBoundary label="Landing"><Landing /></ErrorBoundary>} />
             <Route path="/checkin" element={<ErrorBoundary label="Check-in"><CheckIn /></ErrorBoundary>} />
             <Route path="/help" element={<ErrorBoundary label="Help Centre"><HelpCentre /></ErrorBoundary>} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
 
             {/* Admin auth */}
             <Route path="/admin/login" element={<AdminLogin />} />

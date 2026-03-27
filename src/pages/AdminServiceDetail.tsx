@@ -15,6 +15,7 @@ function GoLiveButton({ service }: { service: Service }) {
       : null
   )
   const [subCount, setSubCount] = useState(0)
+  const [sendError, setSendError] = useState<string | null>(null)
 
   useEffect(() => {
     supabase
@@ -26,59 +27,70 @@ function GoLiveButton({ service }: { service: Service }) {
 
   async function goLive() {
     setSending(true)
+    setSendError(null)
     try {
       const { error } = await supabase.functions.invoke('send-push', {
         body: { service_id: service.id, unit_id: service.unit_id },
       })
-      if (!error) {
+      if (error) {
+        setSendError(error.message ?? 'Failed to send notifications. Check that VAPID secrets are set in Supabase.')
+      } else {
         const now = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
         setSentAt(now)
       }
+    } catch (err: unknown) {
+      setSendError((err as { message?: string })?.message ?? 'Unexpected error sending notifications.')
     } finally {
       setSending(false)
     }
   }
 
-  if (sentAt) {
-    return (
-      <div className="rounded-xl bg-surface-dark border border-emerald-500/20 px-4 py-3.5 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="material-symbols-outlined text-emerald-400 text-2xl">cell_tower</span>
-          <div>
-            <p className="text-sm font-bold text-white">Notified at {sentAt}</p>
-            <p className="text-2xs text-slate-500 font-medium">Members were sent a push notification</p>
+  return (
+    <div className="flex flex-col gap-2">
+      {sentAt ? (
+        <div className="rounded-xl bg-surface-dark border border-emerald-500/20 px-4 py-3.5 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-emerald-400 text-2xl">cell_tower</span>
+            <div>
+              <p className="text-sm font-bold text-white">Notified at {sentAt}</p>
+              <p className="text-2xs text-slate-500 font-medium">Members were sent a push notification</p>
+            </div>
           </div>
+          <button
+            onClick={goLive}
+            disabled={sending}
+            className="text-2xs font-black uppercase tracking-spaced text-emerald-400 hover:text-white transition-colors disabled:opacity-40"
+          >
+            Re-send
+          </button>
         </div>
+      ) : (
         <button
           onClick={goLive}
-          disabled={sending}
-          className="text-2xs font-black uppercase tracking-spaced text-emerald-400 hover:text-white transition-colors disabled:opacity-40"
+          disabled={sending || subCount === 0}
+          className="w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/40 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed group"
         >
-          Re-send
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-primary text-2xl group-disabled:text-slate-500">cell_tower</span>
+            <div className="text-left">
+              <p className="text-sm font-bold text-white">
+                {sending ? 'Sending notifications…' : 'Notify Members — Go Live'}
+              </p>
+              <p className="text-2xs text-slate-500 font-medium">
+                {subCount === 0 ? 'No subscribers yet — members opt in after check-in' : `${subCount} subscriber${subCount !== 1 ? 's' : ''}`}
+              </p>
+            </div>
+          </div>
+          <span className="material-symbols-outlined text-primary text-xl group-disabled:text-slate-600">chevron_right</span>
         </button>
-      </div>
-    )
-  }
-
-  return (
-    <button
-      onClick={goLive}
-      disabled={sending || subCount === 0}
-      className="w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/40 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed group"
-    >
-      <div className="flex items-center gap-3">
-        <span className="material-symbols-outlined text-primary text-2xl group-disabled:text-slate-500">cell_tower</span>
-        <div className="text-left">
-          <p className="text-sm font-bold text-white">
-            {sending ? 'Sending notifications…' : 'Notify Members — Go Live'}
-          </p>
-          <p className="text-2xs text-slate-500 font-medium">
-            {subCount === 0 ? 'No subscribers yet — members opt in after check-in' : `${subCount} subscriber${subCount !== 1 ? 's' : ''}`}
-          </p>
+      )}
+      {sendError && (
+        <div className="flex items-start gap-2 rounded-lg bg-red-500/10 px-3 py-2.5">
+          <span className="material-symbols-outlined text-red-400 text-base mt-0.5 flex-shrink-0">error</span>
+          <p className="text-xs text-red-400 font-medium">{sendError}</p>
         </div>
-      </div>
-      <span className="material-symbols-outlined text-primary text-xl group-disabled:text-slate-600">chevron_right</span>
-    </button>
+      )}
+    </div>
   )
 }
 
@@ -87,12 +99,6 @@ function GoLiveButton({ service }: { service: Service }) {
 const AVATAR_COLORS = ['#5247e6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899']
 function avatarColor(name: string) { return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length] }
 function getInitials(name: string) { return name.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase() }
-
-const EVENT_LABEL: Record<string, string> = {
-  rehearsal:      'Regular Meeting',
-  sunday_service: 'Main Event',
-  meeting:        'Meeting',
-}
 
 
 function formatTime(dateStr: string) {
@@ -224,7 +230,7 @@ export default function AdminServiceDetail() {
   const grouped = groupBySection(displayMembers)
 
   const eventLabel = service
-    ? `${EVENT_LABEL[service.service_type] ?? 'Event'} ${service.date}`
+    ? `${service.service_type || 'Event'} ${service.date}`
     : 'event'
 
   if (serviceLoading) {
@@ -259,7 +265,7 @@ export default function AdminServiceDetail() {
             <span className="material-symbols-outlined text-2xl">arrow_back</span>
           </button>
           <div>
-            <h1 className="text-base font-bold leading-tight">{EVENT_LABEL[service.service_type] ?? 'Event'}</h1>
+            <h1 className="text-base font-bold leading-tight">{service.service_type || 'Event'}</h1>
             <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">
               {formatTime(service.date)}
             </p>

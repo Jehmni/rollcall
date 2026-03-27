@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
 
     if (subsError) throw subsError
 
-    const appUrl = Deno.env.get('APP_URL') ?? 'https://www.rollcall.com'
+    const appUrl = Deno.env.get('APP_URL') ?? 'https://www.rollcally.com'
     const checkinUrl = `${appUrl}/checkin?service_id=${service_id}`
 
     const payload = JSON.stringify({

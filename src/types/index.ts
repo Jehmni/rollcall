@@ -1,4 +1,4 @@
-export type ServiceType = 'rehearsal' | 'sunday_service'
+export type ServiceType = string
 export type MemberStatus = 'active' | 'inactive'
 
 export interface Organization {

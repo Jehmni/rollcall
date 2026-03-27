@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useToast } from '../contexts/ToastContext'
-import type { DashboardMember, Organization, OrgRole, Service, ServiceType, Unit } from '../types'
+import type { DashboardMember, Organization, OrgRole, Service, Unit } from '../types'
 
 // ── Organizations ────────────────────────────────────────────────────────────
 
@@ -198,7 +198,7 @@ export function useServices(unitId: string | null) {
 
   useEffect(() => { setLoading(true); fetch() }, [fetch])
 
-  async function createService(date: string, service_type: ServiceType): Promise<Service> {
+  async function createService(date: string, service_type: string): Promise<Service> {
     if (!unitId) throw new Error('No unit selected')
     const { data, error } = await supabase
       .from('services')
@@ -210,7 +210,7 @@ export function useServices(unitId: string | null) {
     return data
   }
 
-  async function updateService(id: string, date: string, service_type: ServiceType): Promise<Service> {
+  async function updateService(id: string, date: string, service_type: string): Promise<Service> {
     const { data, error } = await supabase
       .from('services')
       .update({ date, service_type })
