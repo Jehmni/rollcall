@@ -21,10 +21,10 @@ export default function CheckIn() {
 
   const paramServiceId = searchParams.get('service_id')
   const serviceId = paramServiceId ?? sessionStorage.getItem('pending_service_id')
-  const { unitName, unitId } = useServiceInfo(serviceId)
+  const { unitName, unitId, requireLocation } = useServiceInfo(serviceId)
 
   // All check-in state lives in the hook
-  const { status, checkedInName, errorMessage, checkIn, reset } = useAttendance(serviceId)
+  const { status, checkedInName, errorMessage, checkIn, reset } = useAttendance(serviceId, requireLocation)
 
   // Push notification opt-in
   const { isSupported: pushSupported, currentPermission, subscribe } = usePushNotifications()

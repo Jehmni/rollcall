@@ -9,11 +9,12 @@ import {
   SUPABASE_URL, IDS,
   asSuperAdmin, asUnitAdmin,
   mockOrgs, mockUnitLookup, mockServices,
-  silenceRealtime,
+  silenceRealtime, mockNoSuperAdmin,
 } from './helpers'
 
 test.describe('Login page', () => {
   test('renders the admin login form', async ({ page }) => {
+    await mockNoSuperAdmin(page)
     await page.goto('/admin/login')
     await expect(page.getByText('Admin Portal').first()).toBeVisible()
     await expect(page.getByLabel('Email')).toBeVisible()
@@ -49,19 +50,19 @@ test.describe('Login page', () => {
 
 test.describe('Auth-based redirects', () => {
   test('unauthenticated access to /admin redirects to login', async ({ page }) => {
-    silenceRealtime(page)
+    await silenceRealtime(page)
     await page.goto('/admin')
     await expect(page).toHaveURL('/admin/login')
   })
 
   test('unauthenticated access to a unit page redirects to login', async ({ page }) => {
-    silenceRealtime(page)
+    await silenceRealtime(page)
     await page.goto(`/admin/units/${IDS.unit}`)
     await expect(page).toHaveURL('/admin/login')
   })
 
   test('super admin already logged in is redirected from login to /admin', async ({ page }) => {
-    silenceRealtime(page)
+    await silenceRealtime(page)
     await asSuperAdmin(page)
     await mockOrgs(page)
     await page.goto('/admin/login')
@@ -69,7 +70,7 @@ test.describe('Auth-based redirects', () => {
   })
 
   test('unit admin (single unit) is redirected from login directly to their unit', async ({ page }) => {
-    silenceRealtime(page)
+    await silenceRealtime(page)
     // asUnitAdmin mocks unit_admins — DO NOT call mockUnitAdmins after this (LIFO would override)
     await asUnitAdmin(page, 1)
     // Unit admin has no org memberships — AdminDashboard uses this to decide on redirect
@@ -85,7 +86,7 @@ test.describe('Auth-based redirects', () => {
 
 test.describe('Sign out', () => {
   test('super admin can sign out and lands on login', async ({ page }) => {
-    silenceRealtime(page)
+    await silenceRealtime(page)
     await asSuperAdmin(page)
     await mockOrgs(page)
     await page.route(`${SUPABASE_URL}/auth/v1/logout*`, route =>

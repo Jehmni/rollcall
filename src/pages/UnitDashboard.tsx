@@ -113,13 +113,14 @@ function ServiceCard({
 
 // ── Create / Edit Event Modal ─────────────────────────────────────────────────
 function EventFormModal({
-  editing, date, type, error, loading,
-  onChangeDate, onChangeType, onSubmit, onClose,
+  editing, date, type, requireLocation, error, loading,
+  onChangeDate, onChangeType, onChangeRequireLocation, onSubmit, onClose,
 }: {
   editing: Service | null
-  date: string; type: string; error: string | null; loading: boolean
+  date: string; type: string; requireLocation: boolean; error: string | null; loading: boolean
   onChangeDate: (v: string) => void
   onChangeType: (v: string) => void
+  onChangeRequireLocation: (v: boolean) => void
   onSubmit: (e: FormEvent) => void
   onClose: () => void
 }) {
@@ -167,6 +168,31 @@ function EventFormModal({
               className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
             />
           </label>
+
+          {/* Location toggle */}
+          <button
+            type="button"
+            onClick={() => onChangeRequireLocation(!requireLocation)}
+            className={`flex items-center justify-between gap-3 w-full px-4 py-3 rounded-xl border transition-all ${requireLocation ? 'bg-primary/10 border-primary/40' : 'bg-background-dark border-border-dark'}`}
+          >
+            <div className="flex items-center gap-3">
+              <span className={`material-symbols-outlined text-xl ${requireLocation ? 'text-primary-light' : 'text-slate-500'}`}>
+                {requireLocation ? 'location_on' : 'location_off'}
+              </span>
+              <div className="text-left">
+                <p className={`text-sm font-semibold ${requireLocation ? 'text-slate-100' : 'text-slate-400'}`}>
+                  {requireLocation ? 'In-person — Location required' : 'Online — No location check'}
+                </p>
+                <p className="text-2xs text-slate-500">
+                  {requireLocation ? 'Members must be on-site to check in' : 'Members can check in from anywhere'}
+                </p>
+              </div>
+            </div>
+            <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-0.5 ${requireLocation ? 'bg-primary' : 'bg-border-dark'}`}>
+              <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${requireLocation ? 'translate-x-4' : 'translate-x-0'}`} />
+            </div>
+          </button>
+
           {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
           <div className="flex gap-3 justify-end pt-2">
             <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-xl hover:bg-border-dark transition-colors">
@@ -312,6 +338,7 @@ export default function UnitDashboard() {
   // Forms state
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0])
   const [newType, setNewType] = useState('')
+  const [newRequireLocation, setNewRequireLocation] = useState(false)
   const [newName, setNewName] = useState('')
   const [newDesc, setNewDesc] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
@@ -353,6 +380,7 @@ export default function UnitDashboard() {
     setEditingService(null)
     setNewDate(new Date().toISOString().split('T')[0])
     setNewType('')
+    setNewRequireLocation(false)
     setError(null)
     setShowCreate(true)
   }
@@ -361,6 +389,7 @@ export default function UnitDashboard() {
     setEditingService(svc)
     setNewDate(svc.date)
     setNewType(svc.service_type)
+    setNewRequireLocation(svc.require_location)
     setError(null)
     setShowCreate(true)
   }
@@ -369,10 +398,10 @@ export default function UnitDashboard() {
     e.preventDefault(); setError(null); setIsUpdating(true)
     try {
       if (editingService) {
-        await updateService(editingService.id, newDate, newType)
+        await updateService(editingService.id, newDate, newType, newRequireLocation)
         setShowCreate(false); setEditingService(null)
       } else {
-        const svc = await createService(newDate, newType)
+        const svc = await createService(newDate, newType, newRequireLocation)
         setShowCreate(false)
         navigate(`/admin/units/${unitId}/events/${svc.id}`)
       }
@@ -655,8 +684,8 @@ export default function UnitDashboard() {
       {showCreate && (
         <EventFormModal
           editing={editingService}
-          date={newDate} type={newType} error={error} loading={isUpdating}
-          onChangeDate={setNewDate} onChangeType={setNewType}
+          date={newDate} type={newType} requireLocation={newRequireLocation} error={error} loading={isUpdating}
+          onChangeDate={setNewDate} onChangeType={setNewType} onChangeRequireLocation={setNewRequireLocation}
           onSubmit={handleEventSubmit}
           onClose={() => { setShowCreate(false); setEditingService(null); setError(null) }}
         />

@@ -32,10 +32,13 @@ const UNIT_LIST = [
 ]
 // SERVICE_SINGLE uses a future date (2026-12-10, Wednesday) so it appears in "Upcoming" sections.
 // SERVICE_PAST remains in the past for historical data.
-const SERVICE_SINGLE = { id: IDS.service, unit_id: IDS.unit, date: '2026-12-10', service_type: 'rehearsal', created_at: '2024-01-01T00:00:00Z' }
+const SERVICE_SINGLE = { id: IDS.service, unit_id: IDS.unit, date: '2026-12-10', service_type: 'rehearsal', require_location: false, notification_sent_at: null, created_at: '2024-01-01T00:00:00Z' }
+const SERVICE_LOCATION_REQUIRED = { ...SERVICE_SINGLE, require_location: true }
 const SERVICE_LIST = [SERVICE_SINGLE]
-const SERVICE_PAST = { id: IDS.servicePast, unit_id: IDS.unit, date: '2026-03-05', service_type: 'rehearsal', created_at: '2024-01-01T00:00:00Z' }
+const SERVICE_PAST = { id: IDS.servicePast, unit_id: IDS.unit, date: '2026-03-05', service_type: 'rehearsal', require_location: false, notification_sent_at: null, created_at: '2024-01-01T00:00:00Z' }
 const SERVICE_LIST_WITH_PAST = [SERVICE_SINGLE, SERVICE_PAST] // upcoming first, then past (desc order)
+
+export { SERVICE_SINGLE, SERVICE_LOCATION_REQUIRED }
 
 function makeSession(userId: string, email: string, metadata: Record<string, string>) {
   return {
@@ -428,6 +431,10 @@ export async function asOrgMember(page: Page) {
   await page.route(`${SUPABASE_URL}/auth/v1/user*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(session.user) }),
   )
+  // Mock the super_admins table check returning empty
+  await page.route(`${SUPABASE_URL}/rest/v1/super_admins*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
+  )
   // Return unit_admins — member has no direct unit access yet
   await page.route(`${SUPABASE_URL}/rest/v1/unit_admins*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
@@ -556,7 +563,11 @@ export async function mockSendPush(page: Page, success = true) {
   })
 }
 
-/** Silence WebSocket console noise from Supabase Realtime */
-export function silenceRealtime(page: Page) {
+/** Silence WebSocket console noise from Supabase Realtime and mock the super_admins check by default */
+export async function silenceRealtime(page: Page) {
   page.on('console', () => {})
+  // Failsafe: mock super_admins as empty to prevent timeouts in legacy tests
+  await page.route(`${SUPABASE_URL}/rest/v1/super_admins*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
+  )
 }

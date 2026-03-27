@@ -18,7 +18,7 @@ interface RpcResult {
   distance?: number
 }
 
-export function useAttendance(serviceId: string | null) {
+export function useAttendance(serviceId: string | null, requireLocation = false) {
   const [status, setStatus] = useState<CheckInStatus>(serviceId ? 'idle' : 'no_service')
   const [checkedInName, setCheckedInName] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -32,17 +32,19 @@ export function useAttendance(serviceId: string | null) {
     setStatus('loading')
     setCheckedInName(null)
 
-    // Capture geolocation if available
+    // Only capture geolocation when the event requires it
     let lat: number | null = null
     let lng: number | null = null
-    try {
-      const pos = await new Promise<GeolocationPosition>((res, rej) =>
-        navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 })
-      )
-      lat = pos.coords.latitude
-      lng = pos.coords.longitude
-    } catch (e) {
-      console.warn('Geolocation failed or denied', e)
+    if (requireLocation) {
+      try {
+        const pos = await new Promise<GeolocationPosition>((res, rej) =>
+          navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 })
+        )
+        lat = pos.coords.latitude
+        lng = pos.coords.longitude
+      } catch (e) {
+        console.warn('Geolocation failed or denied', e)
+      }
     }
 
     // Capture or generate device ID

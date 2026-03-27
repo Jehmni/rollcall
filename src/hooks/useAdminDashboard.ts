@@ -198,11 +198,11 @@ export function useServices(unitId: string | null) {
 
   useEffect(() => { setLoading(true); fetch() }, [fetch])
 
-  async function createService(date: string, service_type: string): Promise<Service> {
+  async function createService(date: string, service_type: string, require_location = false): Promise<Service> {
     if (!unitId) throw new Error('No unit selected')
     const { data, error } = await supabase
       .from('services')
-      .insert({ unit_id: unitId, date, service_type })
+      .insert({ unit_id: unitId, date, service_type, require_location })
       .select()
       .single()
     if (error) throw error
@@ -210,10 +210,10 @@ export function useServices(unitId: string | null) {
     return data
   }
 
-  async function updateService(id: string, date: string, service_type: string): Promise<Service> {
+  async function updateService(id: string, date: string, service_type: string, require_location = false): Promise<Service> {
     const { data, error } = await supabase
       .from('services')
-      .update({ date, service_type })
+      .update({ date, service_type, require_location })
       .eq('id', id)
       .select()
       .single()

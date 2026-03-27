@@ -99,6 +99,7 @@ create table if not exists services (
   date                 date not null,
   service_type         text not null,
   notification_sent_at timestamptz,
+  require_location     boolean not null default false,
   created_at           timestamptz not null default now()
 );
 
@@ -558,8 +559,8 @@ begin
     from units
    where id = v_service.unit_id;
 
-  -- 2. Location check (mandatory when unit has coordinates)
-  if v_unit_lat is not null and v_unit_lng is not null then
+  -- 2. Location check (only when service has require_location = true AND unit has coordinates)
+  if v_service.require_location = true and v_unit_lat is not null and v_unit_lng is not null then
     if p_lat is null or p_lng is null then
       return json_build_object('success', false, 'error', 'location_required');
     end if;

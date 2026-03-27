@@ -68,6 +68,7 @@ export interface Service {
   date: string
   service_type: ServiceType
   notification_sent_at: string | null
+  require_location: boolean
   created_at: string
 }
 
