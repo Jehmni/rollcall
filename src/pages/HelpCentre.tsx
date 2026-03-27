@@ -332,10 +332,10 @@ function AdminsTab() {
 
       <div>
         <SectionLabel>Bulk Import</SectionLabel>
-        <h3 className="font-display text-xl font-bold text-white mb-4">CSV Import</h3>
+        <h3 className="font-display text-xl font-bold text-white mb-4">Roster Import</h3>
         <StepFlow steps={[
           { icon: 'table', title: 'Prepare your spreadsheet', detail: 'Open your roster in Excel, Google Sheets, or Numbers. Make sure the first row is a header row with column names.' },
-          { icon: 'upload_file', title: 'Export as CSV', detail: 'File → Download → CSV (or Save As → .csv). Column order does not matter — Rollcally reads headers by name.' },
+          { icon: 'upload_file', title: 'Upload directly', detail: 'Upload your Excel file (.xlsx) or CSV (.csv) directly — no conversion needed. Column order does not matter; Rollcally reads headers by name.' },
           { icon: 'preview', title: 'Review the preview', detail: 'Rollcally highlights exact and near-duplicate names in the preview before anything is saved.' },
           { icon: 'check_circle', title: 'Confirm import', detail: 'Exact duplicates are automatically skipped. New members are added in one go.' },
         ]} />
@@ -399,11 +399,12 @@ function AdminsTab() {
           </div>
           <div className="space-y-2">
             {[
-              { fmt: 'DD/MM/YYYY', ex: '14/05/1990', ok: true },
-              { fmt: 'YYYY-MM-DD', ex: '1990-05-14', ok: true },
-              { fmt: 'MM/DD/YYYY', ex: '05/14/1990', ok: true },
-              { fmt: 'DD-MM-YY', ex: '14-05-90', ok: false },
-              { fmt: 'Month name', ex: 'May 14 1990', ok: false },
+              { fmt: 'DD/MM', ex: '18/11', ok: true },
+              { fmt: 'DD/MM/YYYY', ex: '18/11/1990', ok: true },
+              { fmt: 'YYYY-MM-DD', ex: '1990-11-18', ok: true },
+              { fmt: 'MM/DD/YYYY', ex: '11/18/1990', ok: true },
+              { fmt: 'DD-MM-YY', ex: '18-11-90', ok: false },
+              { fmt: 'Month name', ex: 'Nov 18 1990', ok: false },
             ].map(({ fmt, ex, ok }) => (
               <div key={fmt} className="flex items-center gap-3">
                 <span className={`material-symbols-outlined text-base ${ok ? 'text-emerald-400' : 'text-red-400'}`}>
@@ -438,15 +439,8 @@ function AdminsTab() {
           <IssueCard
             icon="calendar_month"
             iconColor="#f59e0b"
-            problem="Birthday saved as a formatted date in Excel (e.g. '14 May 1990')"
-            resolution="Format the birthday column as YYYY-MM-DD or DD/MM/YYYY plain text before exporting. Excel's display format does not always match the actual cell value."
-            type="warning"
-          />
-          <IssueCard
-            icon="upload_file"
-            iconColor="#ef4444"
-            problem="File saved as .xlsx instead of .csv"
-            resolution="Only .csv files are supported. In Excel: File → Save As → CSV (Comma delimited). In Google Sheets: File → Download → CSV."
+            problem="Birthday shows as a number in Excel (e.g. 45123)"
+            resolution="This happens when Excel stores the date as a serial number. Rollcally handles this automatically when you upload the .xlsx file directly — no manual fix needed. If uploading CSV, format the birthday column as text (DD/MM or DD/MM/YYYY) before exporting."
             type="warning"
           />
         </div>
@@ -649,12 +643,12 @@ function TroubleshootingTab() {
       a: <p>Offline check-in only works if you've visited the check-in page <strong className="text-white">and searched for names</strong> on the same device while online before. If it's your first time or you're on a new device, a network connection is required.</p>,
     },
     {
-      q: 'CSV import — "Import failed"',
+      q: 'Roster import — "Import failed"',
       a: (
         <div className="space-y-3">
           <p>This generic error usually means one of these issues:</p>
           <ul className="space-y-2">
-            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">Invalid date format</strong> — Birthday values must be DD/MM/YYYY, YYYY-MM-DD, or MM/DD/YYYY. Dates like "14 May 1990" or "May-90" will cause the whole import to fail. Fix the column in your spreadsheet and re-export.</span></li>
+            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">Invalid date format</strong> — Birthday accepts DD/MM, DD/MM/YYYY, YYYY-MM-DD, or MM/DD/YYYY. Dates like "14 May 1990" or "May-90" are not supported. Fix the column in your spreadsheet and re-upload.</span></li>
             <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">Permission denied</strong> — You must be the unit creator, org owner, or an explicitly assigned unit admin to import members. Contact your org owner to grant you access.</span></li>
             <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">Network error</strong> — Check your internet connection and try again. If importing a large roster, a brief connection drop will fail the whole batch.</span></li>
           </ul>
@@ -662,7 +656,7 @@ function TroubleshootingTab() {
       ),
     },
     {
-      q: 'CSV import — "No valid rows found"',
+      q: 'Roster import — "No valid rows found"',
       a: (
         <ul className="space-y-2">
           <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> Every row in your file has an empty name column — check that the name column is correctly identified</li>
@@ -672,7 +666,7 @@ function TroubleshootingTab() {
       ),
     },
     {
-      q: 'CSV import — member names appear in the wrong columns in the preview',
+      q: 'Roster import — member names appear in the wrong columns in the preview',
       a: (
         <div className="space-y-3">
           <p>This means Rollcally could not detect which column contains the names. It happens when:</p>
@@ -685,7 +679,7 @@ function TroubleshootingTab() {
       ),
     },
     {
-      q: 'CSV import — all rows flagged as duplicates',
+      q: 'Roster import — all rows flagged as duplicates',
       a: (
         <ul className="space-y-2">
           <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> <strong className="text-white">Exact duplicate:</strong> A member with that exact name already exists in this unit. These rows are automatically skipped — this is intentional.</li>

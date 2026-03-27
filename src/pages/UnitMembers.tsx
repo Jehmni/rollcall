@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import * as XLSX from 'xlsx'
 import { supabase } from '../lib/supabase'
 import type { Member, MemberStatus } from '../types'
 import { detectDuplicate, type DuplicateStatus } from '../lib/nameUtils'
@@ -63,18 +64,30 @@ function splitCsvLine(line: string): string[] {
   return cells
 }
 
-/** Normalise a date string to ISO YYYY-MM-DD. Handles DD/MM/YYYY and MM/DD/YYYY heuristically. */
+/**
+ * Normalise a date string to ISO YYYY-MM-DD.
+ * - Full date: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
+ * - Partial date (day + month only, e.g. "18/11"): stored as 1900-MM-DD
+ *   Year 1900 is a sentinel meaning "year not provided". Display code must
+ *   check for year === 1900 and omit the year when rendering.
+ */
 function normaliseDate(raw: string): string | null {
   if (!raw) return null
   const s = raw.trim()
   // Already ISO: YYYY-MM-DD
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
-  // DD/MM/YYYY or MM/DD/YYYY  →  prefer DD/MM/YYYY (common outside US)
-  const slashMatch = s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})$/)
-  if (slashMatch) {
-    const [, d, m, y] = slashMatch
+  // Full date: DD/MM/YYYY or MM/DD/YYYY → prefer DD/MM/YYYY (common outside US)
+  const fullMatch = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2,4})$/)
+  if (fullMatch) {
+    const [, d, m, y] = fullMatch
     const year = y.length === 2 ? `20${y}` : y
     return `${year}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
+  }
+  // Partial date: DD/MM or DD-MM (no year) → sentinel year 1900
+  const partialMatch = s.match(/^(\d{1,2})[-/.](\d{1,2})$/)
+  if (partialMatch) {
+    const [, d, m] = partialMatch
+    return `1900-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
   }
   return null
 }
@@ -152,6 +165,64 @@ function parseCsv(text: string): { rows: CsvRow[]; skipped: number } {
       name,
       phone,
       section,
+      status: rawStatus === 'inactive' ? 'inactive' : 'active',
+      birthday: normaliseDate(rawBirthday),
+      duplicateStatus: 'ok',
+    })
+  }
+  return { rows, skipped }
+}
+
+/** Parse an Excel (.xlsx / .xls) file buffer into the same CsvRow format. */
+function parseExcel(buffer: ArrayBuffer): { rows: CsvRow[]; skipped: number } {
+  const wb = XLSX.read(buffer, { type: 'array', cellDates: true })
+  const ws = wb.Sheets[wb.SheetNames[0]]
+  const raw: unknown[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' })
+  if (raw.length === 0) return { rows: [], skipped: 0 }
+
+  // Stringify every cell — convert Excel Date objects to ISO strings
+  const stringify = (val: unknown): string => {
+    if (val == null || val === '') return ''
+    if (val instanceof Date) {
+      const y = val.getFullYear()
+      const m = String(val.getMonth() + 1).padStart(2, '0')
+      const d = String(val.getDate()).padStart(2, '0')
+      return `${y}-${m}-${d}`
+    }
+    return String(val).trim()
+  }
+  const stringRows = raw.map(row => (row as unknown[]).map(stringify))
+
+  const firstRow = stringRows[0]
+  let colMap: Record<string, number> | null = null
+  let startIdx = 0
+  if (isHeaderRow(firstRow)) {
+    colMap = detectColumns(firstRow)
+    if (colMap.name !== -1) startIdx = 1
+    else colMap = null
+  }
+
+  const rows: CsvRow[] = []
+  let skipped = 0
+  for (let i = startIdx; i < stringRows.length; i++) {
+    const cols = stringRows[i]
+    let name: string, phone: string | null, section: string | null, rawStatus: string, rawBirthday: string
+    if (colMap && colMap.name !== -1) {
+      name        = (colMap.name    !== -1 ? cols[colMap.name]     : '') ?? ''
+      phone       = (colMap.phone   !== -1 ? cols[colMap.phone]    : null) || null
+      section     = (colMap.section !== -1 ? cols[colMap.section]  : null) || null
+      rawStatus   = (colMap.status  !== -1 ? cols[colMap.status]   : '')?.toLowerCase() ?? ''
+      rawBirthday = (colMap.birthday !== -1 ? cols[colMap.birthday] : '') ?? ''
+    } else {
+      name        = cols[0] ?? ''
+      phone       = cols[1] || null
+      section     = cols[2] || null
+      rawStatus   = cols[3]?.toLowerCase() ?? ''
+      rawBirthday = cols[4] ?? ''
+    }
+    if (!name) { skipped++; continue }
+    rows.push({
+      name, phone, section,
       status: rawStatus === 'inactive' ? 'inactive' : 'active',
       birthday: normaliseDate(rawBirthday),
       duplicateStatus: 'ok',
@@ -370,7 +441,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
         {/* Header */}
         <div className="sticky top-0 bg-surface-dark border-b border-white/[0.06] px-5 py-4 flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-slate-100">Import CSV</h3>
+            <h3 className="text-base font-bold text-slate-100">Import Members</h3>
             {csvFilename && <p className="text-xs text-slate-500 mt-0.5">{csvFilename}</p>}
           </div>
           <button onClick={onClose} className="size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
@@ -424,7 +495,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-100">Upload Roster</h3>
-                <p className="text-sm text-slate-500 mt-1 max-w-xs mx-auto">Select a CSV file to bulk-import members into this unit.</p>
+                <p className="text-sm text-slate-500 mt-1 max-w-xs mx-auto">Upload your roster as an Excel (.xlsx) or CSV (.csv) file to bulk-import members.</p>
               </div>
               <div className="flex flex-col gap-3 w-full max-w-xs">
                 <button onClick={onChooseFile}
@@ -438,11 +509,11 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
                 </button>
               </div>
               <details className="text-xs text-slate-500 w-full text-left">
-                <summary className="cursor-pointer hover:text-slate-400 select-none">Expected CSV format</summary>
+                <summary className="cursor-pointer hover:text-slate-400 select-none">Expected file format</summary>
                 <pre className="mt-2 rounded-lg bg-background-dark p-3 font-mono leading-relaxed text-slate-500 overflow-x-auto text-2xs">
-                  {`Name,Phone,Section,Status,Birthday\nAlice Johnson,+2348001234567,Soprano,active,1990-05-14\nBob Smith,,Bass,active,1985-11-20`}
+                  {`Name,Phone,Section,Status,Birthday\nAlice Johnson,+2348001234567,Soprano,active,1990-05-14\nBob Smith,,Bass,active,18/11\nCarol Obi,,Alto,active,`}
                 </pre>
-                <p className="mt-1 text-slate-500">Phone, Section, Status, and Birthday are optional. Status defaults to "active".</p>
+                <p className="mt-1 text-slate-500">Phone, Section, Status, and Birthday are all optional. Birthday accepts full dates (18/11/1990) or day &amp; month only (18/11). Status defaults to "active".</p>
               </details>
             </div>
           )}
@@ -697,17 +768,23 @@ export default function UnitMembers() {
     const file = e.target.files?.[0]
     if (!file) { setPanel('none'); return }
     setCsvFilename(file.name)
+    const isExcel = /\.(xlsx|xls)$/i.test(file.name)
     const reader = new FileReader()
     reader.onload = async ev => {
-      const text = ev.target?.result as string
-      const { rows, skipped } = parseCsv(text)
+      let rows: CsvRow[]; let skipped: number
+      if (isExcel) {
+        ;({ rows, skipped } = parseExcel(ev.target?.result as ArrayBuffer))
+      } else {
+        ;({ rows, skipped } = parseCsv(ev.target?.result as string))
+      }
       const { data: allNames } = await supabase.from('members').select('name').eq('unit_id', unitId)
       const existingNames = (allNames ?? []).map(m => m.name)
       const annotated = rows.map(row => ({ ...row, duplicateStatus: detectDuplicate(row.name, existingNames) }))
       setCsvRows(annotated); setCsvSkipped(skipped)
       setImportError(annotated.length === 0 ? 'No valid rows found in this file.' : null)
     }
-    reader.readAsText(file)
+    if (isExcel) reader.readAsArrayBuffer(file)
+    else reader.readAsText(file)
     e.target.value = ''
   }
 
@@ -747,7 +824,7 @@ export default function UnitMembers() {
   return (
     <div className="relative min-h-screen w-full bg-background-dark text-slate-100 font-display antialiased">
       {/* Hidden file input */}
-      <input ref={fileInputRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleFileChange} />
+      <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" className="hidden" onChange={handleFileChange} />
 
       {/* Header */}
       <header className="sticky top-0 z-40 bg-background-dark/90 backdrop-blur-md">

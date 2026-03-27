@@ -9,6 +9,15 @@ function formatDate(dateStr: string) {
   })
 }
 
+/** Format a birthday — omits the year when it's the sentinel 1900 (year-unknown). */
+function formatBirthday(dateStr: string) {
+  const d = new Date(dateStr + 'T00:00:00')
+  if (d.getFullYear() === 1900) {
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })
+  }
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
 function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
@@ -216,7 +225,7 @@ export default function MemberDetail() {
           {member.birthday && (
             <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-black text-2xs uppercase tracking-spaced transition-all ${isBirthday(member.birthday) ? 'bg-pink-600/20 border border-pink-500/30 text-pink-300' : 'bg-white/5 text-slate-400'}`}>
               <span className="material-symbols-outlined text-base" aria-hidden="true">cake</span>
-              {formatDate(member.birthday)}
+              {formatBirthday(member.birthday)}
               {isBirthday(member.birthday) && <span className="ml-2">🎂 Anniversary</span>}
             </div>
           )}
