@@ -1,0 +1,52 @@
+# Rollcally
+
+> Smart roll call and attendance tracking for organisations — free to get started.
+
+## What is Rollcally?
+
+Rollcally is a progressive web app (PWA) that replaces paper-based roll calls with a fast, digital check-in system. Admins set up an event once, share a QR code, and members scan to mark themselves present — all in real time.
+
+It is built for any structured organisation that takes regular attendance:
+
+- **Churches and ministries** — Sunday services, Bible studies, choir rehearsals
+- **Schools and training centres** — class registers, extracurricular clubs
+- **Corporates** — team meetings, workshops, compliance training
+- **Nonprofits and community groups** — volunteer meetings, community events
+
+## Key features
+
+- **QR code check-in** — members scan with any smartphone camera; no app install required
+- **Real-time attendance dashboard** — admins see a live count as members check in
+- **Push notifications** — send a one-tap check-in link directly to members' devices
+- **Member management** — create and organise member profiles by units/teams
+- **Geolocation enforcement** — optional per-event setting to ensure members are on premises before checking in
+- **Attendance analytics** — historical reports, trends, and present/absent breakdowns
+- **Multi-unit support** — one organisation, many sub-groups (departments, classes, choirs)
+- **Birthday and anniversary notifications** — automated member celebration reminders
+- **Offline-capable PWA** — works reliably even with poor connectivity
+
+## Pricing
+
+Free to get started. No credit card required.
+
+## Website
+
+https://www.rollcally.com
+
+## Help and documentation
+
+https://www.rollcally.com/help
+
+## Legal
+
+- Terms of Service: https://www.rollcally.com/terms
+- Privacy Policy: https://www.rollcally.com/privacy
+
+## Technology
+
+Web application — works on any modern browser on iOS, Android, and desktop.
+No native app download required.
+
+## Keywords
+
+roll call app, attendance tracking app, attendance software, QR code check-in, digital attendance register, church attendance tracker, school attendance app, corporate attendance, nonprofit attendance management, member management app, real-time attendance, push notification check-in

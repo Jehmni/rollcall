@@ -1,0 +1,38 @@
+# robots.txt — Rollcally (https://www.rollcally.com)
+# Allow all well-behaved crawlers full access
+
+User-agent: *
+Allow: /
+
+# Block noisy paths that add no SEO value
+Disallow: /admin/
+Disallow: /__rc_super
+Disallow: /checkin
+
+# AI / LLM crawlers — full access
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.rollcally.com/sitemap.xml

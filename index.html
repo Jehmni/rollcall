@@ -2,6 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
+    <!-- ── Primary SEO ─────────────────────────────────────────────────────── -->
+    <title>Rollcally — Roll Call &amp; Attendance App for Organizations</title>
+    <meta name="description" content="Rollcally is a smart roll call and attendance tracking app. QR code check-ins, real-time analytics, push notifications, and member management for churches, schools, corporates, and nonprofits." />
+    <meta name="keywords" content="roll call app, attendance tracking, attendance app, QR code attendance, member management, church attendance, school attendance, corporate attendance, nonprofit attendance, digital roll call, attendance software, check-in app, real-time attendance" />
+    <meta name="author" content="Rollcally" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <link rel="canonical" href="https://www.rollcally.com/" />
+
+    <!-- ── Icons & PWA ─────────────────────────────────────────────────────── -->
     <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
@@ -12,26 +22,94 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Rollcally" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="description" content="Rollcally — Smart attendance tracking and member management for elite organizations. QR code check-ins, real-time analytics and more." />
-    <!-- Open Graph -->
+
+    <!-- ── Open Graph (Facebook, LinkedIn, WhatsApp) ───────────────────────── -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.rollcally.com/" />
-    <meta property="og:title" content="Rollcally — Attendance Reimagined" />
-    <meta property="og:description" content="Smart QR check-ins, real-time analytics, and member management for elite organizations. Start your free trial today." />
-    <meta property="og:image" content="https://www.rollcally.com/icons/icon-512.png" />
     <meta property="og:site_name" content="Rollcally" />
-    <!-- Twitter Card -->
+    <meta property="og:title" content="Rollcally — Roll Call &amp; Attendance App for Organizations" />
+    <meta property="og:description" content="Smart QR code roll call, real-time attendance tracking, push notifications, and member management. Free to get started. Built for churches, schools, corporates, and nonprofits." />
+    <meta property="og:image" content="https://www.rollcally.com/icons/icon-512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:locale" content="en_GB" />
+
+    <!-- ── Twitter / X Card ───────────────────────────────────────────────── -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Rollcally — Attendance Reimagined" />
-    <meta name="twitter:description" content="Smart QR check-ins, real-time analytics, and member management for elite organizations." />
+    <meta name="twitter:site" content="@rollcally" />
+    <meta name="twitter:title" content="Rollcally — Roll Call &amp; Attendance App" />
+    <meta name="twitter:description" content="Smart QR code roll call and attendance tracking. Real-time analytics and member management for any organisation." />
     <meta name="twitter:image" content="https://www.rollcally.com/icons/icon-512.png" />
-    <!-- Canonical -->
-    <link rel="canonical" href="https://www.rollcally.com/" />
-    <!-- Preload hero background -->
+
+    <!-- ── Structured Data — SoftwareApplication (Google Rich Results) ─────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Rollcally",
+      "url": "https://www.rollcally.com",
+      "description": "Rollcally is a smart roll call and attendance tracking application. It enables organisations to take attendance digitally using QR codes, push notifications, and real-time dashboards. Built for churches, schools, corporations, and nonprofits.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web, iOS, Android",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "GBP"
+      },
+      "featureList": [
+        "QR code roll call and attendance check-in",
+        "Real-time attendance dashboard",
+        "Push notification check-in",
+        "Member management",
+        "Attendance analytics and reports",
+        "Multi-unit organisation support",
+        "Birthday and anniversary notifications",
+        "Offline-capable progressive web app"
+      ],
+      "screenshot": "https://www.rollcally.com/icons/icon-512.png",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5",
+        "ratingCount": "1"
+      }
+    }
+    </script>
+
+    <!-- ── Structured Data — Organization ────────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Rollcally",
+      "url": "https://www.rollcally.com",
+      "logo": "https://www.rollcally.com/icons/icon-512.png",
+      "description": "Rollcally provides smart digital roll call and attendance tracking solutions for organizations worldwide.",
+      "sameAs": []
+    }
+    </script>
+
+    <!-- ── Structured Data — WebSite with SearchAction ───────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Rollcally",
+      "url": "https://www.rollcally.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://www.rollcally.com/?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- ── Preload critical assets ─────────────────────────────────────────── -->
     <link rel="preload" as="image" href="/images/hero_bg.jpg" />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <title>Rollcally — Attendance Reimagined</title>
   </head>
   <body>
     <div id="root"></div>
