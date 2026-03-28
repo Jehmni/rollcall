@@ -91,7 +91,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
 
-    // 3. Check if any organisation this admin belongs to is blocked
+    // 3. Check if any organisation this admin belongs to is blocked.
+    // NOTE: PostgREST returns the parent row even when the embedded filter
+    // doesn't match (organizations becomes null). Must check the nested value.
     const { data: blockedOrg } = await supabase
       .from('organization_members')
       .select('organizations(blocked_at, name)')
@@ -99,7 +101,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .not('organizations.blocked_at', 'is', null)
       .maybeSingle()
 
-    if (blockedOrg) {
+    const blockedOrgData = (blockedOrg as { organizations: { blocked_at: string | null } | null } | null)
+    if (blockedOrgData?.organizations?.blocked_at) {
       setIsBlocked(true)
       setBlockReason('Your organisation has been suspended by the platform administrator.')
       setAdminUnits([])
