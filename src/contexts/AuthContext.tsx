@@ -15,7 +15,8 @@ interface AuthContextValue {
   isBlocked: boolean
   blockReason: string | null
   adminUnits: UnitWithOrg[]
-  loading: boolean
+  loading: boolean   // true only during the very first session hydration on mount
+  checking: boolean  // true while async permission checks are in-flight after any sign-in
   signIn: (credentials: SignInWithPasswordCredentials) => Promise<{ error: AuthError | null }>
   signUp: (credentials: SignUpWithPasswordCredentials) => Promise<{ error: AuthError | null }>
   signOut: () => Promise<void>
@@ -49,81 +50,94 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [blockReason, setBlockReason] = useState<string | null>(null)
   const [adminUnits, setAdminUnits] = useState<UnitWithOrg[]>([])
   const [loading, setLoading] = useState(true)
+  const [checking, setChecking] = useState(false)
 
-  async function applySession(session: Session | null) {
-    setSession(session)
-    if (!session) {
+  async function applySession(s: Session | null) {
+    setSession(s)
+    if (!s) {
       setIsSuper(false)
       setIsBlocked(false)
       setBlockReason(null)
       setAdminUnits([])
+      setChecking(false)
       return
     }
 
-    // 1. Check super admin status first
-    const { data: superRow } = await supabase
-      .from('super_admins')
-      .select('user_id')
-      .eq('user_id', session.user.id)
-      .maybeSingle()
-    const super_ = !!superRow
-    setIsSuper(super_)
+    setChecking(true)
+    try {
+      // 1. Super admin check (security-definer table — never blocked)
+      const { data: superRow } = await supabase
+        .from('super_admins')
+        .select('user_id')
+        .eq('user_id', s.user.id)
+        .maybeSingle()
 
-    // Super admins are never blocked
-    if (super_) {
+      if (superRow) {
+        setIsSuper(true)
+        setIsBlocked(false)
+        setBlockReason(null)
+        setAdminUnits([])
+        return
+      }
+      setIsSuper(false)
+
+      // 2. Individual block check
+      const { data: blockedRow } = await supabase
+        .from('blocked_admins')
+        .select('reason')
+        .eq('user_id', s.user.id)
+        .maybeSingle()
+
+      if (blockedRow) {
+        setIsBlocked(true)
+        setBlockReason(blockedRow.reason ?? 'Your account has been suspended by the platform administrator.')
+        setAdminUnits([])
+        return
+      }
+
+      // 3. Org-level block check — two separate queries to avoid PostgREST
+      //    embedded-filter ambiguity (parent row is always returned, even when
+      //    the join filter misses, so checking the parent alone is unreliable).
+      const { data: memberships } = await supabase
+        .from('organization_members')
+        .select('organization_id')
+        .eq('admin_id', s.user.id)
+
+      if (memberships && memberships.length > 0) {
+        const orgIds = memberships.map(m => m.organization_id as string)
+        const { data: blockedOrgs } = await supabase
+          .from('organizations')
+          .select('id')
+          .in('id', orgIds)
+          .not('blocked_at', 'is', null)
+          .limit(1)
+
+        if (blockedOrgs && blockedOrgs.length > 0) {
+          setIsBlocked(true)
+          setBlockReason('Your organisation has been suspended by the platform administrator.')
+          setAdminUnits([])
+          return
+        }
+      }
+
+      // 4. Normal admin — load units
       setIsBlocked(false)
       setBlockReason(null)
-      setAdminUnits([])
-      return
+      const units = await fetchAdminUnits(s.user.id)
+      setAdminUnits(units)
+    } finally {
+      setChecking(false)
     }
-
-    // 2. Check if this admin is individually blocked
-    const { data: blockedRow } = await supabase
-      .from('blocked_admins')
-      .select('reason')
-      .eq('user_id', session.user.id)
-      .maybeSingle()
-
-    if (blockedRow) {
-      setIsBlocked(true)
-      setBlockReason(blockedRow.reason ?? 'Your account has been suspended by the platform administrator.')
-      setAdminUnits([])
-      return
-    }
-
-    // 3. Check if any organisation this admin belongs to is blocked.
-    // NOTE: PostgREST returns the parent row even when the embedded filter
-    // doesn't match (organizations becomes null). Must check the nested value.
-    const { data: blockedOrg } = await supabase
-      .from('organization_members')
-      .select('organizations(blocked_at, name)')
-      .eq('admin_id', session.user.id)
-      .not('organizations.blocked_at', 'is', null)
-      .maybeSingle()
-
-    const blockedOrgData = (blockedOrg as { organizations: { blocked_at: string | null } | null } | null)
-    if (blockedOrgData?.organizations?.blocked_at) {
-      setIsBlocked(true)
-      setBlockReason('Your organisation has been suspended by the platform administrator.')
-      setAdminUnits([])
-      return
-    }
-
-    // 4. Normal admin — load units
-    setIsBlocked(false)
-    setBlockReason(null)
-    const units = await fetchAdminUnits(session.user.id)
-    setAdminUnits(units)
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      await applySession(session)
+    supabase.auth.getSession().then(async ({ data: { session: s } }) => {
+      await applySession(s)
       setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      applySession(session)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      applySession(s)
     })
 
     return () => subscription.unsubscribe()
@@ -170,6 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       blockReason,
       adminUnits,
       loading,
+      checking,
       signIn,
       signUp,
       signOut,

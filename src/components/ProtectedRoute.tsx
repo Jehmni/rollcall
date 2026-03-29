@@ -18,8 +18,12 @@ function Spinner() {
 }
 
 export function AdminRoute({ children }: { children: ReactNode }) {
-  const { session, isBlocked, loading } = useAuth()
-  if (loading) return <Spinner />
+  const { session, isBlocked, loading, checking } = useAuth()
+
+  // Show spinner during initial hydration OR while permission checks are in-flight.
+  // Without this, AdminRoute would evaluate isBlocked before the async checks finish
+  // and could redirect incorrectly based on stale state.
+  if (loading || checking) return <Spinner />
 
   if (!session) return <Navigate to="/admin/login" replace />
   if (isBlocked) return <Navigate to="/blocked" replace />
