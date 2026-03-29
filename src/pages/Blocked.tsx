@@ -1,7 +1,24 @@
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Blocked() {
-  const { blockReason, signOut } = useAuth()
+  const { session, blockReason, signOut } = useAuth()
+  const navigate = useNavigate()
+  const [signingOut, setSigningOut] = useState(false)
+
+  // Once session is cleared (after sign-out), go to login
+  useEffect(() => {
+    if (!session) {
+      navigate('/admin/login', { replace: true })
+    }
+  }, [session, navigate])
+
+  async function handleSignOut() {
+    setSigningOut(true)
+    await signOut()
+    // navigation happens in the useEffect above once session clears
+  }
 
   return (
     <div className="min-h-screen bg-background-dark flex items-center justify-center px-4">
@@ -27,11 +44,12 @@ export default function Blocked() {
 
         {/* Sign out */}
         <button
-          onClick={() => signOut()}
-          className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-white transition-colors"
+          onClick={handleSignOut}
+          disabled={signingOut}
+          className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-white disabled:opacity-50 transition-colors"
         >
           <span className="material-symbols-outlined text-base">logout</span>
-          Sign out
+          {signingOut ? 'Signing out…' : 'Sign out'}
         </button>
 
       </div>
