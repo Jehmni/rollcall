@@ -88,3 +88,27 @@ export interface DashboardMember {
   checked_in: boolean
   checkin_time: string | null
 }
+
+// ─── Absence Messaging ────────────────────────────────────────────────────────
+
+export interface UnitMessagingSettings {
+  unit_id: string
+  enabled: boolean
+  message_template: string
+  send_hour: number   // 12–21 (noon–9 pm), local time
+  timezone: string    // IANA timezone, e.g. 'Africa/Lagos'
+  updated_at: string
+}
+
+export type MessageStatus = 'sent' | 'failed' | 'skipped'
+
+export interface AbsenceMessageLogEntry {
+  id: string
+  service_id: string
+  member_id: string
+  phone: string
+  message: string
+  status: MessageStatus
+  error_text: string | null
+  sent_at: string
+}

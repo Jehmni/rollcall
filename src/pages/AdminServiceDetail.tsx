@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { QRCodeCanvas } from 'qrcode.react'
 import { supabase } from '../lib/supabase'
 import { useAdminDashboard } from '../hooks/useAdminDashboard'
-import type { DashboardMember, Service } from '../types'
+import type { AbsenceMessageLogEntry, DashboardMember, Service, UnitMessagingSettings } from '../types'
 
 // ─── Location Toggle ─────────────────────────────────────────────────────────
 
@@ -237,6 +237,257 @@ function groupBySection(members: DashboardMember[]): Record<string, DashboardMem
   }, {})
 }
 
+// ─── Messaging Panel ──────────────────────────────────────────────────────────
+
+const DEFAULT_TEMPLATE =
+  'Hi {{name}}, we missed you at {{event}} today. Hope all is well — we look forward to seeing you next time! 🙏'
+
+const SEND_HOUR_OPTIONS = [
+  { value: 12, label: '12:00 noon' },
+  { value: 13, label: '1:00 pm' },
+  { value: 14, label: '2:00 pm' },
+  { value: 15, label: '3:00 pm' },
+  { value: 16, label: '4:00 pm' },
+  { value: 17, label: '5:00 pm' },
+  { value: 18, label: '6:00 pm (default)' },
+  { value: 19, label: '7:00 pm' },
+  { value: 20, label: '8:00 pm' },
+  { value: 21, label: '9:00 pm' },
+]
+
+function MessagingPanel({ service, absentCount }: { service: Service; absentCount: number }) {
+  const [open, setOpen]                       = useState(false)
+  const [settings, setSettings]               = useState<UnitMessagingSettings | null>(null)
+  const [log, setLog]                         = useState<AbsenceMessageLogEntry[]>([])
+  const [template, setTemplate]               = useState(DEFAULT_TEMPLATE)
+  const [sendHour, setSendHour]               = useState(18)
+  const [saving, setSaving]                   = useState(false)
+  const [sending, setSending]                 = useState(false)
+  const [showPreview, setShowPreview]         = useState(false)
+
+  const loadSettings = useCallback(async () => {
+    const { data } = await supabase
+      .from('unit_messaging_settings')
+      .select('*')
+      .eq('unit_id', service.unit_id)
+      .maybeSingle()
+    if (data) {
+      setSettings(data as UnitMessagingSettings)
+      setTemplate(data.message_template)
+      setSendHour(data.send_hour)
+    }
+  }, [service.unit_id])
+
+  const loadLog = useCallback(async () => {
+    const { data } = await supabase
+      .from('absence_message_log')
+      .select('*')
+      .eq('service_id', service.id)
+      .order('sent_at', { ascending: false })
+    setLog((data ?? []) as AbsenceMessageLogEntry[])
+  }, [service.id])
+
+  useEffect(() => { loadSettings(); loadLog() }, [loadSettings, loadLog])
+
+  async function toggleEnabled() {
+    const newEnabled = !(settings?.enabled ?? false)
+    const { data } = await supabase
+      .from('unit_messaging_settings')
+      .upsert({
+        unit_id:          service.unit_id,
+        enabled:          newEnabled,
+        message_template: template,
+        send_hour:        sendHour,
+        timezone:         settings?.timezone ?? 'Africa/Lagos',
+        updated_at:       new Date().toISOString(),
+      })
+      .select()
+      .single()
+    if (data) { setSettings(data as UnitMessagingSettings) }
+  }
+
+  async function saveSettings() {
+    setSaving(true)
+    const { data } = await supabase
+      .from('unit_messaging_settings')
+      .upsert({
+        unit_id:          service.unit_id,
+        enabled:          settings?.enabled ?? false,
+        message_template: template,
+        send_hour:        sendHour,
+        timezone:         settings?.timezone ?? 'Africa/Lagos',
+        updated_at:       new Date().toISOString(),
+      })
+      .select()
+      .single()
+    setSaving(false)
+    if (data) setSettings(data as UnitMessagingSettings)
+  }
+
+  async function sendNow() {
+    setSending(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('send-absence-sms', {
+        body: { service_id: service.id },
+      })
+      if (error) throw error
+      await loadLog()
+      const r = data as { sent?: number; failed?: number; skipped?: number; reason?: string }
+      if (r.reason) {
+        alert(`Nothing sent: ${r.reason}`)
+      } else {
+        alert(`Done — ${r.sent ?? 0} sent · ${r.failed ?? 0} failed · ${r.skipped ?? 0} already sent`)
+      }
+    } catch (err: unknown) {
+      alert(`Send failed: ${(err as { message?: string })?.message ?? String(err)}`)
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const enabled  = settings?.enabled ?? false
+  const sentCount   = log.filter(l => l.status === 'sent').length
+  const failedCount = log.filter(l => l.status === 'failed').length
+  const previewMsg  = renderMsgPreview(template, 'Adaeze Obi', service.service_type || 'Rehearsal')
+
+  return (
+    <div className={`rounded-xl border transition-all ${enabled ? 'border-amber-500/30 bg-amber-500/5' : 'border-border-dark bg-surface-dark'}`}>
+      {/* Header row */}
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between gap-3 px-4 py-3.5 hover:bg-white/[0.02] transition-colors rounded-xl"
+      >
+        <div className="flex items-center gap-3">
+          <span className={`material-symbols-outlined text-2xl ${enabled ? 'text-amber-400' : 'text-slate-500'}`}>
+            sms
+          </span>
+          <div className="text-left">
+            <p className={`text-sm font-bold ${enabled ? 'text-white' : 'text-slate-400'}`}>
+              Absence Messaging
+            </p>
+            <p className="text-2xs text-slate-500">
+              {log.length === 0
+                ? (enabled ? `Auto-sends at ${sendHour}:00` : 'SMS to absent members')
+                : `${sentCount} sent · ${failedCount} failed`}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {/* Quick enable toggle */}
+          <div
+            role="switch"
+            aria-checked={enabled}
+            onClick={e => { e.stopPropagation(); toggleEnabled() }}
+            className={`w-10 h-6 rounded-full transition-colors flex items-center px-0.5 flex-shrink-0 cursor-pointer ${enabled ? 'bg-amber-500' : 'bg-border-dark'}`}
+          >
+            <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${enabled ? 'translate-x-4' : 'translate-x-0'}`} />
+          </div>
+          <span className={`material-symbols-outlined text-slate-500 text-lg transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
+            expand_more
+          </span>
+        </div>
+      </button>
+
+      {/* Expanded body */}
+      {open && (
+        <div className="px-4 pb-4 flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
+
+          {/* Delivery log */}
+          {log.length > 0 && (
+            <div className="rounded-lg bg-background-dark p-3 space-y-1">
+              <p className="text-2xs font-black uppercase tracking-spaced text-slate-600 mb-2">Delivery log</p>
+              {log.slice(0, 6).map(entry => (
+                <div key={entry.id} className="flex items-center justify-between gap-2 text-2xs">
+                  <span className="text-slate-400 truncate">{entry.phone}</span>
+                  <span className={`font-bold uppercase flex-shrink-0 ${entry.status === 'sent' ? 'text-emerald-400' : entry.status === 'failed' ? 'text-red-400' : 'text-slate-500'}`}>
+                    {entry.status}
+                  </span>
+                </div>
+              ))}
+              {log.length > 6 && (
+                <p className="text-2xs text-slate-600">+{log.length - 6} more</p>
+              )}
+            </div>
+          )}
+
+          {/* Message template */}
+          <div>
+            <label className="block text-2xs font-black uppercase tracking-spaced text-slate-500 mb-1.5">
+              Message template
+              <span className="normal-case font-medium tracking-normal ml-1 text-slate-600">— use {'{{name}}'} and {'{{event}}'}</span>
+            </label>
+            <textarea
+              value={template}
+              onChange={e => setTemplate(e.target.value)}
+              rows={3}
+              className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-amber-500/50 resize-none"
+            />
+          </div>
+
+          {/* Preview */}
+          {showPreview && (
+            <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2.5">
+              <p className="text-2xs font-black uppercase tracking-spaced text-amber-500/60 mb-1">Preview</p>
+              <p className="text-xs text-amber-100 leading-relaxed">{previewMsg}</p>
+            </div>
+          )}
+
+          {/* Send time */}
+          <div>
+            <label className="block text-2xs font-black uppercase tracking-spaced text-slate-500 mb-1.5">
+              Auto-send time (local)
+            </label>
+            <select
+              value={sendHour}
+              onChange={e => setSendHour(Number(e.target.value))}
+              className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+            >
+              {SEND_HOUR_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Action row */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowPreview(v => !v)}
+              className="flex items-center gap-1.5 px-3 py-2 text-2xs font-bold rounded-lg bg-background-dark border border-border-dark text-slate-400 hover:text-white transition-all"
+            >
+              <span className="material-symbols-outlined text-base">visibility</span>
+              {showPreview ? 'Hide' : 'Preview'}
+            </button>
+            <button
+              onClick={saveSettings}
+              disabled={saving}
+              className="flex items-center gap-1.5 px-3 py-2 text-2xs font-bold rounded-lg bg-background-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all disabled:opacity-40"
+            >
+              <span className="material-symbols-outlined text-base">save</span>
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+            <button
+              onClick={sendNow}
+              disabled={sending || absentCount === 0}
+              className="ml-auto flex items-center gap-1.5 px-3 py-2 text-2xs font-bold rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-all disabled:opacity-40"
+              title={absentCount === 0 ? 'No absent members to message' : 'Send now to all absent members with a phone number'}
+            >
+              <span className="material-symbols-outlined text-base">send</span>
+              {sending ? 'Sending…' : `Send Now (${absentCount})`}
+            </button>
+          </div>
+
+        </div>
+      )}
+    </div>
+  )
+}
+
+function renderMsgPreview(template: string, name: string, event: string): string {
+  return template
+    .replace(/\{\{name\}\}/g, name)
+    .replace(/\{\{event\}\}/g, event)
+}
+
 // ─── Main Component ────────────────────────────────────────────────────────────
 
 export default function AdminServiceDetail() {
@@ -252,12 +503,33 @@ export default function AdminServiceDetail() {
   const effectiveTotal = total > 0 ? total : present.length + absent.length
   const attendanceRate = effectiveTotal > 0 ? Math.round((present.length / effectiveTotal) * 100) : 0
   const qrUrl = serviceId ? `${window.location.origin}/checkin?service_id=${serviceId}` : ''
+  const [exporting, setExporting] = useState(false)
 
   useEffect(() => {
     if (!serviceId) return
     supabase.from('services').select('*').eq('id', serviceId).single()
       .then(({ data }) => { setService(data); setServiceLoading(false) })
   }, [serviceId])
+
+  /** If the member list is paginated, fetch every absent member before exporting. */
+  async function fetchAllAbsent(): Promise<DashboardMember[]> {
+    if (!hasMore) return absent
+    const { data } = await supabase.rpc('get_service_members_full', {
+      p_service_id: serviceId,
+      p_limit: 10000,
+      p_offset: 0,
+    })
+    return ((data ?? []) as DashboardMember[]).filter(m => !m.checked_in)
+  }
+
+  async function handleExport(format: 'txt' | 'csv' | 'rtf') {
+    setExporting(true)
+    const members = await fetchAllAbsent()
+    setExporting(false)
+    if (format === 'txt') exportTXT(members, eventLabel)
+    else if (format === 'csv') exportCSV(members, eventLabel)
+    else exportRTF(members, eventLabel)
+  }
 
   function downloadQR() {
     const canvas = document.getElementById('service-qr') as HTMLCanvasElement | null
@@ -447,6 +719,12 @@ export default function AdminServiceDetail() {
             </div>
           </div>
         </section>
+
+        {/* ── Absence Messaging ─────────────────────────────────────────── */}
+        <section className="px-4">
+          <MessagingPanel service={service} absentCount={absent.length} />
+        </section>
+
           </div> {/* End left column */}
 
           {/* Right column: Tabs + Member List */}
@@ -484,27 +762,33 @@ export default function AdminServiceDetail() {
               </div>
               {/* Export (absent tab only) */}
               {tab === 'absent' && absent.length > 0 && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <button
-                    onClick={() => exportTXT(absent, eventLabel)}
-                    title="Export TXT"
-                    className="size-10 flex items-center justify-center rounded-lg bg-surface-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all"
+                    onClick={() => handleExport('txt')}
+                    disabled={exporting}
+                    title="Download plain-text absence list"
+                    className="flex items-center gap-1.5 px-2.5 py-2 text-2xs font-bold rounded-lg bg-surface-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all disabled:opacity-40"
                   >
-                    <span className="material-symbols-outlined text-lg">description</span>
+                    <span className="material-symbols-outlined text-base">description</span>
+                    {exporting ? '…' : 'TXT'}
                   </button>
                   <button
-                    onClick={() => exportCSV(absent, eventLabel)}
-                    title="Export CSV"
-                    className="size-10 flex items-center justify-center rounded-lg bg-surface-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all"
+                    onClick={() => handleExport('csv')}
+                    disabled={exporting}
+                    title="Download CSV for Excel / Google Sheets"
+                    className="flex items-center gap-1.5 px-2.5 py-2 text-2xs font-bold rounded-lg bg-surface-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all disabled:opacity-40"
                   >
-                    <span className="material-symbols-outlined text-lg">table_view</span>
+                    <span className="material-symbols-outlined text-base">table_view</span>
+                    {exporting ? '…' : 'CSV'}
                   </button>
                   <button
-                    onClick={() => exportRTF(absent, eventLabel)}
-                    title="Export RTF (Word)"
-                    className="size-10 flex items-center justify-center rounded-lg bg-surface-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all"
+                    onClick={() => handleExport('rtf')}
+                    disabled={exporting}
+                    title="Download RTF (opens in Word / Pages)"
+                    className="flex items-center gap-1.5 px-2.5 py-2 text-2xs font-bold rounded-lg bg-surface-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all disabled:opacity-40"
                   >
-                    <span className="material-symbols-outlined text-lg">format_align_left</span>
+                    <span className="material-symbols-outlined text-base">format_align_left</span>
+                    {exporting ? '…' : 'DOC'}
                   </button>
                 </div>
               )}
