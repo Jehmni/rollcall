@@ -4,6 +4,7 @@ import { useAttendance } from '../hooks/useAttendance'
 import { useServiceMembers, useMemberById, useServiceInfo, type PublicMember } from '../hooks/useChoristers'
 import { QRScanner } from '../components/QRScanner'
 import { usePushNotifications } from '../hooks/usePushNotifications'
+import { supabase } from '../lib/supabase'
 
 type Step = 'welcome' | 'list' | 'confirm' | 'done'
 
@@ -21,7 +22,7 @@ export default function CheckIn() {
 
   const paramServiceId = searchParams.get('service_id')
   const serviceId = paramServiceId ?? sessionStorage.getItem('pending_service_id')
-  const { unitName, unitId, requireLocation } = useServiceInfo(serviceId)
+  const { unitName, unitId, requireLocation, smsEnabled } = useServiceInfo(serviceId)
 
   // All check-in state lives in the hook
   const { status, checkedInName, errorMessage, checkIn, reset } = useAttendance(serviceId, requireLocation)
@@ -29,6 +30,7 @@ export default function CheckIn() {
   // Push notification opt-in
   const { isSupported: pushSupported, currentPermission, subscribe } = usePushNotifications()
   const [pushOptIn, setPushOptIn] = useState<'idle' | 'asking' | 'done'>('idle')
+  const [smsConsent, setSmsConsent] = useState<'idle' | 'asking' | 'done'>('idle')
 
   useEffect(() => {
     if (status === 'success' && pushSupported && currentPermission === 'default') {
@@ -36,11 +38,42 @@ export default function CheckIn() {
     }
   }, [status, pushSupported, currentPermission])
 
+  // Show SMS consent prompt once push is resolved (or if push isn't applicable).
+  // Only shown if: unit has SMS messaging enabled + this member hasn't been asked before.
+  useEffect(() => {
+    if (status !== 'success') return
+    if (smsConsent !== 'idle') return
+    // Wait for push prompt to resolve before showing SMS prompt
+    const pushResolved = pushOptIn === 'done' || !pushSupported || currentPermission !== 'default'
+    if (!pushResolved) return
+    if (!smsEnabled) return
+    const memberId = selected?.id ?? localStorage.getItem('rollcally_member_id')
+    if (!memberId || !unitId) return
+    // Use localStorage so we only ask once per member per unit
+    const key = `rollcally_sms_asked_${memberId}_${unitId}`
+    if (!localStorage.getItem(key)) {
+      setSmsConsent('asking')
+    } else {
+      setSmsConsent('done')
+    }
+  }, [status, pushOptIn, pushSupported, currentPermission, smsEnabled, smsConsent, selected, unitId])
+
   async function handlePushEnable() {
     const memberId = selected?.id ?? localStorage.getItem('rollcally_member_id')
     if (!memberId || !unitId) { setPushOptIn('done'); return }
     await subscribe(memberId, unitId)
     setPushOptIn('done')
+  }
+
+  async function handleSmsConsent(consent: boolean) {
+    const memberId = selected?.id ?? localStorage.getItem('rollcally_member_id')
+    if (memberId && unitId) {
+      // Mark as asked in localStorage so we don't prompt again on this device
+      localStorage.setItem(`rollcally_sms_asked_${memberId}_${unitId}`, '1')
+      // Persist consent to DB via SECURITY DEFINER RPC (works without an auth session)
+      await supabase.rpc('set_member_sms_consent', { p_member_id: memberId, p_consent: consent })
+    }
+    setSmsConsent('done')
   }
 
   useEffect(() => {
@@ -466,6 +499,43 @@ export default function CheckIn() {
                             className="flex-1 text-slate-400 text-2xs font-black uppercase tracking-spaced py-2.5 rounded-xl border border-border-dark hover:text-white hover:border-slate-500 active:scale-95 transition-all"
                           >
                             Not now
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* SMS consent card — shown after push prompt resolves, only if unit uses SMS */}
+                {smsConsent === 'asking' && (
+                  <div className="w-full mt-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 p-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex items-start gap-4">
+                      <span className="material-symbols-outlined text-amber-400 text-3xl flex-shrink-0">sms</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-white mb-1">Stay in the loop</p>
+                        <p className="text-2xs text-slate-400 leading-relaxed">
+                          {unitName
+                            ? <><span className="text-slate-300 font-semibold">{unitName}</span> may send you a text message if you miss a session.</>
+                            : 'Your unit may send you a text message if you miss a session.'
+                          }
+                          {' '}You can change this at any time.
+                        </p>
+                        <p className="text-2xs text-slate-600 mt-1.5">
+                          By tapping "Yes" you consent to receiving SMS from {unitName ?? 'your unit'}.
+                          Standard message rates may apply.
+                        </p>
+                        <div className="flex gap-2 mt-4">
+                          <button
+                            onClick={() => handleSmsConsent(true)}
+                            className="flex-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 text-2xs font-black uppercase tracking-spaced py-2.5 rounded-xl hover:bg-amber-500/30 active:scale-95 transition-all"
+                          >
+                            Yes, that's fine
+                          </button>
+                          <button
+                            onClick={() => handleSmsConsent(false)}
+                            className="flex-1 text-slate-400 text-2xs font-black uppercase tracking-spaced py-2.5 rounded-xl border border-border-dark hover:text-white hover:border-slate-500 active:scale-95 transition-all"
+                          >
+                            No thanks
                           </button>
                         </div>
                       </div>

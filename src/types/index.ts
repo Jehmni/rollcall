@@ -50,6 +50,7 @@ export interface Member {
   section: string | null    // e.g. "Soprano", "Senior", "Team A" — unit-defined
   status: MemberStatus
   birthday: string | null
+  sms_consent: boolean | null  // null = not asked, true = consented, false = opted out
   created_at: string
 }
 
@@ -87,6 +88,52 @@ export interface DashboardMember {
   section: string | null
   checked_in: boolean
   checkin_time: string | null
+  sms_consent: boolean | null  // null = not asked, true = consented, false = opted out
+}
+
+// ─── Billing ──────────────────────────────────────────────────────────────────
+
+export type SubscriptionStatus =
+  | 'active'
+  | 'trialing'
+  | 'past_due'
+  | 'canceled'
+  | 'incomplete'
+  | 'incomplete_expired'
+  | 'unpaid'
+
+export interface PricingPlan {
+  id:               string   // 'starter' | 'growth' | 'pro'
+  display_name:     string
+  price_usd_cents:  number
+  credits_included: number
+  sort_order:       number
+}
+
+export interface Subscription {
+  id:                     string
+  org_id:                 string
+  stripe_customer_id:     string
+  stripe_subscription_id: string | null
+  plan_id:                string
+  status:                 SubscriptionStatus
+  credits_included:       number
+  current_period_end:     string | null
+  cancel_at_period_end:   boolean
+  created_at:             string
+  updated_at:             string
+}
+
+export interface SmsCredits {
+  org_id:        string
+  balance:       number
+  last_reset_at: string
+}
+
+export interface OrgBilling {
+  subscription: Subscription | null
+  credits:      SmsCredits | null
+  plan:         PricingPlan | null
 }
 
 // ─── Absence Messaging ────────────────────────────────────────────────────────
@@ -95,8 +142,10 @@ export interface UnitMessagingSettings {
   unit_id: string
   enabled: boolean
   message_template: string
-  send_hour: number   // 12–21 (noon–9 pm), local time
-  timezone: string    // IANA timezone, e.g. 'Africa/Lagos'
+  send_hour: number       // 12–21 (noon–9 pm), local time
+  timezone: string        // IANA timezone, e.g. 'Africa/Lagos'
+  sender_name: string | null  // Alphanumeric sender ID (max 11 chars), shown as "From" in SMS
+  cooldown_days: number   // Min days between messages to same member (0 = no cooldown)
   updated_at: string
 }
 
