@@ -329,31 +329,31 @@ test.describe('AdminServiceDetail', () => {
 
   test('QR code section is collapsed by default', async ({ page }) => {
     await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
-    // Button shows "Expand" when collapsed; QR canvas hidden
-    await expect(page.getByRole('button', { name: /Expand/i })).toBeVisible()
+    // QR toggle button contains "Attendance QR Code" heading
+    await expect(page.getByRole('button', { name: /Attendance QR Code/i })).toBeVisible()
     await expect(page.locator('#service-qr')).not.toBeVisible()
   })
 
   test('clicking QR section header expands and shows the QR canvas', async ({ page }) => {
     await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
-    await page.getByRole('button', { name: /Expand/i }).click()
+    await page.getByRole('button', { name: /Attendance QR Code/i }).click()
     await expect(page.locator('#service-qr')).toBeVisible()
     await expect(page.getByText('Download QR PNG')).toBeVisible()
   })
 
   test('clicking QR section again collapses it', async ({ page }) => {
     await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
-    await page.getByRole('button', { name: /Expand/i }).click()
+    await page.getByRole('button', { name: /Attendance QR Code/i }).click()
     await expect(page.locator('#service-qr')).toBeVisible()
-    // After expand, button text becomes "Collapse"
-    await page.getByRole('button', { name: /Collapse/i }).click()
+    // Click again to collapse
+    await page.getByRole('button', { name: /Attendance QR Code/i }).click()
     await expect(page.locator('#service-qr')).not.toBeVisible()
   })
 
   test('absent tab shows Bob (absent), not Alice (present)', async ({ page }) => {
     await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
-    // Default tab is "all" — must click Absent tab first
-    await page.getByRole('button', { name: /Absent/i }).click()
+    // Tab buttons show "Absent (N)" — require the parenthesis to avoid matching the SMS section button
+    await page.getByRole('button', { name: /Absent \(/ }).click()
     await expect(page.getByText('Bob Smith')).toBeVisible()
     await expect(page.getByText('Alice Johnson')).not.toBeVisible()
   })
@@ -375,7 +375,7 @@ test.describe('AdminServiceDetail', () => {
   test('export buttons appear on absent tab', async ({ page }) => {
     await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     // Export buttons (icon-only, with title attr) only shown on absent tab
-    await page.getByRole('button', { name: /Absent/i }).click()
+    await page.getByRole('button', { name: /Absent \(/ }).click()
     await expect(page.locator('button[title="Export TXT"]')).toBeVisible()
     await expect(page.locator('button[title="Export CSV"]')).toBeVisible()
     await expect(page.locator('button[title="Export RTF (Word)"]')).toBeVisible()
@@ -537,7 +537,7 @@ test.describe('Edge cases', () => {
     await mockServiceLookup(page)
     await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     // Must click Absent tab — default is "all"
-    await page.getByRole('button', { name: /Absent/i }).click()
+    await page.getByRole('button', { name: /Absent \(/ }).click()
     await expect(page.getByText('All members accounted for!')).toBeVisible()
   })
 

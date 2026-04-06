@@ -26,7 +26,7 @@ test.describe('Terms of Service page', () => {
 
   test('displays effective date', async ({ page }) => {
     await page.goto('/terms')
-    await expect(page.getByText(/Effective date/i)).toBeVisible()
+    await expect(page.getByText(/Effective date/i).first()).toBeVisible()
   })
 
   test('has a table of contents with numbered sections', async ({ page }) => {
@@ -39,12 +39,12 @@ test.describe('Terms of Service page', () => {
 
   test('contains acceptance section', async ({ page }) => {
     await page.goto('/terms')
-    await expect(page.getByText(/Acceptance of Terms/i)).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Acceptance of Terms/i })).toBeVisible()
   })
 
   test('contains limitation of liability section', async ({ page }) => {
     await page.goto('/terms')
-    await expect(page.getByText(/Limitation of Liability/i)).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Limitation of Liability/i })).toBeVisible()
   })
 
   test('links to Privacy Policy page', async ({ page }) => {
@@ -88,7 +88,7 @@ test.describe('Privacy Policy page', () => {
 
   test('displays effective date', async ({ page }) => {
     await page.goto('/privacy')
-    await expect(page.getByText(/Effective date/i)).toBeVisible()
+    await expect(page.getByText(/Effective date/i).first()).toBeVisible()
   })
 
   test('has a table of contents with numbered sections', async ({ page }) => {
@@ -100,22 +100,22 @@ test.describe('Privacy Policy page', () => {
 
   test('contains data collection section', async ({ page }) => {
     await page.goto('/privacy')
-    await expect(page.getByText(/Data We Collect/i)).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Data We Collect/i })).toBeVisible()
   })
 
   test('contains GDPR legal basis section', async ({ page }) => {
     await page.goto('/privacy')
-    await expect(page.getByText(/Legal Basis/i)).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Legal Basis/i })).toBeVisible()
   })
 
   test('contains California / CCPA section', async ({ page }) => {
     await page.goto('/privacy')
-    await expect(page.getByText(/California/i)).toBeVisible()
+    await expect(page.getByRole('heading', { name: /California/i })).toBeVisible()
   })
 
   test('contains your rights section', async ({ page }) => {
     await page.goto('/privacy')
-    await expect(page.getByText(/Your Rights/i)).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Your Rights/i })).toBeVisible()
   })
 
   test('links to Terms of Service page', async ({ page }) => {

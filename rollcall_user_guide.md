@@ -15,6 +15,8 @@
 6. [Roles & What Each Can Do](#6-roles--what-each-can-do)
 7. [Tips & Best Practices](#7-tips--best-practices)
 8. [Troubleshooting](#8-troubleshooting)
+9. [SMS Absence Messaging — Member FAQ](#9-sms-absence-messaging--member-faq)
+10. [Billing & Subscriptions](#10-billing--subscriptions)
 
 ---
 
@@ -83,7 +85,16 @@ Tap your name. A confirmation screen appears asking "Is this you?" with your nam
 
 ### Step 4 — Done!
 
-You'll see a green "You're in!" screen with the venue name and your check-in time. You're done — no need to do anything else.
+You'll see a green "You're in!" screen with the venue name and your check-in time.
+
+**Optional prompts after check-in:**
+
+If your group leader has set up notifications, you may see one or two optional prompts:
+
+- **"Get instant check-in next time"** — allows your browser to send you a notification when a session starts. Tap **"Enable"** or **"Not now"**.
+- **"Stay in the loop"** — if your unit uses SMS absence messaging, you'll be asked whether you'd like to receive a text if you miss a session. Tap **"Yes, that's fine"** to consent or **"No thanks"** to opt out.
+
+Both prompts are **completely optional**. You can skip either without affecting your attendance record. Your choice is saved — you won't be asked again on this device for this unit.
 
 ---
 
@@ -227,6 +238,49 @@ Tap any member's name on the roster to open their profile. You'll see:
 If members have a birthday stored in their profile, Rollcally will remind you the day before and on the day itself.
 
 Look for the **bell icon** at the top of your admin pages. A number badge shows how many notifications are waiting. Tap the bell to see who has a birthday — and dismiss each one when you've acknowledged it.
+
+---
+
+### 4.10 SMS Absence Messaging
+
+When a member doesn't check in, Rollcally can automatically send them a friendly text message later that day — if they've consented to receive one.
+
+**Setting it up:**
+
+1. Open any event from the attendance page
+2. Scroll to the **"Absence Messaging"** panel at the bottom of the page
+3. Toggle the switch to **enable** SMS messaging for your unit
+4. Fill in the settings:
+   - **Sender name** — what members see as the "From" name (e.g. `GraceChoir`). Max 11 characters, must start with a letter. Leave blank to use the provider's phone number.
+   - **Message template** — personalise the text using `{{name}}` (member's name) and `{{event}}` (event type). Example: *"Hi {{name}}, we missed you at {{event}} today. Hope you're well!"*
+   - **Auto-send time** — the hour of day when the system sends the messages (noon–9 pm)
+   - **Timezone** — your unit's local timezone, so messages go out at the right local time
+   - **Cooldown** — minimum days between messages to the same member. Default is 7 days. Setting to 0 sends a message for every missed event (not recommended for active units).
+5. Tap **Save** to store your settings
+6. To send immediately (without waiting for the scheduled time), tap **"Send to all"**
+
+**Understanding the eligibility count:**
+
+The panel shows a breakdown of absent members:
+- **"X will receive SMS"** — members who have consented and have a phone number
+- **"X haven't consented"** — members who haven't been asked yet, or haven't responded to the prompt
+- **"X have no phone"** — members with no phone number on record
+
+Only the first group will receive a message. Messages are never sent to members who haven't explicitly agreed.
+
+**The delivery log:**
+
+Below the settings, the delivery log shows the status of every message sent for this event:
+- **Sent** — delivered successfully
+- **Failed** — delivery failed (hover the error snippet to see details — usually a bad phone number format)
+- **Skipped** — a concurrent send attempt already claimed this member (safe to ignore)
+
+**Overriding consent for a member:**
+
+Go to **Members**, tap the edit icon on a member, and change the **SMS Consent** field. Options are:
+- *Not asked yet* — member won't receive messages until they respond to the check-in prompt
+- *Consented — send SMS* — use this to record paper consent (e.g. the member signed a form)
+- *Opted out — do not send* — use this if a member has asked you verbally to stop
 
 ---
 
@@ -418,3 +472,148 @@ The check-in page can work without an internet connection **only if** you've vis
 
 > **Need more help?**
 > Contact your organisation's admin, or reach out to the Rollcally team via the website.
+
+---
+
+## 9. SMS Absence Messaging — Member FAQ
+
+### Will I receive a text message if I miss a session?
+
+Only if **all three** of the following are true:
+1. Your unit administrator has enabled SMS messaging
+2. You have **consented** — you tapped "Yes, that's fine" on the check-in page after a previous check-in
+3. You have a phone number saved in your profile
+
+If you've never been asked, or you tapped "No thanks", you will **not** receive any messages.
+
+---
+
+### Who sends the text message?
+
+The message comes from your unit or organisation — you'll see their sender name (e.g. "GraceChoir") in the "From" field, not "Rollcally". The text itself is written by your unit administrator and will typically include your first name and the name of the event you missed.
+
+---
+
+### How often could I receive messages?
+
+Your unit administrator sets a **cooldown period** — a minimum number of days between messages. The default is 7 days. This means even if you miss multiple events in a row, you'll receive at most one message per week (unless the administrator has chosen a shorter cooldown).
+
+---
+
+### How do I change my mind about SMS?
+
+**To opt out:** The next time you check in, you won't be prompted again — but you can ask your unit administrator to update your preference in your member record. They can set your SMS consent to "Opted out — do not send."
+
+**To consent after previously declining:** Ask your administrator to update your record to "Consented — send SMS."
+
+Rollcally does not currently have a self-service member account where you can change this yourself — it's managed through the administrator.
+
+---
+
+### What if I receive a message in error?
+
+Contact your unit administrator. They can immediately set your SMS preference to "opted out" which prevents any further messages from the next send onwards.
+
+---
+
+### Standard message rates
+
+SMS messages are sent via a third-party provider. Depending on your mobile carrier and plan, standard message rates may apply to messages you receive. Rollcally does not charge you anything to receive messages.
+
+---
+
+## 10. Billing & Subscriptions
+
+This section is for **organisation owners** — the person who created the organisation on Rollcally.
+
+---
+
+### 10.1 Plans
+
+Rollcally offers three monthly subscription plans. Automated follow-ups (absence SMS notifications) are included in every plan:
+
+| Plan | Price | Automated follow-ups included | Extra follow-ups |
+|---|---|---|---|
+| Starter | $25 / month | 200 | $0.18 each |
+| Growth | $59 / month | 600 | $0.15 each |
+| Pro | $119 / month | 1,500 | $0.12 each |
+
+**All new subscriptions include a 14-day free trial.** No charge is made until the trial ends. You can cancel any time before that.
+
+Follow-ups are automated absence notifications sent to members who missed a session and have consented to receive them. See [Section 4.12](#412-automated-absence-follow-ups) for how to set them up.
+
+If your organisation sends more follow-ups than your plan includes in a given month, the extras are charged at the per-credit rate shown above. You can see your usage at any time on the Billing page.
+
+---
+
+### 10.2 Accessing the Billing Page
+
+From the Admin Dashboard, tap **"Billing"** in the sidebar (desktop) or bottom navigation (mobile). You'll see your current plan, usage this cycle, and the option to switch plans.
+
+---
+
+### 10.3 Starting a Subscription
+
+1. Go to the Billing page and select a plan
+2. You'll be redirected to a secure Stripe checkout page
+3. Enter your card details — your 14-day free trial starts immediately
+4. Once complete, you'll return to Rollcally and your follow-ups will be active
+
+---
+
+### 10.4 Understanding Your Follow-Up Allowance
+
+Your allowance resets at the start of each billing cycle (the same date each month). Unused follow-ups do not roll over.
+
+The billing page shows how many follow-ups you've used this cycle. You'll see a warning when you're approaching your limit. If you run out, follow-ups are paused — no messages will be sent until your next cycle or until you upgrade.
+
+> **Important:** The limit applies across your entire organisation, not per unit. If you have three units, they all share the same monthly allowance.
+
+---
+
+### 10.5 Upgrading or Downgrading
+
+From the Billing page, select a different plan. If you're upgrading mid-cycle, the extra follow-ups are added to your balance immediately. If you're downgrading, the change takes effect at the next renewal date.
+
+---
+
+### 10.6 Managing Payment & Invoices
+
+Tap **"Manage billing"** on the Billing page. This opens the Stripe Customer Portal where you can:
+
+- Update your card details
+- Download past invoices
+- Cancel your subscription
+
+Cancellation takes effect at the end of your current billing period — you keep access until then.
+
+---
+
+### 10.7 What Happens If Payment Fails?
+
+Stripe will retry the payment automatically. If it continues to fail:
+
+1. Your subscription will enter **"Payment overdue"** status
+2. Automated follow-ups will be paused
+3. You'll receive an email from Stripe with a link to update your payment method
+
+Once payment is resolved, your follow-ups resume immediately.
+
+---
+
+### 10.8 Frequently Asked Questions
+
+**Can I have separate plans for different units?**
+No — the subscription is per organisation and the allowance is shared across all units. If you run multiple separate organisations on Rollcally (e.g. a church choir and a youth football club), each will need its own subscription.
+
+**Do my follow-ups stop immediately if I cancel?**
+No — you keep access until the end of your current billing period. After that, the allowance drops to zero and no more follow-ups are sent.
+
+**I upgraded but my count didn't change — is that normal?**
+When you upgrade mid-cycle, the extra credits are added to your existing balance. Your used count stays the same; only the remaining balance increases.
+
+**What counts against my allowance?**
+Successfully sent messages and failed delivery attempts both count — in both cases the SMS was submitted to the carrier and a cost was incurred. Blocked sends (when your balance is zero) do not count and are not charged.
+
+**What happens when I run out of included follow-ups mid-month?**
+Follow-ups continue sending, but each one beyond your allowance is charged at the extra-credit rate for your plan. You'll see this on your next Stripe invoice. If you prefer to stop at the limit rather than incur overages, contact us and we can configure a hard cap for your account.

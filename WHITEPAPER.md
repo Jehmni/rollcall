@@ -1,6 +1,6 @@
 # Rollcally — Engineering White Paper
 
-> **Version:** 2.0 · **Date:** March 2026
+> **Version:** 3.0 · **Date:** April 2026
 > Reverse-engineered from codebase. All claims are grounded in source code.
 
 ---
@@ -18,8 +18,9 @@
 9. [State Management Strategy](#9-state-management-strategy)
 10. [Realtime & Background Processing](#10-realtime--background-processing)
 11. [PWA & Offline Strategy](#11-pwa--offline-strategy)
-12. [Testing Strategy](#12-testing-strategy)
-13. [Known Limitations](#13-known-limitations)
+12. [SaaS Billing & Monetisation](#12-saas-billing--monetisation)
+13. [Testing Strategy](#13-testing-strategy)
+14. [Known Limitations](#14-known-limitations)
 
 ---
 
@@ -269,16 +270,22 @@ rollcall/
 
 ```
 organizations ──(N)── organization_members ──► auth.users (admins)
+     │                    └── subscriptions (1:1 per org)
+     │                    └── sms_credits   (1:1 per org)
      │
      └──(N)── units ──(N)── unit_admins ──► auth.users
+                  │         └── unit_messaging_settings (1:1 per unit)
                   │
                   ├──(N)── members
                   │           └──(N)── member_notifications
                   └──(N)── services
                                └──(N)── attendance ◄── members
-                                                   (device_id, lat, lng)
+                               │                   (device_id, lat, lng)
+                               └──(N)── absence_message_log ◄── members
 
-join_requests ──► organizations + auth.users
+join_requests  ──► organizations + auth.users
+pricing_plans  ── static lookup (starter / growth / pro)
+usage_events   ── append-only audit log (org_id, unit_id, event_type)
 ```
 
 ### Tables
@@ -348,6 +355,7 @@ join_requests ──► organizations + auth.users
 | section | text | e.g. `"Soprano"`, `"Bass"` |
 | status | text | `'active'` / `'inactive'` |
 | birthday | date | Optional; used for notifications |
+| sms_consent | boolean \| null | `null` = not asked, `true` = consented, `false` = opted out |
 | created_at | timestamptz | |
 
 #### `services`
@@ -386,6 +394,68 @@ join_requests ──► organizations + auth.users
 | fire_at | timestamptz | When to surface the notification |
 | dismissed | bool | Default false |
 | created_at | timestamptz | |
+
+#### `pricing_plans`
+
+Static lookup table owned by the platform. Seeded once; never modified by tenants.
+
+| Column | Type | Notes |
+|---|---|---|
+| id | text PK | `'starter'` / `'growth'` / `'pro'` |
+| display_name | text NOT NULL | Human-readable label |
+| price_usd_cents | int NOT NULL | Monthly price (USD cents) |
+| credits_included | int NOT NULL | SMS follow-ups per billing cycle |
+| sort_order | int | Display order in pricing UI |
+
+#### `subscriptions`
+
+One row per organisation. Stripe is the source of truth for payment; this table is a webhook-synced cache.
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| org_id | uuid FK → organizations | UNIQUE — one sub per org |
+| stripe_customer_id | text NOT NULL | Stripe customer object ID |
+| stripe_subscription_id | text | Stripe subscription object ID |
+| plan_id | text FK → pricing_plans | Current plan |
+| status | text | `active`, `trialing`, `past_due`, `canceled`, `incomplete`, `unpaid` |
+| credits_included | int | Snapshot at last cycle reset |
+| current_period_end | timestamptz | Next renewal / expiry date |
+| cancel_at_period_end | boolean | Scheduled cancellation flag |
+| created_at | timestamptz | |
+| updated_at | timestamptz | Auto-updated by trigger |
+
+RLS: org owners and org members can SELECT; super admins have full access.
+
+#### `sms_credits`
+
+One row per organisation. Balance is decremented atomically before each SMS send and reset on `invoice.paid`.
+
+| Column | Type | Notes |
+|---|---|---|
+| org_id | uuid PK FK → organizations | |
+| balance | int ≥ 0 | Remaining follow-ups this cycle |
+| last_reset_at | timestamptz | When balance was last set to plan allowance |
+
+CHECK constraint ensures `balance >= 0` — no negative balances possible at the DB layer.
+
+#### `usage_events`
+
+Append-only audit log for all platform feature usage. Designed for extensibility: the same table will record AI usage events in future.
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| org_id | uuid FK → organizations | |
+| unit_id | uuid FK → units | nullable |
+| service_id | uuid FK → services | nullable |
+| member_id | uuid FK → members | nullable |
+| event_type | text | `'sms_sent'`, `'sms_failed'`, `'sms_blocked'` (future: `'ai_insight'`, etc.) |
+| quantity | int | Default 1 |
+| metadata | jsonb | Provider name, error details, etc. |
+| created_at | timestamptz | |
+
+Indexed on `(org_id, created_at DESC)` for fast billing-page queries.
 
 ### Database Triggers
 
@@ -580,12 +650,71 @@ Visible from `AdminServiceDetail` when the "Absent" tab is active. Three formats
 | Format | Description |
 |---|---|
 | **TXT** | Plain-text table with name and section |
-| **CSV** | UTF-8 BOM prefixed (Excel-compatible), columns: Name, Section, Phone |
+| **CSV** | UTF-8 without BOM (standard, works in Google Sheets and modern Excel), columns: Name, Section, Phone |
 | **RTF** | Word-compatible document with a formatted table layout |
 
-All formats trigger a browser file download using a `<a>` element with an object URL.
+All formats include a timestamp in the filename (`absent-Label_YYYY-MM-DD_HH-MM.ext`) to prevent overwrites. RTF escapes special characters (`\`, `{`, `}`) to prevent document corruption. Export of >5,000 members is blocked with a user-visible error before any fetch is attempted.
 
-### 7.8 Organisation Discovery & Join Flow
+### 7.8 SMS Absence Messaging
+
+An optional, consent-gated feature that sends a personalised SMS to absent members after a session ends.
+
+#### Data model additions (migration `20260402_sms_consent.sql`)
+
+| Table | Column | Type | Purpose |
+|---|---|---|---|
+| `members` | `sms_consent` | `boolean \| null` | `null` = not asked, `true` = consented, `false` = opted out |
+| `unit_messaging_settings` | `sender_name` | `text` (≤11 chars) | Alphanumeric SMS sender ID shown as "From" |
+| `unit_messaging_settings` | `cooldown_days` | `int` (0–90) | Min days between messages to same member |
+
+#### Consent flow
+
+Consent is captured at check-in (no auth required):
+
+1. Member checks in successfully
+2. After any push notification prompt resolves, the check-in page checks:
+   - Does the unit have SMS enabled? (`unit_messaging_settings.enabled`)
+   - Has this member been asked on this device? (`localStorage` key `rollcally_sms_asked_{memberId}_{unitId}`)
+3. If both conditions are met, an amber card appears: *"Your unit may send you a text message if you miss a session."*
+4. Member taps **"Yes, that's fine"** or **"No thanks"**
+5. `set_member_sms_consent(member_id, consent)` RPC (SECURITY DEFINER, granted to `anon`) writes the choice to `members.sms_consent`
+6. LocalStorage key is set so the prompt is not shown again on this device
+
+Admins can override consent in the member form to record paper-based consent or honour verbal opt-out requests.
+
+#### Edge function: `send-absence-sms`
+
+Deployment: Supabase Edge Function (Deno). Invoked manually from the admin UI or on a schedule via `pg_cron` + `pg_net`.
+
+Eligibility pipeline (per service):
+1. Fetch `unit_messaging_settings` — abort if not enabled
+2. Check `service.date === todayIn(timezone)` — skip if not today
+3. **Billing gate:** Check `subscriptions.status` for the org — abort batch if not `active` or `trialing`
+4. Call `get_service_members_full` — returns all active members with check-in status **and** `sms_consent`
+5. Filter: `!checked_in && sms_consent === true && phone != null`
+6. Apply cooldown: query `absence_message_log` for `status = 'sent'` rows within `cooldown_days` for these member IDs; remove those from the eligible set
+7. For each eligible member: **credit deduction** via `deduct_sms_credit()` (atomic `FOR UPDATE`); if returns false → count as `blocked`, log `sms_blocked` event, continue
+8. **Log-first atomic pattern** — INSERT `pending` row (unique constraint on `service_id, member_id` prevents duplicate sends across concurrent invocations); if 23505 → refund credit via `refund_sms_credit()`, count as `skipped`; then send; then UPDATE to `sent` or `failed`
+9. Log `sms_sent` / `sms_failed` event to `usage_events` for billing audit trail
+
+#### Sender identity
+
+The `sender_name` field (max 11 chars, must start with a letter) is passed as the Twilio `From` parameter or Africa's Talking `from` parameter. This is an alphanumeric sender ID — supported in UK and Nigeria, **not** available in US/Canada (those require a registered phone number).
+
+#### Cooldown logic
+
+`cooldown_days = 0` disables the cooldown. Otherwise, before sending, the function fetches member IDs from `absence_message_log` where `status = 'sent'` and `sent_at >= now() - cooldown_days * 86400s`. Members in this set are skipped for the current batch.
+
+#### Admin UI (`AdminServiceDetail` — MessagingPanel)
+
+The expanded panel shows:
+- **Reachability summary:** "X will receive SMS · Y haven't consented · Z have no phone"
+- **Sender name** input (validated: ≤11 chars, starts with letter, alphanumeric)
+- **Cooldown days** input (0–90)
+- **Delivery log** (paginated, 50 per page, sorted by `sent_at desc, id desc`)
+- **"Send to all"** button (count reflects only eligible members, not total absent)
+
+### 7.10 Organisation Discovery & Join Flow
 
 1. Admin visits `/admin/discover`
 2. Searches organisations by name (`ilike` query)
@@ -624,9 +753,14 @@ Server-side logic:
 
 #### `get_service_members_full(p_service_id uuid, p_limit int, p_offset int)`
 
-Returns `DashboardMember[]` — `{ id, name, phone, section, checked_in, checkin_time }`.
+Returns `DashboardMember[]` — `{ id, name, phone, section, checked_in, checkin_time, sms_consent }`.
 **Auth:** Verified via `is_org_admin_by_service(p_service_id)`. Returns nothing if caller has no access.
 **Pagination:** `p_limit` = 100 (PAGE_SIZE), `p_offset` increments by 100 per page.
+**`sms_consent`:** `null` = not asked, `true` = consented to SMS, `false` = opted out. Used by the admin UI to show the reachability breakdown and by the edge function to filter eligible recipients.
+
+#### `set_member_sms_consent(p_member_id uuid, p_consent boolean)`
+
+Updates `members.sms_consent`. **SECURITY DEFINER**, granted to `anon` so it can be called from the unauthenticated check-in page. Tightly scoped — only updates the one column.
 
 #### `get_org_join_requests(p_org_id uuid)`
 
@@ -644,6 +778,28 @@ Looks up the user by email in `auth.users`, inserts into `unit_admins`.
 
 Returns `MemberNotification[]` where `dismissed = false` and `fire_at <= now()`.
 **Auth:** Unit admins and org owners.
+
+#### `get_org_billing(p_org_id uuid)`
+
+Returns `{ subscription, credits, plan }` as a single JSON object. Combines data from `subscriptions`, `sms_credits`, and `pricing_plans` in one round-trip.
+**Auth:** `is_org_owner(p_org_id)` or `is_org_member(p_org_id)`.
+**Used by:** `Billing.tsx` on page load.
+
+### Service-Role-Only Functions (no public grant)
+
+These are called exclusively by edge functions using `SUPABASE_SERVICE_ROLE_KEY`, which bypasses RLS.
+
+#### `deduct_sms_credit(p_org_id uuid) → boolean`
+
+Atomically decrements `sms_credits.balance` by 1 using `SELECT ... FOR UPDATE`. Returns `true` if a credit was available and deducted; `false` if balance was 0 or no row exists. Guarantees no negative balances under concurrent invocations.
+
+#### `refund_sms_credit(p_org_id uuid)`
+
+Increments `sms_credits.balance` by 1. Called when a credit was deducted but the send was skipped (concurrent duplicate detected via 23505 constraint on `absence_message_log`).
+
+#### `reset_sms_credits(p_org_id uuid, p_credits int)`
+
+Upserts `sms_credits` to `balance = p_credits` and stamps `last_reset_at = now()`. Called by the stripe-webhook on `invoice.paid` and `checkout.session.completed`.
 
 ---
 
@@ -815,7 +971,125 @@ Installable on iOS Safari ("Add to Home Screen") and Android Chrome. `display: s
 
 ---
 
-## 12. Testing Strategy
+## 12. SaaS Billing & Monetisation
+
+Rollcally monetises through a **subscription model** (migration `20260406_billing.sql`). Revenue is framed around the product value ("automated attendance follow-ups"), not the underlying infrastructure cost (SMS). The billing layer sits between the subscription lifecycle and the outbound SMS send path.
+
+### Architecture Overview
+
+```
+Stripe Checkout ──► create-checkout-session (edge function)
+                         │
+                         └──► Stripe hosted page ──► stripe-webhook (edge function)
+                                                            │
+                                              ┌─────────────┴──────────────┐
+                                              ▼                            ▼
+                                    subscriptions table           sms_credits table
+                                              │
+                                              ▼
+                                    send-absence-sms
+                                    1. Check subscriptions.status
+                                    2. deduct_sms_credit() — atomic FOR UPDATE
+                                    3. Send via Twilio / AT
+                                    4. INSERT usage_events
+```
+
+### Pricing Plans
+
+| Plan | Price | Follow-ups / cycle | Overage rate | Target |
+|---|---|---|---|---|
+| Starter | $25 / month | 200 | $0.18 each | Small org (1–2 units, ≤80 members) |
+| Growth | $59 / month | 600 | $0.15 each | Medium org (3–6 units, up to ~200 members) |
+| Pro | $119 / month | 1,500 | $0.12 each | Large org (7+ units, 200+ members) |
+
+Pricing is designed for 70–87% gross margin at real-world utilisation (~110 SMS/org/month blended average). Overage charges apply when an org exceeds its included allowance; these yield 54–69% margin and are the primary mechanism for large outlier orgs rather than a default revenue stream.
+
+All new subscriptions include a **14-day free trial**. No charge is made until the trial ends.
+
+### Edge Functions
+
+#### `create-checkout-session`
+
+Creates a Stripe Checkout Session for new subscriptions or redirects to the Stripe Billing Portal for existing active customers (plan changes, invoice downloads, card updates).
+
+- **Auth:** Caller must be authenticated AND `is_org_owner(org_id)` — only the org owner can manage billing.
+- **New customer flow:** Creates a Stripe Customer object (email + org name), then a Checkout Session with `client_reference_id = org_id` so the webhook can link back.
+- **Existing active subscription:** Returns a Billing Portal URL instead of a new checkout.
+- **14-day trial:** Applied via `subscription_data.trial_period_days = 14` on first-time checkouts.
+
+Secrets required: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_GROWTH`, `STRIPE_PRICE_PRO`, `APP_URL`.
+
+#### `stripe-webhook`
+
+Processes four Stripe lifecycle events. All DB writes are idempotent upserts.
+
+| Event | Action |
+|---|---|
+| `checkout.session.completed` | Upsert `subscriptions` row; call `reset_sms_credits` with plan allowance |
+| `invoice.paid` | Sync subscription status; call `reset_sms_credits` to start fresh cycle |
+| `customer.subscription.updated` | Sync plan, status, period end; top up credits if upgraded mid-cycle |
+| `customer.subscription.deleted` | Set status to `canceled`; zero out `sms_credits.balance` immediately |
+
+Secrets required: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`.
+
+**Signature verification:** All events are verified via `stripe.webhooks.constructEventAsync()` before any DB access. Requests without a valid `stripe-signature` header are rejected with HTTP 400.
+
+### Credit Deduction — Atomicity
+
+`deduct_sms_credit(p_org_id uuid)` uses `SELECT ... FOR UPDATE` on the `sms_credits` row:
+
+```sql
+select balance into v_balance from sms_credits where org_id = p_org_id for update;
+if v_balance <= 0 then return false; end if;
+update sms_credits set balance = balance - 1 where org_id = p_org_id;
+return true;
+```
+
+The `FOR UPDATE` row lock ensures that concurrent edge function invocations cannot both see the same balance > 0 and both decrement it — only one wins the lock; the other waits and then reads the updated (already decremented) value. The result is **no negative balances and no double-spend, even under concurrent cron-triggered batches**.
+
+If a concurrent duplicate is detected (23505 on `absence_message_log`), the already-deducted credit is refunded via `refund_sms_credit()` before the member is skipped.
+
+### Credit Enforcement in `send-absence-sms`
+
+The updated edge function checks two gates before sending:
+
+1. **Subscription status** — must be `active` or `trialing`. `past_due`, `canceled`, or absent subscription blocks the entire batch with a clear reason logged.
+2. **Credit balance** — `deduct_sms_credit()` is called per member, before the SMS API call. If it returns `false`, the member is counted as `blocked` and the event is logged to `usage_events` with `event_type = 'sms_blocked'`.
+
+The UI (`MessagingPanel`) surfaces blocked sends — the admin can see exactly how many were blocked and link to the billing page.
+
+### Usage Events (AI-Ready Audit Log)
+
+`usage_events` is intentionally generic. Current `event_type` values:
+- `sms_sent` — successful Twilio delivery, credit deducted
+- `sms_failed` — provider returned an error, credit deducted (cost incurred)
+- `sms_blocked` — credit balance was zero or subscription not active, no cost incurred
+
+Planned future values (not yet billed, structure ready):
+- `ai_insight` — AI-generated attendance insight
+- `ai_followup` — AI-written personalised follow-up message
+- `ai_prediction` — predictive absence alert
+
+The `metadata jsonb` column stores provider name, error codes, and any other context needed for future billing granularity without schema changes.
+
+### Frontend
+
+`src/lib/plans.ts` is the single source of truth for plan presentation:
+- `PLANS[]` — ordered plan config (name, price, followUps, features, colour tokens)
+- `isSubActive(status)` — returns true for `active` and `trialing`
+- `subStatusLabel(status)` / `subStatusColor(status)` — consistent UI rendering across all components
+
+`src/pages/Billing.tsx` at `/admin/billing`:
+- Shows current plan, status chip, and renewal/cancellation date
+- Usage bar (follow-ups used / total allowance) — sourced from `usage_events` count since last reset
+- Technical details (raw credit balance) hidden under a `<details>` element — not the primary UI
+- Plan selection cards for upgrade/downgrade (calls `create-checkout-session`)
+- "Manage billing" button → Stripe Billing Portal for card/invoice management
+- Success/cancel redirect handling from Stripe Checkout
+
+---
+
+## 13. Testing Strategy
 
 ### E2E Tests (Playwright)
 
@@ -852,7 +1126,7 @@ All tests use **Playwright route interception** — no real Supabase instance is
 
 ---
 
-## 13. Known Limitations
+## 14. Known Limitations
 
 ### Security
 

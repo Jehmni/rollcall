@@ -714,7 +714,7 @@ test.describe('9 · Member check-in for event', () => {
     )
 
     await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
-    await page.getByRole('button', { name: /Expand/i }).click()
+    await page.getByRole('button', { name: /Attendance QR Code/i }).click()
     await expect(page.locator('#service-qr')).toBeVisible()
   })
 })
