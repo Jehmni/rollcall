@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-const EFFECTIVE_DATE = 'March 26, 2026'
+const EFFECTIVE_DATE = 'April 2, 2026'
 const COMPANY = 'Rollcally Inc.'
 const EMAIL = 'legal@rollcally.com'
 
@@ -40,14 +40,16 @@ const TOC = [
   { id: 'intellectual-property', label: '7. Intellectual Property' },
   { id: 'data-processing', label: '8. Data Processing' },
   { id: 'notifications', label: '9. Push Notifications' },
-  { id: 'third-parties', label: '10. Third-Party Services' },
-  { id: 'disclaimers', label: '11. Disclaimers' },
-  { id: 'liability', label: '12. Limitation of Liability' },
-  { id: 'indemnification', label: '13. Indemnification' },
-  { id: 'termination', label: '14. Termination' },
-  { id: 'changes', label: '15. Changes to These Terms' },
-  { id: 'governing-law', label: '16. Governing Law' },
-  { id: 'contact', label: '17. Contact Us' },
+  { id: 'sms-messaging', label: '10. SMS Absence Messaging' },
+  { id: 'subscriptions', label: '11. Subscriptions & Billing' },
+  { id: 'third-parties', label: '12. Third-Party Services' },
+  { id: 'disclaimers', label: '13. Disclaimers' },
+  { id: 'liability', label: '14. Limitation of Liability' },
+  { id: 'indemnification', label: '15. Indemnification' },
+  { id: 'termination', label: '16. Termination' },
+  { id: 'changes', label: '17. Changes to These Terms' },
+  { id: 'governing-law', label: '18. Governing Law' },
+  { id: 'contact', label: '19. Contact Us' },
 ]
 
 export default function TermsOfService() {
@@ -252,12 +254,105 @@ export default function TermsOfService() {
               </P>
             </Section>
 
-            <Section id="third-parties" title="10. Third-Party Services">
+            <Section id="sms-messaging" title="10. SMS Absence Messaging">
+              <P>
+                The Service includes an optional SMS absence notification feature. The following terms
+                govern its use by administrators and members.
+              </P>
+              <P><strong className="text-white">Administrator obligations</strong></P>
+              <Ul items={[
+                'You may only enable SMS messaging for members who have provided explicit, informed consent as recorded in the Service.',
+                'You must configure a sender name that accurately identifies your unit or organisation. Misleading or impersonating sender names are prohibited.',
+                'You must use the messaging feature only for legitimate absence notifications relevant to your unit\'s activities. Promotional, marketing, or off-topic messages are prohibited.',
+                'You acknowledge that SMS delivery is subject to carrier routing, geographic restrictions, and provider terms. Rollcally does not guarantee delivery.',
+                'Standard SMS rates may apply to message recipients. You are responsible for informing members that they may incur carrier charges.',
+              ]} />
+              <P><strong className="text-white">Member rights</strong></P>
+              <Ul items={[
+                'Members may consent to or opt out of SMS absence notifications via the check-in page at any time.',
+                'Members may also ask an administrator to update their SMS preference on their behalf.',
+                'Withdrawal of consent will be honoured at the next scheduled send — messages already queued at the time of withdrawal may still be delivered.',
+              ]} />
+              <P>
+                Rollcally reserves the right to suspend or terminate SMS sending for any unit that uses
+                the feature in violation of these Terms or applicable law (including anti-spam legislation
+                such as the UK Privacy and Electronic Communications Regulations, GDPR, and the US
+                Telephone Consumer Protection Act).
+              </P>
+            </Section>
+
+            <Section id="subscriptions" title="11. Subscriptions & Billing">
+              <P><strong className="text-white">Plans and pricing</strong></P>
+              <P>
+                Access to the automated absence follow-up feature requires an active paid subscription.
+                Rollcally offers monthly subscription plans (Starter, Growth, and Pro) at prices published
+                on the billing page within the Service. Prices are in US Dollars and are subject to change
+                with 30 days' notice.
+              </P>
+
+              <P><strong className="text-white">Free trial</strong></P>
+              <P>
+                New subscribers receive a 14-day free trial on their first subscription. No payment is
+                charged during the trial period. At the end of the trial, your subscription automatically
+                converts to the selected paid plan. You may cancel at any time during the trial without charge.
+              </P>
+
+              <P><strong className="text-white">Billing and payment</strong></P>
+              <Ul items={[
+                'Subscriptions are billed monthly in advance. Your billing cycle begins on the date you subscribe.',
+                'Payment is processed by Stripe. By subscribing, you authorise Stripe to charge your payment method on a recurring monthly basis.',
+                'You are responsible for ensuring your payment information remains current. If payment fails, we will notify you and your subscription will enter a grace period. If payment is not resolved, follow-up messaging will be suspended.',
+                'All prices are exclusive of any applicable taxes. You are responsible for any taxes applicable in your jurisdiction.',
+              ]} />
+
+              <P><strong className="text-white">Follow-up allowance</strong></P>
+              <Ul items={[
+                'Each plan includes a monthly allowance of automated follow-up messages. This allowance resets at the start of each billing cycle.',
+                'Unused allowance does not roll over to the next cycle.',
+                'The allowance is shared across all units within an organisation. If multiple units are using the follow-up feature, they draw from the same pool.',
+                'When the allowance is exhausted, no further follow-up messages will be sent until the next billing cycle or until you upgrade your plan.',
+              ]} />
+
+              <P><strong className="text-white">Upgrades and downgrades</strong></P>
+              <Ul items={[
+                'You may upgrade your plan at any time. The upgraded allowance is applied immediately; you are charged a prorated amount for the remainder of the current billing period.',
+                'You may downgrade your plan at any time. The downgrade takes effect at the start of the next billing cycle.',
+                'Plan changes are managed through the Stripe Billing Portal, accessible from the Billing page.',
+              ]} />
+
+              <P><strong className="text-white">Cancellation and refunds</strong></P>
+              <Ul items={[
+                'You may cancel your subscription at any time from the Billing page. Cancellation takes effect at the end of the current billing period. You retain access to the Service until that date.',
+                'We do not offer prorated refunds for the unused portion of a billing period following cancellation, except where required by applicable law.',
+                'If you believe you have been charged in error, contact us at ' + EMAIL + ' within 30 days of the charge.',
+              ]} />
+
+              <P><strong className="text-white">Suspension for non-payment</strong></P>
+              <P>
+                If your subscription lapses due to non-payment or cancellation, automated follow-up messaging
+                will be disabled. Your data (members, attendance records, settings) will remain accessible
+                for a period of 90 days, after which we reserve the right to archive or delete it. We will
+                provide reasonable notice before any such action.
+              </P>
+            </Section>
+
+            <Section id="third-parties" title="12. Third-Party Services">
               <P>
                 The Service is built on and integrates with third-party infrastructure providers, including
-                Supabase (database and authentication). By using the Service, you acknowledge that your data
-                may be stored on infrastructure operated by these providers. We select providers that offer
-                strong security and data protection commitments.
+                Supabase (database and authentication) and Stripe (payment processing). By using the Service,
+                you acknowledge that your data may be stored on infrastructure operated by these providers.
+                We select providers that offer strong security and data protection commitments.
+              </P>
+              <P>
+                Payment processing is handled exclusively by Stripe. Your payment card details are
+                transmitted directly to Stripe and are never stored by Rollcally. Your use of Stripe's
+                services is subject to Stripe's own terms of service and privacy policy, available at
+                stripe.com.
+              </P>
+              <P>
+                SMS delivery is handled by Twilio (or Africa's Talking, depending on configuration).
+                By enabling SMS absence messaging, you acknowledge that message content and recipient
+                phone numbers are transmitted to these providers for delivery purposes.
               </P>
               <P>
                 We are not responsible for the privacy practices or content of any third-party websites or
@@ -265,7 +360,7 @@ export default function TermsOfService() {
               </P>
             </Section>
 
-            <Section id="disclaimers" title="11. Disclaimers">
+            <Section id="disclaimers" title="13. Disclaimers">
               <P>
                 THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER
                 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY,
@@ -278,7 +373,7 @@ export default function TermsOfService() {
               </P>
             </Section>
 
-            <Section id="liability" title="12. Limitation of Liability">
+            <Section id="liability" title="14. Limitation of Liability">
               <P>
                 TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT WILL {COMPANY.toUpperCase()},
                 ITS DIRECTORS, EMPLOYEES, PARTNERS, OR AGENTS BE LIABLE FOR ANY INDIRECT, INCIDENTAL,
@@ -296,7 +391,7 @@ export default function TermsOfService() {
               </P>
             </Section>
 
-            <Section id="indemnification" title="13. Indemnification">
+            <Section id="indemnification" title="15. Indemnification">
               <P>
                 You agree to defend, indemnify, and hold harmless {COMPANY}, its officers, directors,
                 employees, and agents from and against any claims, liabilities, damages, judgments, awards,
@@ -307,7 +402,7 @@ export default function TermsOfService() {
               </P>
             </Section>
 
-            <Section id="termination" title="14. Termination">
+            <Section id="termination" title="16. Termination">
               <P>
                 We may suspend or terminate your access to the Service, with or without notice, for conduct
                 that we believe violates these Terms, is harmful to other users or to us, or for any other
@@ -324,7 +419,7 @@ export default function TermsOfService() {
               </P>
             </Section>
 
-            <Section id="changes" title="15. Changes to These Terms">
+            <Section id="changes" title="17. Changes to These Terms">
               <P>
                 We reserve the right to modify these Terms at any time. We will provide notice of material
                 changes by updating the effective date at the top of this page. For significant changes, we
@@ -336,7 +431,7 @@ export default function TermsOfService() {
               </P>
             </Section>
 
-            <Section id="governing-law" title="16. Governing Law">
+            <Section id="governing-law" title="18. Governing Law">
               <P>
                 These Terms are governed by and construed in accordance with the laws of England and Wales,
                 without regard to its conflict of law provisions. You consent to the exclusive jurisdiction
@@ -350,7 +445,7 @@ export default function TermsOfService() {
               </P>
             </Section>
 
-            <Section id="contact" title="17. Contact Us">
+            <Section id="contact" title="19. Contact Us">
               <P>
                 If you have any questions about these Terms, please contact us:
               </P>

@@ -69,6 +69,7 @@ export function useServiceInfo(serviceId: string | null) {
   const [unitName, setUnitName] = useState<string | null>(null)
   const [unitId, setUnitId] = useState<string | null>(null)
   const [requireLocation, setRequireLocation] = useState(false)
+  const [smsEnabled, setSmsEnabled] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -82,13 +83,27 @@ export function useServiceInfo(serviceId: string | null) {
       .single()
       .then(({ data, error }) => {
         if (!error && data) {
+          const uid = (data as unknown as { unit_id: string }).unit_id || null
           setUnitName(((data.units as unknown) as { name: string } | null)?.name || null)
-          setUnitId((data as unknown as { unit_id: string }).unit_id || null)
+          setUnitId(uid)
           setRequireLocation((data as unknown as { require_location: boolean }).require_location ?? false)
+
+          // Check if SMS absence messaging is enabled for this unit.
+          // Used by the check-in consent prompt.
+          if (uid) {
+            supabase
+              .from('unit_messaging_settings')
+              .select('enabled')
+              .eq('unit_id', uid)
+              .maybeSingle()
+              .then(({ data: smsData }) => {
+                setSmsEnabled((smsData as { enabled: boolean } | null)?.enabled ?? false)
+              })
+          }
         }
         setLoading(false)
       })
   }, [serviceId])
 
-  return { unitName, unitId, requireLocation, loading }
+  return { unitName, unitId, requireLocation, smsEnabled, loading }
 }

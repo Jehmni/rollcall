@@ -270,6 +270,13 @@ export default function AdminDashboard() {
             <span className="material-symbols-outlined">explore</span>
             Explore
           </button>
+          <button
+            onClick={() => navigate('/admin/billing')}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-primary/5 font-medium text-sm transition-colors"
+          >
+            <span className="material-symbols-outlined">credit_card</span>
+            Billing
+          </button>
         </nav>
         <div className="px-4 py-4 mt-auto">
           <button
@@ -493,6 +500,13 @@ export default function AdminDashboard() {
           >
             <span className="material-symbols-outlined">explore</span>
             <span className="text-2xs font-black uppercase tracking-widest">Explore</span>
+          </button>
+          <button
+            onClick={() => navigate('/admin/billing')}
+            className="flex flex-col items-center gap-1 text-slate-500 hover:text-primary transition-colors"
+          >
+            <span className="material-symbols-outlined">credit_card</span>
+            <span className="text-2xs font-black uppercase tracking-widest">Billing</span>
           </button>
           <button
             onClick={signOut}

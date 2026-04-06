@@ -21,7 +21,7 @@ function friendlyError(err: unknown): string {
   if (r.includes('null value') && r.includes('name'))
     return "Full name is required. Please fill in the member's name before saving."
   if (r.includes('invalid input syntax') && r.includes('date'))
-    return 'The birthday is not a valid date. Use DD/MM/YYYY format or leave it blank.'
+    return 'The birthday is not a valid date. Use DD/MM (e.g. 18/11) or DD/MM/YYYY — or leave it blank.'
   if (r.includes('value too long'))
     return 'One of the fields is too long. Please shorten it and try again.'
   if (r.includes('network') || r.includes('failed to fetch') || r.includes('load failed'))
@@ -66,30 +66,83 @@ function splitCsvLine(line: string): string[] {
 
 /**
  * Normalise a date string to ISO YYYY-MM-DD.
- * - Full date: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
- * - Partial date (day + month only, e.g. "18/11"): stored as 1900-MM-DD
- *   Year 1900 is a sentinel meaning "year not provided". Display code must
- *   check for year === 1900 and omit the year when rendering.
+ *
+ * Accepted input formats:
+ *   DD/MM        → partial birthday (day + month only) — stored as 1900-MM-DD
+ *   DD/MM/YYYY   → full birthday
+ *   DD/MM/YY     → full birthday (year treated as 20YY)
+ *   YYYY-MM-DD   → already ISO, passed through unchanged
+ *
+ * Separators: / . - all accepted.
+ *
+ * Sentinel year 1900:
+ *   Stored when only day+month are provided. Display code must check
+ *   year === 1900 and omit the year when rendering to the user.
  */
 function normaliseDate(raw: string): string | null {
   if (!raw) return null
   const s = raw.trim()
-  // Already ISO: YYYY-MM-DD
+
+  // Already ISO YYYY-MM-DD
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
-  // Full date: DD/MM/YYYY or MM/DD/YYYY → prefer DD/MM/YYYY (common outside US)
+
+  // Full date: DD/MM/YYYY, DD/MM/YY (separators: / . -)
   const fullMatch = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2,4})$/)
   if (fullMatch) {
     const [, d, m, y] = fullMatch
     const year = y.length === 2 ? `20${y}` : y
     return `${year}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
   }
-  // Partial date: DD/MM or DD-MM (no year) → sentinel year 1900
+
+  // Partial date: DD/MM or DD-MM or DD.MM (no year) → sentinel year 1900
   const partialMatch = s.match(/^(\d{1,2})[-/.](\d{1,2})$/)
   if (partialMatch) {
     const [, d, m] = partialMatch
     return `1900-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
   }
+
   return null
+}
+
+/**
+ * Convert a stored ISO birthday back to a human-readable string for the
+ * text input field. Reverses normaliseDate() so the user sees what they typed.
+ *   1900-MM-DD  → DD/MM        (partial — omit year)
+ *   YYYY-MM-DD  → DD/MM/YYYY   (full date)
+ */
+function birthdayToInput(iso: string | null): string {
+  if (!iso) return ''
+  const [y, m, d] = iso.split('-')
+  if (!y || !m || !d) return ''
+  if (parseInt(y, 10) === 1900) return `${d}/${m}`           // partial: DD/MM
+  return `${d}/${m}/${y}`                                     // full:    DD/MM/YYYY
+}
+
+/**
+ * Returns a human-readable interpretation of what the user typed, shown live
+ * below the birthday input so they can confirm how it will be stored.
+ *
+ * Returns:
+ *   null               — input is empty (show nothing)
+ *   { ok: true, text } — recognised, show the parsed date
+ *   { ok: false, text }— unrecognised format, show an error hint
+ */
+function parseBirthdayPreview(raw: string): { ok: boolean; text: string } | null {
+  const s = raw.trim()
+  if (!s) return null
+
+  const iso = normaliseDate(s)
+  if (!iso) {
+    return { ok: false, text: 'Format not recognised — use DD/MM or DD/MM/YYYY' }
+  }
+
+  const d = new Date(iso + 'T00:00:00')
+  if (parseInt(iso.slice(0, 4), 10) === 1900) {
+    const label = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })
+    return { ok: true, text: `${label} — year not provided` }
+  }
+  const label = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+  return { ok: true, text: label }
 }
 
 /** Detect which column index corresponds to each logical field from a header row. */
@@ -307,6 +360,12 @@ function MemberRow({ member, canManage, onEdit, onDelete, onView }: {
           {member.phone && (
             <span className="text-2xs text-slate-500">{member.phone}</span>
           )}
+          {member.phone && member.sms_consent === true && (
+            <span className="text-2xs text-amber-500/70" title="SMS consent given">· SMS ✓</span>
+          )}
+          {member.phone && member.sms_consent === false && (
+            <span className="text-2xs text-slate-600" title="Opted out of SMS">· SMS off</span>
+          )}
         </div>
       </div>
 
@@ -339,7 +398,7 @@ function MemberRow({ member, canManage, onEdit, onDelete, onView }: {
 // ─── Add/Edit Member Modal ────────────────────────────────────────────────────
 
 const EMPTY: Omit<Member, 'id' | 'unit_id' | 'created_at'> = {
-  name: '', phone: '', section: '', status: 'active', birthday: '',
+  name: '', phone: '', section: '', status: 'active', birthday: '', sms_consent: null,
 }
 
 function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onClose }: {
@@ -393,11 +452,61 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
               </select>
             </label>
             <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Birthday</span>
-              <input type="date" value={form.birthday ?? ''} onChange={e => setForm(f => ({ ...f, birthday: e.target.value }))}
-                className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm [color-scheme:dark]" />
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Birthday
+                <span className="normal-case font-normal text-slate-600 ml-1">— optional</span>
+              </span>
+              <input
+                type="text"
+                value={form.birthday ?? ''}
+                onChange={e => setForm(f => ({ ...f, birthday: e.target.value }))}
+                placeholder="DD/MM or DD/MM/YYYY"
+                className={`w-full bg-background-dark border rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 transition-all text-sm ${
+                  parseBirthdayPreview(form.birthday ?? '')?.ok === false
+                    ? 'border-red-500/50 focus:ring-red-500/20 focus:border-red-500/60'
+                    : 'border-border-dark focus:ring-primary/10 focus:border-primary/60'
+                }`}
+              />
+              {/* Live parsed preview */}
+              {(() => {
+                const preview = parseBirthdayPreview(form.birthday ?? '')
+                if (!preview) return (
+                  <span className="text-2xs text-slate-600">
+                    Day/month only (18/11) or full date (18/11/1990) — year is optional
+                  </span>
+                )
+                return (
+                  <span className={`text-2xs flex items-center gap-1 ${preview.ok ? 'text-emerald-500' : 'text-red-400'}`}>
+                    <span className="material-symbols-outlined text-sm leading-none">
+                      {preview.ok ? 'check_circle' : 'error_outline'}
+                    </span>
+                    {preview.text}
+                  </span>
+                )
+              })()}
             </label>
           </div>
+
+          {/* SMS consent — admin override for paper-consent workflows */}
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">SMS Consent</span>
+            <select
+              value={form.sms_consent === null ? 'null' : form.sms_consent ? 'true' : 'false'}
+              onChange={e => setForm(f => ({
+                ...f,
+                sms_consent: e.target.value === 'null' ? null : e.target.value === 'true',
+              }))}
+              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm appearance-none cursor-pointer"
+            >
+              <option value="null">Not asked yet (default)</option>
+              <option value="true">Consented — send SMS</option>
+              <option value="false">Opted out — do not send</option>
+            </select>
+            <p className="text-2xs text-slate-600 leading-relaxed">
+              Members set this themselves via the check-in prompt. Use this to record
+              paper consent or manually override their preference.
+            </p>
+          </label>
 
           {error && (
             <div className="flex items-start gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2.5 rounded-xl">
@@ -571,7 +680,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
                             {r.status}
                           </span>
                         </td>
-                        <td className="px-3 py-2.5 text-slate-500">{r.birthday ?? '—'}</td>
+                        <td className="px-3 py-2.5 text-slate-500">{r.birthday ? birthdayToInput(r.birthday) : '—'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -717,19 +826,29 @@ export default function UnitMembers() {
   function openCreate() { setEditing(null); setForm(EMPTY); setFormError(null); setPanel('add') }
   function openEdit(m: Member) {
     setEditing(m)
-    setForm({ name: m.name, phone: m.phone ?? '', section: m.section ?? '', status: m.status, birthday: m.birthday ?? '' })
+    setForm({ name: m.name, phone: m.phone ?? '', section: m.section ?? '', status: m.status, birthday: birthdayToInput(m.birthday), sms_consent: m.sms_consent })
     setFormError(null); setPanel('add')
   }
   function closeForm() { setPanel('none'); setEditing(null); setFormError(null) }
 
   async function handleSave(e: FormEvent) {
     e.preventDefault(); setFormError(null); setSaving(true)
+
+    // Validate birthday format before hitting the DB
+    const rawBirthday = form.birthday?.trim() ?? ''
+    if (rawBirthday && !normaliseDate(rawBirthday)) {
+      setFormError('Birthday format not recognised. Use DD/MM for day and month only (e.g. 18/11), or DD/MM/YYYY for a full date (e.g. 18/11/1990).')
+      setSaving(false)
+      return
+    }
+
     const payload = {
       name: form.name.trim(),
       phone: form.phone?.trim() || null,
       section: form.section?.trim() || null,
       status: form.status,
-      birthday: form.birthday || null,
+      birthday: normaliseDate(rawBirthday) ?? null,
+      sms_consent: form.sms_consent,
     }
     try {
       if (editing) {

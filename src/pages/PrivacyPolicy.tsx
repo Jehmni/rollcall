@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-const EFFECTIVE_DATE = 'March 26, 2026'
+const EFFECTIVE_DATE = 'April 2, 2026'
 const COMPANY = 'Rollcally Inc.'
 const EMAIL = 'privacy@rollcally.com'
 
@@ -45,16 +45,18 @@ const TOC = [
   { id: 'data-collected', label: '3. Data We Collect' },
   { id: 'how-we-use', label: '4. How We Use Your Data' },
   { id: 'legal-basis', label: '5. Legal Basis (GDPR)' },
-  { id: 'retention', label: '6. Data Retention' },
-  { id: 'sharing', label: '7. Data Sharing' },
-  { id: 'international', label: '8. International Transfers' },
-  { id: 'cookies', label: '9. Cookies & Local Storage' },
-  { id: 'security', label: '10. Security' },
-  { id: 'your-rights', label: '11. Your Rights' },
-  { id: 'california', label: '12. California Residents (CCPA)' },
-  { id: 'children', label: '13. Children\'s Privacy' },
-  { id: 'changes', label: '14. Changes to This Policy' },
-  { id: 'contact', label: '15. Contact Us' },
+  { id: 'billing', label: '6. Billing & Payment Data' },
+  { id: 'sms-messaging', label: '7. SMS Absence Messaging' },
+  { id: 'retention', label: '8. Data Retention' },
+  { id: 'sharing', label: '9. Data Sharing' },
+  { id: 'international', label: '10. International Transfers' },
+  { id: 'cookies', label: '11. Cookies & Local Storage' },
+  { id: 'security', label: '12. Security' },
+  { id: 'your-rights', label: '13. Your Rights' },
+  { id: 'california', label: '14. California Residents (CCPA)' },
+  { id: 'children', label: '15. Children\'s Privacy' },
+  { id: 'changes', label: '16. Changes to This Policy' },
+  { id: 'contact', label: '17. Contact Us' },
 ]
 
 export default function PrivacyPolicy() {
@@ -147,13 +149,17 @@ export default function PrivacyPolicy() {
                 <TableRow label="Member data" value="Name, phone number, section/group, birthday (optional) — uploaded by administrators." />
                 <TableRow label="Attendance data" value="Event attendance records, check-in timestamps." />
                 <TableRow label="Push subscriptions" value="Browser push subscription endpoints for members who opt in to notifications." />
+                <TableRow label="SMS consent" value="A per-member, per-unit flag recording whether the member has consented to, or opted out of, SMS absence notifications. Null until the member is asked." />
+                <TableRow label="Billing data" value="Organisation name, subscription plan, and subscription status. Payment card details are never stored by Rollcally — they are handled exclusively by Stripe." />
+                <TableRow label="Usage events" value="A log of feature usage (e.g. follow-ups sent, follow-ups blocked) used for billing accounting and service improvement." />
                 <TableRow label="Usage data" value="Log data including IP address, browser type, pages visited, and timestamps, collected automatically when you access the Service." />
                 <TableRow label="Session data" value="Session tokens stored in browser storage to keep you signed in." />
               </div>
 
               <P>
-                We do not collect payment card information. We do not collect biometric data. We do not
-                build advertising profiles or sell your data.
+                We do not store payment card numbers, CVV codes, or bank account details. All payment
+                information is handled by Stripe and subject to their privacy policy. We do not collect
+                biometric data. We do not build advertising profiles or sell your data.
               </P>
             </Section>
 
@@ -163,9 +169,11 @@ export default function PrivacyPolicy() {
                 'Create and manage your administrator account and authenticate you.',
                 'Provide the attendance tracking, roster management, and notification features of the Service.',
                 'Send push notifications to members who have consented (triggered by administrators).',
+                'Send SMS absence notifications to members who have explicitly consented, when a unit administrator has enabled this feature.',
                 'Maintain security, detect fraud, and prevent abuse.',
                 'Diagnose technical issues and improve the reliability and performance of the Service.',
                 'Comply with legal obligations and enforce our Terms of Service.',
+                'Process subscription and billing transactions via Stripe, manage your plan, and enforce plan-level follow-up limits.',
                 'Send transactional emails related to your account (e.g. password reset, email confirmation).',
               ]} />
               <P>We do not use your data for targeted advertising or sell it to third parties.</P>
@@ -177,10 +185,10 @@ export default function PrivacyPolicy() {
                 our legal bases for processing personal data are:
               </P>
               <Ul items={[
-                'Contract — processing necessary to provide the Service you have signed up for (administrator account data).',
+                'Contract — processing necessary to provide the Service you have signed up for (administrator account data, subscription and billing data).',
                 'Legitimate interests — improving and securing the Service, fraud prevention, and service analytics, where these interests are not overridden by your rights.',
-                'Consent — for push notification subscriptions, which members may withdraw at any time.',
-                'Legal obligation — where we are required to process data to comply with applicable law.',
+                'Consent — for push notification and SMS absence notification subscriptions, which members may withdraw at any time.',
+                'Legal obligation — where we are required to process data to comply with applicable law (e.g. financial record-keeping).',
               ]} />
               <P>
                 For member data uploaded by administrators, the legal basis for Rollcally's processing is
@@ -189,7 +197,87 @@ export default function PrivacyPolicy() {
               </P>
             </Section>
 
-            <Section id="retention" title="6. Data Retention">
+            <Section id="billing" title="6. Billing & Payment Data">
+              <P>
+                Rollcally uses <strong className="text-white">Stripe</strong> as its payment processor. When you
+                subscribe to a paid plan, you will be redirected to a Stripe-hosted checkout page. Stripe
+                collects and processes your payment card information directly — Rollcally never sees, stores,
+                or processes card numbers, CVV codes, or bank details.
+              </P>
+              <P>
+                What Rollcally receives from Stripe and stores:
+              </P>
+              <Ul items={[
+                'A Stripe Customer ID — an anonymous reference that allows us to link your organisation to your Stripe account.',
+                'A Stripe Subscription ID and current subscription status (e.g. active, past_due, canceled).',
+                'Your current plan name, billing cycle dates, and cancellation scheduling.',
+                'Invoice events (paid / failed) used to reset your monthly follow-up allowance.',
+              ]} />
+              <P>
+                We store a log of follow-up usage events (sent, failed, blocked) in our database. This log is
+                used to display your usage on the billing page and to audit that credits are correctly
+                accounted for. It contains no payment card information.
+              </P>
+              <P>
+                Stripe may transfer payment data to the United States or other countries. Stripe operates
+                under a data processing agreement that meets GDPR and UK GDPR requirements, including the
+                use of Standard Contractual Clauses. For more information, see{' '}
+                <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">stripe.com/privacy</a>.
+              </P>
+              <P>
+                The legal basis for processing subscription and billing data is <strong className="text-slate-200">contract</strong> —
+                it is necessary to fulfil the subscription agreement between you and Rollcally.
+              </P>
+            </Section>
+
+            <Section id="sms-messaging" title="7. SMS Absence Messaging">
+              <P>
+                Rollcally provides an optional SMS absence notification feature that allows unit
+                administrators to send text messages to members who did not attend a session.
+                This section explains how that feature works and what rights you have.
+              </P>
+
+              <P><strong className="text-white">How consent works</strong></P>
+              <Ul items={[
+                'SMS messages are only ever sent to members who have explicitly consented. Consent is requested on the check-in page immediately after a successful check-in.',
+                'Members who have not been asked, or who have not yet responded to the prompt, will never receive an absence SMS regardless of any administrator setting.',
+                'Consent is stored per member, per unit. Consenting to SMS for one unit does not affect other units.',
+                'Members may withdraw consent at any time — either via the check-in page on their next attendance, or by asking their unit administrator to update their record.',
+              ]} />
+
+              <P><strong className="text-white">What the message contains</strong></P>
+              <Ul items={[
+                'Each message is sent from the unit\'s configured sender name (e.g. "GraceChoir") or a provider phone number, so members can identify who is contacting them.',
+                'The message text is configured by the unit administrator and will typically include the member\'s first name and the name of the session they missed.',
+                'No sensitive personal data (attendance history, health information, etc.) is included in the SMS text.',
+              ]} />
+
+              <P><strong className="text-white">Frequency and cooldown</strong></P>
+              <Ul items={[
+                'Administrators configure a minimum cooldown period (default: 7 days) between messages to the same member. This prevents repeated messages when someone misses several consecutive events.',
+                'Administrators may set the cooldown to 0 (no limit) but are encouraged to use reasonable intervals to avoid message fatigue.',
+              ]} />
+
+              <P><strong className="text-white">Third-party SMS providers</strong></P>
+              <P>
+                SMS delivery is handled by third-party providers (Twilio or Africa's Talking,
+                depending on configuration). These providers process the recipient's phone number
+                and the message text in order to deliver the SMS. They operate under their own
+                data processing agreements and privacy policies. Standard carrier message rates
+                may apply to recipients.
+              </P>
+
+              <P><strong className="text-white">Legal basis</strong></P>
+              <P>
+                The legal basis for sending absence SMS messages is <strong className="text-slate-200">consent</strong> (UK GDPR
+                Article 6(1)(a)). We rely on the member's explicit opt-in, captured at check-in,
+                before any message is sent. Administrators act as data controllers for their
+                members' data; Rollcally processes it on their behalf as a data processor.
+              </P>
+            </Section>
+
+            <Section id="retention" title="8. Data Retention">
+
               <P>
                 We retain personal data for as long as necessary to provide the Service and comply with our
                 legal obligations:
@@ -198,20 +286,24 @@ export default function PrivacyPolicy() {
                 'Administrator account data is retained for the duration of the account and deleted within 90 days of account termination upon request.',
                 'Member and attendance data is retained while the associated administrator account is active. Administrators may delete individual records at any time.',
                 'Push notification subscriptions are automatically removed when the browser signals that the subscription is no longer valid (HTTP 410/404), or upon member opt-out.',
+                'Billing and subscription records are retained for the duration of the subscription and for up to 7 years after termination to comply with financial record-keeping obligations.',
+                'Follow-up usage event logs are retained for up to 24 months.',
                 'Usage logs are retained for up to 90 days for security and debugging purposes.',
               ]} />
             </Section>
 
-            <Section id="sharing" title="7. Data Sharing">
+            <Section id="sharing" title="9. Data Sharing">
               <P>We do not sell your personal data. We share data only in the following circumstances:</P>
               <Ul items={[
                 'Infrastructure providers: Supabase (database, authentication, and edge functions). Supabase processes data on our behalf under a data processing agreement.',
+                'Payment processing: Stripe (subscription billing). Stripe receives your organisation name, email address, and billing event data. Stripe processes payment card details directly and we never have access to them. Stripe\'s privacy policy is available at stripe.com/privacy.',
+                'SMS delivery: Twilio (or Africa\'s Talking, depending on configuration) receives member phone numbers and message text for the purpose of delivering absence notifications. This data is shared only when a member has explicitly consented and an administrator has triggered a send.',
                 'Legal requirements: We may disclose data if required by applicable law, court order, or governmental authority, or to protect the rights, property, or safety of Rollcally, its users, or the public.',
                 'Business transfers: In the event of a merger, acquisition, or sale of assets, your data may be transferred. We will notify affected users prior to data being transferred to a new controller.',
               ]} />
             </Section>
 
-            <Section id="international" title="8. International Data Transfers">
+            <Section id="international" title="10. International Data Transfers">
               <P>
                 Rollcally uses Supabase, which may store and process data in the United States or other
                 countries. Where data is transferred outside the EEA or UK, we ensure appropriate safeguards
@@ -220,7 +312,7 @@ export default function PrivacyPolicy() {
               </P>
             </Section>
 
-            <Section id="cookies" title="9. Cookies & Local Storage">
+            <Section id="cookies" title="11. Cookies & Local Storage">
               <P>
                 We use minimal browser storage to operate the Service:
               </P>
@@ -235,7 +327,7 @@ export default function PrivacyPolicy() {
               </P>
             </Section>
 
-            <Section id="security" title="10. Security">
+            <Section id="security" title="12. Security">
               <P>
                 We implement technical and organisational security measures designed to protect your personal
                 data, including:
@@ -254,7 +346,7 @@ export default function PrivacyPolicy() {
               </P>
             </Section>
 
-            <Section id="your-rights" title="11. Your Rights">
+            <Section id="your-rights" title="13. Your Rights">
               <P>
                 Depending on your location, you may have the following rights regarding your personal data:
               </P>
@@ -282,7 +374,7 @@ export default function PrivacyPolicy() {
               </P>
             </Section>
 
-            <Section id="california" title="12. California Residents (CCPA / CPRA)">
+            <Section id="california" title="14. California Residents (CCPA / CPRA)">
               <P>
                 If you are a California resident, the California Consumer Privacy Act (CCPA), as amended
                 by the California Privacy Rights Act (CPRA), grants you the following additional rights:
@@ -301,7 +393,7 @@ export default function PrivacyPolicy() {
               </P>
             </Section>
 
-            <Section id="children" title="13. Children's Privacy">
+            <Section id="children" title="15. Children's Privacy">
               <P>
                 The Service is not directed to children under 16 years of age. We do not knowingly collect
                 personal information from children under 16 without verifiable parental consent. If you
@@ -315,7 +407,7 @@ export default function PrivacyPolicy() {
               </P>
             </Section>
 
-            <Section id="changes" title="14. Changes to This Policy">
+            <Section id="changes" title="16. Changes to This Policy">
               <P>
                 We may update this Privacy Policy from time to time to reflect changes in our practices,
                 technology, or applicable law. We will notify you of material changes by updating the
@@ -328,7 +420,7 @@ export default function PrivacyPolicy() {
               </P>
             </Section>
 
-            <Section id="contact" title="15. Contact Us">
+            <Section id="contact" title="17. Contact Us">
               <P>
                 For any questions, concerns, or requests relating to this Privacy Policy or our data
                 practices, please contact our privacy team:

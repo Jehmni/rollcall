@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { QRCodeCanvas } from 'qrcode.react'
 import { supabase } from '../lib/supabase'
 import { useAdminDashboard } from '../hooks/useAdminDashboard'
+import { useToast } from '../contexts/ToastContext'
 import type { AbsenceMessageLogEntry, DashboardMember, Service, UnitMessagingSettings } from '../types'
 
 // ─── Location Toggle ─────────────────────────────────────────────────────────
@@ -162,6 +163,19 @@ function triggerDownload(content: string, filename: string, mimeType: string) {
   URL.revokeObjectURL(url)
 }
 
+/** Timestamp suffix for unique filenames: YYYY-MM-DD_HH-MM */
+function fileTimestamp(): string {
+  return new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-').replace(':', '-')
+}
+
+/** Escape RTF special characters so member names never corrupt the document. */
+function escapeRTF(text: string): string {
+  return text
+    .replace(/\\/g, '\\\\')
+    .replace(/\{/g, '\\{')
+    .replace(/\}/g, '\\}')
+}
+
 function exportTXT(members: DashboardMember[], label: string) {
   const rule = '─'.repeat(66)
   const lines = [
@@ -180,11 +194,11 @@ function exportTXT(members: DashboardMember[], label: string) {
     '',
     rule,
   ]
-  triggerDownload(lines.join('\n'), `absent-${label}.txt`, 'text/plain;charset=utf-8')
+  triggerDownload(lines.join('\n'), `absent-${label}_${fileTimestamp()}.txt`, 'text/plain;charset=utf-8')
 }
 
 function exportCSV(members: DashboardMember[], label: string) {
-  const BOM = '\uFEFF'
+  // No BOM — UTF-8 without BOM is standard and works correctly in Google Sheets and modern Excel
   const rows: string[][] = [
     [`Absence Report — ${label}`],
     [`Generated: ${new Date().toLocaleString('en-GB')}`],
@@ -193,8 +207,8 @@ function exportCSV(members: DashboardMember[], label: string) {
     ['#', 'Name', 'Section', 'Phone'],
     ...members.map((m, i) => [String(i + 1), m.name, m.section ?? '', m.phone ?? '']),
   ]
-  const csv = BOM + rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\r\n')
-  triggerDownload(csv, `absent-${label}.csv`, 'text/csv;charset=utf-8')
+  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\r\n')
+  triggerDownload(csv, `absent-${label}_${fileTimestamp()}.csv`, 'text/csv;charset=utf-8')
 }
 
 function exportRTF(members: DashboardMember[], label: string) {
@@ -205,7 +219,7 @@ function exportRTF(members: DashboardMember[], label: string) {
     const content = cells.map(c => {
       const bold = isHeader ? '\\b ' : ''
       const bg   = isHeader ? '\\clshdng10000\\clcfpat2 ' : ''
-      return `${bg}\\pard\\intbl\\ql ${bold}\\f0\\fs20 ${c}\\cell`
+      return `${bg}\\pard\\intbl\\ql ${bold}\\f0\\fs20 ${escapeRTF(c)}\\cell`
     })
     return `{\\trowd\\trgaph108${defs}${content.join('')}\\row}`
   }
@@ -218,13 +232,13 @@ function exportRTF(members: DashboardMember[], label: string) {
 {\\colortbl ;\\red255\\green255\\blue255;\\red29\\green78\\blue216;}
 \\margl1440\\margr1440\\margt1440\\margb1440
 {\\pard\\f0\\fs32\\b\\cf2 Absence Report\\par}
-{\\pard\\f0\\fs24\\b ${label}\\par}
-{\\pard\\f0\\fs20 Generated: ${generated}\\par}
+{\\pard\\f0\\fs24\\b ${escapeRTF(label)}\\par}
+{\\pard\\f0\\fs20 Generated: ${escapeRTF(generated)}\\par}
 {\\pard\\f0\\fs20 Total absent: ${members.length}\\par}
 \\par
 ${tableRows}
 }`
-  triggerDownload(rtf, `absent-${label}.rtf`, 'application/rtf')
+  triggerDownload(rtf, `absent-${label}_${fileTimestamp()}.rtf`, 'application/rtf')
 }
 
 type Tab = 'all' | 'present' | 'absent'
@@ -255,16 +269,62 @@ const SEND_HOUR_OPTIONS = [
   { value: 21, label: '9:00 pm' },
 ]
 
-function MessagingPanel({ service, absentCount }: { service: Service; absentCount: number }) {
-  const [open, setOpen]                       = useState(false)
-  const [settings, setSettings]               = useState<UnitMessagingSettings | null>(null)
-  const [log, setLog]                         = useState<AbsenceMessageLogEntry[]>([])
-  const [template, setTemplate]               = useState(DEFAULT_TEMPLATE)
-  const [sendHour, setSendHour]               = useState(18)
-  const [saving, setSaving]                   = useState(false)
-  const [sending, setSending]                 = useState(false)
-  const [showPreview, setShowPreview]         = useState(false)
+// Curated global timezone list — covers ~95% of users worldwide
+const TIMEZONE_OPTIONS = [
+  { group: 'Africa',    value: 'Africa/Lagos',                    label: 'Lagos / Abuja (WAT, UTC+1)' },
+  { group: 'Africa',    value: 'Africa/Johannesburg',             label: 'Johannesburg / Cape Town (SAST, UTC+2)' },
+  { group: 'Africa',    value: 'Africa/Nairobi',                  label: 'Nairobi / Kampala (EAT, UTC+3)' },
+  { group: 'Africa',    value: 'Africa/Accra',                    label: 'Accra / Dakar (GMT, UTC+0)' },
+  { group: 'Africa',    value: 'Africa/Cairo',                    label: 'Cairo (EET, UTC+2)' },
+  { group: 'Americas',  value: 'America/New_York',                label: 'New York / Eastern (ET)' },
+  { group: 'Americas',  value: 'America/Chicago',                 label: 'Chicago / Central (CT)' },
+  { group: 'Americas',  value: 'America/Denver',                  label: 'Denver / Mountain (MT)' },
+  { group: 'Americas',  value: 'America/Los_Angeles',             label: 'Los Angeles / Pacific (PT)' },
+  { group: 'Americas',  value: 'America/Toronto',                 label: 'Toronto / Eastern Canada' },
+  { group: 'Americas',  value: 'America/Vancouver',               label: 'Vancouver / Pacific Canada' },
+  { group: 'Americas',  value: 'America/Sao_Paulo',               label: 'São Paulo / Brasília (BRT, UTC-3)' },
+  { group: 'Americas',  value: 'America/Argentina/Buenos_Aires',  label: 'Buenos Aires (ART, UTC-3)' },
+  { group: 'Americas',  value: 'America/Bogota',                  label: 'Bogotá / Lima (COT, UTC-5)' },
+  { group: 'Americas',  value: 'America/Mexico_City',             label: 'Mexico City (CST, UTC-6)' },
+  { group: 'Europe',    value: 'Europe/London',                   label: 'London (GMT/BST)' },
+  { group: 'Europe',    value: 'Europe/Paris',                    label: 'Paris / Berlin / Rome (CET/CEST)' },
+  { group: 'Europe',    value: 'Europe/Moscow',                   label: 'Moscow (MSK, UTC+3)' },
+  { group: 'Europe',    value: 'Europe/Istanbul',                 label: 'Istanbul (TRT, UTC+3)' },
+  { group: 'Asia',      value: 'Asia/Dubai',                      label: 'Dubai / Abu Dhabi (GST, UTC+4)' },
+  { group: 'Asia',      value: 'Asia/Karachi',                    label: 'Karachi (PKT, UTC+5)' },
+  { group: 'Asia',      value: 'Asia/Kolkata',                    label: 'Mumbai / Delhi (IST, UTC+5:30)' },
+  { group: 'Asia',      value: 'Asia/Dhaka',                      label: 'Dhaka (BST, UTC+6)' },
+  { group: 'Asia',      value: 'Asia/Bangkok',                    label: 'Bangkok / Jakarta (ICT, UTC+7)' },
+  { group: 'Asia',      value: 'Asia/Singapore',                  label: 'Singapore / KL (SGT, UTC+8)' },
+  { group: 'Asia',      value: 'Asia/Shanghai',                   label: 'Beijing / Shanghai (CST, UTC+8)' },
+  { group: 'Asia',      value: 'Asia/Tokyo',                      label: 'Tokyo (JST, UTC+9)' },
+  { group: 'Asia',      value: 'Asia/Seoul',                      label: 'Seoul (KST, UTC+9)' },
+  { group: 'Oceania',   value: 'Australia/Sydney',                label: 'Sydney / Melbourne (AEST/AEDT)' },
+  { group: 'Oceania',   value: 'Pacific/Auckland',                label: 'Auckland (NZST/NZDT)' },
+  { group: 'UTC',       value: 'UTC',                             label: 'UTC (Coordinated Universal Time)' },
+]
 
+const LOG_PAGE_SIZE = 50
+
+function MessagingPanel({ service, absentMembers }: { service: Service; absentMembers: DashboardMember[] }) {
+  const { toast } = useToast()
+
+  const [open, setOpen]               = useState(false)
+  const [settings, setSettings]       = useState<UnitMessagingSettings | null>(null)
+  const [log, setLog]                 = useState<AbsenceMessageLogEntry[]>([])
+  const [logHasMore, setLogHasMore]   = useState(false)
+  const [logLoading, setLogLoading]   = useState(false)
+  const [template, setTemplate]       = useState(DEFAULT_TEMPLATE)
+  const [sendHour, setSendHour]       = useState(18)
+  const [timezone, setTimezone]       = useState('UTC')
+  const [senderName, setSenderName]   = useState('')
+  const [cooldownDays, setCooldownDays] = useState(7)
+  const [saving, setSaving]           = useState(false)
+  const [sending, setSending]         = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
+  const sendingRef                    = useRef(false) // CRITICAL-6: ref guard against double-fire
+
+  // CRITICAL-1 + MEDIUM-17: load settings and populate all local state from DB
   const loadSettings = useCallback(async () => {
     const { data } = await supabase
       .from('unit_messaging_settings')
@@ -272,83 +332,142 @@ function MessagingPanel({ service, absentCount }: { service: Service; absentCoun
       .eq('unit_id', service.unit_id)
       .maybeSingle()
     if (data) {
-      setSettings(data as UnitMessagingSettings)
-      setTemplate(data.message_template)
-      setSendHour(data.send_hour)
+      const s = data as UnitMessagingSettings
+      setSettings(s)
+      setTemplate(s.message_template)
+      // LOW-21: clamp send_hour to valid range in case DB has a stale value
+      setSendHour(Math.min(21, Math.max(12, s.send_hour)))
+      setTimezone(s.timezone || 'UTC')
+      setSenderName(s.sender_name ?? '')
+      setCooldownDays(Math.min(90, Math.max(0, s.cooldown_days ?? 7)))
     }
   }, [service.unit_id])
 
-  const loadLog = useCallback(async () => {
-    const { data } = await supabase
-      .from('absence_message_log')
-      .select('*')
-      .eq('service_id', service.id)
-      .order('sent_at', { ascending: false })
-    setLog((data ?? []) as AbsenceMessageLogEntry[])
-  }, [service.id])
+  // HIGH-8: paginated delivery log, LOW-20: secondary sort by id
+  const loadLog = useCallback(async (reset = true) => {
+    setLogLoading(true)
+    try {
+      const offset = reset ? 0 : log.length
+      const { data, error } = await supabase
+        .from('absence_message_log')
+        .select('*')
+        .eq('service_id', service.id)
+        .order('sent_at', { ascending: false })
+        .order('id',      { ascending: false })
+        .range(offset, offset + LOG_PAGE_SIZE - 1)
+      if (error) throw error
+      const rows = (data ?? []) as AbsenceMessageLogEntry[]
+      setLog(prev => reset ? rows : [...prev, ...rows])
+      setLogHasMore(rows.length === LOG_PAGE_SIZE)
+    } finally {
+      setLogLoading(false)
+    }
+  }, [service.id, log.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { loadSettings(); loadLog() }, [loadSettings, loadLog])
+  useEffect(() => { loadSettings(); loadLog(true) }, [loadSettings]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Validate sender name: 1-11 chars, must start with a letter, alphanumeric + spaces
+  function senderNameError(value: string): string | null {
+    const v = value.trim()
+    if (!v) return null  // empty is fine — falls back to phone number
+    if (v.length > 11) return 'Max 11 characters'
+    if (!/^[A-Za-z]/.test(v)) return 'Must start with a letter'
+    if (!/^[A-Za-z0-9 ]+$/.test(v)) return 'Letters, numbers and spaces only'
+    return null
+  }
+
+  function buildUpsertPayload(enabled: boolean) {
+    return {
+      unit_id:          service.unit_id,
+      enabled,
+      message_template: template,
+      send_hour:        sendHour,
+      timezone,
+      sender_name:      senderName.trim() || null,
+      cooldown_days:    cooldownDays,
+      updated_at:       new Date().toISOString(),
+    }
+  }
 
   async function toggleEnabled() {
     const newEnabled = !(settings?.enabled ?? false)
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('unit_messaging_settings')
-      .upsert({
-        unit_id:          service.unit_id,
-        enabled:          newEnabled,
-        message_template: template,
-        send_hour:        sendHour,
-        timezone:         settings?.timezone ?? 'Africa/Lagos',
-        updated_at:       new Date().toISOString(),
-      })
+      .upsert(buildUpsertPayload(newEnabled))
       .select()
       .single()
-    if (data) { setSettings(data as UnitMessagingSettings) }
-  }
-
-  async function saveSettings() {
-    setSaving(true)
-    const { data } = await supabase
-      .from('unit_messaging_settings')
-      .upsert({
-        unit_id:          service.unit_id,
-        enabled:          settings?.enabled ?? false,
-        message_template: template,
-        send_hour:        sendHour,
-        timezone:         settings?.timezone ?? 'Africa/Lagos',
-        updated_at:       new Date().toISOString(),
-      })
-      .select()
-      .single()
-    setSaving(false)
+    if (error) {
+      toast(`Failed to update: ${error.message}`, 'error')
+      return
+    }
     if (data) setSettings(data as UnitMessagingSettings)
   }
 
+  async function saveSettings() {
+    const nameErr = senderNameError(senderName)
+    if (nameErr) { toast(`Sender name: ${nameErr}`, 'error'); return }
+    setSaving(true)
+    try {
+      const { data, error } = await supabase
+        .from('unit_messaging_settings')
+        .upsert(buildUpsertPayload(settings?.enabled ?? false))
+        .select()
+        .single()
+      if (error) throw error
+      if (data) setSettings(data as UnitMessagingSettings)
+      toast('Settings saved', 'success')
+    } catch (err: unknown) {
+      toast(`Failed to save: ${(err as { message?: string })?.message ?? String(err)}`, 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   async function sendNow() {
+    // CRITICAL-6: ref guard — prevents double-fire before React re-render disables the button
+    if (sendingRef.current) return
+    sendingRef.current = true
     setSending(true)
     try {
       const { data, error } = await supabase.functions.invoke('send-absence-sms', {
         body: { service_id: service.id },
       })
       if (error) throw error
-      await loadLog()
+      await loadLog(true)
       const r = data as { sent?: number; failed?: number; skipped?: number; reason?: string }
       if (r.reason) {
-        alert(`Nothing sent: ${r.reason}`)
+        toast(`Nothing sent: ${r.reason}`, 'info')
       } else {
-        alert(`Done — ${r.sent ?? 0} sent · ${r.failed ?? 0} failed · ${r.skipped ?? 0} already sent`)
+        toast(`Done — ${r.sent ?? 0} sent · ${r.failed ?? 0} failed · ${r.skipped ?? 0} already sent`, 'success')
       }
     } catch (err: unknown) {
-      alert(`Send failed: ${(err as { message?: string })?.message ?? String(err)}`)
+      toast(`Send failed: ${(err as { message?: string })?.message ?? String(err)}`, 'error')
     } finally {
+      sendingRef.current = false
       setSending(false)
     }
   }
 
-  const enabled  = settings?.enabled ?? false
-  const sentCount   = log.filter(l => l.status === 'sent').length
-  const failedCount = log.filter(l => l.status === 'failed').length
-  const previewMsg  = renderMsgPreview(template, 'Adaeze Obi', service.service_type || 'Rehearsal')
+  const enabled      = settings?.enabled ?? false
+  const sentCount    = log.filter(l => l.status === 'sent').length
+  const failedCount  = log.filter(l => l.status === 'failed').length
+  const skippedCount = log.filter(l => l.status === 'skipped').length
+
+  // Reachability breakdown across absent members
+  const absentNoPhone     = absentMembers.filter(m => !m.phone?.trim()).length
+  const absentNoConsent   = absentMembers.filter(m => m.phone?.trim() && m.sms_consent !== true).length
+  const absentEligible    = absentMembers.filter(m => m.phone?.trim() && m.sms_consent === true).length
+
+  // MEDIUM-16: use a real absent member name in preview, not a hardcoded placeholder
+  const previewName = absentMembers[0]?.name ?? 'A member'
+  const previewMsg  = renderMsgPreview(template, previewName, service.service_type || 'Rehearsal')
+
+  // Group timezone options by continent for the <optgroup> select
+  const tzGroups = TIMEZONE_OPTIONS.reduce<Record<string, typeof TIMEZONE_OPTIONS>>((acc, tz) => {
+    if (!acc[tz.group]) acc[tz.group] = []
+    acc[tz.group].push(tz)
+    return acc
+  }, {})
 
   return (
     <div className={`rounded-xl border transition-all ${enabled ? 'border-amber-500/30 bg-amber-500/5' : 'border-border-dark bg-surface-dark'}`}>
@@ -367,8 +486,8 @@ function MessagingPanel({ service, absentCount }: { service: Service; absentCoun
             </p>
             <p className="text-2xs text-slate-500">
               {log.length === 0
-                ? (enabled ? `Auto-sends at ${sendHour}:00` : 'SMS to absent members')
-                : `${sentCount} sent · ${failedCount} failed`}
+                ? (enabled ? `Auto-sends at ${sendHour}:00 ${timezone}` : 'SMS to absent members')
+                : `${sentCount} sent · ${failedCount} failed${skippedCount > 0 ? ` · ${skippedCount} skipped` : ''}`}
             </p>
           </div>
         </div>
@@ -392,20 +511,55 @@ function MessagingPanel({ service, absentCount }: { service: Service; absentCoun
       {open && (
         <div className="px-4 pb-4 flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
 
-          {/* Delivery log */}
+          {/* Delivery log — HIGH-8: paginated, LOW-20: sorted by sent_at + id */}
           {log.length > 0 && (
             <div className="rounded-lg bg-background-dark p-3 space-y-1">
-              <p className="text-2xs font-black uppercase tracking-spaced text-slate-600 mb-2">Delivery log</p>
-              {log.slice(0, 6).map(entry => (
+              <p className="text-2xs font-black uppercase tracking-spaced text-slate-600 mb-2">
+                Delivery log
+                {logLoading && <span className="ml-2 text-slate-700">loading…</span>}
+              </p>
+              {log.map(entry => (
                 <div key={entry.id} className="flex items-center justify-between gap-2 text-2xs">
                   <span className="text-slate-400 truncate">{entry.phone}</span>
-                  <span className={`font-bold uppercase flex-shrink-0 ${entry.status === 'sent' ? 'text-emerald-400' : entry.status === 'failed' ? 'text-red-400' : 'text-slate-500'}`}>
-                    {entry.status}
-                  </span>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    {entry.status === 'failed' && entry.error_text && (
+                      <span className="text-red-500/70 truncate max-w-[120px]" title={entry.error_text}>
+                        {entry.error_text.slice(0, 30)}
+                      </span>
+                    )}
+                    <span className={`font-bold uppercase ${entry.status === 'sent' ? 'text-emerald-400' : entry.status === 'failed' ? 'text-red-400' : 'text-slate-500'}`}>
+                      {entry.status}
+                    </span>
+                  </div>
                 </div>
               ))}
-              {log.length > 6 && (
-                <p className="text-2xs text-slate-600">+{log.length - 6} more</p>
+              {logHasMore && (
+                <button
+                  onClick={() => loadLog(false)}
+                  disabled={logLoading}
+                  className="mt-1 text-2xs text-amber-500/70 hover:text-amber-400 transition-colors disabled:opacity-40"
+                >
+                  Load more…
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Reachability summary */}
+          {absentMembers.length > 0 && (
+            <div className="rounded-lg bg-background-dark border border-border-dark px-3 py-2.5 flex flex-wrap gap-x-4 gap-y-1">
+              <span className="text-2xs font-bold text-emerald-400">
+                {absentEligible} will receive SMS
+              </span>
+              {absentNoConsent > 0 && (
+                <span className="text-2xs text-slate-500" title="Members who haven't consented via the check-in prompt yet">
+                  {absentNoConsent} haven't consented
+                </span>
+              )}
+              {absentNoPhone > 0 && (
+                <span className="text-2xs text-slate-500">
+                  {absentNoPhone} have no phone
+                </span>
               )}
             </div>
           )}
@@ -424,28 +578,93 @@ function MessagingPanel({ service, absentCount }: { service: Service; absentCoun
             />
           </div>
 
-          {/* Preview */}
+          {/* Preview — MEDIUM-16: uses real absent member's name */}
           {showPreview && (
             <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2.5">
-              <p className="text-2xs font-black uppercase tracking-spaced text-amber-500/60 mb-1">Preview</p>
+              <p className="text-2xs font-black uppercase tracking-spaced text-amber-500/60 mb-1">
+                Preview {absentMembers[0] ? `(${absentMembers[0].name})` : ''}
+              </p>
               <p className="text-xs text-amber-100 leading-relaxed">{previewMsg}</p>
             </div>
           )}
 
-          {/* Send time */}
-          <div>
-            <label className="block text-2xs font-black uppercase tracking-spaced text-slate-500 mb-1.5">
-              Auto-send time (local)
-            </label>
-            <select
-              value={sendHour}
-              onChange={e => setSendHour(Number(e.target.value))}
-              className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
-            >
-              {SEND_HOUR_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
+          {/* Schedule: send hour + timezone — CRITICAL-1 */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-2xs font-black uppercase tracking-spaced text-slate-500 mb-1.5">
+                Auto-send time
+              </label>
+              <select
+                value={sendHour}
+                onChange={e => setSendHour(Number(e.target.value))}
+                className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+              >
+                {SEND_HOUR_OPTIONS.map(o => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-2xs font-black uppercase tracking-spaced text-slate-500 mb-1.5">
+                Timezone
+              </label>
+              <select
+                value={timezone}
+                onChange={e => setTimezone(e.target.value)}
+                className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+              >
+                {Object.entries(tzGroups).map(([group, zones]) => (
+                  <optgroup key={group} label={group}>
+                    {zones.map(tz => (
+                      <option key={tz.value} value={tz.value}>{tz.label}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Sender name + cooldown */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-2xs font-black uppercase tracking-spaced text-slate-500 mb-1.5">
+                Sender name
+                <span className="normal-case font-normal tracking-normal ml-1 text-slate-600">— max 11 chars</span>
+              </label>
+              <input
+                type="text"
+                value={senderName}
+                onChange={e => setSenderName(e.target.value.slice(0, 11))}
+                placeholder="e.g. GraceChoir"
+                maxLength={11}
+                className={`w-full rounded-lg bg-background-dark border px-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                  senderNameError(senderName) ? 'border-red-500/50 focus:ring-red-500/30' : 'border-border-dark focus:ring-amber-500/50'
+                }`}
+              />
+              {senderNameError(senderName) && (
+                <p className="text-2xs text-red-400 mt-1">{senderNameError(senderName)}</p>
+              )}
+              {!senderNameError(senderName) && !senderName.trim() && (
+                <p className="text-2xs text-slate-600 mt-1">Uses provider phone number if blank</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-2xs font-black uppercase tracking-spaced text-slate-500 mb-1.5">
+                Cooldown
+                <span className="normal-case font-normal tracking-normal ml-1 text-slate-600">— days between SMS</span>
+              </label>
+              <input
+                type="number"
+                value={cooldownDays}
+                min={0}
+                max={90}
+                onChange={e => setCooldownDays(Math.min(90, Math.max(0, Number(e.target.value))))}
+                className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+              />
+              <p className="text-2xs text-slate-600 mt-1">
+                {cooldownDays === 0 ? 'No cooldown — messages every missed event' : `Min ${cooldownDays} day${cooldownDays !== 1 ? 's' : ''} between messages`}
+              </p>
+            </div>
           </div>
 
           {/* Action row */}
@@ -465,14 +684,19 @@ function MessagingPanel({ service, absentCount }: { service: Service; absentCoun
               <span className="material-symbols-outlined text-base">save</span>
               {saving ? 'Saving…' : 'Save'}
             </button>
+            {/* Sends only to consented members with a phone — absentEligible is the real count */}
             <button
               onClick={sendNow}
-              disabled={sending || absentCount === 0}
+              disabled={sending || absentEligible === 0}
               className="ml-auto flex items-center gap-1.5 px-3 py-2 text-2xs font-bold rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-all disabled:opacity-40"
-              title={absentCount === 0 ? 'No absent members to message' : 'Send now to all absent members with a phone number'}
+              title={
+                absentEligible === 0
+                  ? `No eligible members (${absentNoConsent} haven't consented, ${absentNoPhone} have no phone)`
+                  : `Send to ${absentEligible} consented absent member${absentEligible !== 1 ? 's' : ''} with a phone`
+              }
             >
               <span className="material-symbols-outlined text-base">send</span>
-              {sending ? 'Sending…' : `Send Now (${absentCount})`}
+              {sending ? 'Sending…' : `Send to all (${absentEligible})`}
             </button>
           </div>
 
@@ -493,6 +717,7 @@ function renderMsgPreview(template: string, name: string, event: string): string
 export default function AdminServiceDetail() {
   const { unitId, serviceId } = useParams<{ unitId: string; serviceId: string }>()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [service, setService] = useState<Service | null>(null)
   const [serviceLoading, setServiceLoading] = useState(true)
   const [showQR, setShowQR] = useState(false)
@@ -511,24 +736,44 @@ export default function AdminServiceDetail() {
       .then(({ data }) => { setService(data); setServiceLoading(false) })
   }, [serviceId])
 
-  /** If the member list is paginated, fetch every absent member before exporting. */
+  /**
+   * Fetch every absent member before exporting.
+   * Warns + aborts if the count is unusually large to protect browser memory.
+   */
   async function fetchAllAbsent(): Promise<DashboardMember[]> {
+    const EXPORT_CAP = 5_000
+    // If the list fits in what's already loaded, use it directly
     if (!hasMore) return absent
-    const { data } = await supabase.rpc('get_service_members_full', {
+
+    // Count first to guard against unexpectedly large datasets
+    const { count } = await supabase
+      .rpc('get_service_members_full', { p_service_id: serviceId, p_limit: 1, p_offset: 0 }, { count: 'exact', head: true })
+    const absentEstimate = (count ?? 0)
+    if (absentEstimate > EXPORT_CAP) {
+      throw new Error(`Too many absent members to export at once (${absentEstimate.toLocaleString()}). Please contact support for large-batch exports.`)
+    }
+
+    const { data, error } = await supabase.rpc('get_service_members_full', {
       p_service_id: serviceId,
-      p_limit: 10000,
+      p_limit: EXPORT_CAP,
       p_offset: 0,
     })
+    if (error) throw error
     return ((data ?? []) as DashboardMember[]).filter(m => !m.checked_in)
   }
 
   async function handleExport(format: 'txt' | 'csv' | 'rtf') {
     setExporting(true)
-    const members = await fetchAllAbsent()
-    setExporting(false)
-    if (format === 'txt') exportTXT(members, eventLabel)
-    else if (format === 'csv') exportCSV(members, eventLabel)
-    else exportRTF(members, eventLabel)
+    try {
+      const members = await fetchAllAbsent()
+      if (format === 'txt') exportTXT(members, eventLabel)
+      else if (format === 'csv') exportCSV(members, eventLabel)
+      else exportRTF(members, eventLabel)
+    } catch (err: unknown) {
+      toast(`Export failed: ${(err as { message?: string })?.message ?? 'Unknown error'}`, 'error')
+    } finally {
+      setExporting(false)
+    }
   }
 
   function downloadQR() {
@@ -722,7 +967,7 @@ export default function AdminServiceDetail() {
 
         {/* ── Absence Messaging ─────────────────────────────────────────── */}
         <section className="px-4">
-          <MessagingPanel service={service} absentCount={absent.length} />
+          <MessagingPanel service={service} absentMembers={absent} />
         </section>
 
           </div> {/* End left column */}
