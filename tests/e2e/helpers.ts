@@ -435,6 +435,10 @@ export async function asOrgMember(page: Page) {
   await page.route(`${SUPABASE_URL}/rest/v1/super_admins*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
   )
+  // blocked_admins: not blocked
+  await page.route(`${SUPABASE_URL}/rest/v1/blocked_admins*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: 'null' }),
+  )
   // Return unit_admins — member has no direct unit access yet
   await page.route(`${SUPABASE_URL}/rest/v1/unit_admins*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
@@ -538,9 +542,13 @@ export async function mockPushSubscriptions(page: Page, count = 0) {
   const rows = Array.from({ length: count }, (_, i) => ({ id: `sub-${i}`, unit_id: IDS.unit }))
   await page.route(`${SUPABASE_URL}/rest/v1/member_push_subscriptions*`, async route => {
     if (route.request().method() === 'HEAD') {
+      // Must expose Content-Range so browser CORS policy allows JS to read it
       await route.fulfill({
         status: 200,
-        headers: { 'Content-Range': count > 0 ? `0-${count - 1}/${count}` : '*/0' },
+        headers: {
+          'content-range': count > 0 ? `0-${count - 1}/${count}` : '*/0',
+          'Access-Control-Expose-Headers': 'Content-Range,content-range',
+        },
         body: '',
       })
     } else {

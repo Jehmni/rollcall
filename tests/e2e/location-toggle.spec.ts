@@ -62,10 +62,12 @@ test.describe('Admin — event creation form location toggle', () => {
   test('toggling switches between online and in-person labels', async ({ page }) => {
     await page.goto(`/admin/units/${IDS.unit}`)
     await page.getByRole('button', { name: /schedule event|new event|add event/i }).first().click()
-    const toggle = page.getByText('Online — No location check').locator('..')
-    await toggle.click()
+    await expect(page.getByText('Online — No location check')).toBeVisible()
+    // The toggle is a button that contains the location text — find the button ancestor
+    const toggleBtn = page.locator('button').filter({ hasText: /Online — No location check|In-person — Location required/ })
+    await toggleBtn.click()
     await expect(page.getByText('In-person — Location required')).toBeVisible()
-    await toggle.click()
+    await toggleBtn.click()
     await expect(page.getByText('Online — No location check')).toBeVisible()
   })
 })

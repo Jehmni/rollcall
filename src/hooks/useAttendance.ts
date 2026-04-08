@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { withRetry } from '../lib/retry'
+import { logger } from '../lib/logger'
 
 export type CheckInStatus =
   | 'idle'
@@ -43,7 +45,7 @@ export function useAttendance(serviceId: string | null, requireLocation = false)
         lat = pos.coords.latitude
         lng = pos.coords.longitude
       } catch (e) {
-        console.warn('Geolocation failed or denied', e)
+        logger.warn('Geolocation failed or denied', { memberId, serviceId, error: String(e) })
       }
     }
 
@@ -54,23 +56,53 @@ export function useAttendance(serviceId: string | null, requireLocation = false)
       localStorage.setItem('rollcally_device_id', deviceId)
     }
 
-    const { data, error } = await supabase.rpc('checkin_by_id', {
-      p_member_id: memberId,
-      p_service_id: serviceId,
-      p_device_id: deviceId,
-      p_lat: lat,
-      p_lng: lng
-    })
+    let data: RpcResult | null = null
+    let rpcError: unknown = null
 
-    if (error) {
+    try {
+      const result = await withRetry(
+        () => supabase.rpc('checkin_by_id', {
+          p_member_id: memberId,
+          p_service_id: serviceId,
+          p_device_id: deviceId,
+          p_lat: lat,
+          p_lng: lng,
+        }),
+        {
+          maxAttempts: 3,
+          baseDelayMs: 600,
+          // Only retry on network-level failures — not RPC logic errors
+          isRetryable: (err) => {
+            const e = err as { message?: string; code?: string }
+            if (!e?.message) return false
+            const msg = e.message.toLowerCase()
+            return msg.includes('fetch') || msg.includes('network') || msg.includes('timeout')
+          },
+        },
+      )
+      if (result.error) {
+        rpcError = result.error
+      } else {
+        data = result.data as RpcResult
+      }
+    } catch (err) {
+      rpcError = err
+    }
+
+    if (rpcError) {
+      const errObj = rpcError as { message?: string }
+      logger.error('check-in RPC failed', rpcError instanceof Error ? rpcError : undefined, {
+        memberId, serviceId, error: errObj?.message ?? String(rpcError),
+      })
       setStatus('error')
-      setErrorMessage(error.message)
-      throw error
+      setErrorMessage(errObj?.message ?? 'Something went wrong')
+      throw rpcError
     }
 
     const result = data as RpcResult
 
     if (result.success) {
+      logger.info('Check-in succeeded', { memberId, serviceId, name: result.name })
       setCheckedInName(result.name ?? null)
       localStorage.setItem('rollcally_member_id', memberId)
       setStatus('success')
@@ -94,6 +126,7 @@ export function useAttendance(serviceId: string | null, requireLocation = false)
           msg = result.error ?? 'Something went wrong'
           setStatus('error'); setErrorMessage(msg)
       }
+      logger.warn('Check-in rejected', { memberId, serviceId, reason: result.error })
       throw new Error(result.error ?? 'check_in_failed')
     }
   }

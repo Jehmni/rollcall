@@ -130,9 +130,10 @@ test.describe('Billing page: layout and plan cards', () => {
 
   test('plan cards show follow-up counts', async ({ page }) => {
     await page.goto('/admin/billing')
-    await expect(page.getByText('200')).toBeVisible()   // Starter
-    await expect(page.getByText('600')).toBeVisible()   // Growth
-    await expect(page.getByText('1,500')).toBeVisible() // Pro
+    // Match the span containing the follow-up count (first occurrence of each number)
+    await expect(page.getByText('200').first()).toBeVisible()   // Starter
+    await expect(page.getByText('600').first()).toBeVisible()   // Growth
+    await expect(page.getByText('1,500').first()).toBeVisible() // Pro
   })
 
   test('Growth plan is marked "Most popular"', async ({ page }) => {
@@ -204,7 +205,8 @@ test.describe('Billing page: active subscription', () => {
   test('non-current plan cards show "Choose plan" and are enabled', async ({ page }) => {
     await page.goto('/admin/billing')
     const chooseBtns = page.getByRole('button', { name: /Choose plan/i })
-    // At least 2 other plans are choosable
+    // Wait for at least one "Choose plan" button to appear before counting
+    await expect(chooseBtns.first()).toBeVisible()
     const count = await chooseBtns.count()
     expect(count).toBeGreaterThanOrEqual(2)
   })
@@ -269,7 +271,7 @@ test.describe('Billing page: Stripe return URL params', () => {
     await mockUsageEvents(page, 50)
 
     await page.goto('/admin/billing?status=success&org=' + IDS.org)
-    await expect(page.getByText(/Subscription activated/i)).toBeVisible()
+    await expect(page.getByText(/Subscription activated/i).first()).toBeVisible()
   })
 
   test('?status=canceled shows a cancelled info toast', async ({ page }) => {
@@ -280,7 +282,7 @@ test.describe('Billing page: Stripe return URL params', () => {
     await mockUsageEvents(page, 0)
 
     await page.goto('/admin/billing?status=canceled&org=' + IDS.org)
-    await expect(page.getByText(/Checkout cancelled/i)).toBeVisible()
+    await expect(page.getByText(/Checkout cancelled/i).first()).toBeVisible()
   })
 })
 
@@ -356,11 +358,18 @@ test.describe('Billing page: usage bar thresholds', () => {
         }),
       }),
     )
-    // Count of usage_events = used
+    // Count of usage_events = used (must expose content-range for CORS to allow JS to read it)
     await page.route(`${SUPABASE_URL}/rest/v1/usage_events*`, async route => {
       if (route.request().method() === 'HEAD') {
         const hdr = used > 0 ? `0-${used - 1}/${used}` : '*/0'
-        await route.fulfill({ status: 200, headers: { 'Content-Range': hdr }, body: '' })
+        await route.fulfill({
+          status: 200,
+          headers: {
+            'content-range': hdr,
+            'Access-Control-Expose-Headers': 'Content-Range,content-range',
+          },
+          body: '',
+        })
       } else {
         await route.fulfill({ status: 200, contentType: 'application/json', body: '[]' })
       }
@@ -370,7 +379,11 @@ test.describe('Billing page: usage bar thresholds', () => {
   test('shows critical warning when usage is at 90%+', async ({ page }) => {
     await setupWithUsage(page, 540, 600) // 90%
     await page.goto('/admin/billing')
-    await expect(page.getByText(/Almost out/i)).toBeVisible()
+    // Wait for subscription status to confirm billing loaded
+    await expect(page.getByText('Active')).toBeVisible()
+    // The "Almost out" warning appears once usage count loads and pct >= 90%
+    // Give extra time for the second async query (usage_events HEAD) to resolve
+    await expect(page.getByText(/Almost out/i).first()).toBeVisible({ timeout: 15000 })
   })
 
   test('does not show critical warning when usage is below 70%', async ({ page }) => {

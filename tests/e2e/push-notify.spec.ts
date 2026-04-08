@@ -72,19 +72,22 @@ test.describe('GoLiveButton: subscriber count display', () => {
 
   test('Go Live button is enabled when subscribers exist', async ({ page }) => {
     await setupServiceDetail(page)
+    // Supabase JS reads count from Content-Range, but browsers enforce CORS header visibility.
+    // Must expose content-range via Access-Control-Expose-Headers so JS can read it.
     await page.route(`${SUPABASE_URL}/rest/v1/member_push_subscriptions*`, async route => {
-      if (route.request().method() === 'HEAD') {
-        await route.fulfill({ status: 200, headers: { 'Content-Range': '0-2/3' }, body: '' })
-      } else {
-        await route.fulfill({
-          status: 200, contentType: 'application/json',
-          body: JSON.stringify([{ id: 'sub-1' }, { id: 'sub-2' }, { id: 'sub-3' }]),
-        })
-      }
+      await route.fulfill({
+        status: 200,
+        headers: {
+          'content-range': '0-2/3',
+          'Access-Control-Expose-Headers': 'Content-Range,content-range',
+        },
+        body: '',
+      })
     })
     await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
+    // Wait for subscriber count to load — button becomes enabled once count > 0
     const goLiveBtn = page.getByRole('button', { name: /Notify Members|Go Live/i })
-    await expect(goLiveBtn).toBeEnabled()
+    await expect(goLiveBtn).toBeEnabled({ timeout: 15000 })
   })
 })
 

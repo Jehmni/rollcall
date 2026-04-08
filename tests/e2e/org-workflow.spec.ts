@@ -6,7 +6,7 @@
  */
 import { test, expect } from '@playwright/test'
 import {
-  IDS, IDS_ORG2,
+  IDS, IDS_ORG2, IDS_MEMBER_ADMIN,
   SUPABASE_URL,
   asSuperAdmin, asOrgMember,
   mockOrgsWithRole, mockUnitsAll, mockUnits, mockUnitAdmins,
@@ -141,25 +141,51 @@ test.describe('Join request → approval → org visible', () => {
 // ── Non-owner member creates unit ─────────────────────────────────────────────
 
 test.describe('Non-owner org member: create unit', () => {
-  test('member sees "Create New Unit" button', async ({ page }) => {
+  async function setupOrgMember(page: import('@playwright/test').Page) {
     silenceRealtime(page)
     await asOrgMember(page)
-    await mockOrgsWithRole(page, 'member')
+    // org_members for auth context org-level block check
+    await page.route(`${SUPABASE_URL}/rest/v1/organization_members*`, route =>
+      route.fulfill({
+        status: 200, contentType: 'application/json',
+        body: JSON.stringify([{ organization_id: IDS.org, admin_id: IDS_MEMBER_ADMIN }]),
+      }),
+    )
+    // Organizations: block check query (not.is.null) must return empty → not blocked
+    // Display query (with organization_members join) must return the org
+    await page.route(`${SUPABASE_URL}/rest/v1/organizations*`, async route => {
+      const url = route.request().url()
+      if (url.includes('blocked_at=not.is.null')) {
+        // Block check — no blocked orgs
+        await route.fulfill({ status: 200, contentType: 'application/json', body: '[]' })
+      } else {
+        await route.fulfill({
+          status: 200, contentType: 'application/json',
+          body: JSON.stringify([{
+            id: IDS.org, name: 'Grace Baptist Church',
+            created_by_admin_id: IDS_MEMBER_ADMIN, created_at: '2024-01-01T00:00:00Z',
+            organization_members: [{ role: 'member' }],
+          }]),
+        })
+      }
+    })
     await mockUnits(page)
-    await mockOrganizationMembers(page)
+    await page.route(`${SUPABASE_URL}/rest/v1/services*`, route =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+    )
+  }
 
+  test('member sees "Create New Unit" button', async ({ page }) => {
+    await setupOrgMember(page)
     await page.goto(`/admin/orgs/${IDS.org}`)
+    await expect(page.getByText('Grace Baptist Church').first()).toBeVisible({ timeout: 15000 })
     await expect(page.getByRole('button', { name: /Create New Unit/i })).toBeVisible()
   })
 
   test('member can open the create unit form', async ({ page }) => {
-    silenceRealtime(page)
-    await asOrgMember(page)
-    await mockOrgsWithRole(page, 'member')
-    await mockUnits(page)
-    await mockOrganizationMembers(page)
-
+    await setupOrgMember(page)
     await page.goto(`/admin/orgs/${IDS.org}`)
+    await expect(page.getByText('Grace Baptist Church').first()).toBeVisible({ timeout: 15000 })
     await page.getByRole('button', { name: /Create New Unit/i }).click()
     await expect(page.getByLabel('Unit name')).toBeVisible()
   })

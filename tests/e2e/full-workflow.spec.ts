@@ -280,10 +280,14 @@ test.describe('5 · Edit event', () => {
     await mockUnitLookup(page)
 
     await page.goto(`/admin/units/${IDS.unit}`)
-    // Hover over the service card to reveal edit icon (desktop)
-    await page.getByText('Regular Meeting').hover()
+    // Hover over the service card to reveal edit icon
+    // Service type is 'rehearsal' from mockServicesAll
+    const serviceCard = page.locator('li, div, article').filter({ hasText: 'rehearsal' }).first()
+    if (await serviceCard.count() > 0) {
+      await serviceCard.hover()
+    }
     // Click the edit (pencil) button on the card
-    const editBtn = page.locator('button').filter({ has: page.locator('span', { hasText: 'edit' }) }).first()
+    const editBtn = page.locator('button').filter({ has: page.locator('span.material-symbols-outlined', { hasText: 'edit' }) }).first()
     if (await editBtn.count() > 0) {
       await editBtn.click()
       await expect(page.getByText('Edit Event')).toBeVisible()

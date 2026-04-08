@@ -376,15 +376,15 @@ test.describe('AdminServiceDetail', () => {
     await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     // Export buttons (icon-only, with title attr) only shown on absent tab
     await page.getByRole('button', { name: /Absent \(/ }).click()
-    await expect(page.locator('button[title="Export TXT"]')).toBeVisible()
-    await expect(page.locator('button[title="Export CSV"]')).toBeVisible()
-    await expect(page.locator('button[title="Export RTF (Word)"]')).toBeVisible()
+    await expect(page.locator('button[title="Download plain-text absence list"]')).toBeVisible()
+    await expect(page.locator('button[title="Download CSV for Excel / Google Sheets"]')).toBeVisible()
+    await expect(page.locator('button[title="Download RTF (opens in Word / Pages)"]')).toBeVisible()
   })
 
   test('export buttons not shown on present tab', async ({ page }) => {
     await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
     await page.getByRole('button', { name: /Present/i }).click()
-    await expect(page.locator('button[title="Export TXT"]')).not.toBeVisible()
+    await expect(page.locator('button[title="Download plain-text absence list"]')).not.toBeVisible()
   })
 
   test('all-tab members are grouped by section', async ({ page }) => {

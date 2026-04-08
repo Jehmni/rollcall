@@ -441,12 +441,6 @@ async function logUsageEvent(
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
-  const secretsError = validateSecrets()
-  if (secretsError) {
-    console.error('SMS configuration error:', secretsError)
-    return json(503, { error: `SMS provider not configured: ${secretsError}` })
-  }
-
   const authHeader = req.headers.get('Authorization') ?? ''
 
   const adminClient = createClient(
@@ -465,6 +459,15 @@ Deno.serve(async (req) => {
       dry_run?:    boolean
     }
     const dryRun = body.dry_run ?? false
+
+    // Validate SMS secrets only when we will actually send (skip for dry runs)
+    if (!dryRun) {
+      const secretsError = validateSecrets()
+      if (secretsError) {
+        console.error('SMS configuration error:', secretsError)
+        return json(503, { error: `SMS provider not configured: ${secretsError}` })
+      }
+    }
 
     // ── Manual single-service send ─────────────────────────────────────────
     if (body.service_id) {

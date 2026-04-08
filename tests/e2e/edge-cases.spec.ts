@@ -155,9 +155,10 @@ test.describe('EDGE-030: Free-form service_type input', () => {
     await mockUnitLookup(page)
     await page.goto(`/admin/units/${IDS.unit}`)
     await page.getByRole('button', { name: /New Event/i }).click()
-    // Should be input[type=text], not a select
-    await expect(page.locator('input[type="text"]').filter({ has: page.locator('xpath=..') }).nth(1)).not.toHaveCount(0)
-    await expect(page.locator('select')).not.toBeVisible()
+    // "Event Type" should be a text input, not a select
+    await expect(page.getByLabel('Event Type')).toBeVisible()
+    const tagName = await page.getByLabel('Event Type').evaluate((el) => el.tagName)
+    expect(tagName.toLowerCase()).toBe('input')
   })
 
   test('Event Type accepts completely custom text', async ({ page }) => {
@@ -349,23 +350,23 @@ test.describe('EDGE-033: Confirm dialogs — cancel vs confirm', () => {
     await asSuperAdmin(page)
     await mockUnitAdmins(page)
     await mockUnitLookup(page)
-    await page.route(`${SUPABASE_URL}/rest/v1/services*`, route =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([{
-          id: IDS.service, unit_id: IDS.unit, date: '2026-12-10',
-          service_type: 'Rehearsal', created_at: '2024-01-01T00:00:00Z',
-        }]),
-      }),
-    )
+
+    const SERVICE_DATA = [{
+      id: IDS.service, unit_id: IDS.unit, date: '2026-12-10',
+      service_type: 'Rehearsal', require_location: false, notification_sent_at: null, created_at: '2024-01-01T00:00:00Z',
+    }]
     let deleteCalled = false
+    // Single route handler that handles all service requests
     await page.route(`${SUPABASE_URL}/rest/v1/services*`, async route => {
       if (route.request().method() === 'DELETE') {
         deleteCalled = true
-        await route.continue()
+        await route.fulfill({ status: 204, body: '' })
       } else {
-        await route.continue()
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(SERVICE_DATA),
+        })
       }
     })
 

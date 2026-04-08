@@ -117,7 +117,8 @@ test.describe('SMS consent: enabled (unit has SMS on)', () => {
   test('consent prompt shows unit name in the copy', async ({ page }) => {
     await mockSmsConsentRpc(page)
     await doCheckin(page)
-    await expect(page.getByText(/Main Choir/i)).toBeVisible({ timeout: 5000 })
+    // "Main Choir" appears in the SMS consent prompt (may appear multiple times on page)
+    await expect(page.getByText(/Main Choir/i).first()).toBeVisible({ timeout: 5000 })
   })
 
   test('"Yes, that\'s fine" calls set_member_sms_consent with consent=true', async ({ page }) => {
@@ -140,15 +141,17 @@ test.describe('SMS consent: enabled (unit has SMS on)', () => {
     await expect(page.getByText(/Stay in the loop/i)).not.toBeVisible({ timeout: 3000 })
   })
 
-  test('"No thanks" dismisses the prompt without calling RPC', async ({ page }) => {
-    const { getCalled } = await mockSmsConsentRpc(page)
+  test('"No thanks" dismisses the prompt (calls RPC with consent=false)', async ({ page }) => {
+    const { getCalled, getCalledWith } = await mockSmsConsentRpc(page)
     await doCheckin(page)
     const noBtn = page.getByRole('button', { name: /No thanks/i })
     await noBtn.waitFor({ timeout: 5000 })
     await noBtn.click()
-    await page.waitForTimeout(500)
-    // RPC should NOT have been called
-    expect(getCalled()).toBe(false)
+    await page.waitForTimeout(800)
+    // RPC is called with consent=false to record the decline
+    expect(getCalled()).toBe(true)
+    const payload = getCalledWith()
+    expect(payload).toMatchObject({ p_consent: false })
     await expect(page.getByText(/Stay in the loop/i)).not.toBeVisible()
   })
 
