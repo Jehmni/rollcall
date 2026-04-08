@@ -36,6 +36,9 @@ export interface Unit {
   description: string | null
   created_by_admin_id: string
   created_at: string
+  latitude: number | null
+  longitude: number | null
+  radius_meters: number | null
 }
 
 export interface UnitWithOrg extends Unit {

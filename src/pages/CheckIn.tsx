@@ -158,6 +158,7 @@ export default function CheckIn() {
     if (step === 'done') {
       if (status === 'success') return 'Verification'
       if (status === 'loading') return 'Processing'
+      if (status === 'device_locked') return 'Already Registered'
       return 'Sync Denied'
     }
     return 'Check In'
@@ -555,6 +556,27 @@ export default function CheckIn() {
                     Rollcally Identity Verification System
                   </p>
                 </div>
+              </div>
+            ) : status === 'device_locked' ? (
+              <div className="flex flex-col items-center gap-10 text-center py-20 rounded-[4rem] bg-amber-500/5 border border-amber-500/20 shadow-2xl">
+                <div className="flex h-24 w-24 items-center justify-center rounded-[2.5rem] bg-amber-500 text-white shadow-[0_20px_40px_rgba(245,158,11,0.4)]">
+                  <span className="material-symbols-outlined text-6xl">devices</span>
+                </div>
+                <div className="px-10">
+                  <h2 className="font-display text-3xl font-bold text-white uppercase tracking-tighter mb-3">Already Registered</h2>
+                  <p className="text-base text-amber-400 font-bold leading-relaxed mb-4">
+                    Someone else already checked in using this device for this session.
+                  </p>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    Each device can only be used for one person per session. If you believe this is a mistake, please speak to your choir administrator.
+                  </p>
+                </div>
+                <button
+                  onClick={handleBack}
+                  className="text-xs font-black uppercase tracking-super text-primary hover:underline underline-offset-8"
+                >
+                  Try a Different Name
+                </button>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-10 text-center py-20 rounded-[4rem] bg-red-500/5 border border-red-500/20 shadow-2xl">

@@ -11,6 +11,7 @@ export type CheckInStatus =
   | 'not_found'
   | 'invalid_service'
   | 'no_service'
+  | 'device_locked'
   | 'error'
 
 interface RpcResult {
@@ -120,8 +121,7 @@ export function useAttendance(serviceId: string | null, requireLocation = false)
           msg = `You are too far from the venue (${result.distance}m).`
           setStatus('error'); setErrorMessage(msg); break
         case 'device_locked':
-          msg = 'This device is already linked to another member for this event.'
-          setStatus('error'); setErrorMessage(msg); break
+          setStatus('device_locked'); break
         default:
           msg = result.error ?? 'Something went wrong'
           setStatus('error'); setErrorMessage(msg)

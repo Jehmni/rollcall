@@ -108,10 +108,19 @@ export function useUnits(orgId: string | null) {
     return data
   }
 
-  async function updateUnit(id: string, name: string, description?: string): Promise<Unit> {
+  async function updateUnit(
+    id: string,
+    name: string,
+    description?: string,
+    location?: { latitude: number | null; longitude: number | null; radius_meters: number | null },
+  ): Promise<Unit> {
     const { data, error } = await supabase
       .from('units')
-      .update({ name, description: description ?? null })
+      .update({
+        name,
+        description: description ?? null,
+        ...(location !== undefined ? location : {}),
+      })
       .eq('id', id)
       .select()
       .single()

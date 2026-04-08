@@ -212,16 +212,24 @@ function EventFormModal({
 
 // ── Settings Modal ────────────────────────────────────────────────────────────
 function SettingsModal({
-  name, desc, error, loading,
-  onChangeName, onChangeDesc, onSubmit, onDelete, onClose,
+  name, desc, lat, lng, radius, geocoding, error, loading,
+  onChangeName, onChangeDesc, onChangeLat, onChangeLng, onChangeRadius, onGeocode,
+  onSubmit, onDelete, onClose,
 }: {
-  name: string; desc: string; error: string | null; loading: boolean
+  name: string; desc: string
+  lat: string; lng: string; radius: string
+  geocoding: boolean; error: string | null; loading: boolean
   onChangeName: (v: string) => void; onChangeDesc: (v: string) => void
+  onChangeLat: (v: string) => void; onChangeLng: (v: string) => void; onChangeRadius: (v: string) => void
+  onGeocode: (address: string) => void
   onSubmit: (e: FormEvent) => void; onDelete: () => void; onClose: () => void
 }) {
+  const [address, setAddress] = useState('')
+  const hasCoords = lat !== '' && lng !== ''
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300">
+      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
         <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mb-5 sm:hidden" />
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
@@ -243,6 +251,55 @@ function SettingsModal({
             <input value={desc} onChange={e => onChangeDesc(e.target.value)} placeholder="Purpose of this unit…"
               className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
           </label>
+
+          {/* Venue Location */}
+          <div className="flex flex-col gap-3 pt-1">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-lg">location_on</span>
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Venue Location</span>
+              {hasCoords && (
+                <span className="ml-auto text-2xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Set</span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <input
+                value={address}
+                onChange={e => setAddress(e.target.value)}
+                placeholder="Enter venue address…"
+                className="flex-1 bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => onGeocode(address)}
+                disabled={!address.trim() || geocoding}
+                className="px-4 py-2 bg-primary/20 border border-primary/30 text-primary text-sm font-bold rounded-xl hover:bg-primary/30 active:scale-95 transition-all disabled:opacity-40 flex-shrink-0"
+              >
+                {geocoding ? '…' : 'Find'}
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <label className="flex flex-col gap-1">
+                <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Latitude</span>
+                <input value={lat} onChange={e => onChangeLat(e.target.value)} placeholder="e.g. 51.5074"
+                  className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Longitude</span>
+                <input value={lng} onChange={e => onChangeLng(e.target.value)} placeholder="e.g. -0.1278"
+                  className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+              </label>
+            </div>
+            <label className="flex flex-col gap-1">
+              <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Check-in radius (metres)</span>
+              <input value={radius} onChange={e => onChangeRadius(e.target.value)} placeholder="100"
+                type="number" min="10" max="5000"
+                className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+            </label>
+            <p className="text-2xs text-slate-600 leading-relaxed">
+              Members must be within this radius to check in when location enforcement is enabled on an event.
+            </p>
+          </div>
+
           {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
           <div className="flex items-center justify-between pt-2">
             <button type="button" onClick={onDelete} className="text-sm font-semibold text-red-400 hover:text-red-300 flex items-center gap-1.5 transition-colors">
@@ -341,6 +398,10 @@ export default function UnitDashboard() {
   const [newRequireLocation, setNewRequireLocation] = useState(false)
   const [newName, setNewName] = useState('')
   const [newDesc, setNewDesc] = useState('')
+  const [newLat, setNewLat] = useState('')
+  const [newLng, setNewLng] = useState('')
+  const [newRadius, setNewRadius] = useState('100')
+  const [geocoding, setGeocoding] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -369,6 +430,9 @@ export default function UnitDashboard() {
           setOrgId(org?.id ?? '')
           setNewName(data.name)
           setNewDesc(data.description ?? '')
+          setNewLat(data.latitude != null ? String(data.latitude) : '')
+          setNewLng(data.longitude != null ? String(data.longitude) : '')
+          setNewRadius(data.radius_meters != null ? String(data.radius_meters) : '100')
           const role = org?.organization_members?.[0]?.role || 'member'
           setUserRole(role)
           setIsOwnerOrCreator(isSuper || role === 'owner' || data.created_by_admin_id === session.user.id)
@@ -423,10 +487,41 @@ export default function UnitDashboard() {
     } finally { setIsUpdating(false) }
   }
 
+  async function handleGeocode(address: string) {
+    if (!address.trim()) return
+    setGeocoding(true)
+    setError(null)
+    try {
+      const params = new URLSearchParams({ q: address, format: 'json', limit: '1' })
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
+        headers: { 'Accept-Language': 'en', 'User-Agent': 'Rollcally/1.0' },
+      })
+      const results = await res.json() as Array<{ lat: string; lon: string }>
+      if (results.length === 0) {
+        setError('Address not found. Try a more specific address or enter coordinates manually.')
+      } else {
+        setNewLat(parseFloat(results[0].lat).toFixed(6))
+        setNewLng(parseFloat(results[0].lon).toFixed(6))
+      }
+    } catch {
+      setError('Could not look up address. Please enter coordinates manually.')
+    } finally {
+      setGeocoding(false)
+    }
+  }
+
   async function handleUpdateUnit(e: FormEvent) {
     e.preventDefault(); if (!unitId) return; setError(null); setIsUpdating(true)
     try {
-      const updated = await updateUnit(unitId, newName.trim(), newDesc.trim() || undefined)
+      const parsedLat = newLat !== '' ? parseFloat(newLat) : null
+      const parsedLng = newLng !== '' ? parseFloat(newLng) : null
+      const parsedRadius = newRadius !== '' ? parseInt(newRadius, 10) : null
+      const updated = await updateUnit(
+        unitId,
+        newName.trim(),
+        newDesc.trim() || undefined,
+        { latitude: parsedLat, longitude: parsedLng, radius_meters: parsedRadius },
+      )
       setUnit(updated); setShowSettings(false)
     } catch (err) { setError(err instanceof Error ? err.message : 'Failed to update unit') }
     finally { setIsUpdating(false) }
@@ -702,8 +797,12 @@ export default function UnitDashboard() {
       />
       {showSettings && (
         <SettingsModal
-          name={newName} desc={newDesc} error={error} loading={isUpdating}
+          name={newName} desc={newDesc}
+          lat={newLat} lng={newLng} radius={newRadius}
+          geocoding={geocoding} error={error} loading={isUpdating}
           onChangeName={setNewName} onChangeDesc={setNewDesc}
+          onChangeLat={setNewLat} onChangeLng={setNewLng} onChangeRadius={setNewRadius}
+          onGeocode={handleGeocode}
           onSubmit={handleUpdateUnit}
           onDelete={() => { setShowSettings(false); setConfirmDelete(true) }}
           onClose={() => { setShowSettings(false); setError(null) }}

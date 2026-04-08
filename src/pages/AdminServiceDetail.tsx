@@ -10,6 +10,18 @@ import type { AbsenceMessageLogEntry, DashboardMember, Service, UnitMessagingSet
 
 function LocationToggle({ service, onUpdate }: { service: Service; onUpdate: (updated: Service) => void }) {
   const [saving, setSaving] = useState(false)
+  const [hasCoords, setHasCoords] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    supabase
+      .from('units')
+      .select('latitude, longitude')
+      .eq('id', service.unit_id)
+      .single()
+      .then(({ data }) => {
+        setHasCoords(!!(data?.latitude && data?.longitude))
+      })
+  }, [service.unit_id])
 
   async function toggle() {
     setSaving(true)
@@ -24,30 +36,41 @@ function LocationToggle({ service, onUpdate }: { service: Service; onUpdate: (up
   }
 
   const on = service.require_location
+  const showCoordsWarning = on && hasCoords === false
 
   return (
-    <button
-      onClick={toggle}
-      disabled={saving}
-      className={`w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl border transition-all active:scale-[0.98] disabled:opacity-40 ${on ? 'bg-primary/10 border-primary/30' : 'bg-surface-dark border-border-dark hover:border-slate-600'}`}
-    >
-      <div className="flex items-center gap-3">
-        <span className={`material-symbols-outlined text-2xl ${on ? 'text-primary-light' : 'text-slate-500'}`}>
-          {on ? 'location_on' : 'location_off'}
-        </span>
-        <div className="text-left">
-          <p className={`text-sm font-bold ${on ? 'text-white' : 'text-slate-400'}`}>
-            {on ? 'In-person — Location enforced' : 'Online — No location check'}
-          </p>
-          <p className="text-2xs text-slate-500 font-medium">
-            {on ? 'Members must be on-site to check in' : 'Members can check in from anywhere'}
+    <div className="flex flex-col gap-2">
+      <button
+        onClick={toggle}
+        disabled={saving}
+        className={`w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl border transition-all active:scale-[0.98] disabled:opacity-40 ${on ? 'bg-primary/10 border-primary/30' : 'bg-surface-dark border-border-dark hover:border-slate-600'}`}
+      >
+        <div className="flex items-center gap-3">
+          <span className={`material-symbols-outlined text-2xl ${on ? 'text-primary-light' : 'text-slate-500'}`}>
+            {on ? 'location_on' : 'location_off'}
+          </span>
+          <div className="text-left">
+            <p className={`text-sm font-bold ${on ? 'text-white' : 'text-slate-400'}`}>
+              {on ? 'In-person — Location enforced' : 'Online — No location check'}
+            </p>
+            <p className="text-2xs text-slate-500 font-medium">
+              {on ? 'Members must be on-site to check in' : 'Members can check in from anywhere'}
+            </p>
+          </div>
+        </div>
+        <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-0.5 flex-shrink-0 ${on ? 'bg-primary' : 'bg-border-dark'}`}>
+          <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${on ? 'translate-x-4' : 'translate-x-0'}`} />
+        </div>
+      </button>
+      {showCoordsWarning && (
+        <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
+          <span className="material-symbols-outlined text-amber-400 text-lg flex-shrink-0 mt-0.5">warning</span>
+          <p className="text-2xs text-amber-300 leading-relaxed">
+            <span className="font-bold">Venue coordinates not set.</span> Members won't be able to check in until you add them in Unit Settings.
           </p>
         </div>
-      </div>
-      <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-0.5 flex-shrink-0 ${on ? 'bg-primary' : 'bg-border-dark'}`}>
-        <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${on ? 'translate-x-4' : 'translate-x-0'}`} />
-      </div>
-    </button>
+      )}
+    </div>
   )
 }
 

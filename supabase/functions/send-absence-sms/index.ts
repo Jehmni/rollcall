@@ -436,6 +436,100 @@ async function logUsageEvent(
   // Non-fatal: if this fails, we log to console but don't abort the send
 }
 
+// ─── Absence report email ─────────────────────────────────────────────────────
+
+async function sendAbsenceReportEmail(
+  db: ReturnType<typeof createClient>,
+  service: ServiceRow,
+  result: { sent: number; failed: number; skipped: number; blocked: number; reason?: string },
+): Promise<void> {
+  const apiKey  = Deno.env.get('RESEND_API_KEY')
+  const from    = Deno.env.get('FROM_EMAIL') ?? 'Rollcally <noreply@rollcally.com>'
+  if (!apiKey) return  // email not configured — skip silently
+
+  try {
+    // Fetch unit (owner id + name) and message log in parallel
+    const [unitRes, logRes] = await Promise.all([
+      db.from('units').select('name, created_by_admin_id').eq('id', service.unit_id).single(),
+      db.from('absence_message_log')
+        .select('member_id, phone, status, error_text, members!inner(name)')
+        .eq('service_id', service.id)
+        .order('created_at', { ascending: false })
+        .limit(200),
+    ])
+
+    const unitRow = unitRes.data as { name: string; created_by_admin_id: string } | null
+    const unitName = unitRow?.name ?? 'Your unit'
+    if (!unitRow?.created_by_admin_id) return
+
+    // Resolve owner email from auth.users via service-role admin API
+    const { data: { user: ownerUser } } = await db.auth.admin.getUserById(unitRow.created_by_admin_id)
+    if (!ownerUser?.email) return
+    const adminEmails = [ownerUser.email]
+
+    // Build rows for the email table
+    const logRows = (logRes.data ?? []) as Array<{
+      member_id: string; phone: string | null; status: string; error_text: string | null
+      members: { name: string }
+    }>
+
+    const tableRows = logRows.map(r => {
+      const statusEmoji = r.status === 'sent' ? '✅' : r.status === 'failed' ? '❌' : '⏸'
+      return `<tr style="border-bottom:1px solid #334155">
+        <td style="padding:8px 12px;color:#f1f5f9">${r.members?.name ?? '—'}</td>
+        <td style="padding:8px 12px;color:#94a3b8">${r.phone ?? '—'}</td>
+        <td style="padding:8px 12px">${statusEmoji} ${r.status}</td>
+        ${r.error_text ? `<td style="padding:8px 12px;color:#f87171;font-size:12px">${r.error_text}</td>` : '<td></td>'}
+      </tr>`
+    }).join('')
+
+    const eventLabel = `${service.service_type} on ${service.date}`
+    const summary = `${result.sent} sent · ${result.failed} failed · ${result.blocked} blocked · ${result.skipped} skipped`
+
+    const html = `
+<!DOCTYPE html>
+<html>
+<body style="background:#0f172a;color:#f1f5f9;font-family:system-ui,sans-serif;padding:32px;margin:0">
+  <div style="max-width:640px;margin:0 auto">
+    <h2 style="color:#818cf8;margin:0 0 4px">Absence Report</h2>
+    <p style="margin:0 0 24px;color:#94a3b8;font-size:14px">${unitName} · ${eventLabel}</p>
+    <p style="background:#1e293b;border-radius:8px;padding:12px 16px;font-size:14px;margin:0 0 24px">${summary}</p>
+    ${logRows.length > 0 ? `
+    <table style="width:100%;border-collapse:collapse;font-size:14px;background:#1e293b;border-radius:8px;overflow:hidden">
+      <thead>
+        <tr style="background:#334155">
+          <th style="padding:10px 12px;text-align:left;color:#94a3b8;font-weight:600">Member</th>
+          <th style="padding:10px 12px;text-align:left;color:#94a3b8;font-weight:600">Phone</th>
+          <th style="padding:10px 12px;text-align:left;color:#94a3b8;font-weight:600">Status</th>
+          <th style="padding:10px 12px;text-align:left;color:#94a3b8;font-weight:600">Detail</th>
+        </tr>
+      </thead>
+      <tbody>${tableRows}</tbody>
+    </table>` : '<p style="color:#64748b;font-size:14px">No messages were sent for this session.</p>'}
+    <p style="margin-top:32px;font-size:12px;color:#475569">Sent by Rollcally · <a href="https://rollcally.com" style="color:#818cf8">rollcally.com</a></p>
+  </div>
+</body>
+</html>`
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from,
+        to: adminEmails,
+        subject: `Absence report — ${unitName} — ${service.date}`,
+        html,
+      }),
+    })
+  } catch (err) {
+    // Email failure must never break the SMS flow
+    console.warn('Absence report email failed (non-fatal):', String(err))
+  }
+}
+
 // ─── Request handler ──────────────────────────────────────────────────────────
 
 Deno.serve(async (req) => {
@@ -494,6 +588,7 @@ Deno.serve(async (req) => {
       if (svcErr || !service) return json(404, { error: 'Service not found' })
 
       const result = await processService(adminClient, service, dryRun)
+      if (!dryRun) await sendAbsenceReportEmail(adminClient, service, result)
       return json(200, { ...result, dry_run: dryRun })
     }
 
@@ -533,7 +628,9 @@ Deno.serve(async (req) => {
           .eq('service_id', row.id)
         if ((count ?? 0) > 0) continue
 
-        results[row.id] = await processService(adminClient, row, dryRun)
+        const svcResult = await processService(adminClient, row, dryRun)
+        results[row.id] = svcResult
+        if (!dryRun) await sendAbsenceReportEmail(adminClient, row, svcResult)
       }
 
       return json(200, { processed: Object.keys(results).length, results, dry_run: dryRun })
