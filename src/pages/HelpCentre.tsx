@@ -267,7 +267,7 @@ function MembersTab() {
         <div className="space-y-3">
           <IssueCard icon="check_circle" iconColor="#10b981" problem="Already checked in" resolution="You're already recorded for this event. Nothing to do." type="success" />
           <IssueCard icon="location_off" iconColor="#f59e0b" problem="Too far away" resolution="Enable location access and make sure you're physically at the venue." type="warning" />
-          <IssueCard icon="devices" iconColor="#f59e0b" problem="Device already in use" resolution="This device is linked to another member. Contact your group leader." type="warning" />
+          <IssueCard icon="devices" iconColor="#f59e0b" problem="Already Registered — device in use" resolution="Someone else already checked in using this device for this session. Each device can only be used for one person per event. Speak to your group leader if this is a mistake." type="warning" />
           <IssueCard icon="sync_problem" iconColor="#ef4444" problem="Sync Denied" resolution="Tap 'Re-verify Identity' to return to the member list and try again." type="warning" />
           <IssueCard icon="person_search" iconColor="#6366f1" problem="Name not found" resolution="Check your spelling or try your surname. Ask your admin to verify you're on the roster." type="info" />
         </div>
@@ -452,6 +452,55 @@ function AdminsTab() {
       </div>
 
       <div>
+        <SectionLabel>Location Enforcement</SectionLabel>
+        <h3 className="font-display text-xl font-bold text-white mb-4">Require Members to Be On-Site</h3>
+        <p className="text-sm text-slate-400 leading-relaxed mb-5">
+          When enabled for an event, members must be physically within a set radius of your venue to check in. Their device will be rejected if they are too far away.
+        </p>
+        <StepFlow steps={[
+          { icon: 'settings', title: 'Set venue coordinates', detail: 'Open your unit dashboard → tap the settings icon → scroll to Venue Location. Enter your address and tap Find, or type the coordinates manually. Set the check-in radius (default 100 m).' },
+          { icon: 'location_on', title: 'Enable per event', detail: 'Inside an event, tap the location toggle. It turns blue when active. A warning appears if your unit has no coordinates set yet.' },
+          { icon: 'check_circle', title: 'Members check in on-site', detail: 'Members are silently geolocated during check-in. If they are within range, check-in proceeds normally. If they are too far, they see a "Too far away" message.' },
+        ]} />
+        <TipBox>
+          The radius is measured in metres. 100 m works well for most indoor venues. Increase to 200–500 m if your building has thick walls or poor GPS reception.
+        </TipBox>
+      </div>
+
+      <div>
+        <SectionLabel>Absence Notifications</SectionLabel>
+        <h3 className="font-display text-xl font-bold text-white mb-4">SMS & Email Reports</h3>
+        <p className="text-sm text-slate-400 leading-relaxed mb-5">
+          After an event, you can send an SMS to every absent member who has given consent, and receive an email summary in your inbox.
+        </p>
+        <CardGrid>
+          <FeatureCard icon="sms" title="SMS to Absentees">
+            <p>Open an event → scroll to <strong className="text-white">Absence Messaging</strong></p>
+            <p>→ Enable messaging for the unit in settings</p>
+            <p>→ Tap <strong className="text-white">Send to all absentees</strong></p>
+            <p className="text-2xs text-slate-500 mt-2">Only members with SMS consent and a phone number are contacted. A cooldown window prevents repeat messages.</p>
+          </FeatureCard>
+          <FeatureCard icon="mail" title="Email Report to You">
+            <p>After sending SMS, you automatically receive an email listing every absent member and whether their SMS was delivered.</p>
+            <p className="text-2xs text-slate-500 mt-2">Sent to the unit owner's email address. Requires RESEND_API_KEY to be configured by your platform administrator.</p>
+          </FeatureCard>
+          <FeatureCard icon="tune" title="Messaging Settings">
+            <p>Inside the event → <strong className="text-white">Messaging Settings</strong></p>
+            <p>→ Enable / disable for the unit</p>
+            <p>→ Customise the SMS template using {'{{name}}'} and {'{{event}}'}</p>
+            <p>→ Set send hour and timezone</p>
+            <p>→ Set cooldown period (days)</p>
+          </FeatureCard>
+          <FeatureCard icon="credit_card" title="SMS Credits">
+            <p>Each SMS sent costs one credit from your plan balance.</p>
+            <p>→ View balance on the <strong className="text-white">Billing</strong> page</p>
+            <p>→ Credits reset monthly with your subscription</p>
+            <p className="text-2xs text-slate-500 mt-2">Blocked sends are logged but not charged.</p>
+          </FeatureCard>
+        </CardGrid>
+      </div>
+
+      <div>
         <SectionLabel>Analytics</SectionLabel>
         <CardGrid>
           <FeatureCard icon="person_check" title="Member Profile">
@@ -552,7 +601,8 @@ function OrgsTab() {
           {[
             { icon: 'edit', label: 'Rename organisation', detail: 'Tap settings on the org page' },
             { icon: 'delete_forever', label: 'Delete organisation', detail: 'Permanent — removes all units and history' },
-            { icon: 'tune', label: 'Edit unit', detail: 'Rename or update description' },
+            { icon: 'tune', label: 'Edit unit', detail: 'Rename, update description, or set venue coordinates for location enforcement' },
+            { icon: 'location_on', label: 'Set venue location', detail: 'Enter an address or coordinates in Unit Settings — required for location-enforced events' },
             { icon: 'remove_circle', label: 'Delete unit', detail: 'Removes all members and attendance history' },
           ].map(({ icon, label, detail }) => (
             <div key={icon} className="flex items-center gap-4 p-4 bg-surface-low rounded-xl hover:bg-surface-high transition-colors">
@@ -606,8 +656,8 @@ function TroubleshootingTab() {
       ),
     },
     {
-      q: 'I see "Device already in use"',
-      a: <p>This device has been used to check in a different member. Contact your group leader — they can mark your attendance manually from the admin dashboard.</p>,
+      q: 'I see "Already Registered"',
+      a: <p>Someone else already checked in using this device for this session. Each physical device can only be used for one person per event. If this is a mistake, speak to your group leader — they can mark your attendance manually from the admin dashboard.</p>,
     },
     {
       q: 'My organisation is not showing on my dashboard',

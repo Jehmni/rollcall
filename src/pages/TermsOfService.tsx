@@ -41,6 +41,7 @@ const TOC = [
   { id: 'data-processing', label: '8. Data Processing' },
   { id: 'notifications', label: '9. Push Notifications' },
   { id: 'sms-messaging', label: '10. SMS Absence Messaging' },
+  { id: 'location', label: '10a. Location-Based Check-In' },
   { id: 'subscriptions', label: '11. Subscriptions & Billing' },
   { id: 'third-parties', label: '12. Third-Party Services' },
   { id: 'disclaimers', label: '13. Disclaimers' },
@@ -273,11 +274,42 @@ export default function TermsOfService() {
                 'Members may also ask an administrator to update their SMS preference on their behalf.',
                 'Withdrawal of consent will be honoured at the next scheduled send — messages already queued at the time of withdrawal may still be delivered.',
               ]} />
+              <P><strong className="text-white">Absence report emails</strong></P>
+              <P>
+                When an SMS batch is sent, an automated email summarising the delivery results is sent to
+                the unit owner's registered email address. This report contains the same information already
+                visible on the event dashboard. By using the SMS feature you acknowledge that this report
+                will be generated and delivered on your behalf.
+              </P>
               <P>
                 Rollcally reserves the right to suspend or terminate SMS sending for any unit that uses
                 the feature in violation of these Terms or applicable law (including anti-spam legislation
                 such as the UK Privacy and Electronic Communications Regulations, GDPR, and the US
                 Telephone Consumer Protection Act).
+              </P>
+            </Section>
+
+            <Section id="location" title="10a. Location-Based Check-In">
+              <P>
+                The Service includes an optional location enforcement feature that administrators may enable
+                on a per-event basis. When enabled, the check-in page will request access to the member's
+                device location and the check-in will be rejected if the member is not within the configured
+                radius of the venue.
+              </P>
+              <P><strong className="text-white">Administrator responsibilities</strong></P>
+              <Ul items={[
+                'Administrators must set accurate venue coordinates in their unit settings before enabling location enforcement on any event.',
+                'You are responsible for ensuring the configured radius is appropriate for your venue.',
+                'You must inform members that location access will be requested when location enforcement is active.',
+                'Location enforcement must not be used to track members outside of the check-in flow.',
+              ]} />
+              <P><strong className="text-white">Member notice</strong></P>
+              <P>
+                When an event uses location enforcement, your device will request your approximate location
+                solely to verify you are on-site. Your browser will prompt you for permission before
+                accessing location. You may decline; however, check-in will not be possible for that event
+                without location access. Location data is used only for proximity verification and is not
+                stored or shared with third parties.
               </P>
             </Section>
 

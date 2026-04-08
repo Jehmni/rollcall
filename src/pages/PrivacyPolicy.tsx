@@ -147,7 +147,9 @@ export default function PrivacyPolicy() {
               <div className="bg-surface-low rounded-2xl p-5 space-y-0 mt-2">
                 <TableRow label="Account data" value="Email address and hashed password for administrator accounts." />
                 <TableRow label="Member data" value="Name, phone number, section/group, birthday (optional) — uploaded by administrators." />
-                <TableRow label="Attendance data" value="Event attendance records, check-in timestamps." />
+                <TableRow label="Attendance data" value="Event attendance records, check-in timestamps, and device identifiers used to enforce the one-device-per-member-per-event rule." />
+                <TableRow label="Location data" value="Approximate geolocation (latitude/longitude) captured from the member's device at check-in time, only when the administrator has enabled location enforcement for that event. This data is passed to our server to verify proximity to the venue and is not stored independently." />
+                <TableRow label="Venue data" value="Venue coordinates (latitude, longitude, radius in metres) stored per unit by administrators to support location-enforced check-in." />
                 <TableRow label="Push subscriptions" value="Browser push subscription endpoints for members who opt in to notifications." />
                 <TableRow label="SMS consent" value="A per-member, per-unit flag recording whether the member has consented to, or opted out of, SMS absence notifications. Null until the member is asked." />
                 <TableRow label="Billing data" value="Organisation name, subscription plan, and subscription status. Payment card details are never stored by Rollcally — they are handled exclusively by Stripe." />
@@ -170,11 +172,13 @@ export default function PrivacyPolicy() {
                 'Provide the attendance tracking, roster management, and notification features of the Service.',
                 'Send push notifications to members who have consented (triggered by administrators).',
                 'Send SMS absence notifications to members who have explicitly consented, when a unit administrator has enabled this feature.',
+                'Send absence report emails to the unit owner after an SMS batch is sent, summarising delivery outcomes.',
+                'Verify a member\'s proximity to a venue during check-in when location enforcement is enabled by the administrator.',
                 'Maintain security, detect fraud, and prevent abuse.',
                 'Diagnose technical issues and improve the reliability and performance of the Service.',
                 'Comply with legal obligations and enforce our Terms of Service.',
                 'Process subscription and billing transactions via Stripe, manage your plan, and enforce plan-level follow-up limits.',
-                'Send transactional emails related to your account (e.g. password reset, email confirmation).',
+                'Send transactional emails related to your account (e.g. password reset, email confirmation, absence reports).',
               ]} />
               <P>We do not use your data for targeted advertising or sell it to third parties.</P>
             </Section>
@@ -256,6 +260,14 @@ export default function PrivacyPolicy() {
               <Ul items={[
                 'Administrators configure a minimum cooldown period (default: 7 days) between messages to the same member. This prevents repeated messages when someone misses several consecutive events.',
                 'Administrators may set the cooldown to 0 (no limit) but are encouraged to use reasonable intervals to avoid message fatigue.',
+              ]} />
+
+              <P><strong className="text-white">Absence report emails to administrators</strong></P>
+              <Ul items={[
+                'After each SMS batch is sent, the unit owner automatically receives an email summarising the results: which members were absent, their phone numbers, and whether each SMS was successfully delivered.',
+                'This email is sent to the unit owner\'s registered email address via Resend, a third-party email delivery service.',
+                'The report contains the same member data already visible to the administrator on the event dashboard. It is not sent to any third party.',
+                'If email delivery is not configured by the platform operator, no report email is sent and the SMS process is unaffected.',
               ]} />
 
               <P><strong className="text-white">Third-party SMS providers</strong></P>
