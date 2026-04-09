@@ -31,7 +31,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
       const cleanup = scanner.isScanning
         ? scanner.stop()
         : Promise.resolve()
-      cleanup.catch(console.error).finally(() => scanner.clear().catch(console.error))
+      cleanup.catch(console.error).finally(() => Promise.resolve(scanner.clear()).catch(console.error))
     }
   // startScanner intentionally omitted — runs once on mount only
   // eslint-disable-next-line react-hooks/exhaustive-deps

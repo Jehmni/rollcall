@@ -62,7 +62,7 @@ export function useAttendance(serviceId: string | null, requireLocation = false)
 
     try {
       const result = await withRetry(
-        () => supabase.rpc('checkin_by_id', {
+        async () => await supabase.rpc('checkin_by_id', {
           p_member_id: memberId,
           p_service_id: serviceId,
           p_device_id: deviceId,
