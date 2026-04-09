@@ -110,6 +110,67 @@ test.describe('Check-in: confirmation flow', () => {
   })
 })
 
+/**
+ * Regression: the glow overlay (absolute inset-0) must have pointer-events-none
+ * so that tapping the search input on mobile actually focuses it.
+ * These tests use click() + pressSequentially() instead of fill() to catch the
+ * invisible-overlay-intercepts-tap class of bug.
+ */
+test.describe('Check-in: search input is tappable and typeable', () => {
+  test.beforeEach(async ({ page }) => {
+    silenceRealtime(page)
+    await mockGetServiceMembers(page)
+  })
+
+  test('search input can be focused by clicking it', async ({ page }) => {
+    await page.goto(`/checkin?service_id=${IDS.service}`)
+    const input = page.getByPlaceholder('Search your name…')
+    await input.click()
+    await expect(input).toBeFocused()
+  })
+
+  test('search input accepts typed characters after clicking', async ({ page }) => {
+    await page.goto(`/checkin?service_id=${IDS.service}`)
+    const input = page.getByPlaceholder('Search your name…')
+    await input.click()
+    await input.pressSequentially('Ali')
+    await expect(input).toHaveValue('Ali')
+    await expect(page.getByText('Alice Johnson')).toBeVisible()
+  })
+
+  test('full QR-scan-simulated flow: navigate with service_id, click input, type, select, confirm', async ({ page }) => {
+    await mockCheckinSuccess(page)
+    // Simulate arriving from a QR scan: page opens with service_id in URL
+    await page.goto(`/checkin?service_id=${IDS.service}`)
+    const input = page.getByPlaceholder('Search your name…')
+    // Must be clickable (the invisible glow div must not intercept the click)
+    await input.click()
+    await expect(input).toBeFocused()
+    // Type the query character by character (as a real user would on mobile keyboard)
+    await input.pressSequentially('Alice')
+    await expect(page.getByText('Alice Johnson')).toBeVisible()
+    // Select the member
+    await page.getByText('Alice Johnson').click()
+    await expect(page.getByText('Is this you?')).toBeVisible()
+    // Confirm check-in
+    await page.getByRole('button', { name: 'Yes, check me in' }).click()
+    await expect(page.getByText("You're in!")).toBeVisible()
+  })
+
+  test('duplicate check-in still shows correct error after tap-and-type flow', async ({ page }) => {
+    await mockCheckinAlreadyIn(page)
+    await page.goto(`/checkin?service_id=${IDS.service}`)
+    const input = page.getByPlaceholder('Search your name…')
+    await input.click()
+    await expect(input).toBeFocused()
+    await input.pressSequentially('Alice')
+    await page.getByText('Alice Johnson').click()
+    await page.getByRole('button', { name: 'Yes, check me in' }).click()
+    await expect(page.getByRole('heading', { name: 'Sync Denied' })).toBeVisible()
+    await expect(page.getByText(/Already checked in/)).toBeVisible()
+  })
+})
+
 test.describe('Check-in: result screens', () => {
   test.beforeEach(async ({ page }) => {
     silenceRealtime(page)
@@ -165,5 +226,95 @@ test.describe('Check-in: result screens', () => {
     await page.getByRole('button', { name: 'Yes, check me in' }).click()
     await page.getByRole('button', { name: 'Re-verify Identity' }).click()
     await expect(page.getByPlaceholder('Search your name…')).toBeVisible()
+  })
+})
+
+/**
+ * Mobile viewport suite (iPhone 14 — 390×844).
+ *
+ * At this width the bottom nav renders (sm:hidden hides it above 640 px) and the
+ * mobile software keyboard is what a real user would get. Running these tests at
+ * mobile dimensions means:
+ *   • The pointer-events regression is exercised in the exact layout where it bites.
+ *   • The full QR-scan → success → Done → landing flow is covered end-to-end.
+ *
+ * test.use() scoped inside describe applies only to this block.
+ */
+test.describe('Check-in: mobile viewport (390×844 — iPhone 14)', () => {
+  test.use({ viewport: { width: 390, height: 844 } })
+
+  test.beforeEach(async ({ page }) => {
+    silenceRealtime(page)
+    await mockGetServiceMembers(page)
+  })
+
+  test('search input is focusable by tap on mobile layout', async ({ page }) => {
+    await page.goto(`/checkin?service_id=${IDS.service}`)
+    const input = page.getByPlaceholder('Search your name…')
+    await input.click()
+    await expect(input).toBeFocused()
+  })
+
+  test('typing after tap shows matching members on mobile layout', async ({ page }) => {
+    await page.goto(`/checkin?service_id=${IDS.service}`)
+    const input = page.getByPlaceholder('Search your name…')
+    await input.click()
+    await input.pressSequentially('Alice')
+    await expect(input).toHaveValue('Alice')
+    await expect(page.getByText('Alice Johnson')).toBeVisible()
+  })
+
+  /**
+   * Full end-to-end flow as a real mobile user experiences it:
+   *   QR scan (simulated via URL) → tap search bar → type name →
+   *   select member → confirm → success screen → Done → landing page
+   */
+  test('full flow: QR scan → tap → type → select → confirm → success screen → Done → landing', async ({ page }) => {
+    await mockCheckinSuccess(page)
+
+    // Step 1 — arrive at check-in without a service (as the device would before scanning)
+    await page.goto('/checkin')
+    await expect(page.getByRole('button', { name: 'Tap to Scan' })).toBeVisible()
+
+    // Step 2 — simulate the QR scan result: scanner calls handleScan() which sets
+    //           service_id in the URL, matching exactly what the real app does
+    await page.goto(`/checkin?service_id=${IDS.service}`)
+
+    // Step 3 — tap the search input (the core mobile regression under test)
+    const input = page.getByPlaceholder('Search your name…')
+    await input.click()
+    await expect(input).toBeFocused()
+
+    // Step 4 — type name character-by-character (as a mobile keyboard would send it)
+    await input.pressSequentially('Alice')
+    await expect(page.getByText('Alice Johnson')).toBeVisible()
+
+    // Step 5 — select the member
+    await page.getByText('Alice Johnson').click()
+    await expect(page.getByText('Is this you?')).toBeVisible()
+
+    // Step 6 — confirm check-in
+    await page.getByRole('button', { name: 'Yes, check me in' }).click()
+
+    // Step 7 — success screen
+    await expect(page.getByText("You're in!")).toBeVisible()
+    await expect(page.getByText('Check-in Successful')).toBeVisible()
+
+    // Step 8 — Done button navigates back to landing page
+    await page.getByRole('button', { name: /done/i }).click()
+    await expect(page).toHaveURL('/')
+  })
+
+  test('duplicate check-in handled correctly on mobile layout', async ({ page }) => {
+    await mockCheckinAlreadyIn(page)
+    await page.goto(`/checkin?service_id=${IDS.service}`)
+    const input = page.getByPlaceholder('Search your name…')
+    await input.click()
+    await expect(input).toBeFocused()
+    await input.pressSequentially('Alice')
+    await page.getByText('Alice Johnson').click()
+    await page.getByRole('button', { name: 'Yes, check me in' }).click()
+    await expect(page.getByRole('heading', { name: 'Sync Denied' })).toBeVisible()
+    await expect(page.getByText(/Already checked in/)).toBeVisible()
   })
 })
