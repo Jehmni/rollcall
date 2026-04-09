@@ -423,7 +423,10 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
       toast(`Failed to update: ${error.message}`, 'error')
       return
     }
-    if (data) setSettings(data as UnitMessagingSettings)
+    if (data) {
+      setSettings(data as UnitMessagingSettings)
+      if (newEnabled) setOpen(true)
+    }
   }
 
   async function saveSettings() {
@@ -500,9 +503,15 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
         className="w-full flex items-center justify-between gap-3 px-4 py-3.5 hover:bg-white/[0.02] transition-colors rounded-xl"
       >
         <div className="flex items-center gap-3">
-          <span className={`material-symbols-outlined text-2xl ${enabled ? 'text-amber-400' : 'text-slate-500'}`}>
-            sms
-          </span>
+          {/* SMS icon with notification dot when enabled but panel is closed */}
+          <div className="relative flex-shrink-0">
+            <span className={`material-symbols-outlined text-2xl ${enabled ? 'text-amber-400' : 'text-slate-500'}`}>
+              sms
+            </span>
+            {enabled && !open && (
+              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-amber-400 border-2 border-surface-dark" />
+            )}
+          </div>
           <div className="text-left">
             <p className={`text-sm font-bold ${enabled ? 'text-white' : 'text-slate-400'}`}>
               Absence Messaging
@@ -524,9 +533,17 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
           >
             <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${enabled ? 'translate-x-4' : 'translate-x-0'}`} />
           </div>
-          <span className={`material-symbols-outlined text-slate-500 text-lg transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
-            expand_more
-          </span>
+          {/* CTA — explicit when closed, subtle when open */}
+          {open ? (
+            <span className="material-symbols-outlined text-slate-500 text-lg rotate-180">
+              expand_more
+            </span>
+          ) : (
+            <span className={`flex items-center gap-0.5 text-2xs font-bold tracking-wide ${enabled ? 'text-amber-400' : 'text-slate-500'}`}>
+              Configure
+              <span className="material-symbols-outlined text-base">chevron_right</span>
+            </span>
+          )}
         </div>
       </button>
 
