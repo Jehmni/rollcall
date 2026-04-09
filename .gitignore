@@ -28,4 +28,11 @@ Thumbs.db
 
 # Playwright
 playwright-report/
+playwright-report-integration/
 test-results/
+
+# Supabase CLI runtime state
+supabase/.temp/
+
+# Claude Code
+.claude/settings.local.json

@@ -2,7 +2,21 @@
   "permissions": {
     "allow": [
       "Bash(npm install:*)",
-      "Bash(npm list:*)"
+      "Bash(npm list:*)",
+      "Bash(find /c/Users/ofone/Documents/JEHMNi/Portfolio/rollcall -name *member* -type f)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx|sql\\)$\")",
+      "Bash(grep -r \"get_service_members_full\\\\|is_org_admin_by_service\" /c/Users/ofone/Documents/JEHMNi/Portfolio/rollcall/supabase --include=*.sql)",
+      "Bash(find /c/Users/ofone/Documents/JEHMNi/Portfolio/rollcall -name *service* -type f)",
+      "Bash(grep -E \"\\\\.\\(tsx\\)$\")",
+      "Bash(grep -n \"is_org_admin_by_service\" supabase/schema.sql supabase/migrations/*.sql)",
+      "Bash(xargs cat:*)",
+      "Bash(grep -rn \"\\\\$9\\\\|\\\\$29\\\\|\\\\$79\\\\|250.*follow\\\\|1,000.*follow\\\\|5,000.*follow\\\\|250 auto\\\\|1000 auto\\\\|5000 auto\\\\| 250\\\\b.*month\\\\| 1,000\\\\b.*month\\\\| 5,000\\\\b.*month\" --include=\"*.md\" --include=\"*.tsx\" --include=\"*.ts\")",
+      "Bash(grep -rn \"\\\\$9\\\\|\\\\$29\\\\|\\\\$79\\\\|250.*follow\\\\|1,000.*follow\\\\|5,000.*follow\" --include=\"*.md\" --include=\"*.tsx\" --include=\"*.ts\")",
+      "Bash(ls playwright.config*)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(npx playwright:*)",
+      "Bash(echo \"EXIT_CODE:$?\")",
+      "Bash(echo \"DONE_CODE:$?\")"
     ]
   }
 }
