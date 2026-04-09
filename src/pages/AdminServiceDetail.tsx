@@ -608,7 +608,6 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
           <div>
             <label className="block text-2xs font-black uppercase tracking-spaced text-slate-500 mb-1.5">
               Message template
-              <span className="normal-case font-medium tracking-normal ml-1 text-slate-600">— use {'{{name}}'} and {'{{event}}'}</span>
             </label>
             <textarea
               value={template}
@@ -616,6 +615,14 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
               rows={3}
               className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-amber-500/50 resize-none"
             />
+            <p className="text-2xs text-slate-500 mt-1.5 leading-relaxed">
+              Use{' '}
+              <code className="text-amber-400/80 bg-amber-500/10 px-1 rounded font-mono">{'{{name}}'}</code>
+              {' '}and{' '}
+              <code className="text-amber-400/80 bg-amber-500/10 px-1 rounded font-mono">{'{{event}}'}</code>
+              {' '}as placeholders — Rollcally replaces them with each member's name and the event type before sending.
+              Leave them exactly as written.
+            </p>
           </div>
 
           {/* Preview — MEDIUM-16: uses real absent member's name */}

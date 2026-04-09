@@ -485,11 +485,37 @@ function AdminsTab() {
             <p className="text-2xs text-slate-500 mt-2">Sent to the unit owner's email address. Requires RESEND_API_KEY to be configured by your platform administrator.</p>
           </FeatureCard>
           <FeatureCard icon="tune" title="Messaging Settings">
-            <p>Inside the event → <strong className="text-white">Messaging Settings</strong></p>
+            <p>Inside the event → <strong className="text-white">Absence Messaging</strong> → <strong className="text-white">Configure</strong></p>
             <p>→ Enable / disable for the unit</p>
-            <p>→ Customise the SMS template using {'{{name}}'} and {'{{event}}'}</p>
-            <p>→ Set send hour and timezone</p>
-            <p>→ Set cooldown period (days)</p>
+            <p>→ Set auto-send hour and timezone</p>
+            <p>→ Set cooldown period (days between messages)</p>
+            <p className="text-white font-semibold mt-2">Personalising the SMS template</p>
+            <p>
+              Your message template can include two special placeholders that Rollcally
+              replaces automatically before each SMS is sent:
+            </p>
+            <ul className="mt-1 space-y-1 pl-1">
+              <li>
+                <code className="text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded font-mono text-2xs">{'{{name}}'}</code>
+                <span className="ml-1.5">→ replaced with the member's full name</span>
+              </li>
+              <li>
+                <code className="text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded font-mono text-2xs">{'{{event}}'}</code>
+                <span className="ml-1.5">→ replaced with the event type (e.g. Sunday Service)</span>
+              </li>
+            </ul>
+            <p className="text-2xs text-slate-500 mt-2">
+              <strong className="text-slate-300">Important:</strong> leave{' '}
+              <code className="text-amber-400/80 bg-amber-500/10 px-1 rounded font-mono">{'{{name}}'}</code>{' '}
+              and{' '}
+              <code className="text-amber-400/80 bg-amber-500/10 px-1 rounded font-mono">{'{{event}}'}</code>{' '}
+              exactly as shown — do not replace them with real text. Rollcally fills
+              them in for each member automatically.
+            </p>
+            <p className="text-2xs text-slate-500 mt-1">
+              Example: <em>"Hi {'{{name}}'}, we missed you at {'{{event}}'} today. Hope you're well."</em>{' '}
+              becomes <em>"Hi Grace Adeyemi, we missed you at Sunday Service today. Hope you're well."</em>
+            </p>
           </FeatureCard>
           <FeatureCard icon="credit_card" title="SMS Credits">
             <p>Each SMS sent costs one credit from your plan balance.</p>
