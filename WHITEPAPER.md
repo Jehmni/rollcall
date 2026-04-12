@@ -56,7 +56,7 @@ The route model is explicit and role-gated in code. [Ref: src/App.tsx:37, src/co
 - Effective venue resolution (service override first, then unit defaults).
 - Device lock: one device cannot check in multiple members in one service.
 
-[Ref: src/hooks/useServiceInfo in src/hooks/useChoristers.ts:81, supabase/schema.sql:593, supabase/schema.sql:659]
+[Ref: src/hooks/useChoristers.ts:81, supabase/schema.sql:593, supabase/schema.sql:659]
 
 ### 3.3 Admin Insights and Control
 
