@@ -79,9 +79,16 @@ export default function CheckIn() {
 
   async function handleSmsConsent(consent: boolean) {
     const memberId = selected?.id ?? localStorage.getItem('rollcally_member_id')
-    if (memberId && unitId) {
+    if (memberId && unitId && serviceId) {
       localStorage.setItem(`rollcally_sms_asked_${memberId}_${unitId}`, '1')
-      await supabase.rpc('set_member_sms_consent', { p_member_id: memberId, p_consent: consent })
+      const { error } = await supabase.rpc('set_member_sms_consent', {
+        p_member_id: memberId,
+        p_consent: consent,
+        p_service_id: serviceId,
+      })
+      if (error) {
+        console.warn('set_member_sms_consent failed:', error.message)
+      }
     }
     setSmsConsent('done')
   }

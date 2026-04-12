@@ -429,11 +429,9 @@ create policy "Admins: view all attendance in their orgs"
     )
   );
 
-drop policy if exists "Anon: insert attendance via RPC" on attendance;
-create policy "Anon: insert attendance via RPC"
-  on attendance for insert
-  to anon
-  with check (true);
+-- No direct anonymous table inserts to attendance.
+-- Public check-ins are handled via checkin_by_id() (security definer),
+-- which enforces service/member validity, geofence, device lock, and dedupe.
 
 -- ---- member_notifications ----
 
