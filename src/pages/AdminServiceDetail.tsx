@@ -13,6 +13,12 @@ function LocationToggle({ service, onUpdate }: { service: Service; onUpdate: (up
   const [hasCoords, setHasCoords] = useState<boolean | null>(null)
 
   useEffect(() => {
+    // A venue is available if: (a) this service has its own override coords,
+    // or (b) the unit has default coordinates.
+    if (service.venue_lat && service.venue_lng) {
+      setHasCoords(true)
+      return
+    }
     supabase
       .from('units')
       .select('latitude, longitude')
@@ -21,7 +27,7 @@ function LocationToggle({ service, onUpdate }: { service: Service; onUpdate: (up
       .then(({ data }) => {
         setHasCoords(!!(data?.latitude && data?.longitude))
       })
-  }, [service.unit_id])
+  }, [service.unit_id, service.venue_lat, service.venue_lng])
 
   async function toggle() {
     setSaving(true)

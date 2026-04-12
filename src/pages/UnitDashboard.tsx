@@ -6,6 +6,9 @@ import { useAuth } from '../contexts/AuthContext'
 import { ConfirmDialog } from '../components/ui/Modal'
 import type { Service, Unit, OrgRole } from '../types'
 import { NotificationBell } from '../components/NotificationBell'
+import { searchVenue, formatGeoResult, QUALITY_COLOR, QUALITY_LABEL } from '../lib/geocoding'
+import type { GeoResult } from '../lib/geocoding'
+import { VenueMapPicker } from '../components/VenueMapPicker'
 
 
 function serviceStatus(dateStr: string): 'today' | 'upcoming' | 'past' {
@@ -114,19 +117,105 @@ function ServiceCard({
 // ── Create / Edit Event Modal ─────────────────────────────────────────────────
 function EventFormModal({
   editing, date, type, requireLocation, error, loading,
-  onChangeDate, onChangeType, onChangeRequireLocation, onSubmit, onClose,
+  venueMode, venueLat, venueLng, venueRadius, venueName, venueAddress,
+  onChangeDate, onChangeType, onChangeRequireLocation,
+  onChangeVenueMode, onChangeVenueLat, onChangeVenueLng,
+  onChangeVenueRadius, onChangeVenueName, onChangeVenueAddress,
+  onSubmit, onClose,
 }: {
   editing: Service | null
   date: string; type: string; requireLocation: boolean; error: string | null; loading: boolean
+  venueMode: 'unit_default' | 'override'
+  venueLat: string; venueLng: string; venueRadius: string
+  venueName: string; venueAddress: string
   onChangeDate: (v: string) => void
   onChangeType: (v: string) => void
   onChangeRequireLocation: (v: boolean) => void
+  onChangeVenueMode: (v: 'unit_default' | 'override') => void
+  onChangeVenueLat: (v: string) => void; onChangeVenueLng: (v: string) => void
+  onChangeVenueRadius: (v: string) => void
+  onChangeVenueName: (v: string) => void; onChangeVenueAddress: (v: string) => void
   onSubmit: (e: FormEvent) => void
   onClose: () => void
 }) {
+  // Internal geocoding state for the meeting-level override search
+  const [searchQuery, setSearchQuery] = useState('')
+  const [geoResults, setGeoResults] = useState<GeoResult[]>([])
+  const [geoNotice, setGeoNotice] = useState<string | null>(null)
+  const [geoLoading, setGeoLoading] = useState(false)
+  const [geoError, setGeoError] = useState<string | null>(null)
+  const [confirmedIdx, setConfirmedIdx] = useState<number | null>(null)
+  // VenueMapPicker state
+  const [mapPicker, setMapPicker] = useState<{ lat: number; lng: number; address: string; name: string; zoom?: number } | null>(null)
+
+  const overrideHasCoords = venueLat !== '' && venueLng !== ''
+  const radiusNum = venueRadius !== '' ? parseInt(venueRadius, 10) : 100
+
+  async function handleSearch() {
+    if (!searchQuery.trim()) return
+    setGeoLoading(true); setGeoError(null); setGeoResults([]); setGeoNotice(null); setConfirmedIdx(null)
+    try {
+      const { results, notice } = await searchVenue(searchQuery)
+      if (results.length === 0) {
+        setGeoError('No matching locations found. Try adding more detail — e.g. city, postcode, or country.')
+      } else {
+        setGeoResults(results)
+        setGeoNotice(notice)
+      }
+    } catch {
+      setGeoError('Could not reach the location service. Please enter coordinates manually.')
+    } finally {
+      setGeoLoading(false)
+    }
+  }
+
+  function selectResult(idx: number) {
+    const r = geoResults[idx]
+    const resolvedAddress = formatGeoResult(r)
+    const suggestedName = venueName || (r.address.amenity ?? r.address.building ?? r.address.house_name ?? r.address.road ?? r.address.suburb ?? r.address.city ?? r.address.town ?? '')
+    setMapPicker({ lat: parseFloat(r.lat), lng: parseFloat(r.lon), address: resolvedAddress, name: suggestedName })
+  }
+
+  function handleMapConfirm(pinLat: number, pinLng: number) {
+    if (!mapPicker) return
+    onChangeVenueLat(pinLat.toFixed(6))
+    onChangeVenueLng(pinLng.toFixed(6))
+    onChangeVenueAddress(mapPicker.address)
+    if (!venueName) onChangeVenueName(mapPicker.name)
+    setConfirmedIdx(geoResults.findIndex(r => parseFloat(r.lat) === mapPicker.lat && parseFloat(r.lon) === mapPicker.lng))
+    setMapPicker(null)
+  }
+
+  function openMapManually() {
+    const hasCoords = venueLat !== '' && venueLng !== ''
+    setMapPicker({
+      lat: hasCoords ? parseFloat(venueLat) : 20,
+      lng: hasCoords ? parseFloat(venueLng) : 0,
+      address: venueAddress,
+      name: venueName,
+      zoom: hasCoords ? 16 : 3,
+    })
+  }
+
+  // Show map picker as full-screen overlay when active
+  if (mapPicker) {
+    return (
+      <VenueMapPicker
+        initialLat={mapPicker.lat}
+        initialLng={mapPicker.lng}
+        initialZoom={mapPicker.zoom}
+        radiusMeters={radiusNum}
+        resolvedAddress={mapPicker.address}
+        venueName={mapPicker.name}
+        onConfirm={handleMapConfirm}
+        onCancel={() => setMapPicker(null)}
+      />
+    )
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300">
+      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
         <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mb-5 sm:hidden" />
 
         <div className="flex items-center gap-4 mb-6">
@@ -193,6 +282,184 @@ function EventFormModal({
             </div>
           </button>
 
+          {/* Meeting-level location override — only shown when location is required */}
+          {requireLocation && (
+            <div className="flex flex-col gap-3 rounded-xl bg-background-dark border border-border-dark p-4 animate-in fade-in duration-200">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Venue for this meeting</p>
+
+              {/* Mode selector */}
+              <div className="flex flex-col gap-2">
+                {(['unit_default', 'override'] as const).map(mode => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => onChangeVenueMode(mode)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all ${
+                      venueMode === mode
+                        ? 'bg-primary/10 border-primary/40 text-white'
+                        : 'bg-surface-dark border-border-dark text-slate-400 hover:border-slate-600'
+                    }`}
+                  >
+                    <div className={`size-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                      venueMode === mode ? 'border-primary' : 'border-slate-600'
+                    }`}>
+                      {venueMode === mode && <div className="size-2 rounded-full bg-primary" />}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold">
+                        {mode === 'unit_default' ? 'Use unit default venue' : 'Set a different venue for this meeting'}
+                      </p>
+                      <p className="text-2xs text-slate-500">
+                        {mode === 'unit_default'
+                          ? 'The coordinates set in Unit Settings will be used'
+                          : 'Override the venue just for this meeting'}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Override form */}
+              {venueMode === 'override' && (
+                <div className="flex flex-col gap-3 pt-1 border-t border-border-dark animate-in fade-in duration-200">
+                  <label className="flex flex-col gap-1">
+                    <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Venue Name</span>
+                    <input value={venueName} onChange={e => onChangeVenueName(e.target.value)}
+                      placeholder="e.g. Town Hall — Main Room"
+                      className="w-full bg-surface-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+                  </label>
+
+                  {/* Search */}
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                      <input
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleSearch())}
+                        placeholder="Search by address, postcode, area…"
+                        className="w-full bg-surface-dark border border-border-dark rounded-xl pl-3 pr-9 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
+                      />
+                      {searchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => setSearchQuery('')}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 size-6 flex items-center justify-center rounded-lg hover:bg-white/5 text-slate-500 hover:text-slate-300 transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-base">close</span>
+                        </button>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleSearch}
+                      disabled={!searchQuery.trim() || geoLoading}
+                      className="px-3 py-2 bg-primary/20 border border-primary/30 text-primary text-sm font-bold rounded-xl hover:bg-primary/30 active:scale-95 transition-all disabled:opacity-40 flex-shrink-0"
+                    >
+                      {geoLoading ? '…' : 'Search'}
+                    </button>
+                  </div>
+                  <p className="text-2xs text-slate-600 -mt-1">
+                    e.g. "12 Example Street", "10 Demo Avenue, Test City" or "AB1 2CD"
+                  </p>
+
+                  {geoError && (
+                    <p className="text-2xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-lg">{geoError}</p>
+                  )}
+
+                  {/* Notice banner */}
+                  {geoNotice && geoResults.length > 0 && confirmedIdx === null && (
+                    <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                      <span className="material-symbols-outlined text-amber-400 text-base flex-shrink-0 mt-0.5">info</span>
+                      <p className="text-2xs text-amber-300 leading-relaxed">{geoNotice}</p>
+                    </div>
+                  )}
+
+                  {geoResults.length > 0 && confirmedIdx === null && (
+                    <div className="flex flex-col gap-1.5">
+                      <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">
+                        Select the correct location
+                      </p>
+                      {geoResults.map((r, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => selectResult(i)}
+                          className="text-left px-3 py-2.5 rounded-xl bg-surface-dark border border-border-dark hover:border-primary/50 hover:bg-primary/5 active:scale-[0.99] transition-all"
+                        >
+                          <div className="flex items-start gap-2 mb-0.5">
+                            <p className="text-sm text-slate-100 font-medium leading-snug flex-1">{formatGeoResult(r)}</p>
+                            <span className={`flex-shrink-0 text-2xs font-bold px-1.5 py-0.5 rounded-md ${QUALITY_COLOR[r.quality]}`}>
+                              {QUALITY_LABEL[r.quality]}
+                            </span>
+                          </div>
+                          <p className="text-2xs text-slate-600">
+                            {parseFloat(r.lat).toFixed(5)}, {parseFloat(r.lon).toFixed(5)}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Place on map / no results fallback */}
+                  {confirmedIdx === null && geoResults.length === 0 && (
+                    <button
+                      type="button"
+                      onClick={openMapManually}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border-dark text-slate-400 hover:text-white hover:border-slate-600 text-sm transition-all active:scale-[0.98]"
+                    >
+                      <span className="material-symbols-outlined text-base">map</span>
+                      Place on map manually
+                    </button>
+                  )}
+
+                  {confirmedIdx !== null && (
+                    <div className="flex items-start gap-3 px-3 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
+                      <span className="material-symbols-outlined text-emerald-400 text-lg mt-0.5 flex-shrink-0">check_circle</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-2xs text-emerald-300 font-semibold">Location confirmed</p>
+                        <p className="text-2xs text-slate-400 mt-0.5 leading-relaxed">{venueAddress}</p>
+                        <p className="text-2xs text-slate-600">{venueLat}, {venueLng}</p>
+                      </div>
+                      <button type="button" onClick={() => { setConfirmedIdx(null); setGeoResults([]) }}
+                        className="text-slate-500 hover:text-slate-300 text-2xs underline underline-offset-2 flex-shrink-0">
+                        Change
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Manual coords fallback */}
+                  {!overrideHasCoords && confirmedIdx === null && (
+                    <details className="group">
+                      <summary className="text-2xs text-slate-500 cursor-pointer hover:text-slate-300 transition-colors list-none flex items-center gap-1">
+                        <span className="material-symbols-outlined text-sm group-open:rotate-90 transition-transform">chevron_right</span>
+                        Enter coordinates manually
+                      </summary>
+                      <div className="mt-2 grid grid-cols-2 gap-2">
+                        <label className="flex flex-col gap-1">
+                          <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Latitude</span>
+                          <input value={venueLat} onChange={e => onChangeVenueLat(e.target.value)} placeholder="e.g. 51.5074"
+                            className="w-full bg-surface-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 text-sm transition-all" />
+                        </label>
+                        <label className="flex flex-col gap-1">
+                          <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Longitude</span>
+                          <input value={venueLng} onChange={e => onChangeVenueLng(e.target.value)} placeholder="e.g. -0.1278"
+                            className="w-full bg-surface-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 text-sm transition-all" />
+                        </label>
+                      </div>
+                    </details>
+                  )}
+
+                  <label className="flex flex-col gap-1">
+                    <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Check-in radius (metres)</span>
+                    <input value={venueRadius} onChange={e => onChangeVenueRadius(e.target.value)}
+                      placeholder="100" type="number" min="10" max="5000"
+                      className="w-full bg-surface-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 text-sm transition-all" />
+                  </label>
+                </div>
+              )}
+            </div>
+          )}
+
           {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
           <div className="flex gap-3 justify-end pt-2">
             <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-xl hover:bg-border-dark transition-colors">
@@ -210,22 +477,101 @@ function EventFormModal({
   )
 }
 
+// UI labels/colours moved to geocoding.ts for DRY reuse
+
+
 // ── Settings Modal ────────────────────────────────────────────────────────────
 function SettingsModal({
-  name, desc, lat, lng, radius, geocoding, error, loading,
-  onChangeName, onChangeDesc, onChangeLat, onChangeLng, onChangeRadius, onGeocode,
+  name, desc, lat, lng, radius, venueName, address,
+  error, loading,
+  onChangeName, onChangeDesc,
+  onChangeLat, onChangeLng, onChangeRadius,
+  onChangeVenueName, onChangeAddress,
   onSubmit, onDelete, onClose,
 }: {
   name: string; desc: string
   lat: string; lng: string; radius: string
-  geocoding: boolean; error: string | null; loading: boolean
+  venueName: string; address: string
+  error: string | null; loading: boolean
   onChangeName: (v: string) => void; onChangeDesc: (v: string) => void
   onChangeLat: (v: string) => void; onChangeLng: (v: string) => void; onChangeRadius: (v: string) => void
-  onGeocode: (address: string) => void
+  onChangeVenueName: (v: string) => void; onChangeAddress: (v: string) => void
   onSubmit: (e: FormEvent) => void; onDelete: () => void; onClose: () => void
 }) {
-  const [address, setAddress] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [geoResults, setGeoResults] = useState<GeoResult[]>([])
+  const [geoNotice, setGeoNotice] = useState<string | null>(null)
+  const [geoLoading, setGeoLoading] = useState(false)
+  const [geoError, setGeoError] = useState<string | null>(null)
+  const [confirmedIdx, setConfirmedIdx] = useState<number | null>(null)
+  // VenueMapPicker state — holds the result being confirmed on the map
+  const [mapPicker, setMapPicker] = useState<{ lat: number; lng: number; address: string; name: string; zoom?: number } | null>(null)
+
   const hasCoords = lat !== '' && lng !== ''
+  const radiusNum = radius !== '' ? parseInt(radius, 10) : 100
+
+  async function handleSearch() {
+    if (!searchQuery.trim()) return
+    setGeoLoading(true); setGeoError(null); setGeoResults([]); setGeoNotice(null); setConfirmedIdx(null)
+    try {
+      const { results, notice } = await searchVenue(searchQuery)
+      if (results.length === 0) {
+        setGeoError('No matching locations found. Try adding more detail — e.g. city, postcode, or country.')
+      } else {
+        setGeoResults(results)
+        setGeoNotice(notice)
+      }
+    } catch {
+      setGeoError('Could not reach the location service. Please enter coordinates manually.')
+    } finally {
+      setGeoLoading(false)
+    }
+  }
+
+  function selectResult(idx: number) {
+    const r = geoResults[idx]
+    const resolvedAddress = formatGeoResult(r)
+    const suggestedName = venueName || (r.address.amenity ?? r.address.building ?? r.address.house_name ?? r.address.road ?? r.address.suburb ?? r.address.city ?? r.address.town ?? '')
+    // Open map picker for precise pin placement
+    setMapPicker({ lat: parseFloat(r.lat), lng: parseFloat(r.lon), address: resolvedAddress, name: suggestedName })
+  }
+
+  function handleMapConfirm(pinLat: number, pinLng: number) {
+    if (!mapPicker) return
+    onChangeLat(pinLat.toFixed(6))
+    onChangeLng(pinLng.toFixed(6))
+    onChangeAddress(mapPicker.address)
+    if (!venueName) onChangeVenueName(mapPicker.name)
+    setConfirmedIdx(geoResults.findIndex(r => parseFloat(r.lat) === mapPicker.lat && parseFloat(r.lon) === mapPicker.lng))
+    setMapPicker(null)
+  }
+
+  function openMapManually() {
+    const hasExisting = lat !== '' && lng !== ''
+    setMapPicker({
+      lat: hasExisting ? parseFloat(lat) : 20,
+      lng: hasExisting ? parseFloat(lng) : 0,
+      address: address,
+      name: venueName,
+      zoom: hasExisting ? 16 : 3,
+    })
+  }
+
+  // Show map picker as full-screen overlay when active
+  if (mapPicker) {
+    return (
+      <VenueMapPicker
+        initialLat={mapPicker.lat}
+        initialLng={mapPicker.lng}
+        initialZoom={mapPicker.zoom}
+        radiusMeters={radiusNum}
+        resolvedAddress={mapPicker.address}
+        venueName={mapPicker.name}
+        onConfirm={handleMapConfirm}
+        onCancel={() => setMapPicker(null)}
+      />
+    )
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -252,52 +598,168 @@ function SettingsModal({
               className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
           </label>
 
-          {/* Venue Location */}
-          <div className="flex flex-col gap-3 pt-1">
-            <div className="flex items-center gap-2">
+          {/* ── Default Venue Location ─────────────────────────────────────── */}
+          <div className="flex flex-col gap-3 pt-1 border-t border-border-dark">
+            <div className="flex items-center gap-2 pt-3">
               <span className="material-symbols-outlined text-primary text-lg">location_on</span>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Venue Location</span>
+              <div>
+                <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Default Venue</span>
+                <p className="text-2xs text-slate-500">Used for all meetings unless overridden per-event.</p>
+              </div>
               {hasCoords && (
                 <span className="ml-auto text-2xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Set</span>
               )}
             </div>
-            <div className="flex gap-2">
-              <input
-                value={address}
-                onChange={e => setAddress(e.target.value)}
-                placeholder="Enter venue address…"
-                className="flex-1 bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
-              />
+
+            {/* Venue name */}
+            <label className="flex flex-col gap-1">
+              <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Venue Name</span>
+              <input value={venueName} onChange={e => onChangeVenueName(e.target.value)}
+                placeholder="e.g. St Andrew's Church Hall"
+                className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+            </label>
+
+            {/* Address search */}
+            <div>
+              <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Find Location</span>
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <input
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleSearch())}
+                    placeholder="Search by address, postcode, area…"
+                    className="w-full bg-background-dark border border-border-dark rounded-xl pl-4 pr-10 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 size-7 flex items-center justify-center rounded-lg hover:bg-white/5 text-slate-500 hover:text-slate-300 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-base">close</span>
+                    </button>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSearch}
+                  disabled={!searchQuery.trim() || geoLoading}
+                  className="px-4 py-2 bg-primary/20 border border-primary/30 text-primary text-sm font-bold rounded-xl hover:bg-primary/30 active:scale-95 transition-all disabled:opacity-40 flex-shrink-0"
+                >
+                  {geoLoading ? '…' : 'Search'}
+                </button>
+              </div>
+              <p className="text-2xs text-slate-600 mt-1.5">
+                e.g. "12 Example Street", "10 Demo Avenue, Test City" or "AB1 2CD"
+              </p>
+            </div>
+
+            {/* Geocode error */}
+            {geoError && (
+              <p className="text-2xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-lg">{geoError}</p>
+            )}
+
+            {/* Notice banner (e.g. postcode centroid warning) */}
+            {geoNotice && geoResults.length > 0 && confirmedIdx === null && (
+              <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                <span className="material-symbols-outlined text-amber-400 text-base flex-shrink-0 mt-0.5">info</span>
+                <p className="text-2xs text-amber-300 leading-relaxed">{geoNotice}</p>
+              </div>
+            )}
+
+            {/* Results list — admin must pick explicitly */}
+            {geoResults.length > 0 && confirmedIdx === null && (
+              <div className="flex flex-col gap-1.5">
+                <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">
+                  {geoResults.length} result{geoResults.length > 1 ? 's' : ''} — select the correct location
+                </p>
+                {geoResults.map((r, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => selectResult(i)}
+                    className="text-left px-3 py-2.5 rounded-xl bg-background-dark border border-border-dark hover:border-primary/50 hover:bg-primary/5 active:scale-[0.99] transition-all"
+                  >
+                    <div className="flex items-start gap-2 mb-0.5">
+                      <p className="text-sm text-slate-100 font-medium leading-snug flex-1">{formatGeoResult(r)}</p>
+                      <span className={`flex-shrink-0 text-2xs font-bold px-1.5 py-0.5 rounded-md ${QUALITY_COLOR[r.quality]}`}>
+                        {QUALITY_LABEL[r.quality]}
+                      </span>
+                    </div>
+                    <p className="text-2xs text-slate-600">
+                      {parseFloat(r.lat).toFixed(5)}, {parseFloat(r.lon).toFixed(5)}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Place on map / no results fallback */}
+            {confirmedIdx === null && geoResults.length === 0 && (
               <button
                 type="button"
-                onClick={() => onGeocode(address)}
-                disabled={!address.trim() || geocoding}
-                className="px-4 py-2 bg-primary/20 border border-primary/30 text-primary text-sm font-bold rounded-xl hover:bg-primary/30 active:scale-95 transition-all disabled:opacity-40 flex-shrink-0"
+                onClick={openMapManually}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border-dark text-slate-400 hover:text-white hover:border-slate-600 text-sm transition-all active:scale-[0.98]"
               >
-                {geocoding ? '…' : 'Find'}
+                <span className="material-symbols-outlined text-base">map</span>
+                Place on map manually
               </button>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <label className="flex flex-col gap-1">
-                <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Latitude</span>
-                <input value={lat} onChange={e => onChangeLat(e.target.value)} placeholder="e.g. 51.5074"
-                  className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Longitude</span>
-                <input value={lng} onChange={e => onChangeLng(e.target.value)} placeholder="e.g. -0.1278"
-                  className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
-              </label>
-            </div>
+            )}
+
+            {/* Confirmed selection summary */}
+            {confirmedIdx !== null && (
+              <div className="flex items-start gap-3 px-3 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
+                <span className="material-symbols-outlined text-emerald-400 text-lg mt-0.5 flex-shrink-0">check_circle</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-emerald-300 font-semibold">Location confirmed</p>
+                  <p className="text-2xs text-slate-400 mt-0.5 leading-relaxed">{address}</p>
+                  <p className="text-2xs text-slate-600 mt-0.5">{lat}, {lng}</p>
+                </div>
+                <button type="button" onClick={() => { setConfirmedIdx(null); setGeoResults([]) }}
+                  className="text-slate-500 hover:text-slate-300 text-2xs underline underline-offset-2 flex-shrink-0">
+                  Change
+                </button>
+              </div>
+            )}
+
+            {/* Manual coordinate inputs (always available as fallback) */}
+            <details className="group">
+              <summary className="text-2xs text-slate-500 cursor-pointer hover:text-slate-300 transition-colors list-none flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm group-open:rotate-90 transition-transform">chevron_right</span>
+                Enter coordinates manually
+              </summary>
+              <div className="mt-2 flex flex-col gap-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="flex flex-col gap-1">
+                    <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Latitude</span>
+                    <input value={lat} onChange={e => onChangeLat(e.target.value)} placeholder="e.g. 51.5074"
+                      className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+                  </label>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Longitude</span>
+                    <input value={lng} onChange={e => onChangeLng(e.target.value)} placeholder="e.g. -0.1278"
+                      className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+                  </label>
+                </div>
+                <label className="flex flex-col gap-1">
+                  <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Stored Address</span>
+                  <input value={address} onChange={e => onChangeAddress(e.target.value)}
+                    placeholder="Full address (used for display)"
+                    className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+                </label>
+              </div>
+            </details>
+
             <label className="flex flex-col gap-1">
               <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Check-in radius (metres)</span>
               <input value={radius} onChange={e => onChangeRadius(e.target.value)} placeholder="100"
                 type="number" min="10" max="5000"
                 className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+              <p className="text-2xs text-slate-600 leading-relaxed">
+                Members must be within this radius to check in when location enforcement is enabled.
+              </p>
             </label>
-            <p className="text-2xs text-slate-600 leading-relaxed">
-              Members must be within this radius to check in when location enforcement is enabled on an event.
-            </p>
           </div>
 
           {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
@@ -392,16 +854,26 @@ export default function UnitDashboard() {
   const [userRole, setUserRole] = useState<OrgRole>('member')
   const [isOwnerOrCreator, setIsOwnerOrCreator] = useState(false)
 
-  // Forms state
-  const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0])
-  const [newType, setNewType] = useState('')
-  const [newRequireLocation, setNewRequireLocation] = useState(false)
+  // Forms state — unit settings
   const [newName, setNewName] = useState('')
   const [newDesc, setNewDesc] = useState('')
   const [newLat, setNewLat] = useState('')
   const [newLng, setNewLng] = useState('')
   const [newRadius, setNewRadius] = useState('100')
-  const [geocoding, setGeocoding] = useState(false)
+  const [newVenueName, setNewVenueName] = useState('')
+  const [newAddress, setNewAddress] = useState('')
+
+  // Forms state — event create/edit
+  const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0])
+  const [newType, setNewType] = useState('')
+  const [newRequireLocation, setNewRequireLocation] = useState(false)
+  const [svcVenueMode, setSvcVenueMode] = useState<'unit_default' | 'override'>('unit_default')
+  const [svcVenueLat, setSvcVenueLat] = useState('')
+  const [svcVenueLng, setSvcVenueLng] = useState('')
+  const [svcVenueRadius, setSvcVenueRadius] = useState('100')
+  const [svcVenueName, setSvcVenueName] = useState('')
+  const [svcVenueAddress, setSvcVenueAddress] = useState('')
+
   const [isUpdating, setIsUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -433,6 +905,8 @@ export default function UnitDashboard() {
           setNewLat(data.latitude != null ? String(data.latitude) : '')
           setNewLng(data.longitude != null ? String(data.longitude) : '')
           setNewRadius(data.radius_meters != null ? String(data.radius_meters) : '100')
+          setNewVenueName(data.venue_name ?? '')
+          setNewAddress(data.address ?? '')
           const role = org?.organization_members?.[0]?.role || 'member'
           setUserRole(role)
           setIsOwnerOrCreator(isSuper || role === 'owner' || data.created_by_admin_id === session.user.id)
@@ -440,11 +914,18 @@ export default function UnitDashboard() {
       })
   }, [unitId, session?.user?.id, isSuper])
 
+  function resetSvcVenue() {
+    setSvcVenueMode('unit_default')
+    setSvcVenueLat(''); setSvcVenueLng(''); setSvcVenueRadius('100')
+    setSvcVenueName(''); setSvcVenueAddress('')
+  }
+
   function openCreate() {
     setEditingService(null)
     setNewDate(new Date().toISOString().split('T')[0])
     setNewType('')
     setNewRequireLocation(false)
+    resetSvcVenue()
     setError(null)
     setShowCreate(true)
   }
@@ -454,6 +935,14 @@ export default function UnitDashboard() {
     setNewDate(svc.date)
     setNewType(svc.service_type)
     setNewRequireLocation(svc.require_location)
+    // Populate venue override from service if present
+    const hasOverride = svc.venue_lat != null && svc.venue_lng != null
+    setSvcVenueMode(hasOverride ? 'override' : 'unit_default')
+    setSvcVenueLat(svc.venue_lat != null ? String(svc.venue_lat) : '')
+    setSvcVenueLng(svc.venue_lng != null ? String(svc.venue_lng) : '')
+    setSvcVenueRadius(svc.venue_radius_meters != null ? String(svc.venue_radius_meters) : '100')
+    setSvcVenueName(svc.venue_name ?? '')
+    setSvcVenueAddress(svc.venue_address ?? '')
     setError(null)
     setShowCreate(true)
   }
@@ -461,11 +950,22 @@ export default function UnitDashboard() {
   async function handleEventSubmit(e: FormEvent) {
     e.preventDefault(); setError(null); setIsUpdating(true)
     try {
+      // Build venue override only when mode is 'override' and coordinates are provided
+      const venueOverride = svcVenueMode === 'override' && svcVenueLat && svcVenueLng
+        ? {
+            venue_name: svcVenueName.trim() || null,
+            venue_address: svcVenueAddress.trim() || null,
+            venue_lat: parseFloat(svcVenueLat),
+            venue_lng: parseFloat(svcVenueLng),
+            venue_radius_meters: svcVenueRadius ? parseInt(svcVenueRadius, 10) : 100,
+          }
+        : undefined
+
       if (editingService) {
-        await updateService(editingService.id, newDate, newType, newRequireLocation)
+        await updateService(editingService.id, newDate, newType, newRequireLocation, venueOverride)
         setShowCreate(false); setEditingService(null)
       } else {
-        const svc = await createService(newDate, newType, newRequireLocation)
+        const svc = await createService(newDate, newType, newRequireLocation, venueOverride)
         setShowCreate(false)
         navigate(`/admin/units/${unitId}/events/${svc.id}`)
       }
@@ -487,29 +987,6 @@ export default function UnitDashboard() {
     } finally { setIsUpdating(false) }
   }
 
-  async function handleGeocode(address: string) {
-    if (!address.trim()) return
-    setGeocoding(true)
-    setError(null)
-    try {
-      const params = new URLSearchParams({ q: address, format: 'json', limit: '1' })
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
-        headers: { 'Accept-Language': 'en', 'User-Agent': 'Rollcally/1.0' },
-      })
-      const results = await res.json() as Array<{ lat: string; lon: string }>
-      if (results.length === 0) {
-        setError('Address not found. Try a more specific address or enter coordinates manually.')
-      } else {
-        setNewLat(parseFloat(results[0].lat).toFixed(6))
-        setNewLng(parseFloat(results[0].lon).toFixed(6))
-      }
-    } catch {
-      setError('Could not look up address. Please enter coordinates manually.')
-    } finally {
-      setGeocoding(false)
-    }
-  }
-
   async function handleUpdateUnit(e: FormEvent) {
     e.preventDefault(); if (!unitId) return; setError(null); setIsUpdating(true)
     try {
@@ -520,7 +997,13 @@ export default function UnitDashboard() {
         unitId,
         newName.trim(),
         newDesc.trim() || undefined,
-        { latitude: parsedLat, longitude: parsedLng, radius_meters: parsedRadius },
+        {
+          latitude: parsedLat,
+          longitude: parsedLng,
+          radius_meters: parsedRadius,
+          venue_name: newVenueName.trim() || null,
+          address: newAddress.trim() || null,
+        },
       )
       setUnit(updated); setShowSettings(false)
     } catch (err) { setError(err instanceof Error ? err.message : 'Failed to update unit') }
@@ -780,7 +1263,14 @@ export default function UnitDashboard() {
         <EventFormModal
           editing={editingService}
           date={newDate} type={newType} requireLocation={newRequireLocation} error={error} loading={isUpdating}
+          venueMode={svcVenueMode}
+          venueLat={svcVenueLat} venueLng={svcVenueLng} venueRadius={svcVenueRadius}
+          venueName={svcVenueName} venueAddress={svcVenueAddress}
           onChangeDate={setNewDate} onChangeType={setNewType} onChangeRequireLocation={setNewRequireLocation}
+          onChangeVenueMode={setSvcVenueMode}
+          onChangeVenueLat={setSvcVenueLat} onChangeVenueLng={setSvcVenueLng}
+          onChangeVenueRadius={setSvcVenueRadius}
+          onChangeVenueName={setSvcVenueName} onChangeVenueAddress={setSvcVenueAddress}
           onSubmit={handleEventSubmit}
           onClose={() => { setShowCreate(false); setEditingService(null); setError(null) }}
         />
@@ -799,10 +1289,11 @@ export default function UnitDashboard() {
         <SettingsModal
           name={newName} desc={newDesc}
           lat={newLat} lng={newLng} radius={newRadius}
-          geocoding={geocoding} error={error} loading={isUpdating}
+          venueName={newVenueName} address={newAddress}
+          error={error} loading={isUpdating}
           onChangeName={setNewName} onChangeDesc={setNewDesc}
           onChangeLat={setNewLat} onChangeLng={setNewLng} onChangeRadius={setNewRadius}
-          onGeocode={handleGeocode}
+          onChangeVenueName={setNewVenueName} onChangeAddress={setNewAddress}
           onSubmit={handleUpdateUnit}
           onDelete={() => { setShowSettings(false); setConfirmDelete(true) }}
           onClose={() => { setShowSettings(false); setError(null) }}

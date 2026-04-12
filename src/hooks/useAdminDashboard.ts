@@ -112,7 +112,13 @@ export function useUnits(orgId: string | null) {
     id: string,
     name: string,
     description?: string,
-    location?: { latitude: number | null; longitude: number | null; radius_meters: number | null },
+    location?: {
+      latitude: number | null
+      longitude: number | null
+      radius_meters: number | null
+      venue_name: string | null
+      address: string | null
+    },
   ): Promise<Unit> {
     const { data, error } = await supabase
       .from('units')
@@ -207,11 +213,28 @@ export function useServices(unitId: string | null) {
 
   useEffect(() => { setLoading(true); fetch() }, [fetch])
 
-  async function createService(date: string, service_type: string, require_location = false): Promise<Service> {
+  async function createService(
+    date: string,
+    service_type: string,
+    require_location = false,
+    venueOverride?: {
+      venue_name: string | null
+      venue_address: string | null
+      venue_lat: number | null
+      venue_lng: number | null
+      venue_radius_meters: number | null
+    },
+  ): Promise<Service> {
     if (!unitId) throw new Error('No unit selected')
     const { data, error } = await supabase
       .from('services')
-      .insert({ unit_id: unitId, date, service_type, require_location })
+      .insert({
+        unit_id: unitId,
+        date,
+        service_type,
+        require_location,
+        ...(venueOverride ?? {}),
+      })
       .select()
       .single()
     if (error) throw error
@@ -219,10 +242,33 @@ export function useServices(unitId: string | null) {
     return data
   }
 
-  async function updateService(id: string, date: string, service_type: string, require_location = false): Promise<Service> {
+  async function updateService(
+    id: string,
+    date: string,
+    service_type: string,
+    require_location = false,
+    venueOverride?: {
+      venue_name: string | null
+      venue_address: string | null
+      venue_lat: number | null
+      venue_lng: number | null
+      venue_radius_meters: number | null
+    },
+  ): Promise<Service> {
     const { data, error } = await supabase
       .from('services')
-      .update({ date, service_type, require_location })
+      .update({
+        date,
+        service_type,
+        require_location,
+        // Always write venue override fields so that switching back to
+        // "use unit default" correctly clears any previously stored override.
+        venue_name: venueOverride?.venue_name ?? null,
+        venue_address: venueOverride?.venue_address ?? null,
+        venue_lat: venueOverride?.venue_lat ?? null,
+        venue_lng: venueOverride?.venue_lng ?? null,
+        venue_radius_meters: venueOverride?.venue_radius_meters ?? null,
+      })
       .eq('id', id)
       .select()
       .single()

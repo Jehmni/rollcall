@@ -68,7 +68,7 @@ export default function AdminUpdatePassword() {
               UPDATE SECURITY
             </h1>
             <p className="mt-2 text-2xs font-black uppercase tracking-spread text-primary/60">
-              Credentials modification protocol
+              Change your password
             </p>
           </div>
         </div>
@@ -80,10 +80,10 @@ export default function AdminUpdatePassword() {
                 <span className="material-symbols-outlined text-primary-light text-5xl" aria-hidden="true">check_circle</span>
               </div>
               <div className="space-y-4">
-                <h2 className="text-2xl font-display font-bold text-white uppercase tracking-tighter">Security Updated</h2>
+                <h2 className="text-2xl font-display font-bold text-white uppercase tracking-tighter">Password Updated</h2>
                 <p className="text-xs font-bold text-slate-500 uppercase tracking-spaced leading-loose px-4">
-                  New credentials have been successfully authorized. <br/>
-                  <span className="text-primary-light font-black">Redirecting to headquarters...</span>
+                  Your password has been updated. <br/>
+                  <span className="text-primary-light font-black">Taking you to the login page...</span>
                 </p>
               </div>
               <Button
@@ -104,12 +104,12 @@ export default function AdminUpdatePassword() {
 
               <div className="rounded-2xl bg-primary/5 p-5 flex gap-4 text-2xs font-bold text-primary-light border border-primary/10 leading-relaxed uppercase tracking-widest">
                 <span className="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">shield_lock</span>
-                <p>Authorized access requires a unique security string of at least 6 characters.</p>
+                <p>Your password must be at least 6 characters long.</p>
               </div>
 
               <div className="space-y-6">
                 <Input
-                  label="New Security String"
+                  label="New Password"
                   type="password"
                   placeholder="••••••••"
                   value={password}
@@ -120,7 +120,7 @@ export default function AdminUpdatePassword() {
                 />
 
                 <Input
-                  label="Verify Security String"
+                  label="Confirm New Password"
                   type="password"
                   placeholder="••••••••"
                   value={confirmPassword}
@@ -135,7 +135,7 @@ export default function AdminUpdatePassword() {
                 loading={loading}
                 className="w-full h-16 rounded-[1.5rem] font-black uppercase tracking-spaced text-xs shadow-2xl shadow-primary/30 transition-all hover:scale-[1.02] active:scale-95 group overflow-hidden relative"
               >
-                <span className="relative z-10">Finalize Update</span>
+                <span className="relative z-10">Save Password</span>
                 <div className="absolute top-0 left-0 w-full h-full bg-white/10 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" aria-hidden="true"></div>
               </Button>
             </form>
@@ -143,7 +143,7 @@ export default function AdminUpdatePassword() {
         </div>
 
         <p className="mt-12 text-center text-2xs font-bold text-slate-600 uppercase tracking-spaced max-w-xs mx-auto leading-relaxed">
-          Standard operational protocols apply. Security modifications are tracked and archived.
+          Your password is encrypted and stored securely.
         </p>
       </div>
     </div>

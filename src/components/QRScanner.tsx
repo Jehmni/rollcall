@@ -63,7 +63,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
             }
           } catch {
             console.error('Invalid QR URL', decodedText)
-            setError('Not a valid Rollcally service QR code')
+            setError('That QR code is not for this app. Try scanning again.')
           }
         },
         () => {} // Silent frame errors
@@ -72,7 +72,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
     } catch (err: unknown) {
       console.error(err)
       setPermissionState('denied')
-      setError('Camera access failed. Please enable permissions in your browser settings.')
+      setError('Camera access failed. Please allow camera access and try again.')
     }
   }
 
@@ -112,15 +112,15 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                     <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-red-500/10 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.1)]">
                       <span className="material-symbols-outlined text-4xl text-red-500">no_photography</span>
                     </div>
-                    <p className="mb-2 text-xl font-display font-bold text-white uppercase tracking-tighter">Access Denied</p>
+                    <p className="mb-2 text-xl font-display font-bold text-white uppercase tracking-tighter">Camera Blocked</p>
                     <p className="mb-8 text-sm text-slate-400 leading-relaxed font-medium">
-                      Camera permissions are required to scan venue nodes. Please update your system settings.
+                      Please allow camera access to scan the QR code.
                     </p>
-                    <button 
+                    <button
                       className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95 uppercase tracking-widest text-xs"
                       onClick={() => startScanner()}
                     >
-                      Retry Authorization
+                      Try Again
                     </button>
                   </>
                 ) : permissionState === 'requesting' ? (
@@ -128,20 +128,20 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                     <div className="mb-6 relative">
                       <div className="absolute inset-0 bg-primary/20 blur-2xl animate-pulse"></div>
                       <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 border border-primary/20">
-                        <span className="material-symbols-outlined text-5xl animate-spin text-primary">sync</span>
+                        <span className="material-symbols-outlined text-5xl animate-spin text-primary">progress_activity</span>
                       </div>
                     </div>
-                    <p className="text-xl font-display font-bold text-white uppercase tracking-tighter mb-2">Syncing...</p>
-                    <p className="text-sm text-slate-400 font-medium">Authorizing system camera access</p>
+                    <p className="text-xl font-display font-bold text-white uppercase tracking-tighter mb-2">Starting camera…</p>
+                    <p className="text-sm text-slate-400 font-medium">Turning on your camera</p>
                   </>
                 ) : (
                   <>
                     <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 border border-primary/20">
                       <span className="material-symbols-outlined text-4xl text-primary">photo_camera</span>
                     </div>
-                    <p className="mb-2 text-xl font-display font-bold text-white uppercase tracking-tighter">Capture Ready</p>
+                    <p className="mb-2 text-xl font-display font-bold text-white uppercase tracking-tighter">Ready to Scan</p>
                     <p className="mb-8 text-sm text-slate-400 font-medium leading-relaxed">
-                      Initialize your physical scan module to continue check-in protocol.
+                      Tap the button below to turn on your camera.
                     </p>
                     <button 
                       className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-2xl shadow-xl shadow-primary/30 transition-all active:scale-95 uppercase tracking-spaced text-xs"

@@ -65,12 +65,28 @@ export function useMemberById(memberId: string | null) {
   return { member, loading, error }
 }
 
+export interface EffectiveVenueLocation {
+  /** Resolved latitude (service override → unit default → null) */
+  lat: number | null
+  /** Resolved longitude */
+  lng: number | null
+  /** Resolved check-in radius in metres */
+  radiusMeters: number
+  /** Human-readable venue name */
+  venueName: string | null
+  /** Formatted address string */
+  venueAddress: string | null
+}
+
 export function useServiceInfo(serviceId: string | null) {
   const [unitName, setUnitName] = useState<string | null>(null)
   const [unitId, setUnitId] = useState<string | null>(null)
   const [requireLocation, setRequireLocation] = useState(false)
   const [smsEnabled, setSmsEnabled] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [effectiveVenue, setEffectiveVenue] = useState<EffectiveVenueLocation>({
+    lat: null, lng: null, radiusMeters: 100, venueName: null, venueAddress: null,
+  })
 
   useEffect(() => {
     if (!serviceId) return
@@ -78,18 +94,51 @@ export function useServiceInfo(serviceId: string | null) {
     setLoading(true)
     supabase
       .from('services')
-      .select('unit_id, require_location, units(name)')
+      .select(`
+        unit_id, require_location,
+        venue_name, venue_address, venue_lat, venue_lng, venue_radius_meters,
+        units(name, venue_name, address, latitude, longitude, radius_meters)
+      `)
       .eq('id', serviceId)
       .single()
       .then(({ data, error }) => {
         if (!error && data) {
-          const uid = (data as unknown as { unit_id: string }).unit_id || null
-          setUnitName(((data.units as unknown) as { name: string } | null)?.name || null)
+          const row = data as unknown as {
+            unit_id: string
+            require_location: boolean
+            venue_name: string | null
+            venue_address: string | null
+            venue_lat: number | null
+            venue_lng: number | null
+            venue_radius_meters: number | null
+            units: {
+              name: string
+              venue_name: string | null
+              address: string | null
+              latitude: number | null
+              longitude: number | null
+              radius_meters: number | null
+            } | null
+          }
+
+          const uid = row.unit_id || null
           setUnitId(uid)
-          setRequireLocation((data as unknown as { require_location: boolean }).require_location ?? false)
+          setUnitName(row.units?.name ?? null)
+          setRequireLocation(row.require_location ?? false)
+
+          // Compute effective venue: service override takes precedence
+          const hasServiceOverride = row.venue_lat != null && row.venue_lng != null
+          setEffectiveVenue({
+            lat: hasServiceOverride ? row.venue_lat : (row.units?.latitude ?? null),
+            lng: hasServiceOverride ? row.venue_lng : (row.units?.longitude ?? null),
+            radiusMeters: (hasServiceOverride
+              ? row.venue_radius_meters
+              : row.units?.radius_meters) ?? 100,
+            venueName: (hasServiceOverride ? row.venue_name : row.units?.venue_name) ?? null,
+            venueAddress: (hasServiceOverride ? row.venue_address : row.units?.address) ?? null,
+          })
 
           // Check if SMS absence messaging is enabled for this unit.
-          // Used by the check-in consent prompt.
           if (uid) {
             supabase
               .from('unit_messaging_settings')
@@ -105,5 +154,5 @@ export function useServiceInfo(serviceId: string | null) {
       })
   }, [serviceId])
 
-  return { unitName, unitId, requireLocation, smsEnabled, loading }
+  return { unitName, unitId, requireLocation, smsEnabled, loading, effectiveVenue }
 }

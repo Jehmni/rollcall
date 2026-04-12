@@ -1,9 +1,22 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-export type LocationStatus = 'checking' | 'within' | 'outside' | 'unavailable'
+/**
+ * Distinct location states:
+ *  checking          – geolocation request is in flight
+ *  within            – device is inside the venue radius
+ *  outside           – device is outside the venue radius
+ *  permission_denied – the user explicitly denied location access
+ *  unavailable       – geolocation timed out, errored, or the venue has no coordinates
+ */
+export type LocationStatus =
+  | 'checking'
+  | 'within'
+  | 'outside'
+  | 'permission_denied'
+  | 'unavailable'
 
-function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+export function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371000
   const toRad = (x: number) => (x * Math.PI) / 180
   const dLat = toRad(lat2 - lat1)
@@ -14,39 +27,60 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
+interface VenueOverride {
+  lat: number
+  lng: number
+  radiusMeters: number
+}
+
 /**
- * Check whether the device is within the venue radius for a given unit.
- * Coordinates are fetched from `units.latitude/longitude/radius_meters`.
- * Returns `unavailable` if the unit has no coordinates or geolocation is denied.
+ * Resolves whether the device is within the venue radius.
+ *
+ * Pass `venueOverride` when you already have the effective lat/lng/radius
+ * (e.g. from useServiceInfo's effectiveVenue), so the hook doesn't need to
+ * fetch it from the unit table again.
+ *
+ * Returns `{ locationStatus, configured }`:
+ *   - configured  true when the venue has coordinates set
+ *   - locationStatus  see LocationStatus above
  */
-export function useLocation(unitId: string | null) {
+export function useLocation(
+  unitId: string | null,
+  venueOverride?: VenueOverride | null,
+) {
   const [status, setStatus] = useState<LocationStatus>('checking')
   const [configured, setConfigured] = useState(false)
 
   useEffect(() => {
-    if (!unitId) {
-      setStatus('unavailable')
-      return
-    }
-
     let cancelled = false
 
     async function run() {
-      const { data } = await supabase
-        .from('units')
-        .select('latitude, longitude, radius_meters')
-        .eq('id', unitId!)
-        .single()
+      let venueLat: number | null = null
+      let venueLng: number | null = null
+      let venueRadius = 100
+
+      if (venueOverride) {
+        venueLat   = venueOverride.lat
+        venueLng   = venueOverride.lng
+        venueRadius = venueOverride.radiusMeters
+      } else if (unitId) {
+        const { data } = await supabase
+          .from('units')
+          .select('latitude, longitude, radius_meters')
+          .eq('id', unitId)
+          .single()
+
+        if (cancelled) return
+        venueLat   = (data?.latitude  as number | null) ?? null
+        venueLng   = (data?.longitude as number | null) ?? null
+        venueRadius = (data?.radius_meters as number | null) ?? 100
+      }
 
       if (cancelled) return
 
-      const lat = data?.latitude as number | null
-      const lng = data?.longitude as number | null
-      const radius = (data?.radius_meters as number | null) ?? 100
-
-      if (!lat || !lng) {
-        setStatus('unavailable')
+      if (venueLat == null || venueLng == null) {
         setConfigured(false)
+        setStatus('unavailable')
         return
       }
 
@@ -60,17 +94,28 @@ export function useLocation(unitId: string | null) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           if (cancelled) return
-          const dist = haversineDistance(pos.coords.latitude, pos.coords.longitude, lat, lng)
-          setStatus(dist <= radius ? 'within' : 'outside')
+          const dist = haversineDistance(
+            pos.coords.latitude, pos.coords.longitude,
+            venueLat!, venueLng!,
+          )
+          setStatus(dist <= venueRadius ? 'within' : 'outside')
         },
-        () => { if (!cancelled) setStatus('unavailable') },
-        { timeout: 6000, maximumAge: 60000 },
+        (err) => {
+          if (cancelled) return
+          if (err.code === err.PERMISSION_DENIED) {
+            setStatus('permission_denied')
+          } else {
+            setStatus('unavailable')
+          }
+        },
+        { timeout: 8000, maximumAge: 60000 },
       )
     }
 
+    setStatus('checking')
     run()
     return () => { cancelled = true }
-  }, [unitId])
+  }, [unitId, venueOverride])
 
   return { locationStatus: status, configured }
 }

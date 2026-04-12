@@ -39,6 +39,10 @@ export interface Unit {
   latitude: number | null
   longitude: number | null
   radius_meters: number | null
+  /** Human-readable name for the default venue (e.g. "St Andrew's Church Hall") */
+  venue_name: string | null
+  /** Formatted address string stored alongside coordinates */
+  address: string | null
 }
 
 export interface UnitWithOrg extends Unit {
@@ -74,6 +78,16 @@ export interface Service {
   notification_sent_at: string | null
   require_location: boolean
   created_at: string
+  /**
+   * Meeting-level venue override fields.
+   * When venue_lat + venue_lng are both non-null they take precedence over
+   * the unit's default coordinates for geofence validation.
+   */
+  venue_name: string | null
+  venue_address: string | null
+  venue_lat: number | null
+  venue_lng: number | null
+  venue_radius_meters: number | null
 }
 
 export interface Attendance {

@@ -268,7 +268,7 @@ function MembersTab() {
           <IssueCard icon="check_circle" iconColor="#10b981" problem="Already checked in" resolution="You're already recorded for this event. Nothing to do." type="success" />
           <IssueCard icon="location_off" iconColor="#f59e0b" problem="Too far away" resolution="Enable location access and make sure you're physically at the venue." type="warning" />
           <IssueCard icon="devices" iconColor="#f59e0b" problem="Already Registered — device in use" resolution="Someone else already checked in using this device for this session. Each device can only be used for one person per event. Speak to your group leader if this is a mistake." type="warning" />
-          <IssueCard icon="sync_problem" iconColor="#ef4444" problem="Sync Denied" resolution="Tap 'Re-verify Identity' to return to the member list and try again." type="warning" />
+          <IssueCard icon="sync_problem" iconColor="#ef4444" problem="Check-in Blocked" resolution="Go back to the member list and try again." type="warning" />
           <IssueCard icon="person_search" iconColor="#6366f1" problem="Name not found" resolution="Check your spelling or try your surname. Ask your admin to verify you're on the roster." type="info" />
         </div>
       </div>
@@ -453,14 +453,14 @@ function AdminsTab() {
 
       <div>
         <SectionLabel>Location Enforcement</SectionLabel>
-        <h3 className="font-display text-xl font-bold text-white mb-4">Require Members to Be On-Site</h3>
+        <h3 className="font-display text-xl font-bold text-white mb-4">Require Members to Be at the Venue</h3>
         <p className="text-sm text-slate-400 leading-relaxed mb-5">
-          When enabled for an event, members must be physically within a set radius of your venue to check in. Their device will be rejected if they are too far away.
+          When enabled for an event, members must be physically within a set distance of your venue to check in. They will be blocked if they are too far away.
         </p>
         <StepFlow steps={[
           { icon: 'settings', title: 'Set venue coordinates', detail: 'Open your unit dashboard → tap the settings icon → scroll to Venue Location. Enter your address and tap Find, or type the coordinates manually. Set the check-in radius (default 100 m).' },
           { icon: 'location_on', title: 'Enable per event', detail: 'Inside an event, tap the location toggle. It turns blue when active. A warning appears if your unit has no coordinates set yet.' },
-          { icon: 'check_circle', title: 'Members check in on-site', detail: 'Members are silently geolocated during check-in. If they are within range, check-in proceeds normally. If they are too far, they see a "Too far away" message.' },
+          { icon: 'check_circle', title: 'Members check in at the venue', detail: 'Members\' locations are checked when they check in. If they are within range, check-in goes through normally. If they are too far away, they see a "Too far away" message.' },
         ]} />
         <TipBox>
           The radius is measured in metres. 100 m works well for most indoor venues. Increase to 200–500 m if your building has thick walls or poor GPS reception.
@@ -770,9 +770,9 @@ function TroubleshootingTab() {
         <div className="space-y-3">
           <p>The error message shown now includes the actual reason. Common causes:</p>
           <ul className="space-y-2">
-            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">new row violates row-level security policy</strong> — You don't have write permission on this unit. Only the unit creator, org owner, and explicitly assigned unit admins can add members. Ask your org owner to grant you unit admin access.</span></li>
-            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">Network error</strong> — Check your internet connection and try again.</span></li>
-            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">JWT expired</strong> — Your session has timed out. Log out and log back in, then try again.</span></li>
+            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">"You don't have permission to add members to this unit"</strong> — Only the unit creator, org owner, and assigned unit admins can add members. Ask your org owner to grant you access.</span></li>
+            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">"Connection problem"</strong> — Check your internet connection and try again.</span></li>
+            <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span><span><strong className="text-white">"Your session has expired"</strong> — Log out and log back in, then try again.</span></li>
           </ul>
         </div>
       ),

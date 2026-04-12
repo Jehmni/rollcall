@@ -12,6 +12,9 @@ export type CheckInStatus =
   | 'invalid_service'
   | 'no_service'
   | 'device_locked'
+  | 'permission_denied'    // User explicitly denied browser location access
+  | 'location_unavailable' // Geolocation timed out or device cannot determine position
+  | 'outside_radius'       // Location obtained but member is outside the venue radius
   | 'error'
 
 interface RpcResult {
@@ -19,12 +22,16 @@ interface RpcResult {
   error?: string
   name?: string
   distance?: number
+  radius?: number
+  venue_name?: string
 }
 
 export function useAttendance(serviceId: string | null, requireLocation = false) {
   const [status, setStatus] = useState<CheckInStatus>(serviceId ? 'idle' : 'no_service')
   const [checkedInName, setCheckedInName] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [errorVenueName, setErrorVenueName] = useState<string | null>(null)
+  const [errorDistance, setErrorDistance] = useState<number | null>(null)
 
   async function checkIn(memberId: string) {
     if (!serviceId) {
@@ -34,23 +41,40 @@ export function useAttendance(serviceId: string | null, requireLocation = false)
 
     setStatus('loading')
     setCheckedInName(null)
+    setErrorMessage(null)
+    setErrorVenueName(null)
+    setErrorDistance(null)
 
-    // Only capture geolocation when the event requires it
+    // Capture device geolocation when the event requires it.
+    // We distinguish three failure modes before even calling the backend:
+    //   1. PERMISSION_DENIED  – browser denied access → show permission error
+    //   2. POSITION_UNAVAILABLE / TIMEOUT – technical failure → show unavailable error
+    //   3. Success → proceed with lat/lng
     let lat: number | null = null
     let lng: number | null = null
+
     if (requireLocation) {
       try {
         const pos = await new Promise<GeolocationPosition>((res, rej) =>
-          navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 })
+          navigator.geolocation.getCurrentPosition(res, rej, { timeout: 8000 })
         )
         lat = pos.coords.latitude
         lng = pos.coords.longitude
       } catch (e) {
-        logger.warn('Geolocation failed or denied', { memberId, serviceId, error: String(e) })
+        const geoErr = e as GeolocationPositionError | null
+        if (geoErr && 'code' in geoErr && geoErr.code === geoErr.PERMISSION_DENIED) {
+          logger.warn('Geolocation permission denied', { memberId, serviceId })
+          setStatus('permission_denied')
+          throw new Error('permission_denied')
+        } else {
+          logger.warn('Geolocation unavailable', { memberId, serviceId, error: String(e) })
+          setStatus('location_unavailable')
+          throw new Error('location_unavailable')
+        }
       }
     }
 
-    // Capture or generate device ID
+    // Capture or generate a persistent device ID
     let deviceId = localStorage.getItem('rollcally_device_id')
     if (!deviceId) {
       deviceId = self.crypto.randomUUID()
@@ -72,7 +96,7 @@ export function useAttendance(serviceId: string | null, requireLocation = false)
         {
           maxAttempts: 3,
           baseDelayMs: 600,
-          // Only retry on network-level failures — not RPC logic errors
+          // Only retry on transient network failures, not RPC logic errors
           isRetryable: (err) => {
             const e = err as { message?: string; code?: string }
             if (!e?.message) return false
@@ -109,22 +133,33 @@ export function useAttendance(serviceId: string | null, requireLocation = false)
       setStatus('success')
     } else {
       if (result.name) setCheckedInName(result.name)
-      let msg: string | null = null
+      if (result.venue_name) setErrorVenueName(result.venue_name)
+
       switch (result.error) {
-        case 'not_found':          setStatus('not_found'); break
-        case 'already_checked_in': setStatus('already_checked_in'); break
-        case 'invalid_service':    setStatus('invalid_service'); break
+        case 'not_found':
+          setStatus('not_found')
+          break
+        case 'already_checked_in':
+          setStatus('already_checked_in')
+          break
+        case 'invalid_service':
+          setStatus('invalid_service')
+          break
         case 'location_required':
-          msg = 'Location access is required to check in.'
-          setStatus('error'); setErrorMessage(msg); break
+          // Backend got null lat/lng — should not happen now (we bail before calling
+          // the backend if permission is denied), but handle it defensively.
+          setStatus('permission_denied')
+          break
         case 'too_far':
-          msg = `You are too far from the venue (${result.distance}m).`
-          setStatus('error'); setErrorMessage(msg); break
+          setErrorDistance(result.distance ?? null)
+          setStatus('outside_radius')
+          break
         case 'device_locked':
-          setStatus('device_locked'); break
+          setStatus('device_locked')
+          break
         default:
-          msg = result.error ?? 'Something went wrong'
-          setStatus('error'); setErrorMessage(msg)
+          setErrorMessage(result.error ?? 'Something went wrong')
+          setStatus('error')
       }
       logger.warn('Check-in rejected', { memberId, serviceId, reason: result.error })
       throw new Error(result.error ?? 'check_in_failed')
@@ -135,7 +170,17 @@ export function useAttendance(serviceId: string | null, requireLocation = false)
     setStatus(serviceId ? 'idle' : 'no_service')
     setCheckedInName(null)
     setErrorMessage(null)
+    setErrorVenueName(null)
+    setErrorDistance(null)
   }
 
-  return { status, checkedInName, errorMessage, checkIn, reset }
+  return {
+    status,
+    checkedInName,
+    errorMessage,
+    errorVenueName,
+    errorDistance,
+    checkIn,
+    reset,
+  }
 }
