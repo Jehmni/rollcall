@@ -185,10 +185,10 @@ flowchart TD
 ### 7.4 Consent and Privacy Safeguards
 
 - Member SMS consent tracked at `members.sms_consent`.
-- Consent RPC available to anon/authenticated contexts for check-in UX.
+- Consent RPC remains available to anon/authenticated contexts for check-in UX, but is now service-scoped and requires a valid checked-in member/service pair.
 - Absence send eligibility requires consent + phone + absence status.
 
-[Ref: supabase/migrations/20260402_sms_consent.sql:53, supabase/migrations/20260402_sms_consent.sql:110, supabase/functions/send-absence-sms/index.ts:294]
+[Ref: supabase/migrations/20260402_sms_consent.sql:53, supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql:18, src/pages/CheckIn.tsx:80, supabase/functions/send-absence-sms/index.ts:294]
 
 ## 8. Runtime Flow Summaries
 
@@ -308,10 +308,12 @@ The following gaps are directly observable in repository behavior and should be 
 
 [Ref: .github/workflows/ci.yml:70]
 
-3. Public RPC surface:
-- Anonymous execution for check-in and consent RPCs is intentional for UX, but should be continuously threat-modeled and monitored.
+3. Public RPC surface (narrowed):
+- Anonymous RPC execution remains intentional for check-in UX.
+- Direct anonymous table inserts to `attendance` were removed, and consent writes were constrained to verified member/service pairs.
+- Remaining anon RPC boundary should still be continuously threat-modeled and monitored.
 
-[Ref: supabase/schema.sql:557, supabase/schema.sql:679, supabase/migrations/20260402_sms_consent.sql:127]
+[Ref: supabase/schema.sql:557, supabase/schema.sql:679, supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql:12, supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql:18]
 
 ## 13. Enterprise Readiness Roadmap
 
@@ -324,6 +326,7 @@ The following gaps are directly observable in repository behavior and should be 
 ### Phase 2: Security and Compliance Maturity
 
 - Add formal threat model around anon RPC boundary and edge-function authz paths.
+- Validate and monitor the post-hardening anon RPC boundary (check-in + service-scoped consent).
 - Introduce auditable key rotation cadence for Stripe/SMS/VAPID secrets.
 - Expand immutable audit logging for admin governance actions (org block/delete and admin delete).
 
@@ -354,6 +357,7 @@ Primary implementation evidence used in this whitepaper:
 - `supabase/migrations/20260402_sms_consent.sql`
 - `supabase/migrations/20260406_billing.sql`
 - `supabase/migrations/20260411_location_improvements.sql`
+- `supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql`
 - `supabase/functions/create-checkout-session/index.ts`
 - `supabase/functions/stripe-webhook/index.ts`
 - `supabase/functions/send-absence-sms/index.ts`

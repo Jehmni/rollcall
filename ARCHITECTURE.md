@@ -225,15 +225,15 @@ Evidence: `src/pages/AdminServiceDetail.tsx:458`, `supabase/functions/send-absen
 | Tenant isolation | Org/unit-scoped policy predicates | `supabase/schema.sql:352`, `supabase/schema.sql:390` | Strong |
 | Privileged admin | Super admin table lookup (not metadata-only) | `src/contexts/AuthContext.tsx:68`, `supabase/migrations/20260326_secure_super_admin.sql:11` | Strong |
 | Billing integrity | Atomic credit deduction with row lock | `supabase/migrations/20260406_billing.sql:172` | Strong |
-| Consent governance | Explicit per-member sms_consent with public RPC update | `supabase/migrations/20260402_sms_consent.sql:53`, `:110` | Moderate |
+| Consent governance | Explicit per-member sms_consent with service-scoped RPC verification for anon check-in flow | `supabase/migrations/20260402_sms_consent.sql:53`, `supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql:18` | Moderate |
 | External event trust | Stripe webhook signature verification | `supabase/functions/stripe-webhook/index.ts:69` | Strong |
 
 ### 7.2 Security Notes
 
-- Anonymous check-in and consent APIs are required for member UX but should be continuously monitored for abuse patterns.
+- Anonymous check-in and consent APIs remain for member UX, but the boundary has been tightened: direct anon attendance table inserts were removed and consent writes are service-scoped.
 - Super-admin destructive actions (org delete, user delete) exist and should eventually emit immutable audit records.
 
-[Ref: supabase/schema.sql:557, src/pages/SuperAdminDashboard.tsx:167, supabase/functions/delete-user/index.ts:52]
+[Ref: supabase/schema.sql:557, supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql:12, supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql:18, src/pages/SuperAdminDashboard.tsx:167, supabase/functions/delete-user/index.ts:52]
 
 ## 8. Reliability and Performance Architecture
 
@@ -308,7 +308,7 @@ Evidence: `.github/workflows/ci.yml:70`, `supabase/schema.sql:3`, `src/lib/logge
 - Production release gates including integration and critical E2E suites.
 - Formalized observability stack with SLO, error budget, and on-call runbooks.
 - Immutable governance audit trail for super-admin actions.
-- Threat model and abuse detection for anon RPC endpoints.
+- Threat model and abuse detection for remaining anon RPC endpoints.
 
 ## 12. Recommended Architecture Evolution Plan
 
@@ -332,12 +332,12 @@ Evidence: `.github/workflows/ci.yml:70`, `supabase/schema.sql:3`, `src/lib/logge
 
 ## 13. Decision Log (Current)
 
-1. Use security-definer RPCs for anonymous check-in and consent updates to preserve a low-friction member UX.
+1. Use security-definer RPCs for anonymous check-in and service-scoped consent updates to preserve low-friction member UX while tightening write boundaries.
 2. Use row-level locks for billing-credit correctness under concurrency.
 3. Use append-only usage events for auditability and monetization analytics.
 4. Keep edge integrations separated by concern (checkout, webhook, SMS, push, delete-user).
 
-Evidence: `supabase/schema.sql:562`, `supabase/migrations/20260406_billing.sql:172`, `supabase/migrations/20260406_billing.sql:135`, `supabase/functions/*`.
+Evidence: `supabase/schema.sql:562`, `supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql:12`, `supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql:18`, `supabase/migrations/20260406_billing.sql:172`, `supabase/migrations/20260406_billing.sql:135`, `supabase/functions/*`.
 
 ## 14. Source References
 
@@ -362,6 +362,7 @@ Primary files used:
 - `supabase/migrations/20260402_sms_consent.sql`
 - `supabase/migrations/20260406_billing.sql`
 - `supabase/migrations/20260411_location_improvements.sql`
+- `supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql`
 - `supabase/functions/create-checkout-session/index.ts`
 - `supabase/functions/stripe-webhook/index.ts`
 - `supabase/functions/send-absence-sms/index.ts`
