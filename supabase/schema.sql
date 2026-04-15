@@ -1,11 +1,32 @@
 -- ============================================================
--- Rollcally — Canonical Schema (single source of truth)
--- Incorporates all migrations through 20260315.
+-- Rollcally — Canonical Schema (bootstrap reference)
+-- Last updated: 2026-04-15
 --
 -- ⚠️  MANUAL BOOTSTRAP ONLY — DO NOT AUTOMATE
 -- Run once on a fresh Supabase project via the SQL Editor.
 -- After initial setup, use migration files for all schema changes.
 -- Never run this against an existing production database.
+--
+-- MIGRATION HISTORY (apply in order after bootstrap):
+--   20260313_multi_admin.sql
+--   20260314_refine_permissions.sql
+--   20260315_fix_missing_functions.sql
+--   20260318_fix_members_rls_and_csv.sql
+--   20260326_secure_super_admin.sql
+--   20260401_absence_messaging.sql        -- unit_messaging_settings, absence_message_log
+--   20260402_sms_consent.sql              -- members.sms_consent, set_member_sms_consent
+--   20260405_attendance_location_columns.sql
+--   20260406_billing.sql                  -- subscriptions, sms_credits, pricing_plans
+--   20260408_units_location_columns.sql
+--   20260411_location_improvements.sql
+--   20260412_harden_anon_attendance_and_sms_consent.sql
+--   20260415_enforce_search_minimum.sql   -- get_service_members (3-char guard)
+--
+-- NOTE: This file covers the core schema through 20260315 plus columns from
+-- later migrations that were backported here for readability (attendance
+-- location columns, units location columns).  Tables added after 20260315
+-- (unit_messaging_settings, absence_message_log, billing tables) are NOT in
+-- this file — apply migrations 20260401+ after bootstrapping.
 -- ============================================================
 
 -- Enable UUID extension
@@ -83,14 +104,16 @@ alter table unit_admins enable row level security;
 
 -- ---- members ----
 create table if not exists members (
-  id         uuid primary key default gen_random_uuid(),
-  unit_id    uuid not null references units(id) on delete cascade,
-  name       text not null,
-  phone      text,
-  section    text,
-  status     text not null default 'active' check (status in ('active', 'inactive')),
-  birthday   date,
-  created_at timestamptz not null default now()
+  id          uuid primary key default gen_random_uuid(),
+  unit_id     uuid not null references units(id) on delete cascade,
+  name        text not null,
+  phone       text,
+  section     text,
+  status      text not null default 'active' check (status in ('active', 'inactive')),
+  birthday    date,
+  -- sms_consent added by migration 20260402. null = not yet asked.
+  sms_consent boolean,
+  created_at  timestamptz not null default now()
 );
 
 alter table members enable row level security;

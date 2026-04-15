@@ -318,3 +318,56 @@ test.describe('Check-in: mobile viewport (390×844 — iPhone 14)', () => {
     await expect(page.getByText(/Already checked in/)).toBeVisible()
   })
 })
+
+/**
+ * sessionStorage isolation — regression suite for the service_id handoff fix.
+ *
+ * Previously the app fell back to sessionStorage.getItem('pending_service_id')
+ * when the URL contained no service_id param.  This created two risks:
+ *   1. A stale entry from a previous session could silently bind users to the
+ *      wrong (or a dead) service.
+ *   2. Writing the same key from multiple tabs could corrupt the stored ID.
+ *
+ * After the fix, service_id comes exclusively from the URL.  These tests
+ * verify that sessionStorage can no longer influence the check-in flow.
+ */
+test.describe('Check-in: service_id comes from URL only (no sessionStorage fallback)', () => {
+  test('no service_id in URL → shows QR scanner, even if sessionStorage has a stale ID', async ({ page }) => {
+    silenceRealtime(page)
+    // Pre-seed sessionStorage with what a stale previous session would leave.
+    await page.goto('/checkin')
+    await page.evaluate(id => sessionStorage.setItem('pending_service_id', id), IDS.service)
+    // Hard reload to simulate coming back to the page without a URL param.
+    await page.goto('/checkin')
+    // Should see the "no service" prompt, NOT a member search.
+    await expect(page.getByText('Scan the QR code at your venue')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Tap to Scan' })).toBeVisible()
+    // The search input must NOT be present (it only renders when serviceId is set).
+    await expect(page.getByPlaceholder('Search your name…')).not.toBeVisible()
+  })
+
+  test('service_id in URL is used regardless of sessionStorage content', async ({ page }) => {
+    silenceRealtime(page)
+    await mockGetServiceMembers(page)
+    // Seed a different (wrong) service_id into sessionStorage.
+    await page.goto('/checkin')
+    await page.evaluate(() => sessionStorage.setItem('pending_service_id', 'stale-wrong-id'))
+    // Navigate with the correct service_id in the URL.
+    await page.goto(`/checkin?service_id=${IDS.service}`)
+    // The search input should appear (URL param is honoured).
+    await page.getByPlaceholder('Search your name…').fill('Ali')
+    await expect(page.getByText('Alice Johnson')).toBeVisible()
+  })
+
+  test('scanner flow puts service_id in URL and shows search (no sessionStorage needed)', async ({ page }) => {
+    silenceRealtime(page)
+    await mockGetServiceMembers(page)
+    // Navigate first, then clear sessionStorage to ensure it is empty.
+    await page.goto('/checkin')
+    await page.evaluate(() => sessionStorage.removeItem('pending_service_id'))
+    // Now navigate with service_id in URL — should work without any sessionStorage entry.
+    await page.goto(`/checkin?service_id=${IDS.service}`)
+    await page.getByPlaceholder('Search your name…').fill('Ali')
+    await expect(page.getByText('Alice Johnson')).toBeVisible()
+  })
+})

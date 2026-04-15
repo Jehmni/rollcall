@@ -21,8 +21,11 @@ export default function CheckIn() {
   const storedMemberId = localStorage.getItem('rollcally_member_id')
   const { member: recognizedMember } = useMemberById(storedMemberId)
 
-  const paramServiceId = searchParams.get('service_id')
-  const serviceId = paramServiceId ?? sessionStorage.getItem('pending_service_id')
+  // service_id comes exclusively from the URL param set by the QR code or
+  // the in-page scanner (handleScan calls setSearchParams).  We deliberately
+  // do NOT fall back to sessionStorage: a stale entry from a previous session
+  // could silently bind a user to a dead or wrong service.
+  const serviceId = searchParams.get('service_id')
   const { unitName, unitId, requireLocation, smsEnabled, effectiveVenue } = useServiceInfo(serviceId)
 
   // All check-in state lives in the hook
@@ -94,10 +97,6 @@ export default function CheckIn() {
   }
 
   useEffect(() => {
-    if (paramServiceId) sessionStorage.setItem('pending_service_id', paramServiceId)
-  }, [paramServiceId])
-
-  useEffect(() => {
     if (recognizedMember && step === 'list') {
       setStep('welcome')
       setSelected(recognizedMember)
@@ -156,7 +155,7 @@ export default function CheckIn() {
   }
 
   function handleScan(scannedServiceId: string) {
-    sessionStorage.setItem('pending_service_id', scannedServiceId)
+    // Put service_id in the URL — this is the single source of truth.
     setSearchParams({ service_id: scannedServiceId })
     setShowScanner(false)
   }

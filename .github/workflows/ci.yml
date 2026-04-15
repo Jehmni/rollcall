@@ -34,9 +34,9 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
-  # ── Deploy: runs after build passes, does not wait for E2E ─────────────────
+  # ── Deploy: runs after both build AND e2e pass ──────────────────────────────
   deploy:
-    needs: build
+    needs: [build, e2e]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
@@ -63,11 +63,10 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-  # ── E2E tests: informational only, never blocks deployment ─────────────────
+  # ── E2E tests: must pass before deploy ────────────────────────────────────
   e2e:
     needs: build
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v5
 
