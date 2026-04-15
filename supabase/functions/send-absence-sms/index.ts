@@ -4,10 +4,39 @@
  * Sends an SMS to every absent member (who has a phone number and has
  * consented) for a given service and logs the result.
  *
- * Billing layer: before sending each SMS, deducts one credit from the
- * organisation's sms_credits balance via an atomic DB function. If the
- * balance is exhausted, the send is blocked and logged as 'sms_blocked'
- * in usage_events. No charge is incurred for blocked sends.
+ * Send policy:
+ *   Each eligible member is attempted exactly once — no automatic retries.
+ *   If a provider call fails the error is logged and the admin is notified
+ *   via the absence report email. Manual re-send is the recovery path.
+ *   This prevents duplicate sends and keeps billing deterministic.
+ *
+ * Idempotency:
+ *   absence_message_log has UNIQUE(service_id, member_id).
+ *   processService loads existing log rows for the service once before the
+ *   send loop so that re-triggers never charge billing twice.
+ *   The UNIQUE constraint + 23505 handler is the concurrent-invocation safety net.
+ *
+ * Outcome counters (returned in the JSON response and email report):
+ *   sent              — provider accepted; one credit consumed.
+ *   failed            — provider rejected or timed out; one credit consumed.
+ *                       Failed sends are visible in the delivery log for follow-up.
+ *   blocked           — credit balance was 0; no attempt made, no charge.
+ *   already_processed — member had an existing log row (idempotency / re-run /
+ *                       concurrent-race win by another invocation); no charge.
+ *   stale_pending     — pending row older than STALE_PENDING_TTL_MINUTES (likely
+ *                       left by a crashed function run); marked failed in the log,
+ *                       not re-sent. Needs admin review — member may or may not
+ *                       have received the SMS.
+ *
+ * Billing layer:
+ *   One credit is deducted per send attempt via deduct_sms_credit() (FOR UPDATE).
+ *   Credits are refunded only if the log INSERT races with a concurrent invocation
+ *   (23505). There is no automatic refund for provider failures — the attempt was
+ *   made and the credit is consumed.
+ *
+ * Concurrency:
+ *   Members are processed SEND_CONCURRENCY at a time via batched Promise.all.
+ *   This bounds edge-function wall-clock time without overwhelming the provider.
  *
  * Provider selection (set SMS_PROVIDER secret):
  *   'twilio'         — default, global coverage
@@ -36,9 +65,18 @@ const CORS = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const SMS_TIMEOUT_MS  = 12_000  // per-message API call timeout
-const MAX_MEMBERS     = 5_000   // hard cap — matches client-side export cap
-const SMS_MAX_RETRIES = 3       // retry on transient errors
+const SMS_TIMEOUT_MS          = 12_000  // per-message API call timeout
+const MAX_MEMBERS             = 5_000   // hard cap — matches client-side export cap
+// Bounded concurrency: process this many members in parallel.
+// Keeps edge-function wall-clock time proportional to CONCURRENCY rather than
+// member count, preventing timeout at moderate roster sizes (20-100 absents).
+// 5 is intentional: avoids overwhelming the Twilio/AT API with burst traffic
+// while still giving ~5× speedup over fully sequential processing.
+const SEND_CONCURRENCY        = 5
+// A 'pending' log row older than this TTL was left by a crashed function run.
+// The edge function hard-timeout is 150 s, so any pending row older than 30
+// minutes is provably not owned by a live invocation.
+const STALE_PENDING_TTL_MINUTES = 30
 
 // ─── Validate secrets at startup ─────────────────────────────────────────────
 
@@ -147,31 +185,6 @@ function sendOnce(
   return sendTwilio(phone, message, senderName)
 }
 
-function isRetryableError(err: string): boolean {
-  const lower = err.toLowerCase()
-  return lower.includes('timed out') ||
-         lower.includes('network') ||
-         lower.includes('timeout') ||
-         lower.includes('fetch') ||
-         lower.includes('econnreset')
-}
-
-async function sendSMS(
-  phone: string, message: string, senderName?: string | null,
-): Promise<{ ok: boolean; error?: string }> {
-  let lastError = 'Unknown error'
-  for (let attempt = 0; attempt < SMS_MAX_RETRIES; attempt++) {
-    if (attempt > 0) {
-      await new Promise(r => setTimeout(r, 1_000 * Math.pow(2, attempt - 1)))
-    }
-    const result = await sendOnce(phone, message, senderName)
-    if (result.ok) return result
-    lastError = result.error ?? lastError
-    if (!isRetryableError(lastError)) break
-  }
-  return { ok: false, error: lastError }
-}
-
 // ─── Template helpers ─────────────────────────────────────────────────────────
 
 function sanitizeTemplateVar(value: string): string {
@@ -228,14 +241,146 @@ interface MemberRow {
   checked_in: boolean
   sms_consent: boolean | null
 }
+// Existing absence_message_log row fetched during the idempotency pre-load.
+interface LogPreloadRow {
+  member_id:  string
+  status:     string   // 'pending' | 'sent' | 'failed' | 'skipped'
+  created_at: string   // true row-creation timestamp (not sent_at which implies delivery)
+}
+// Per-member outcome returned by sendToMember.
+interface MemberOutcome {
+  sent:              number
+  failed:            number
+  blocked:           number
+  already_processed: number  // existing log row (re-run idempotency or concurrent race)
+}
+// Per-service outcome returned by processService.
+interface ProcessResult {
+  sent:              number
+  failed:            number
+  blocked:           number
+  already_processed: number  // members skipped due to existing log row
+  stale_pending:     number  // pending rows expired TTL, marked failed, not re-sent
+  reason?:           string  // whole-service skip reason (no send attempted)
+}
+
+// ─── Per-member send (called concurrently inside processService) ──────────────
+//
+// Each member is attempted exactly once — no retries.
+// Returns a MemberOutcome; never throws — all errors are caught and reflected
+// in counters so partial batch failures are observable, not silently dropped.
+//
+// Idempotency is handled at the processService level: processedIds contains
+// member IDs that already have a log row. sendToMember is only called for
+// members NOT in that set. The UNIQUE(service_id, member_id) constraint +
+// 23505 handler here is the safety net for concurrent invocations that both
+// pass the pre-load check in the same millisecond.
+//
+// Billing:
+//   One credit is deducted before the send attempt.
+//   If the provider succeeds   → credit consumed, status = 'sent'.
+//   If the provider fails      → credit consumed, status = 'failed'.
+//                                (the attempt was made; no automatic refund)
+//   If credits exhausted       → no attempt, credit not deducted, status = 'blocked'.
+//   If 23505 concurrent race   → credit refunded, counted as already_processed.
+
+async function sendToMember(
+  supabase:   ReturnType<typeof createClient>,
+  member:     MemberRow,
+  service:    ServiceRow,
+  orgId:      string,
+  message:    string,
+  senderName: string | null,
+  dryRun:     boolean,
+): Promise<MemberOutcome> {
+  if (dryRun) return { sent: 1, failed: 0, blocked: 0, already_processed: 0 }
+
+  // ── BILLING: atomic credit deduction ──────────────────────────────────────
+  // deduct_sms_credit uses FOR UPDATE — safe to call concurrently.
+  const { data: credited, error: creditErr } = await supabase
+    .rpc('deduct_sms_credit', { p_org_id: orgId })
+
+  if (creditErr) {
+    console.error(`Credit deduction error for org ${orgId} member ${member.id}:`, creditErr.message)
+    await logUsageEvent(supabase, orgId, service, member.id, 'sms_blocked')
+    // Blocked members intentionally produce NO absence_message_log row.
+    // This keeps them re-eligible: the next scheduled run will attempt them
+    // again once credits are replenished, without any manual intervention.
+    return { sent: 0, failed: 0, blocked: 1, already_processed: 0 }
+  }
+
+  if (!credited) {
+    await logUsageEvent(supabase, orgId, service, member.id, 'sms_blocked')
+    console.warn(`Credits exhausted for org ${orgId} — member ${member.id} blocked`)
+    // Blocked members intentionally produce NO absence_message_log row.
+    // This keeps them re-eligible: the next scheduled run will attempt them
+    // again once credits are replenished, without any manual intervention.
+    return { sent: 0, failed: 0, blocked: 1, already_processed: 0 }
+  }
+
+  // ── Log-first atomic pattern: claim the log slot before sending ───────────
+  // Concurrent-race safety net: two invocations that both passed the pre-load
+  // check will race here. Only one INSERT wins; the other gets 23505, refunds,
+  // and returns already_processed (not failed — no attempt was made).
+  const { data: logRow, error: insertErr } = await supabase
+    .from('absence_message_log')
+    .insert({
+      service_id: service.id,
+      member_id:  member.id,
+      phone:      member.phone,
+      message,
+      status:     'pending',
+      error_text: '',
+    })
+    .select('id')
+    .single()
+
+  if (insertErr) {
+    if (insertErr.code === '23505') {
+      // Concurrent invocation claimed this member — refund credit, no attempt.
+      await supabase.rpc('refund_sms_credit', { p_org_id: orgId })
+      return { sent: 0, failed: 0, blocked: 0, already_processed: 1 }
+    }
+    // Unexpected DB error — refund credit, count as failed (not silently dropped).
+    await supabase.rpc('refund_sms_credit', { p_org_id: orgId })
+    console.error(`Failed to claim log slot for member ${member.id}:`, insertErr.message)
+    return { sent: 0, failed: 1, blocked: 0, already_processed: 0 }
+  }
+
+  // ── Send the SMS — single attempt, no retries ──────────────────────────────
+  // Credit has already been deducted. Whether the provider succeeds or fails,
+  // the credit is consumed — the attempt was made.
+  const result = await sendOnce(member.phone!, message, senderName)
+
+  const { error: updateErr } = await supabase
+    .from('absence_message_log')
+    .update({
+      status:     result.ok ? 'sent' : 'failed',
+      error_text: result.error ?? '',
+    })
+    .eq('id', logRow.id)
+
+  if (updateErr) {
+    console.error(`Failed to update log for member ${member.id}:`, updateErr.message)
+  }
+
+  await logUsageEvent(supabase, orgId, service, member.id, result.ok ? 'sms_sent' : 'sms_failed')
+
+  return {
+    sent:              result.ok ? 1 : 0,
+    failed:            result.ok ? 0 : 1,
+    blocked:           0,
+    already_processed: 0,
+  }
+}
 
 // ─── Core per-service logic ───────────────────────────────────────────────────
 
 async function processService(
   supabase: ReturnType<typeof createClient>,
-  service: ServiceRow,
-  dryRun: boolean,
-): Promise<{ sent: number; failed: number; skipped: number; blocked: number; reason?: string }> {
+  service:  ServiceRow,
+  dryRun:   boolean,
+): Promise<ProcessResult> {
 
   // ── 1. Check messaging settings ────────────────────────────────────────────
   const { data: settings } = await supabase
@@ -245,17 +390,16 @@ async function processService(
     .maybeSingle() as { data: SettingsRow | null }
 
   if (!settings?.enabled) {
-    return { sent: 0, failed: 0, skipped: 0, blocked: 0, reason: 'messaging not enabled for this unit' }
+    return { sent: 0, failed: 0, blocked: 0, already_processed: 0, stale_pending: 0, reason: 'messaging not enabled for this unit' }
   }
 
   const tz = settings.timezone || 'UTC'
   const localToday = todayIn(tz)
   if (service.date !== localToday) {
-    return { sent: 0, failed: 0, skipped: 0, blocked: 0, reason: `service date ${service.date} is not today (${localToday} in ${tz})` }
+    return { sent: 0, failed: 0, blocked: 0, already_processed: 0, stale_pending: 0, reason: `service date ${service.date} is not today (${localToday} in ${tz})` }
   }
 
   // ── 2. Billing check: resolve org_id from unit ─────────────────────────────
-  // We need org_id to check/deduct SMS credits.
   const { data: unitRow } = await supabase
     .from('units')
     .select('org_id')
@@ -263,7 +407,7 @@ async function processService(
     .single() as { data: { org_id: string } | null }
 
   if (!unitRow?.org_id) {
-    return { sent: 0, failed: 0, skipped: 0, blocked: 0, reason: 'unit has no organisation' }
+    return { sent: 0, failed: 0, blocked: 0, already_processed: 0, stale_pending: 0, reason: 'unit has no organisation' }
   }
 
   const orgId = unitRow.org_id
@@ -281,7 +425,7 @@ async function processService(
   if (!subActive && !dryRun) {
     console.warn(`Blocked: org ${orgId} subscription status is "${subStatus}"`)
     return {
-      sent: 0, failed: 0, skipped: 0, blocked: 0,
+      sent: 0, failed: 0, blocked: 0, already_processed: 0, stale_pending: 0,
       reason: `subscription is not active (status: ${subStatus}) — subscribe at /admin/billing`,
     }
   }
@@ -303,7 +447,7 @@ async function processService(
     if (noConsent > 0) reasons.push(`${noConsent} without consent`)
     if (noPhone   > 0) reasons.push(`${noPhone} without phone`)
     return {
-      sent: 0, failed: 0, skipped: 0, blocked: 0,
+      sent: 0, failed: 0, blocked: 0, already_processed: 0, stale_pending: 0,
       reason: allAbsent.length === 0
         ? 'no absent members'
         : `no eligible absent members (${reasons.join(', ')})`,
@@ -325,94 +469,107 @@ async function processService(
     )
     eligible = eligible.filter(m => !cooledDownIds.has(m.id))
     if (eligible.length === 0) {
-      return { sent: 0, failed: 0, skipped: 0, blocked: 0, reason: `all eligible members are within the ${cooldown}-day cooldown window` }
+      return { sent: 0, failed: 0, blocked: 0, already_processed: 0, stale_pending: 0, reason: `all eligible members are within the ${cooldown}-day cooldown window` }
     }
+  }
+
+  // ── 5. Idempotency pre-load ────────────────────────────────────────────────
+  // Fetch all existing absence_message_log rows for this service in a single
+  // query. This collapses N per-member SELECTs into one regardless of roster
+  // size, and lets us classify each row before touching any credits.
+  //
+  // Row classifications:
+  //   terminal (sent/failed/skipped): member was processed; skip, count as already_processed.
+  //   fresh pending (< TTL):          concurrent invocation in flight; skip, count as already_processed.
+  //   stale pending (>= TTL):         left by a crashed run; mark failed, count as stale_pending.
+  //                                   NOT re-sent — the admin receives a report so they can
+  //                                   manually verify and re-send if appropriate.
+  let already_processed = 0
+  let stale_pending     = 0
+  const processedIds    = new Set<string>()
+
+  if (!dryRun && eligible.length > 0) {
+    const { data: existingRows, error: preloadErr } = await supabase
+      .from('absence_message_log')
+      .select('member_id, status, created_at')
+      .eq('service_id', service.id)
+      .in('member_id', eligible.map(m => m.id))
+
+    if (preloadErr) {
+      // Non-fatal: log and continue. The UNIQUE + 23505 guard will catch duplicates.
+      console.error(`Idempotency pre-load failed (continuing with 23505 guard):`, preloadErr.message)
+    } else {
+      const staleCutoff = new Date(Date.now() - STALE_PENDING_TTL_MINUTES * 60_000).toISOString()
+      const staleIds: string[] = []
+
+      for (const row of (existingRows ?? []) as LogPreloadRow[]) {
+        processedIds.add(row.member_id)
+        if (row.status === 'pending' && row.created_at <= staleCutoff) {
+          // Stale pending: the function that created this row is no longer running.
+          // Mark it failed so the log is accurate, but do NOT re-send — we don't
+          // know whether the SMS was dispatched before the crash.
+          staleIds.push(row.member_id)
+          stale_pending++
+          console.warn(`Stale pending row for member ${row.member_id} (age > ${STALE_PENDING_TTL_MINUTES}min) — marking failed`)
+        } else {
+          already_processed++
+        }
+      }
+
+      // Batch-update stale pending rows to 'failed' with an explanatory error_text.
+      // reason_code distinguishes these from genuine provider failures in the log.
+      if (staleIds.length > 0) {
+        const { error: staleErr } = await supabase
+          .from('absence_message_log')
+          .update({
+            status:      'failed',
+            reason_code: 'stale_pending_recovered',
+            error_text:  `send interrupted: pending row expired after ${STALE_PENDING_TTL_MINUTES} min (possible crash before send completed) — verify manually`,
+          })
+          .eq('service_id', service.id)
+          .eq('status', 'pending')   // guard: only update still-pending rows
+          .in('member_id', staleIds)
+
+        if (staleErr) {
+          console.error(`Failed to update stale pending rows:`, staleErr.message)
+        }
+      }
+
+      // Filter out all processed members (terminal + stale) from eligible.
+      eligible = eligible.filter(m => !processedIds.has(m.id))
+    }
+  }
+
+  // All members were already processed on a prior run.
+  if (eligible.length === 0) {
+    return { sent: 0, failed: 0, blocked: 0, already_processed, stale_pending, reason: 'all eligible members already processed' }
   }
 
   const eventName  = service.service_type || "today's event"
   const senderName = settings.sender_name?.trim() || null
-  let sent = 0, failed = 0, skipped = 0, blocked = 0
+  let sent = 0, failed = 0, blocked = 0
 
-  // ── 5. Send loop ───────────────────────────────────────────────────────────
-  for (const member of eligible) {
-    const message = renderTemplate(settings.message_template, member.name, eventName)
-
-    if (dryRun) { sent++; continue }
-
-    // ── BILLING: atomic credit deduction ────────────────────────────────────
-    // deduct_sms_credit uses FOR UPDATE to prevent race conditions.
-    // Returns false if balance is 0 — we stop sending and log the block.
-    const { data: credited, error: creditErr } = await supabase
-      .rpc('deduct_sms_credit', { p_org_id: orgId })
-
-    if (creditErr) {
-      console.error(`Credit deduction error for org ${orgId}:`, creditErr.message)
-      // Treat DB errors as blocked to be safe — don't send without billing
-      blocked++
-      await logUsageEvent(supabase, orgId, service, member.id, 'sms_blocked')
-      continue
-    }
-
-    if (!credited) {
-      // Credits exhausted — block all remaining members in this batch
-      blocked++
-      await logUsageEvent(supabase, orgId, service, member.id, 'sms_blocked')
-      console.warn(`Credits exhausted for org ${orgId} — ${eligible.length - sent - failed - skipped - blocked} members not sent`)
-      // Continue loop to count all blocked members accurately
-      continue
-    }
-
-    // ── Log-first atomic pattern: claim the log slot before sending ──────────
-    const { data: logRow, error: insertErr } = await supabase
-      .from('absence_message_log')
-      .insert({
-        service_id: service.id,
-        member_id:  member.id,
-        phone:      member.phone,
-        message,
-        status:     'pending',
-        error_text: '',
+  // ── 6. Send with bounded concurrency ──────────────────────────────────────
+  // Process SEND_CONCURRENCY members in parallel.
+  // Each member's credit deduction, log claim, send, and log update are
+  // independent. The DB function uses FOR UPDATE so deductions are atomic.
+  for (let i = 0; i < eligible.length; i += SEND_CONCURRENCY) {
+    const batch = eligible.slice(i, i + SEND_CONCURRENCY)
+    const results = await Promise.all(
+      batch.map(member => {
+        const message = renderTemplate(settings.message_template, member.name, eventName)
+        return sendToMember(supabase, member, service, orgId, message, senderName, dryRun)
       })
-      .select('id')
-      .single()
-
-    if (insertErr) {
-      if (insertErr.code === '23505') {
-        // Another concurrent invocation already claimed and is processing this member.
-        // Refund the credit we just deducted since we won't be sending.
-        await supabase.rpc('refund_sms_credit', { p_org_id: orgId })
-        skipped++
-        continue
-      }
-      // Unexpected DB error — refund the credit and move on
-      await supabase.rpc('refund_sms_credit', { p_org_id: orgId })
-      console.error(`Failed to claim log slot for member ${member.id}:`, insertErr.message)
-      continue
+    )
+    for (const r of results) {
+      sent              += r.sent
+      failed            += r.failed
+      blocked           += r.blocked
+      already_processed += r.already_processed  // concurrent-race wins inside the batch
     }
-
-    // Send the SMS
-    const result = await sendSMS(member.phone!, message, senderName)
-
-    // Update log row with final status
-    const { error: updateErr } = await supabase
-      .from('absence_message_log')
-      .update({
-        status:     result.ok ? 'sent' : 'failed',
-        error_text: result.error ?? '',
-      })
-      .eq('id', logRow.id)
-
-    if (updateErr) {
-      console.error(`Failed to update log for member ${member.id}:`, updateErr.message)
-    }
-
-    // Record in generic usage_events for billing audit trail
-    await logUsageEvent(supabase, orgId, service, member.id, result.ok ? 'sms_sent' : 'sms_failed')
-
-    if (result.ok) sent++; else failed++
   }
 
-  return { sent, failed, skipped, blocked }
+  return { sent, failed, blocked, already_processed, stale_pending }
 }
 
 // ─── Usage event logger ───────────────────────────────────────────────────────
@@ -439,9 +596,9 @@ async function logUsageEvent(
 // ─── Absence report email ─────────────────────────────────────────────────────
 
 async function sendAbsenceReportEmail(
-  db: ReturnType<typeof createClient>,
+  db:      ReturnType<typeof createClient>,
   service: ServiceRow,
-  result: { sent: number; failed: number; skipped: number; blocked: number; reason?: string },
+  result:  ProcessResult,
 ): Promise<void> {
   const apiKey  = Deno.env.get('RESEND_API_KEY')
   const from    = Deno.env.get('FROM_EMAIL') ?? 'Rollcally <noreply@rollcally.com>'
@@ -484,7 +641,15 @@ async function sendAbsenceReportEmail(
     }).join('')
 
     const eventLabel = `${service.service_type} on ${service.date}`
-    const summary = `${result.sent} sent · ${result.failed} failed · ${result.blocked} blocked · ${result.skipped} skipped`
+    // Build summary line — only include non-zero counts to keep it readable.
+    const parts = [
+      result.sent              > 0 ? `${result.sent} sent`                      : null,
+      result.failed            > 0 ? `${result.failed} failed (credit consumed)` : null,
+      result.blocked           > 0 ? `${result.blocked} blocked (no credits)`    : null,
+      result.already_processed > 0 ? `${result.already_processed} already processed` : null,
+      result.stale_pending     > 0 ? `${result.stale_pending} stale pending — verify manually` : null,
+    ].filter(Boolean)
+    const summary = parts.length > 0 ? parts.join(' · ') : 'no messages sent'
 
     const html = `
 <!DOCTYPE html>
