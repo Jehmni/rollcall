@@ -214,6 +214,20 @@ sequenceDiagram
 
 Evidence: `src/pages/AdminServiceDetail.tsx:458`, `supabase/functions/send-absence-sms/index.ts:342`, `supabase/migrations/20260406_billing.sql:172`.
 
+**Credit and log-row invariants (support reference):**
+
+| Outcome | Credit deducted | `absence_message_log` row | Notes |
+|---|---|---|---|
+| `sent` | Yes | Yes (`status = sent`) | Normal path |
+| `failed` | Yes | Yes (`status = failed`) | Attempt reached provider; credit consumed regardless |
+| `blocked` | No | **No row** | Member re-eligible automatically on next run |
+| `already_processed` | No | Existing row (idempotency pre-load or 23505 race) | No action needed |
+| `stale_pending_recovered` | Unknown | Existing row updated to `failed` + `reason_code = stale_pending_recovered` | Conservative recovery — not re-sent; admin must verify via provider dashboard |
+
+`blocked` produces no log row by design. The idempotency pre-load skips members that *have* an existing row, so the absence of a row is the re-eligibility mechanism. No manual intervention is required once credits are replenished.
+
+`stale_pending_recovered` is triggered when a `pending` row's `created_at` is older than `STALE_PENDING_TTL_MINUTES` (30 min). This indicates a prior function run crashed. The row is marked `failed` rather than re-sent because the crash point is unknown — the SMS may or may not have been dispatched.
+
 ## 7. Security Architecture
 
 ### 7.1 Control Matrix
@@ -336,6 +350,9 @@ Evidence: `.github/workflows/ci.yml:70`, `supabase/schema.sql:3`, `src/lib/logge
 2. Use row-level locks for billing-credit correctness under concurrency.
 3. Use append-only usage events for auditability and monetization analytics.
 4. Keep edge integrations separated by concern (checkout, webhook, SMS, push, delete-user).
+5. **No automatic SMS retries; failed sends consume a credit.** Each member is attempted exactly once. Retries would risk duplicate sends if the provider accepted the first attempt but returned a transient error on the response. The admin delivery log surfaces failures for manual follow-up. Credit consumption on failure is intentional — the attempt was made.
+6. **Blocked members produce no `absence_message_log` row.** The idempotency pre-load skips members with existing rows, so inserting a `blocked` row would permanently exclude them even after credits replenish. The absence of a row is the re-eligibility signal.
+7. **Stale pending recovery is conservative (mark failed, do not re-send).** A `pending` row older than 30 minutes is left by a crashed function run. The crash point is unknown — the provider may have already accepted the send. Re-sending risks a duplicate. Marking `failed` with `reason_code = stale_pending_recovered` surfaces the anomaly to admins without making an irrevocable decision on their behalf.
 
 Evidence: `supabase/schema.sql:562`, `supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql:12`, `supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql:18`, `supabase/migrations/20260406_billing.sql:172`, `supabase/migrations/20260406_billing.sql:135`, `supabase/functions/*`.
 

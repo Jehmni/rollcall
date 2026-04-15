@@ -226,9 +226,24 @@ sequenceDiagram
 
 - Manual trigger from admin UI or scheduled cron invocation.
 - Pipeline checks settings, date/time window, subscription state, consent, cooldown.
-- Each send attempts credit deduction first; blocked sends are logged for audit.
+- Each send attempts credit deduction first; blocked sends are logged via usage event for audit.
+- Each eligible member is attempted exactly once — no automatic retries. Failures are surfaced in the delivery log for manual follow-up.
 
-[Ref: src/pages/AdminServiceDetail.tsx:458, supabase/functions/send-absence-sms/index.ts:567, supabase/functions/send-absence-sms/index.ts:595, supabase/functions/send-absence-sms/index.ts:342]
+**Outcome semantics (operator reference):**
+
+| Outcome | Credit consumed | Log row created | Admin action |
+|---|---|---|---|
+| `sent` | Yes | Yes (`status = sent`) | None required |
+| `failed` | Yes | Yes (`status = failed`) | Verify phone number; re-send manually if needed |
+| `blocked` | No | **No** — member re-eligible on next run once credits replenish | Replenish credits |
+| `already_processed` | No | Existing row (idempotency) | None — safe to ignore |
+| `stale_pending_recovered` | Unknown | Yes (`status = failed`, `reason_code = stale_pending_recovered`) | Verify via provider dashboard; re-send if member was not reached |
+
+> `blocked` members intentionally produce no `absence_message_log` row. This makes them automatically re-eligible the next time the function runs without any manual intervention once credits are available.
+
+> `stale_pending_recovered` means a `pending` row older than 30 minutes was found (left by a function run that crashed before completing). The row is marked `failed` conservatively — the send is not retried because the crash point is unknown and the member may already have received the SMS.
+
+[Ref: src/pages/AdminServiceDetail.tsx:458, supabase/functions/send-absence-sms/index.ts:267, supabase/functions/send-absence-sms/index.ts:302, supabase/functions/send-absence-sms/index.ts:499]
 
 ## 9. Billing and Monetization Model
 
@@ -252,10 +267,16 @@ sequenceDiagram
 ### 9.3 Credit Governance
 
 - `deduct_sms_credit` uses row lock (`FOR UPDATE`) to avoid race conditions.
-- `refund_sms_credit` handles duplicate/concurrency correction path.
+- `refund_sms_credit` handles duplicate/concurrency correction path only (called when a concurrent 23505 insert race is lost — not called for provider failures).
 - `reset_sms_credits` refreshes allowance per cycle.
 
-[Ref: supabase/migrations/20260406_billing.sql:172, supabase/migrations/20260406_billing.sql:212, supabase/migrations/20260406_billing.sql:231]
+**Credit consumption policy:**
+- One credit is deducted per send *attempt* — before the provider call, not after.
+- Provider failure (`failed`) does **not** trigger a refund. The attempt was made; the credit is consumed.
+- `blocked` (credits exhausted before attempt) does **not** deduct a credit and produces no `absence_message_log` row, ensuring the member is automatically re-eligible on the next run.
+- `already_processed` (existing log row found) does **not** deduct a credit — no attempt is made.
+
+[Ref: supabase/migrations/20260406_billing.sql:172, supabase/migrations/20260406_billing.sql:212, supabase/migrations/20260406_billing.sql:231, supabase/functions/send-absence-sms/index.ts:299]
 
 ## 10. Quality Engineering and Validation
 

@@ -271,9 +271,13 @@ Only the first group will receive a message. Messages are never sent to members 
 **The delivery log:**
 
 Below the settings, the delivery log shows the status of every message sent for this event:
-- **Sent** — delivered successfully
-- **Failed** — delivery failed (hover the error snippet to see details — usually a bad phone number format)
-- **Skipped** — a concurrent send attempt already claimed this member (safe to ignore)
+- **Sent** — delivered successfully; one follow-up credit consumed.
+- **Failed** — delivery attempt was made but the provider rejected it (hover the error snippet for details — usually a bad phone number format or unsupported destination). **One follow-up credit is still consumed** — the attempt reached the carrier.
+- **Already processed** — a concurrent send attempt claimed this member first; no credit consumed and no duplicate sent. Safe to ignore.
+
+> **Stale pending (support note):** If a previous send run crashed mid-flight, any member whose row was left in `pending` for more than 30 minutes is automatically marked **Failed** with a note reading *"send interrupted — verify manually"*. The delivery log will also show `reason: stale_pending_recovered`. The member was **not** re-sent — check your SMS provider dashboard to confirm whether they received the message, and use "Send to all" again if a re-send is needed.
+
+> **Blocked members** (credits exhausted) do **not** appear in the delivery log at all. Because no log row is created, they are automatically re-eligible the next time a send runs — once your credit balance is replenished there is nothing extra to do.
 
 **Overriding consent for a member:**
 
@@ -613,7 +617,7 @@ No — you keep access until the end of your current billing period. After that,
 When you upgrade mid-cycle, the extra credits are added to your existing balance. Your used count stays the same; only the remaining balance increases.
 
 **What counts against my allowance?**
-Successfully sent messages and failed delivery attempts both count — in both cases the SMS was submitted to the carrier and a cost was incurred. Blocked sends (when your balance is zero) do not count and are not charged.
+Successfully sent messages (`sent`) and failed delivery attempts (`failed`) both count — in both cases the message was submitted to the carrier and a cost was incurred. Blocked sends (when your balance is zero) do not count and are not charged. Stale-pending recoveries (`stale_pending_recovered`) are also marked `failed` in the log — whether a credit was consumed depends on whether the original send attempt reached the provider before the function crashed; when in doubt treat it as consumed and check your provider dashboard.
 
 **What happens when I run out of included follow-ups mid-month?**
 Follow-ups continue sending, but each one beyond your allowance is charged at the extra-credit rate for your plan. You'll see this on your next Stripe invoice. If you prefer to stop at the limit rather than incur overages, contact us and we can configure a hard cap for your account.
