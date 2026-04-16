@@ -155,18 +155,26 @@ export interface OrgBilling {
 
 // ─── Absence Messaging ────────────────────────────────────────────────────────
 
-export interface UnitMessagingSettings {
-  unit_id: string
-  enabled: boolean
-  message_template: string
-  send_hour: number       // 12–21 (noon–9 pm), local time
-  timezone: string        // IANA timezone, e.g. 'Africa/Lagos'
-  sender_name: string | null  // Alphanumeric sender ID (max 11 chars), shown as "From" in SMS
-  cooldown_days: number   // Min days between messages to same member (0 = no cooldown)
-  updated_at: string
+export interface SmsCountry {
+  code:     string        // ISO 3166-1 alpha-2, e.g. 'NG', 'GB'
+  name:     string        // Display name, e.g. 'Nigeria'
+  provider: string        // 'twilio' | 'africastalking' | 'termii'
+  flag:     string | null // Emoji flag, e.g. '🇳🇬'
 }
 
-export type MessageStatus = 'sent' | 'failed' | 'skipped'
+export interface UnitMessagingSettings {
+  unit_id:          string
+  enabled:          boolean
+  message_template: string
+  send_hour:        number       // 12–21 (noon–9 pm), local time
+  timezone:         string        // IANA timezone, e.g. 'Africa/Lagos'
+  sender_name:      string | null // Alphanumeric sender ID (max 11 chars)
+  cooldown_days:    number        // Min days between messages to same member (0 = no cooldown)
+  sms_country_code: string | null // ISO 3166-1 alpha-2; null = Twilio fallback
+  updated_at:       string
+}
+
+export type MessageStatus = 'pending' | 'sent' | 'failed' | 'skipped'
 
 export interface AbsenceMessageLogEntry {
   id: string

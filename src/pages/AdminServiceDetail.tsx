@@ -4,7 +4,7 @@ import { QRCodeCanvas } from 'qrcode.react'
 import { supabase } from '../lib/supabase'
 import { useAdminDashboard } from '../hooks/useAdminDashboard'
 import { useToast } from '../contexts/ToastContext'
-import type { AbsenceMessageLogEntry, DashboardMember, Service, UnitMessagingSettings } from '../types'
+import type { AbsenceMessageLogEntry, DashboardMember, Service, SmsCountry, UnitMessagingSettings } from '../types'
 
 // ─── Location Toggle ─────────────────────────────────────────────────────────
 
@@ -348,6 +348,8 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
   const [timezone, setTimezone]       = useState('UTC')
   const [senderName, setSenderName]   = useState('')
   const [cooldownDays, setCooldownDays] = useState(7)
+  const [smsCountryCode, setSmsCountryCode] = useState<string | null>(null)
+  const [countries, setCountries]     = useState<SmsCountry[]>([])
   const [saving, setSaving]           = useState(false)
   const [sending, setSending]         = useState(false)
   const [showPreview, setShowPreview] = useState(false)
@@ -369,6 +371,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
       setTimezone(s.timezone || 'UTC')
       setSenderName(s.sender_name ?? '')
       setCooldownDays(Math.min(90, Math.max(0, s.cooldown_days ?? 7)))
+      setSmsCountryCode(s.sms_country_code ?? null)
     }
   }, [service.unit_id])
 
@@ -393,7 +396,17 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
     }
   }, [service.id, log.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { loadSettings(); loadLog(true) }, [loadSettings]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    loadSettings()
+    loadLog(true)
+    // Load country list once — small table, no pagination needed
+    supabase
+      .from('sms_countries')
+      .select('code, name, flag, provider')
+      .eq('active', true)
+      .order('name')
+      .then(({ data }) => setCountries((data ?? []) as SmsCountry[]))
+  }, [loadSettings]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Validate sender name: 1-11 chars, must start with a letter, alphanumeric + spaces
   function senderNameError(value: string): string | null {
@@ -414,6 +427,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
       timezone,
       sender_name:      senderName.trim() || null,
       cooldown_days:    cooldownDays,
+      sms_country_code: smsCountryCode || null,
       updated_at:       new Date().toISOString(),
     }
   }
@@ -466,11 +480,18 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
       })
       if (error) throw error
       await loadLog(true)
-      const r = data as { sent?: number; failed?: number; skipped?: number; reason?: string }
+      const r = data as { sent?: number; failed?: number; already_processed?: number; stale_pending?: number; blocked?: number; reason?: string }
       if (r.reason) {
         toast(`Nothing sent: ${r.reason}`, 'info')
       } else {
-        toast(`Done — ${r.sent ?? 0} sent · ${r.failed ?? 0} failed · ${r.skipped ?? 0} already sent`, 'success')
+        const parts = [
+          `${r.sent ?? 0} sent`,
+          r.failed            ? `${r.failed} failed`             : null,
+          r.blocked           ? `${r.blocked} blocked`           : null,
+          r.already_processed ? `${r.already_processed} already processed` : null,
+          r.stale_pending     ? `${r.stale_pending} stale pending — verify manually` : null,
+        ].filter(Boolean)
+        toast(`Done — ${parts.join(' · ')}`, (r.failed ?? 0) > 0 ? 'error' : 'success')
       }
     } catch (err: unknown) {
       toast(`Send failed: ${(err as { message?: string })?.message ?? String(err)}`, 'error')
@@ -480,10 +501,9 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
     }
   }
 
-  const enabled      = settings?.enabled ?? false
-  const sentCount    = log.filter(l => l.status === 'sent').length
-  const failedCount  = log.filter(l => l.status === 'failed').length
-  const skippedCount = log.filter(l => l.status === 'skipped').length
+  const enabled     = settings?.enabled ?? false
+  const sentCount   = log.filter(l => l.status === 'sent').length
+  const failedCount = log.filter(l => l.status === 'failed').length
 
   // Reachability breakdown across absent members
   const absentNoPhone     = absentMembers.filter(m => !m.phone?.trim()).length
@@ -525,7 +545,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
             <p className="text-2xs text-slate-500">
               {log.length === 0
                 ? (enabled ? `Auto-sends at ${sendHour}:00 ${timezone}` : 'SMS to absent members')
-                : `${sentCount} sent · ${failedCount} failed${skippedCount > 0 ? ` · ${skippedCount} skipped` : ''}`}
+                : `${sentCount} sent · ${failedCount} failed`}
             </p>
           </div>
         </div>
@@ -675,6 +695,36 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* Country — determines which SMS provider handles sends ─────────── */}
+          <div>
+            <label className="block text-2xs font-black uppercase tracking-spaced text-slate-500 mb-1.5">
+              Country
+              <span className="normal-case font-normal tracking-normal ml-1 text-slate-600">— routes messages via the best local carrier</span>
+            </label>
+            <select
+              value={smsCountryCode ?? ''}
+              onChange={e => setSmsCountryCode(e.target.value || null)}
+              className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+            >
+              <option value="">Not set — uses platform default (Twilio)</option>
+              {countries.map(c => (
+                <option key={c.code} value={c.code}>
+                  {c.flag ? `${c.flag} ` : ''}{c.name}
+                </option>
+              ))}
+            </select>
+            {smsCountryCode ? (
+              <div className="flex items-start gap-2 mt-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                <span className="material-symbols-outlined text-amber-400 text-base flex-shrink-0 mt-0.5">info</span>
+                <p className="text-2xs text-amber-300 leading-relaxed">
+                  Your country is set to <span className="font-bold">{countries.find(c => c.code === smsCountryCode)?.name ?? smsCountryCode}</span> — messages to international numbers may not deliver.
+                </p>
+              </div>
+            ) : (
+              <p className="text-2xs text-slate-600 mt-1">Set your country to route messages via the cheapest local carrier</p>
+            )}
           </div>
 
           {/* Sender name + cooldown */}

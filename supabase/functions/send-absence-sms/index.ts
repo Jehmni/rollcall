@@ -78,15 +78,21 @@ const SEND_CONCURRENCY        = 5
 // minutes is provably not owned by a live invocation.
 const STALE_PENDING_TTL_MINUTES = 30
 
-// ─── Validate secrets at startup ─────────────────────────────────────────────
+// ─── Secret validation (per resolved provider) ───────────────────────────────
+// Called inside processService after the provider is resolved from the unit's
+// country setting. Each provider only checks its own secrets so a missing
+// TERMII_API_KEY does not block units routed through Twilio.
 
-const SMS_PROVIDER = (Deno.env.get('SMS_PROVIDER') ?? 'twilio').toLowerCase()
-
-function validateSecrets(): string | null {
-  if (SMS_PROVIDER === 'africastalking') {
+function validateSecrets(provider: string): string | null {
+  if (provider === 'africastalking') {
     if (!Deno.env.get('AT_API_KEY')) return 'AT_API_KEY secret not configured'
     return null
   }
+  if (provider === 'termii') {
+    if (!Deno.env.get('TERMII_API_KEY')) return 'TERMII_API_KEY secret not configured'
+    return null
+  }
+  // twilio (default)
   if (!Deno.env.get('TWILIO_SID'))        return 'TWILIO_SID secret not configured'
   if (!Deno.env.get('TWILIO_AUTH_TOKEN')) return 'TWILIO_AUTH_TOKEN secret not configured'
   if (!Deno.env.get('TWILIO_FROM'))       return 'TWILIO_FROM secret not configured'
@@ -178,10 +184,53 @@ async function sendAfricasTalking(
   }
 }
 
-function sendOnce(
+// ─── Termii (Nigeria — DND-compliant routes) ──────────────────────────────────
+
+async function sendTermii(
   phone: string, message: string, senderName?: string | null,
 ): Promise<{ ok: boolean; error?: string }> {
-  if (SMS_PROVIDER === 'africastalking') return sendAfricasTalking(phone, message, senderName)
+  const apiKey   = Deno.env.get('TERMII_API_KEY')!
+  // TERMII_SENDER_ID is optional alphanumeric; falls back to 'N-Alert' (Termii default).
+  // Sender IDs must be pre-registered with Termii for production use.
+  const senderId = senderName?.trim() || Deno.env.get('TERMII_SENDER_ID') || 'N-Alert'
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), SMS_TIMEOUT_MS)
+
+  try {
+    const res = await fetch('https://api.ng.termii.com/api/sms/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        api_key: apiKey,
+        to:      phone,
+        from:    senderId,
+        sms:     message,
+        type:    'plain',
+        channel: 'generic',  // 'dnd' channel available for DND-registered sender IDs
+      }),
+      signal: controller.signal,
+    })
+    const data = await res.json()
+    if (res.ok && data.message === 'Successfully Sent') return { ok: true }
+    return { ok: false, error: data.message ?? `Termii HTTP ${res.status}` }
+  } catch (err: unknown) {
+    const msg = (err as Error)?.name === 'AbortError' ? 'Termii request timed out' : String(err)
+    return { ok: false, error: msg }
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+// ─── Provider dispatcher ──────────────────────────────────────────────────────
+// provider is resolved once per service invocation by resolveProvider() and
+// passed down through processService → sendToMember → sendOnce.
+
+function sendOnce(
+  phone: string, message: string, senderName: string | null | undefined, provider: string,
+): Promise<{ ok: boolean; error?: string }> {
+  if (provider === 'africastalking') return sendAfricasTalking(phone, message, senderName)
+  if (provider === 'termii')         return sendTermii(phone, message, senderName)
   return sendTwilio(phone, message, senderName)
 }
 
@@ -223,16 +272,41 @@ function todayIn(timezone: string): string {
   }
 }
 
+// ─── Provider resolver ────────────────────────────────────────────────────────
+// Looks up the provider for the unit's country code in sms_countries.
+// Falls back to SMS_PROVIDER env var (or 'twilio') when:
+//   - No country is set on the unit
+//   - The country code is not in the sms_countries table
+//   - The row has active = false
+
+async function resolveProvider(
+  supabase:    ReturnType<typeof createClient>,
+  countryCode: string | null,
+): Promise<string> {
+  if (countryCode) {
+    const { data } = await supabase
+      .from('sms_countries')
+      .select('provider')
+      .eq('code', countryCode)
+      .eq('active', true)
+      .maybeSingle()
+    if (data?.provider) return (data.provider as string).toLowerCase()
+    console.warn(`sms_countries: no active row for code "${countryCode}" — falling back to default`)
+  }
+  return (Deno.env.get('SMS_PROVIDER') ?? 'twilio').toLowerCase()
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ServiceRow  { id: string; unit_id: string; date: string; service_type: string }
 interface SettingsRow {
-  enabled: boolean
+  enabled:          boolean
   message_template: string
-  send_hour: number
-  timezone: string
-  sender_name: string | null
-  cooldown_days: number
+  send_hour:        number
+  timezone:         string
+  sender_name:      string | null
+  cooldown_days:    number
+  sms_country_code: string | null  // ISO 3166-1 alpha-2; null = use SMS_PROVIDER env fallback
 }
 interface MemberRow {
   id: string
@@ -291,6 +365,7 @@ async function sendToMember(
   orgId:      string,
   message:    string,
   senderName: string | null,
+  provider:   string,
   dryRun:     boolean,
 ): Promise<MemberOutcome> {
   if (dryRun) return { sent: 1, failed: 0, blocked: 0, already_processed: 0 }
@@ -350,7 +425,7 @@ async function sendToMember(
   // ── Send the SMS — single attempt, no retries ──────────────────────────────
   // Credit has already been deducted. Whether the provider succeeds or fails,
   // the credit is consumed — the attempt was made.
-  const result = await sendOnce(member.phone!, message, senderName)
+  const result = await sendOnce(member.phone!, message, senderName, provider)
 
   const { error: updateErr } = await supabase
     .from('absence_message_log')
@@ -385,12 +460,25 @@ async function processService(
   // ── 1. Check messaging settings ────────────────────────────────────────────
   const { data: settings } = await supabase
     .from('unit_messaging_settings')
-    .select('enabled, message_template, send_hour, timezone, sender_name, cooldown_days')
+    .select('enabled, message_template, send_hour, timezone, sender_name, cooldown_days, sms_country_code')
     .eq('unit_id', service.unit_id)
     .maybeSingle() as { data: SettingsRow | null }
 
   if (!settings?.enabled) {
     return { sent: 0, failed: 0, blocked: 0, already_processed: 0, stale_pending: 0, reason: 'messaging not enabled for this unit' }
+  }
+
+  // ── 1a. Resolve SMS provider for this unit's country ───────────────────────
+  const provider = await resolveProvider(supabase, settings.sms_country_code)
+  if (!dryRun) {
+    const secretsErr = validateSecrets(provider)
+    if (secretsErr) {
+      console.error(`SMS provider "${provider}" misconfigured for unit ${service.unit_id}:`, secretsErr)
+      return {
+        sent: 0, failed: 0, blocked: 0, already_processed: 0, stale_pending: 0,
+        reason: `SMS provider (${provider}) not configured: ${secretsErr} — contact support`,
+      }
+    }
   }
 
   const tz = settings.timezone || 'UTC'
@@ -558,7 +646,7 @@ async function processService(
     const results = await Promise.all(
       batch.map(member => {
         const message = renderTemplate(settings.message_template, member.name, eventName)
-        return sendToMember(supabase, member, service, orgId, message, senderName, dryRun)
+        return sendToMember(supabase, member, service, orgId, message, senderName, provider, dryRun)
       })
     )
     for (const r of results) {
@@ -719,14 +807,9 @@ Deno.serve(async (req) => {
     }
     const dryRun = body.dry_run ?? false
 
-    // Validate SMS secrets only when we will actually send (skip for dry runs)
-    if (!dryRun) {
-      const secretsError = validateSecrets()
-      if (secretsError) {
-        console.error('SMS configuration error:', secretsError)
-        return json(503, { error: `SMS provider not configured: ${secretsError}` })
-      }
-    }
+    // Secret validation is now per-provider, resolved inside processService()
+    // after the unit's country setting is loaded. A missing secret for one
+    // provider does not block units routed through a different provider.
 
     // ── Manual single-service send ─────────────────────────────────────────
     if (body.service_id) {
