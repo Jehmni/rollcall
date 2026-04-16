@@ -251,13 +251,29 @@ When a member doesn't check in, Rollcally can automatically send them a friendly
 2. Scroll to the **"Absence Messaging"** panel at the bottom of the page
 3. Toggle the switch to **enable** SMS messaging for your unit
 4. Fill in the settings:
-   - **Sender name** — what members see as the "From" name (e.g. `GraceChoir`). Max 11 characters, must start with a letter. Leave blank to use the provider's phone number.
-   - **Message template** — personalise the text using `{{name}}` (member's name) and `{{event}}` (event type). Example: *"Hi {{name}}, we missed you at {{event}} today. Hope you're well!"*
+   - **Country** — select the country where your unit is based. Rollcally uses this to route messages through the most reliable and cost-effective local carrier for that country. You can change this at any time. If you leave it unset, messages are sent via the platform's global default (Twilio).
    - **Auto-send time** — the hour of day when the system sends the messages (noon–9 pm)
    - **Timezone** — your unit's local timezone, so messages go out at the right local time
+   - **Sender name** — what members see as the "From" name (e.g. `GraceChoir`). Max 11 characters, must start with a letter. Leave blank to use the provider's phone number.
    - **Cooldown** — minimum days between messages to the same member. Default is 7 days. Setting to 0 sends a message for every missed event (not recommended for active units).
+   - **Message template** — personalise the text using `{{name}}` (member's name) and `{{event}}` (event type). Example: *"Hi {{name}}, we missed you at {{event}} today. Hope you're well!"*
 5. Tap **Save** to store your settings
 6. To send immediately (without waiting for the scheduled time), tap **"Send to all"**
+
+> **Country warning:** When a country is set, a yellow notice will appear reading *"Your country is set to [country] — messages to international numbers may not deliver."* This is a reminder that routing is optimised for numbers registered in that country. If your members have phone numbers from multiple countries, contact support.
+
+**How country routing works:**
+
+You pick your country once — the platform handles the rest invisibly. Rollcally currently routes as follows:
+
+| Country | Provider used |
+|---|---|
+| Nigeria | Termii (DND-compliant routes) |
+| Kenya, Ghana, Uganda, Tanzania, South Africa, Rwanda, Zambia, Ethiopia | Africa's Talking |
+| UK, Germany, France, Netherlands, Ireland, USA, Canada, Australia | Twilio |
+| Not set / any other country | Twilio (global fallback) |
+
+You can change your country at any time from the Absence Messaging panel. The new routing takes effect on the next send.
 
 **Understanding the eligibility count:**
 

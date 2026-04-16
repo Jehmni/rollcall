@@ -71,8 +71,9 @@ The route model is explicit and role-gated in code. [Ref: src/App.tsx:37, src/co
 - Web push subscription capture and Go Live dispatch.
 - Automated absence SMS with per-unit settings and cooldown window.
 - Consent-gated messaging pipeline.
+- Country-based SMS provider routing: each unit selects its country; the platform routes sends through the optimal provider for that market (Termii for Nigeria, Africa's Talking for East/Central/Southern Africa, Twilio for Europe/Americas/Oceania and as global fallback).
 
-[Ref: src/hooks/usePushNotifications.ts:20, supabase/functions/send-push/index.ts:66, supabase/functions/send-absence-sms/index.ts:294, supabase/migrations/20260402_sms_consent.sql:53]
+[Ref: src/hooks/usePushNotifications.ts:20, supabase/functions/send-push/index.ts:66, supabase/functions/send-absence-sms/index.ts:294, supabase/migrations/20260402_sms_consent.sql:53, supabase/migrations/20260416_sms_country_routing.sql:1]
 
 ### 3.5 Monetization
 
@@ -143,9 +144,10 @@ flowchart TD
 - `attendance` records event-member presence with device and geo metadata.
 - `member_push_subscriptions` stores browser push endpoints.
 - `unit_messaging_settings` and `absence_message_log` define SMS automation behavior.
+- `sms_countries` maps ISO country codes to SMS providers; drives cost-optimised routing.
 - Billing entities: `pricing_plans`, `subscriptions`, `sms_credits`, `usage_events`.
 
-[Ref: supabase/schema.sql:99, supabase/schema.sql:141, supabase/schema.sql:174, supabase/migrations/20260401_absence_messaging.sql:10, supabase/migrations/20260406_billing.sql:13]
+[Ref: supabase/schema.sql:99, supabase/schema.sql:141, supabase/schema.sql:174, supabase/migrations/20260401_absence_messaging.sql:10, supabase/migrations/20260406_billing.sql:13, supabase/migrations/20260416_sms_country_routing.sql:1]
 
 ### 6.3 Data Consistency Patterns
 
@@ -228,6 +230,17 @@ sequenceDiagram
 - Pipeline checks settings, date/time window, subscription state, consent, cooldown.
 - Each send attempts credit deduction first; blocked sends are logged via usage event for audit.
 - Each eligible member is attempted exactly once — no automatic retries. Failures are surfaced in the delivery log for manual follow-up.
+- Provider is resolved per unit at send time via the `sms_countries` lookup table. Adding a new country or switching a provider requires only an SQL update — no code deploy.
+
+**Phase 1 provider map:**
+
+| Region | Provider | Rationale |
+|---|---|---|
+| Nigeria | Termii | DND-compliant routes; no 2-week carrier registration required |
+| Kenya, Ghana, Uganda, Tanzania, South Africa, Rwanda, Zambia, Ethiopia | Africa's Talking | Direct carrier connections; 10×–80× cheaper than Twilio in East Africa |
+| UK, Germany, France, Netherlands, Ireland, USA, Canada, Australia | Twilio | Global coverage; used as platform fallback when no country is set |
+
+Future providers (Plivo for Europe/US cost savings, Arkesel for Ghana specialisation) are added by inserting a row in `sms_countries` and setting new secrets — no application code changes required.
 
 **Outcome semantics (operator reference):**
 

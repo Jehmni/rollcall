@@ -57,7 +57,7 @@ flowchart LR
   S --> E[Edge Functions]
 
   E --> STRIPE[Stripe]
-  E --> SMS[Twilio or AfricasTalking]
+  E --> SMS[Twilio / AfricasTalking / Termii]
   E --> PUSH[Web Push Gateway]
 ```
 
@@ -129,6 +129,7 @@ erDiagram
   members ||--o{ attendance : appears_in
   members ||--o{ member_push_subscriptions : owns
   units ||--|| unit_messaging_settings : configures
+  unit_messaging_settings }o--|| sms_countries : routed_via
   services ||--o{ absence_message_log : logs
   organizations ||--|| subscriptions : billed_as
   organizations ||--|| sms_credits : owns
@@ -198,18 +199,20 @@ sequenceDiagram
   participant SMS as SMS Provider
 
   AD->>MSG: manual send request
-  MSG->>DB: load service + settings + eligible members
-  loop per member
+  MSG->>DB: load service + settings (incl. sms_country_code)
+  MSG->>DB: resolveProvider(sms_country_code) → sms_countries lookup
+  MSG->>DB: load eligible members
+  loop per member (SEND_CONCURRENCY=5 in parallel)
     MSG->>DB: deduct_sms_credit(org)
     alt credit available
       MSG->>DB: insert pending log row
-      MSG->>SMS: send message
+      MSG->>SMS: send via resolved provider (Termii / AT / Twilio)
       MSG->>DB: update log status + usage event
     else credit exhausted
       MSG->>DB: log sms_blocked usage event
     end
   end
-  MSG-->>AD: sent/failed/blocked summary
+  MSG-->>AD: sent/failed/blocked/already_processed summary
 ```
 
 Evidence: `src/pages/AdminServiceDetail.tsx:458`, `supabase/functions/send-absence-sms/index.ts:342`, `supabase/migrations/20260406_billing.sql:172`.
@@ -283,6 +286,20 @@ Evidence: `src/pages/AdminServiceDetail.tsx:458`, `supabase/functions/send-absen
 - Frontend requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 - Edge functions require service and third-party secrets (Stripe, SMS, VAPID).
 
+**SMS secrets** — only the secrets for the resolved provider are validated per invocation (lazy validation):
+
+| Secret | Required for | Notes |
+|---|---|---|
+| `TWILIO_ACCOUNT_SID` | Twilio sends | Global fallback provider |
+| `TWILIO_AUTH_TOKEN` | Twilio sends | |
+| `TWILIO_FROM_NUMBER` | Twilio sends | E.164 format, e.g. `+14155552671` |
+| `AT_API_KEY` | Africa's Talking sends | East/Central/Southern Africa |
+| `AT_USERNAME` | Africa's Talking sends | |
+| `AT_SENDER_ID` | Africa's Talking sends | Optional alphanumeric sender ID |
+| `TERMII_API_KEY` | Termii sends | Nigeria (DND-compliant routes) |
+| `TERMII_SENDER_ID` | Termii sends | Optional; defaults to `N-Alert` if unset |
+| `SMS_PROVIDER` | Fallback resolution | Used when unit has no country set; defaults to `twilio` |
+
 [Ref: .env.example:4, supabase/functions/create-checkout-session/index.ts:43, supabase/functions/send-absence-sms/index.ts:45, supabase/functions/send-push/index.ts:76]
 
 ## 10. Data and Schema Governance
@@ -353,6 +370,8 @@ Evidence: `.github/workflows/ci.yml:70`, `supabase/schema.sql:3`, `src/lib/logge
 5. **No automatic SMS retries; failed sends consume a credit.** Each member is attempted exactly once. Retries would risk duplicate sends if the provider accepted the first attempt but returned a transient error on the response. The admin delivery log surfaces failures for manual follow-up. Credit consumption on failure is intentional — the attempt was made.
 6. **Blocked members produce no `absence_message_log` row.** The idempotency pre-load skips members with existing rows, so inserting a `blocked` row would permanently exclude them even after credits replenish. The absence of a row is the re-eligibility signal.
 7. **Stale pending recovery is conservative (mark failed, do not re-send).** A `pending` row older than 30 minutes is left by a crashed function run. The crash point is unknown — the provider may have already accepted the send. Re-sending risks a duplicate. Marking `failed` with `reason_code = stale_pending_recovered` surfaces the anomaly to admins without making an irrevocable decision on their behalf.
+8. **Country-based SMS routing is table-driven, not code-driven.** Provider assignment lives in `sms_countries`. Adding a country or switching a provider (e.g. Nigeria from Termii to Africa's Talking once DND registration is complete) requires only an SQL update — no application code change or redeployment. The edge function resolves provider per unit per invocation from this table, falling back to the `SMS_PROVIDER` env var and then Twilio.
+9. **Provider secrets are validated lazily per resolved provider.** A missing `TERMII_API_KEY` does not block units routed through Twilio. Each provider's secrets are checked only when that provider is actually selected for a send.
 
 Evidence: `supabase/schema.sql:562`, `supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql:12`, `supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql:18`, `supabase/migrations/20260406_billing.sql:172`, `supabase/migrations/20260406_billing.sql:135`, `supabase/functions/*`.
 
@@ -380,6 +399,7 @@ Primary files used:
 - `supabase/migrations/20260406_billing.sql`
 - `supabase/migrations/20260411_location_improvements.sql`
 - `supabase/migrations/20260412_harden_anon_attendance_and_sms_consent.sql`
+- `supabase/migrations/20260416_sms_country_routing.sql`
 - `supabase/functions/create-checkout-session/index.ts`
 - `supabase/functions/stripe-webhook/index.ts`
 - `supabase/functions/send-absence-sms/index.ts`
