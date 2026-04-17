@@ -158,8 +158,10 @@ test.describe('MessagingPanel: SMS enabled state', () => {
   test('message template textarea is editable', async ({ page }) => {
     await openMessagingPanel(page)
     const textarea = page.locator('textarea').first()
-    await textarea.waitFor({ timeout: 5000 })
-    await textarea.fill('Hello {name}, missed you!')
+    // Use 'attached' state: the panel's animate-in/fade-in class starts at opacity:0
+    // which can stall visibility in headless CI even after the element is in the DOM.
+    await textarea.waitFor({ state: 'attached', timeout: 5000 })
+    await textarea.fill('Hello {name}, missed you!', { force: true })
     await expect(textarea).toHaveValue('Hello {name}, missed you!')
   })
 
