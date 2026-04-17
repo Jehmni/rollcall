@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import * as XLSX from 'xlsx'
 import { supabase } from '../lib/supabase'
 import type { Member, MemberStatus } from '../types'
 import { detectDuplicate, type DuplicateStatus } from '../lib/nameUtils'
@@ -227,13 +226,24 @@ function parseCsv(text: string): { rows: CsvRow[]; skipped: number } {
 }
 
 /** Parse an Excel (.xlsx / .xls) file buffer into the same CsvRow format. */
-function parseExcel(buffer: ArrayBuffer): { rows: CsvRow[]; skipped: number } {
-  const wb = XLSX.read(buffer, { type: 'array', cellDates: true })
-  const ws = wb.Sheets[wb.SheetNames[0]]
-  const raw: unknown[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' })
+async function parseExcel(buffer: ArrayBuffer): Promise<{ rows: CsvRow[]; skipped: number }> {
+  // Dynamic import keeps ExcelJS (~1.5 MB) out of the initial bundle — it only
+  // loads when the user actually uploads an Excel file.
+  const ExcelJS = (await import('exceljs')).default
+  const wb = new ExcelJS.Workbook()
+  await wb.xlsx.load(buffer)
+  const ws = wb.worksheets[0]
+  if (!ws) return { rows: [], skipped: 0 }
+
+  // ExcelJS row.values is 1-indexed; index 0 is always undefined — drop it
+  const raw: unknown[][] = []
+  ws.eachRow({ includeEmpty: true }, row => {
+    raw.push((row.values as unknown[]).slice(1))
+  })
   if (raw.length === 0) return { rows: [], skipped: 0 }
 
-  // Stringify every cell — convert Excel Date objects to ISO strings
+  // Stringify every cell — handle Date, ExcelJS rich-text / formula / hyperlink
+  // cell value objects in addition to plain primitives
   const stringify = (val: unknown): string => {
     if (val == null || val === '') return ''
     if (val instanceof Date) {
@@ -241,6 +251,14 @@ function parseExcel(buffer: ArrayBuffer): { rows: CsvRow[]; skipped: number } {
       const m = String(val.getMonth() + 1).padStart(2, '0')
       const d = String(val.getDate()).padStart(2, '0')
       return `${y}-${m}-${d}`
+    }
+    if (typeof val === 'object') {
+      // RichText: { richText: Array<{ text: string }> }
+      if ('richText' in val) return (val as { richText: { text: string }[] }).richText.map(r => r.text).join('').trim()
+      // Shared formula: { formula: string, result: unknown }
+      if ('result' in val) return stringify((val as { result: unknown }).result)
+      // Hyperlink: { text: string, hyperlink: string }
+      if ('text' in val) return String((val as { text: unknown }).text).trim()
     }
     return String(val).trim()
   }
@@ -892,7 +910,7 @@ export default function UnitMembers() {
     reader.onload = async ev => {
       let rows: CsvRow[]; let skipped: number
       if (isExcel) {
-        ;({ rows, skipped } = parseExcel(ev.target?.result as ArrayBuffer))
+        ;({ rows, skipped } = await parseExcel(ev.target?.result as ArrayBuffer))
       } else {
         ;({ rows, skipped } = parseCsv(ev.target?.result as string))
       }
