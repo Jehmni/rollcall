@@ -16,7 +16,12 @@
       "Bash(curl -s http://localhost:5173)",
       "Bash(npx playwright:*)",
       "Bash(echo \"EXIT_CODE:$?\")",
-      "Bash(echo \"DONE_CODE:$?\")"
+      "Bash(echo \"DONE_CODE:$?\")",
+      "Bash(claude mcp *)",
+      "WebFetch(domain:help.figma.com)",
+      "WebFetch(domain:developers.figma.com)",
+      "WebFetch(domain:api.anthropic.com)",
+      "WebFetch(domain:stitch.withgoogle.com)"
     ]
   }
 }
