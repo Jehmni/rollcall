@@ -47,27 +47,34 @@ async function mockMessagingDisabled(page: import('@playwright/test').Page) {
 
 /** Mock unit_messaging_settings — SMS enabled */
 async function mockMessagingEnabled(page: import('@playwright/test').Page) {
+  const settingsBody = JSON.stringify({
+    unit_id: IDS.unit,
+    enabled: true,
+    message_template: 'Hi {name}, you were absent from {service_type} on {date}.',
+    send_hour: 18,
+    timezone: 'UTC',
+    sender_name: 'Choir',
+    cooldown_days: 7,
+    sms_country_code: null,
+    updated_at: '2026-04-01T00:00:00Z',
+  })
   await page.route(`${SUPABASE_URL}/rest/v1/unit_messaging_settings*`, async route => {
     if (route.request().method() === 'GET' || route.request().method() === 'POST') {
+      // Use pgrst object content-type so Supabase maybeSingle() parses correctly
       await route.fulfill({
         status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          unit_id: IDS.unit,
-          enabled: true,
-          message_template: 'Hi {name}, you were absent from {service_type} on {date}.',
-          send_hour: 18,
-          timezone: 'UTC',
-          sender_name: 'Choir',
-          cooldown_days: 7,
-          updated_at: '2026-04-01T00:00:00Z',
-        }),
+        contentType: 'application/vnd.pgrst.object+json',
+        body: settingsBody,
       })
     } else {
       await route.continue()
     }
   })
   await page.route(`${SUPABASE_URL}/rest/v1/absence_message_log*`, route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+  )
+  // Stub the country list so the component doesn't make an unmocked live request
+  await page.route(`${SUPABASE_URL}/rest/v1/sms_countries*`, route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   )
 }
