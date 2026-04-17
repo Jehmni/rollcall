@@ -205,8 +205,9 @@ test.describe('Billing page: active subscription', () => {
   test('non-current plan cards show "Choose plan" and are enabled', async ({ page }) => {
     await page.goto('/admin/billing')
     const chooseBtns = page.getByRole('button', { name: /Choose plan/i })
-    // Wait for at least one "Choose plan" button to appear before counting
+    // Wait for both non-current plan buttons to be visible before counting
     await expect(chooseBtns.first()).toBeVisible()
+    await expect(chooseBtns.nth(1)).toBeVisible()
     const count = await chooseBtns.count()
     expect(count).toBeGreaterThanOrEqual(2)
   })

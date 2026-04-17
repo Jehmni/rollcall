@@ -86,7 +86,8 @@ async function openMessagingPanel(page: import('@playwright/test').Page) {
   const panelToggle = page.getByRole('button', { name: /Absence Messaging/i }).first()
   // Wait for the page to fully load before clicking
   await panelToggle.waitFor({ timeout: 10000 })
-  await panelToggle.click()
+  // force: true bypasses the internal toggle switch which has stopPropagation
+  await panelToggle.click({ force: true })
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
