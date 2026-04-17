@@ -183,6 +183,11 @@ test.describe('Check-in — in-person event (location required)', () => {
       }),
     )
 
+    // Grant geolocation and provide a mock position so the hook can call the RPC
+    // (without this, getCurrentPosition times out/denied and the hook never reaches the RPC)
+    await page.context().grantPermissions(['geolocation'])
+    await page.context().setGeolocation({ latitude: 51.5, longitude: -0.1 })
+
     await page.goto(`/checkin?service_id=${IDS.service}`)
     await page.getByPlaceholder('Search your name…').fill('Alice')
     await page.getByText('Alice Johnson').click()
