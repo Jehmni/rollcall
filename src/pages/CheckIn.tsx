@@ -402,7 +402,7 @@ export default function CheckIn() {
                   {selected.name.charAt(0)}
                 </div>
               </div>
-              <h3 className="text-2xs font-black uppercase tracking-super text-slate-500 mb-4">Is This You?</h3>
+              <h3 className="text-2xs font-black uppercase tracking-super text-slate-500 mb-4">Confirm Your Name</h3>
               <h2 className="font-display text-4xl font-bold text-white uppercase tracking-tighter">Is this you?</h2>
               <div className="mt-10 p-8 rounded-[2.5rem] bg-primary/5 border border-primary/20 shadow-[0_0_50px_rgba(82,71,230,0.1)] w-full relative overflow-hidden">
                 <div className="absolute top-0 right-0 -mt-8 -mr-8 h-24 w-24 bg-primary/10 rounded-full blur-2xl"></div>
