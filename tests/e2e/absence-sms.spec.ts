@@ -82,12 +82,12 @@ async function mockMessagingEnabled(page: import('@playwright/test').Page) {
 /** Navigate to service detail and open the messaging panel */
 async function openMessagingPanel(page: import('@playwright/test').Page) {
   await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
-  // The MessagingPanel has a collapsible section with "Absence Messaging" text
-  const panelToggle = page.getByRole('button', { name: /Absence Messaging/i }).first()
-  // Wait for the page to fully load before clicking
-  await panelToggle.waitFor({ timeout: 10000 })
-  // force: true bypasses the internal toggle switch which has stopPropagation
-  await panelToggle.click({ force: true })
+  // Click on the "Absence Messaging" text <p> directly — it sits on the left
+  // of the header button, away from the toggle switch div that has stopPropagation.
+  // Clicking the button at center can land on the switch and block setOpen().
+  const label = page.getByText('Absence Messaging').first()
+  await label.waitFor({ timeout: 10000 })
+  await label.click()
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -117,7 +117,9 @@ test.describe('MessagingPanel: collapsed / expanded state', () => {
     await setupServiceDetail(page)
     await mockMessagingDisabled(page)
     await page.goto(`/admin/units/${IDS.unit}/events/${IDS.service}`)
-    const toggle = page.getByRole('button', { name: /Absence|SMS|Follow.?up|Messaging/i }).first()
+    // Click the text label, not the button center — the inner toggle switch has
+    // stopPropagation and occupies the right side; center-click can hit it.
+    const toggle = page.getByText('Absence Messaging').first()
     await toggle.click()
     // After expansion, some form elements should appear
     await expect(page.locator('textarea, input[type="text"], select').first()).toBeAttached({ timeout: 5000 })
