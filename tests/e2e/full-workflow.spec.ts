@@ -667,10 +667,10 @@ test.describe('9 · Member check-in for event', () => {
     await page.getByPlaceholder('Search your name…').fill('Ali')
     await expect(page.getByText('Alice Johnson')).toBeVisible()
     await page.getByText('Alice Johnson').click()
-    await expect(page.getByRole('button', { name: 'Yes, check me in' })).toBeVisible()
-    await page.getByRole('button', { name: 'Yes, check me in' }).click()
+    await expect(page.getByRole('button', { name: 'Yes, Check Me In' })).toBeVisible()
+    await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
     await expect(page.getByText("You're in!")).toBeVisible()
-    await expect(page.getByText('Check-in Successful')).toBeVisible()
+    await expect(page.getByText('Attendance confirmed')).toBeVisible()
   })
 
   test('admin can toggle attendance from service detail page', async ({ page }) => {

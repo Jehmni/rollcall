@@ -187,7 +187,7 @@ test.describe('Check-in — in-person event (location required)', () => {
     await page.getByPlaceholder('Search your name…').fill('Alice')
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: /confirm|yes.*me/i }).click()
-    await expect(page.getByText(/too far from the venue/i)).toBeVisible()
+    await expect(page.getByText(/away from the venue/i)).toBeVisible()
     await expect(page.getByText(/450m/i)).toBeVisible()
   })
 })

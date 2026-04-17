@@ -231,7 +231,7 @@ export default function OrgDetail() {
 
   useEffect(() => {
     if (org?.name && !orgName) setOrgName(org.name)
-  }, [org?.name])
+  }, [org?.name, orgName])
 
   const pendingCount = joinRequests.filter(r => r.status === 'pending').length
 

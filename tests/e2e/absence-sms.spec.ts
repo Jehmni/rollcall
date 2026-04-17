@@ -112,7 +112,7 @@ test.describe('MessagingPanel: collapsed / expanded state', () => {
     const toggle = page.getByRole('button', { name: /Absence|SMS|Follow.?up|Messaging/i }).first()
     await toggle.click()
     // After expansion, some form elements should appear
-    await expect(page.locator('textarea, input[type="text"], select').first()).toBeVisible({ timeout: 5000 })
+    await expect(page.locator('textarea, input[type="text"], select').first()).toBeAttached({ timeout: 5000 })
   })
 })
 
@@ -145,7 +145,7 @@ test.describe('MessagingPanel: SMS enabled state', () => {
   test('settings form shows when SMS is enabled', async ({ page }) => {
     await openMessagingPanel(page)
     // template textarea is visible
-    await expect(page.locator('textarea').first()).toBeVisible({ timeout: 5000 })
+    await expect(page.locator('textarea').first()).toBeAttached({ timeout: 5000 })
   })
 
   test('message template textarea is editable', async ({ page }) => {

@@ -69,7 +69,7 @@ async function doCheckin(page: import('@playwright/test').Page) {
   await page.goto(`/checkin?service_id=${IDS.service}`)
   await page.getByPlaceholder('Search your name…').fill('Ali')
   await page.getByText('Alice Johnson').click()
-  await page.getByRole('button', { name: 'Yes, check me in' }).click()
+  await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
   // Wait for success screen
   await expect(page.getByText("You're in!")).toBeVisible()
 }

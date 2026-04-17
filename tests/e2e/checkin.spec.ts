@@ -74,7 +74,7 @@ test.describe('Check-in: confirmation flow', () => {
     await page.getByPlaceholder('Search your name…').fill('Ali')
     await page.getByText('Alice Johnson').click()
     await expect(page.getByText('Is this you?')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Yes, check me in' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Yes, Check Me In' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'No, go back' })).toBeVisible()
   })
 
@@ -153,7 +153,7 @@ test.describe('Check-in: search input is tappable and typeable', () => {
     await page.getByText('Alice Johnson').click()
     await expect(page.getByText('Is this you?')).toBeVisible()
     // Confirm check-in
-    await page.getByRole('button', { name: 'Yes, check me in' }).click()
+    await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
     await expect(page.getByText("You're in!")).toBeVisible()
   })
 
@@ -165,9 +165,9 @@ test.describe('Check-in: search input is tappable and typeable', () => {
     await expect(input).toBeFocused()
     await input.pressSequentially('Alice')
     await page.getByText('Alice Johnson').click()
-    await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await expect(page.getByRole('heading', { name: 'Sync Denied' })).toBeVisible()
-    await expect(page.getByText(/Already checked in/)).toBeVisible()
+    await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
+    await expect(page.getByRole('heading', { name: 'Already Checked In' })).toBeVisible()
+    await expect(page.getByText(/already checked in/i)).toBeVisible()
   })
 })
 
@@ -182,9 +182,9 @@ test.describe('Check-in: result screens', () => {
     await page.goto(`/checkin?service_id=${IDS.service}`)
     await page.getByPlaceholder('Search your name…').fill('Ali')
     await page.getByText('Alice Johnson').click()
-    await page.getByRole('button', { name: 'Yes, check me in' }).click()
+    await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
     await expect(page.getByText("You're in!")).toBeVisible()
-    await expect(page.getByText('Check-in Successful')).toBeVisible()
+    await expect(page.getByText('Attendance confirmed')).toBeVisible()
   })
 
   test('already checked in shows error screen', async ({ page }) => {
@@ -192,19 +192,19 @@ test.describe('Check-in: result screens', () => {
     await page.goto(`/checkin?service_id=${IDS.service}`)
     await page.getByPlaceholder('Search your name…').fill('Ali')
     await page.getByText('Alice Johnson').click()
-    await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await expect(page.getByRole('heading', { name: 'Sync Denied' })).toBeVisible()
-    await expect(page.getByText(/Already checked in/)).toBeVisible()
+    await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
+    await expect(page.getByRole('heading', { name: 'Already Checked In' })).toBeVisible()
+    await expect(page.getByText(/already checked in/i)).toBeVisible()
   })
 
-  test('"Re-verify Identity" from error returns to list', async ({ page }) => {
+  test('"Go Back" from error returns to list', async ({ page }) => {
     await mockCheckinAlreadyIn(page)
     await page.goto(`/checkin?service_id=${IDS.service}`)
     await page.getByPlaceholder('Search your name…').fill('Ali')
     await page.getByText('Alice Johnson').click()
-    await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await expect(page.getByRole('heading', { name: 'Sync Denied' })).toBeVisible()
-    await page.getByRole('button', { name: 'Re-verify Identity' }).click()
+    await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
+    await expect(page.getByRole('heading', { name: 'Already Checked In' })).toBeVisible()
+    await page.getByRole('button', { name: 'Go Back' }).click()
     await expect(page.getByPlaceholder('Search your name…')).toBeVisible()
   })
 
@@ -213,18 +213,18 @@ test.describe('Check-in: result screens', () => {
     await page.goto(`/checkin?service_id=${IDS.service}`)
     await page.getByPlaceholder('Search your name…').fill('Ali')
     await page.getByText('Alice Johnson').click()
-    await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await expect(page.getByRole('heading', { name: 'Sync Denied' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Re-verify Identity' })).toBeVisible()
+    await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
+    await expect(page.getByRole('heading', { name: 'Invalid Event' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Go Back' })).toBeVisible()
   })
 
-  test('"Re-verify Identity" from invalid service returns to list', async ({ page }) => {
+  test('"Go Back" from invalid service returns to list', async ({ page }) => {
     await mockCheckinInvalidService(page)
     await page.goto(`/checkin?service_id=${IDS.service}`)
     await page.getByPlaceholder('Search your name…').fill('Ali')
     await page.getByText('Alice Johnson').click()
-    await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await page.getByRole('button', { name: 'Re-verify Identity' }).click()
+    await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
+    await page.getByRole('button', { name: 'Go Back' }).click()
     await expect(page.getByPlaceholder('Search your name…')).toBeVisible()
   })
 })
@@ -294,11 +294,11 @@ test.describe('Check-in: mobile viewport (390×844 — iPhone 14)', () => {
     await expect(page.getByText('Is this you?')).toBeVisible()
 
     // Step 6 — confirm check-in
-    await page.getByRole('button', { name: 'Yes, check me in' }).click()
+    await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
 
     // Step 7 — success screen
     await expect(page.getByText("You're in!")).toBeVisible()
-    await expect(page.getByText('Check-in Successful')).toBeVisible()
+    await expect(page.getByText('Attendance confirmed')).toBeVisible()
 
     // Step 8 — Done button navigates back to landing page
     await page.getByRole('button', { name: /done/i }).click()
@@ -313,9 +313,9 @@ test.describe('Check-in: mobile viewport (390×844 — iPhone 14)', () => {
     await expect(input).toBeFocused()
     await input.pressSequentially('Alice')
     await page.getByText('Alice Johnson').click()
-    await page.getByRole('button', { name: 'Yes, check me in' }).click()
-    await expect(page.getByRole('heading', { name: 'Sync Denied' })).toBeVisible()
-    await expect(page.getByText(/Already checked in/)).toBeVisible()
+    await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
+    await expect(page.getByRole('heading', { name: 'Already Checked In' })).toBeVisible()
+    await expect(page.getByText(/already checked in/i)).toBeVisible()
   })
 })
 
