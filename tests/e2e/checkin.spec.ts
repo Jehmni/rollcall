@@ -167,7 +167,7 @@ test.describe('Check-in: search input is tappable and typeable', () => {
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
     await expect(page.getByRole('heading', { name: 'Already Checked In' })).toBeVisible()
-    await expect(page.getByText(/already checked in/i)).toBeVisible()
+    await expect(page.getByText(/has already checked in/i)).toBeVisible()
   })
 })
 
@@ -194,7 +194,7 @@ test.describe('Check-in: result screens', () => {
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
     await expect(page.getByRole('heading', { name: 'Already Checked In' })).toBeVisible()
-    await expect(page.getByText(/already checked in/i)).toBeVisible()
+    await expect(page.getByText(/has already checked in/i)).toBeVisible()
   })
 
   test('"Go Back" from error returns to list', async ({ page }) => {
@@ -315,7 +315,7 @@ test.describe('Check-in: mobile viewport (390×844 — iPhone 14)', () => {
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
     await expect(page.getByRole('heading', { name: 'Already Checked In' })).toBeVisible()
-    await expect(page.getByText(/already checked in/i)).toBeVisible()
+    await expect(page.getByText(/has already checked in/i)).toBeVisible()
   })
 })
 
