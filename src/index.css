@@ -18,32 +18,36 @@
 
 /* Light mode */
 :root {
-  --color-bg:               250 249 246; /* #faf9f6 */
-  --color-surface-low:      237 238 234; /* #edeeea */
-  --color-surface-high:     230 233 228; /* #e6e9e4 */
-  --color-surface-highest:  224 228 222; /* #e0e4de */
-  --color-border:           175 179 174; /* #afb3ae */
-  --color-text:              47  51  48; /* #2f3330 */
-  --color-text-muted:        92  96  92; /* #5c605c */
-  --color-primary:          129  87   0; /* #815700 — amber */
-  --color-primary-light:    249 173  18; /* #f9ad12 */
-  --color-primary-dark:      50  31   0; /* #321f00 */
-  --color-secondary:         91  95 101; /* #5b5f65 */
+  --color-bg:               245 245 245; /* #f5f5f5 — off-white */
+  --color-surface-low:      235 235 235; /* #ebebeb */
+  --color-surface-high:     225 225 225; /* #e1e1e1 */
+  --color-surface-highest:  215 215 215; /* #d7d7d7 */
+  --color-border:           117 117 117; /* #757575 */
+  --color-text:              19  19  19; /* #131313 */
+  --color-text-muted:       117 117 117; /* #757575 */
+  --color-primary:          240 165   0; /* #F0A500 — signal amber */
+  --color-primary-light:    255 221 175; /* #ffddaf */
+  --color-primary-dark:     129  87   0; /* #815700 */
+  --color-secondary:        117 117 117; /* #757575 */
+  --color-teal:               0 201 167; /* #00C9A7 — found teal */
+  --color-red:              239  83  80; /* #EF5350 — functional red */
 }
 
 /* Dark mode */
 .dark {
   --color-bg:                19  19  19; /* #131313 */
-  --color-surface-low:       32  31  31; /* #201f1f */
-  --color-surface-high:      42  42  42; /* #2a2a2a */
+  --color-surface-low:       28  27  27; /* #1c1b1b */
+  --color-surface-high:      32  31  31; /* #201f1f */
   --color-surface-highest:   53  53  53; /* #353535 */
   --color-border:            71  71  71; /* #474747 */
-  --color-text:             229 226 225; /* #e5e2e1 */
-  --color-text-muted:       198 198 198; /* #c6c6c6 */
-  --color-primary:          240 165   0; /* #F0A500 — amber */
+  --color-text:             245 245 245; /* #f5f5f5 */
+  --color-text-muted:       117 117 117; /* #757575 */
+  --color-primary:          240 165   0; /* #F0A500 — signal amber */
   --color-primary-light:    255 221 175; /* #ffddaf */
   --color-primary-dark:      40  24   0; /* #281800 */
-  --color-secondary:        198 198 198; /* #c6c6c6 */
+  --color-secondary:        117 117 117; /* #757575 */
+  --color-teal:               0 201 167; /* #00C9A7 — found teal */
+  --color-red:              239  83  80; /* #EF5350 — functional red */
 }
 
 @tailwind base;
@@ -65,12 +69,6 @@
     min-height: 100svh;
     min-height: 100dvh;
     background-color: rgb(var(--color-bg));
-    background-image: radial-gradient(
-      circle at top center,
-      rgb(var(--color-surface-high)) 0%,
-      rgb(var(--color-bg)) 100%
-    );
-    background-attachment: fixed;
   }
 
   /* Extend background behind the notch/status bar on iOS PWA */

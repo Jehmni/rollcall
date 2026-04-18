@@ -1,5 +1,5 @@
 ---
-title: "Rollcally Enterprise Architecture"
+title: "Yevo Monochrome Signal Architecture"
 description: "Enterprise-grade architecture baseline and target-state design for Rollcally"
 version: "1.0"
 date: "2026-04-12"

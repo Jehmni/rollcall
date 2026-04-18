@@ -1,5 +1,5 @@
 ---
-title: "Rollcally Whitepaper"
+title: "Yevo Monochrome Signal Whitepaper"
 description: "Comprehensive product and technical whitepaper for the Rollcally attendance platform"
 version: "4.0"
 date: "2026-04-12"

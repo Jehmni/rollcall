@@ -61,7 +61,7 @@ export default {
         // Body & UI: Inter
         sans: ['Inter', 'system-ui', 'sans-serif'],
         // Display & Headlines: Manrope — Editorial Voice
-        display: ['Manrope', 'system-ui', 'sans-serif'],
+        display: ['Newsreader', 'Manrope', 'system-ui', 'sans-serif'],
         // Prestige accent: Cormorant Garamond — use sparingly for elite words
         accent: ['"Cormorant Garamond"', 'Georgia', 'serif'],
       },
