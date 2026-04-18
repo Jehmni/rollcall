@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+import { ThemeToggle } from '../components/ThemeToggle'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -226,13 +227,16 @@ export default function SuperAdminDashboard() {
             <p className="text-2xs text-slate-500 font-medium mt-0.5">Rollcally founder console</p>
           </div>
         </div>
-        <button
-          onClick={() => signOut()}
-          className="flex items-center gap-1.5 text-2xs font-black uppercase tracking-spaced text-slate-500 hover:text-white transition-colors"
-        >
-          <span className="material-symbols-outlined text-base">logout</span>
-          Sign out
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            onClick={() => signOut()}
+            className="flex items-center gap-1.5 text-2xs font-black uppercase tracking-spaced text-slate-500 hover:text-white transition-colors"
+          >
+            <span className="material-symbols-outlined text-base">logout</span>
+            Sign out
+          </button>
+        </div>
       </header>
 
       {/* Tab bar */}

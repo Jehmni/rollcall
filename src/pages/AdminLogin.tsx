@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { ThemeToggle } from '../components/ThemeToggle'
 
 export default function AdminLogin() {
   const navigate = useNavigate()
@@ -62,13 +63,16 @@ export default function AdminLogin() {
             </button>
             <h2 className="text-white text-lg font-bold leading-tight tracking-tight">Admin Portal</h2>
           </div>
-          <button
-            onClick={() => navigate('/help')}
-            className="size-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_15px_rgba(82,71,230,0.2)] hover:bg-primary/20 transition-colors"
-            title="User Guide"
-          >
-            <span className="material-symbols-outlined text-primary text-xl">help</span>
-          </button>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <button
+              onClick={() => navigate('/help')}
+              className="size-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_15px_rgba(82,71,230,0.2)] hover:bg-primary/20 transition-colors"
+              title="User Guide"
+            >
+              <span className="material-symbols-outlined text-primary text-xl">help</span>
+            </button>
+          </div>
         </header>
 
         {/* Main Content Area */}

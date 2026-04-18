@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import LiveCounterRing from '../components/LiveCounterRing'
+import { ThemeToggle } from '../components/ThemeToggle'
 
 // Defined as a string literal so Tailwind's JIT scanner picks it up at this line
 const HERO_BG_CLASS = "bg-[url('/images/hero_bg.jpg')]"
@@ -53,6 +54,7 @@ export default function Landing() {
         </button>
         <div className="flex items-center gap-6">
           <button onClick={() => navigate('/help')} className="hidden sm:block text-slate-400 hover:text-white transition-colors font-medium text-sm">User Guide</button>
+          <ThemeToggle />
           <button onClick={() => navigate('/admin/login')} className="text-slate-300 hover:text-white font-semibold text-sm transition-colors">Sign In</button>
           <button onClick={() => navigate('/admin/signup')} className="relative overflow-hidden group bg-white text-slate-950 px-5 py-2 rounded-full text-sm font-bold transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
             <span className="relative z-10">Get Started</span>

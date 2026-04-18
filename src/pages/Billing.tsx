@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import { supabase } from '../lib/supabase'
+import { ThemeToggle } from '../components/ThemeToggle'
 import {
   PLANS, PLAN_MAP, isSubActive, subStatusLabel, subStatusColor,
   type Plan,
@@ -243,10 +244,11 @@ export default function Billing() {
         >
           <span className="material-symbols-outlined text-xl">arrow_back</span>
         </button>
-        <div>
+        <div className="flex-1">
           <h1 className="text-base font-extrabold uppercase tracking-tighter text-white leading-none">Billing</h1>
           <p className="text-2xs text-slate-500 font-medium mt-0.5">Manage your subscription</p>
         </div>
+        <ThemeToggle />
       </header>
 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-10">

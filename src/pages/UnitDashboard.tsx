@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useServices, useUnitAdmins, useUnits } from '../hooks/useAdminDashboard'
 import { useAuth } from '../contexts/AuthContext'
+import { ThemeToggle } from '../components/ThemeToggle'
 import { ConfirmDialog } from '../components/ui/Modal'
 import type { Service, Unit, OrgRole } from '../types'
 import { NotificationBell } from '../components/NotificationBell'
@@ -1059,6 +1060,7 @@ export default function UnitDashboard() {
 
             <div className="flex items-center gap-2">
               {unitId && <NotificationBell unitId={unitId} />}
+              <ThemeToggle className="bg-white/10 hover:bg-white/20 border border-white/10 dark:bg-white/10 dark:hover:bg-white/20" />
               <button
                 onClick={() => navigate('/help')}
                 className="size-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"

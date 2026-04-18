@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import type { Member } from '../types'
+import { ThemeToggle } from '../components/ThemeToggle'
 
 function formatDate(dateStr: string) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-GB', {
@@ -203,13 +204,16 @@ export default function MemberDetail() {
             </div>
           </div>
 
-          <button
-            onClick={() => navigate('/help')}
-            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 hover:bg-primary/20 transition-all active:scale-95"
-            title="User Guide"
-          >
-            <span className="material-symbols-outlined text-slate-400 hover:text-white transition-colors text-xl" aria-hidden="true">help</span>
-          </button>
+          <div className="flex items-center gap-1">
+            <ThemeToggle className="rounded-2xl" />
+            <button
+              onClick={() => navigate('/help')}
+              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 hover:bg-primary/20 transition-all active:scale-95"
+              title="User Guide"
+            >
+              <span className="material-symbols-outlined text-slate-400 hover:text-white transition-colors text-xl" aria-hidden="true">help</span>
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-3 relative z-10">

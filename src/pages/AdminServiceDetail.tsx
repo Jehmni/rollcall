@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { QRCodeCanvas } from 'qrcode.react'
 import { supabase } from '../lib/supabase'
 import { useAdminDashboard } from '../hooks/useAdminDashboard'
+import { ThemeToggle } from '../components/ThemeToggle'
 import { useToast } from '../contexts/ToastContext'
 import type { AbsenceMessageLogEntry, DashboardMember, Service, SmsCountry, UnitMessagingSettings } from '../types'
 
@@ -937,6 +938,7 @@ export default function AdminServiceDetail() {
           </div>
         </div>
         <div className="flex items-center gap-1">
+          <ThemeToggle />
           <button
             onClick={() => navigate('/help')}
             className="size-10 flex items-center justify-center rounded-full hover:bg-primary/20 transition-colors text-slate-400 hover:text-slate-100"

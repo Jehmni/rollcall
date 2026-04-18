@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import type { Member, MemberStatus } from '../types'
 import { detectDuplicate, type DuplicateStatus } from '../lib/nameUtils'
+import { ThemeToggle } from '../components/ThemeToggle'
 
 // ─── Friendly error translator ───────────────────────────────────────────────
 function friendlyError(err: unknown): string {
@@ -982,13 +983,16 @@ export default function UnitMembers() {
                 </p>
               )}
             </div>
-            <button
-              onClick={() => navigate('/help')}
-              className="size-10 flex items-center justify-center rounded-full bg-surface-dark/50 border border-border-dark hover:bg-surface-dark transition-colors"
-              title="User Guide"
-            >
-              <span className="material-symbols-outlined text-slate-400 hover:text-slate-100 transition-colors text-lg">help</span>
-            </button>
+            <div className="flex items-center gap-1">
+              <ThemeToggle />
+              <button
+                onClick={() => navigate('/help')}
+                className="size-10 flex items-center justify-center rounded-full bg-surface-dark/50 border border-border-dark hover:bg-surface-dark transition-colors"
+                title="User Guide"
+              >
+                <span className="material-symbols-outlined text-slate-400 hover:text-slate-100 transition-colors text-lg">help</span>
+              </button>
+            </div>
           </div>
 
           {/* Search */}

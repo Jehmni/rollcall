@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useUnits, useOrganizations as useAdminOrgs, useOrgStats } from '../hooks/useAdminDashboard'
 import { useOrganizations } from '../hooks/useOrganizations'
 import { useAuth } from '../contexts/AuthContext'
+import { ThemeToggle } from '../components/ThemeToggle'
 import { ConfirmDialog } from '../components/ui/Modal'
 import type { Unit } from '../types'
 import type { UnitStats } from '../hooks/useAdminDashboard'
@@ -360,6 +361,7 @@ export default function OrgDetail() {
         </button>
         <h1 className="text-base font-bold tracking-tight text-slate-100 truncate max-w-[60vw]">{org?.name ?? 'Organisation'}</h1>
         <div className="flex items-center gap-1">
+          <ThemeToggle />
           <button
             onClick={() => navigate('/help')}
             className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors"

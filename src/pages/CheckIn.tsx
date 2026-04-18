@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useAttendance } from '../hooks/useAttendance'
 import { useServiceMembers, useMemberById, useServiceInfo, type PublicMember } from '../hooks/useChoristers'
 import { useLocation } from '../hooks/useLocation'
+import { ThemeToggle } from '../components/ThemeToggle'
 import { QRScanner } from '../components/QRScanner'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { supabase } from '../lib/supabase'
@@ -203,7 +204,8 @@ export default function CheckIn() {
           </span>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-1">
+          <ThemeToggle />
           <button
             onClick={() => navigate('/help')}
             className="flex size-10 items-center justify-center rounded-full hover:bg-primary/20 transition-colors text-slate-400 hover:text-white"
