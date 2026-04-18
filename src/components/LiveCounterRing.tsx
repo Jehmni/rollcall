@@ -14,9 +14,10 @@ const TICK_MS = 2000   // total time per person
 const DOT_TO_TICK = 1200  // when dot morphs into tick
 const PAUSE_MS = 3000
 
-const PRIMARY_LIGHT = '#c3c0ff'
-const PRIMARY_CONTAINER = '#5247e6'
-const TRACK = '#151b2d'
+const TEAL = '#00C9A7'         // brand teal — signal of confirmed presence
+const TEAL_SOFT = '#26D4BA'    // brand teal tint for completion glow
+const OFFWHITE = '#F5F5F5'     // brand off-white — name text
+const TRACK = '#2E2E2E'        // monochrome track
 
 type Phase = 'entering' | 'active' | 'ticked'
 
@@ -41,14 +42,14 @@ function Tick({ visible }: { visible: boolean }) {
       <circle
         cx="9" cy="9" r="8"
         fill="none"
-        stroke={PRIMARY_LIGHT}
+        stroke={TEAL}
         strokeWidth="1.5"
         opacity="0.4"
       />
       <polyline
         points="5,9 7.5,11.5 13,6"
         fill="none"
-        stroke={PRIMARY_LIGHT}
+        stroke={TEAL}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -144,8 +145,8 @@ export default function LiveCounterRing() {
           <div style={{
             position: 'absolute', inset: 0,
             borderRadius: '50%',
-            backgroundColor: PRIMARY_CONTAINER,
-            opacity: isComplete ? 0.22 : 0.1,
+            backgroundColor: TEAL,
+            opacity: isComplete ? 0.18 : 0.08,
             filter: 'blur(20px)',
             transform: 'scale(0.72)',
             transition: 'opacity 0.6s ease',
@@ -153,25 +154,15 @@ export default function LiveCounterRing() {
 
           <svg width="160" height="160" viewBox="0 0 160 160"
             style={{ transform: 'rotate(-90deg)', position: 'relative', zIndex: 1 }}>
-            <defs>
-              <filter id="ringGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="2.5" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
             <circle cx="80" cy="80" r={radius}
               fill="transparent" stroke={TRACK} strokeWidth={strokeWidth} />
             <circle cx="80" cy="80" r={radius}
               fill="transparent"
-              stroke={isComplete ? PRIMARY_LIGHT : PRIMARY_CONTAINER}
+              stroke={isComplete ? TEAL_SOFT : TEAL}
               strokeWidth={strokeWidth}
               strokeDasharray={circumference}
               strokeDashoffset={dashOffset}
-              strokeLinecap="round"
-              filter="url(#ringGlow)"
+              strokeLinecap="butt"
               style={{
                 transition: `stroke-dashoffset ${TICK_MS * 0.5}ms cubic-bezier(0.4,0,0.2,1), stroke 0.4s ease`,
               }}
@@ -190,7 +181,7 @@ export default function LiveCounterRing() {
               fontWeight: 800,
               lineHeight: 1,
               letterSpacing: '-0.03em',
-              color: isComplete ? PRIMARY_LIGHT : '#FFFFFF',
+              color: isComplete ? TEAL : OFFWHITE,
               transition: 'color 0.4s ease',
             }}>
               {count}
@@ -214,7 +205,7 @@ export default function LiveCounterRing() {
           fontWeight: 700,
           letterSpacing: '0.15em',
           textTransform: 'uppercase',
-          color: isComplete ? PRIMARY_LIGHT : PRIMARY_CONTAINER,
+          color: TEAL,
           transition: 'color 0.4s ease',
         }}>
           {isComplete ? 'Complete' : 'Marking...'}
@@ -266,19 +257,19 @@ export default function LiveCounterRing() {
                     display: 'flex',
                     alignItems: 'center',
                     padding: '11px 14px',
-                    borderRadius: '14px',
-                    // Active = solid indigo pill. Ticked/older = ghost tint.
+                    borderRadius: 0,
+                    // Flat editorial treatment — subtle tint for active, transparent for aged.
                     backgroundColor: (isEntering || isActive)
-                      ? PRIMARY_CONTAINER
-                      : 'rgba(82, 71, 230, 0.07)',
+                      ? 'rgba(245, 245, 245, 0.06)'
+                      : 'transparent',
+                    borderLeft: (isEntering || isActive)
+                      ? `2px solid ${TEAL}`
+                      : '2px solid transparent',
                     opacity: ageOpacity,
-                    boxShadow: (isEntering || isActive)
-                      ? '0 0 24px rgba(82,71,230,0.5), 0 0 48px rgba(195,192,255,0.08)'
-                      : 'none',
                     animation: isEntering
                       ? 'slideDown 0.32s cubic-bezier(0.22,1,0.36,1) both'
                       : 'none',
-                    transition: 'background-color 0.5s ease, box-shadow 0.5s ease, opacity 0.5s ease',
+                    transition: 'background-color 0.5s ease, border-color 0.5s ease, opacity 0.5s ease',
                   }}
                 >
                   {/* Left indicator: pulsing dot (active) or tick (ticked) */}
@@ -287,8 +278,7 @@ export default function LiveCounterRing() {
                       width: '7px',
                       height: '7px',
                       borderRadius: '50%',
-                      backgroundColor: PRIMARY_LIGHT,
-                      boxShadow: `0 0 8px ${PRIMARY_LIGHT}`,
+                      backgroundColor: TEAL,
                       marginRight: '12px',
                       flexShrink: 0,
                       animation: isActive ? 'dotPulse 1s ease-in-out infinite' : 'none',
@@ -301,7 +291,7 @@ export default function LiveCounterRing() {
                     fontFamily: 'Inter, sans-serif',
                     fontSize: '14px',
                     fontWeight: (isEntering || isActive) ? 600 : 400,
-                    color: (isEntering || isActive) ? '#FFFFFF' : '#64748b',
+                    color: (isEntering || isActive) ? OFFWHITE : '#757575',
                     letterSpacing: (isEntering || isActive) ? '-0.01em' : '0',
                     transition: 'color 0.4s ease, font-weight 0.3s ease',
                   }}>
