@@ -330,7 +330,7 @@ function getInitials(name: string) {
   return name.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase()
 }
 
-const AVATAR_COLORS = ['#5247e6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899']
+const AVATAR_COLORS = ['#757575', '#BFBFBF', '#F5F5F5', '#131313', '#2E2E2E']
 function avatarColor(name: string) {
   return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length]
 }
@@ -351,7 +351,7 @@ function MemberRow({ member, canManage, onEdit, onDelete, onView }: {
     >
       {/* Avatar */}
       <div
-        className="size-10 sm:size-11 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold text-white relative"
+        className="size-10 sm:size-11 rounded-none flex items-center justify-center flex-shrink-0 text-sm font-bold text-white relative"
         style={{ backgroundColor: `${color}25`, border: `1.5px solid ${color}40` }}
       >
         <span style={{ color }}>{getInitials(member.name)}</span>
@@ -365,10 +365,10 @@ function MemberRow({ member, canManage, onEdit, onDelete, onView }: {
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-sm font-semibold text-slate-100 truncate">{member.name}</p>
           {member.status === 'inactive' && (
-            <span className="text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-500 border border-slate-700">Retired</span>
+            <span className="text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-none bg-slate-800 text-slate-500 border border-slate-700">Retired</span>
           )}
           {isToday && (
-            <span className="text-2xs font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20 animate-pulse">🎂 Today</span>
+            <span className="text-2xs font-black uppercase tracking-wider px-2 py-0.5 rounded-none bg-amber-500/10 text-amber-500 border border-amber-500/20 animate-pulse">🎂 Today</span>
           )}
         </div>
         <div className="flex items-center gap-2 mt-0.5">
@@ -394,14 +394,14 @@ function MemberRow({ member, canManage, onEdit, onDelete, onView }: {
           <>
             <button
               onClick={e => { e.stopPropagation(); onEdit(member) }}
-              className="size-10 flex items-center justify-center rounded-xl text-slate-600 hover:text-primary hover:bg-primary/10 active:scale-95 transition-all sm:opacity-0 sm:group-hover:opacity-100"
+              className="size-10 flex items-center justify-center rounded-none text-slate-600 hover:text-white hover:bg-white/5 active:scale-95 transition-all sm:opacity-0 sm:group-hover:opacity-100"
               title="Edit"
             >
               <span className="material-symbols-outlined text-lg">edit</span>
             </button>
             <button
               onClick={e => { e.stopPropagation(); onDelete(member.id) }}
-              className="size-10 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 active:scale-95 transition-all sm:opacity-0 sm:group-hover:opacity-100"
+              className="size-10 flex items-center justify-center rounded-none text-slate-600 hover:text-red hover:bg-red/10 active:scale-95 transition-all sm:opacity-0 sm:group-hover:opacity-100"
               title="Remove"
             >
               <span className="material-symbols-outlined text-[17px]">delete</span>
@@ -429,11 +429,11 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
-        <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mt-4 mb-1 sm:hidden" />
+      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-none shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
+        <div className="w-10 h-1 bg-border-dark rounded-none mx-auto mt-4 mb-1 sm:hidden" />
         <div className="sticky top-0 bg-surface-dark border-b border-white/[0.06] px-5 py-4 flex items-center justify-between">
           <h3 className="text-base font-bold text-slate-100">{editing ? 'Edit Member' : 'Add Member'}</h3>
-          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
+          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-none hover:bg-border-dark text-slate-400 transition-colors">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -443,7 +443,7 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Full Name *</span>
             <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required autoFocus
               placeholder="e.g. Johnathan Doe"
-              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
+              className="w-full bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
           </label>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -451,13 +451,13 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Phone</span>
               <input type="tel" value={form.phone ?? ''} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                 placeholder="+234 800 000 0000"
-                className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
+                className="w-full bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Section / Group</span>
               <input value={form.section ?? ''} onChange={e => setForm(f => ({ ...f, section: e.target.value }))}
                 placeholder="e.g. Soprano, Staff"
-                className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
+                className="w-full bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm" />
             </label>
           </div>
 
@@ -465,7 +465,7 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</span>
               <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value as MemberStatus }))}
-                className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm appearance-none cursor-pointer">
+                className="w-full bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm appearance-none cursor-pointer">
                 <option value="active">Active</option>
                 <option value="inactive">Retired / Inactive</option>
               </select>
@@ -480,7 +480,7 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
                 value={form.birthday ?? ''}
                 onChange={e => setForm(f => ({ ...f, birthday: e.target.value }))}
                 placeholder="DD/MM or DD/MM/YYYY"
-                className={`w-full bg-background-dark border rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 transition-all text-sm ${
+                className={`w-full bg-background-dark border rounded-none px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 transition-all text-sm ${
                   parseBirthdayPreview(form.birthday ?? '')?.ok === false
                     ? 'border-red-500/50 focus:ring-red-500/20 focus:border-red-500/60'
                     : 'border-border-dark focus:ring-primary/10 focus:border-primary/60'
@@ -495,7 +495,7 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
                   </span>
                 )
                 return (
-                  <span className={`text-2xs flex items-center gap-1 ${preview.ok ? 'text-emerald-500' : 'text-red-400'}`}>
+                  <span className={`text-2xs flex items-center gap-1 ${preview.ok ? 'text-teal' : 'text-red-400'}`}>
                     <span className="material-symbols-outlined text-sm leading-none">
                       {preview.ok ? 'check_circle' : 'error_outline'}
                     </span>
@@ -515,7 +515,7 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
                 ...f,
                 sms_consent: e.target.value === 'null' ? null : e.target.value === 'true',
               }))}
-              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm appearance-none cursor-pointer"
+              className="w-full bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm appearance-none cursor-pointer"
             >
               <option value="null">Not asked yet (default)</option>
               <option value="true">Consented — send SMS</option>
@@ -528,17 +528,17 @@ function MemberFormModal({ editing, form, setForm, error, saving, onSubmit, onCl
           </label>
 
           {error && (
-            <div className="flex items-start gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2.5 rounded-xl">
+            <div className="flex items-start gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2.5 rounded-none">
               <span className="material-symbols-outlined text-base mt-0.5 shrink-0">error_outline</span>
               <span>{error}</span>
             </div>
           )}
 
           <div className="flex gap-3 justify-end pt-2">
-            <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-xl hover:bg-border-dark transition-colors">Cancel</button>
+            <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-none hover:bg-border-dark transition-colors">Cancel</button>
             <button type="submit" disabled={saving}
-              className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50 flex items-center gap-2">
-              {saving && <span className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              className="px-6 py-2.5 bg-white text-charcoal text-sm font-bold rounded-none hover:opacity-90 active:scale-95 transition-all shadow-none disabled:opacity-50 flex items-center gap-2">
+              {saving && <span className="size-4 border-2 border-charcoal/30 border-t-charcoal rounded-none animate-spin" />}
               {editing ? 'Update Member' : 'Add Member'}
             </button>
           </div>
@@ -563,8 +563,8 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full sm:max-w-lg bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
-        <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mt-4 mb-1 sm:hidden" />
+      <div className="w-full sm:max-w-lg bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-none shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
+        <div className="w-10 h-1 bg-border-dark rounded-none mx-auto mt-4 mb-1 sm:hidden" />
 
         {/* Header */}
         <div className="sticky top-0 bg-surface-dark border-b border-white/[0.06] px-5 py-4 flex items-center justify-between">
@@ -572,7 +572,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
             <h3 className="text-base font-bold text-slate-100">Import Members</h3>
             {csvFilename && <p className="text-xs text-slate-500 mt-0.5">{csvFilename}</p>}
           </div>
-          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
+          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-none hover:bg-border-dark text-slate-400 transition-colors">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -580,13 +580,13 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
         <div className="p-5">
           {/* Success state */}
           {importDone !== null && (
-            <div className="flex flex-col items-center gap-0 animate-in fade-in slide-in-from-bottom-8 duration-700 rounded-2xl overflow-hidden">
-              <div className="w-full bg-background-dark border border-primary/20 rounded-2xl overflow-hidden shadow-2xl relative">
-                <div className="absolute top-0 right-0 -mt-8 -mr-8 size-24 bg-primary/10 rounded-full blur-3xl" />
+            <div className="flex flex-col items-center gap-0 animate-in fade-in slide-in-from-bottom-8 duration-700 rounded-none overflow-hidden">
+              <div className="w-full bg-background-dark border border-primary/20 rounded-none overflow-hidden shadow-2xl relative">
+                <div className="absolute top-0 right-0 -mt-8 -mr-8 size-24 bg-primary/10 rounded-none blur-3xl" />
                 <div className="flex flex-col items-center gap-5 p-8 text-center">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150" />
-                    <div className="relative bg-primary text-white rounded-2xl p-4 shadow-[0_0_40px_rgba(82,71,230,0.5)] border border-white/20">
+                    <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-none scale-150" />
+                    <div className="relative bg-primary text-white rounded-none p-4 shadow-[0_0_40px_rgba(82,71,230,0.5)] border border-white/20">
                       <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>group_add</span>
                     </div>
                   </div>
@@ -595,8 +595,8 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
                     <p className="text-slate-400 text-sm mt-1">Roster integration successful</p>
                   </div>
                 </div>
-                <div className="mx-6 mb-6 p-4 bg-primary/5 border border-primary/10 rounded-xl flex items-center gap-4">
-                  <div className="bg-primary/10 p-2.5 rounded-xl text-primary border border-primary/20">
+                <div className="mx-6 mb-6 p-4 bg-primary/5 border border-primary/10 rounded-none flex items-center gap-4">
+                  <div className="bg-primary/10 p-2.5 rounded-none text-primary border border-primary/20">
                     <span className="material-symbols-outlined text-xl">people</span>
                   </div>
                   <div>
@@ -604,9 +604,9 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
                     <p className="text-white font-black text-lg">{importDone} {importDone !== 1 ? 'Members' : 'Member'}</p>
                   </div>
                 </div>
-                <div className="px-6 pb-6">
+                  <div className="px-6 pb-6">
                   <button onClick={onClose}
-                    className="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-3 group transition-all active:scale-95 text-sm">
+                    className="w-full bg-white text-charcoal font-bold py-4 rounded-none shadow-none flex items-center justify-center gap-3 group transition-all active:scale-95 text-sm">
                     View Roster
                     <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
                   </button>
@@ -618,7 +618,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
           {/* No file chosen */}
           {importDone === null && !csvFilename && (
             <div className="flex flex-col items-center gap-6 py-8 text-center">
-              <div className="size-16 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center">
+              <div className="size-16 bg-primary/10 border border-primary/20 rounded-none flex items-center justify-center">
                 <span className="material-symbols-outlined text-primary text-3xl">upload_file</span>
               </div>
               <div>
@@ -627,18 +627,18 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
               </div>
               <div className="flex flex-col gap-3 w-full max-w-xs">
                 <button onClick={onChooseFile}
-                  className="w-full py-3 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30">
+                  className="w-full py-3 bg-white text-charcoal text-sm font-bold rounded-none hover:opacity-90 active:scale-95 transition-all shadow-none">
                   Choose File
                 </button>
                 <button onClick={onDownloadTemplate}
-                  className="w-full py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-300 flex items-center justify-center gap-2 transition-colors rounded-xl hover:bg-border-dark">
+                  className="w-full py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-300 flex items-center justify-center gap-2 transition-colors rounded-none hover:bg-border-dark">
                   <span className="material-symbols-outlined text-lg">download</span>
                   Download Template
                 </button>
               </div>
               <details className="text-xs text-slate-500 w-full text-left">
                 <summary className="cursor-pointer hover:text-slate-400 select-none">Expected file format</summary>
-                <pre className="mt-2 rounded-lg bg-background-dark p-3 font-mono leading-relaxed text-slate-500 overflow-x-auto text-2xs">
+                <pre className="mt-2 rounded-none bg-background-dark p-3 font-mono leading-relaxed text-slate-500 overflow-x-auto text-2xs">
                   {`Name,Phone,Section,Status,Birthday\nAlice Johnson,+2348001234567,Soprano,active,1990-05-14\nBob Smith,,Bass,active,18/11\nCarol Obi,,Alto,active,`}
                 </pre>
                 <p className="mt-1 text-slate-500">Phone, Section, Status, and Birthday are all optional. Birthday accepts full dates (18/11/1990) or day &amp; month only (18/11). Status defaults to "active".</p>
@@ -648,7 +648,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
 
           {/* Parse error */}
           {importDone === null && csvFilename && importError && !csvRows.length && (
-            <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-sm text-red-400">{importError}</div>
+            <div className="rounded-none bg-red-500/10 border border-red-500/20 p-4 text-sm text-red-400">{importError}</div>
           )}
 
           {/* Preview table */}
@@ -660,17 +660,17 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
               </p>
 
               {exactCount > 0 && (
-                <p className="text-xs text-red-400 bg-red-500/10 px-3 py-2 rounded-lg border border-red-500/20">
+                <p className="text-xs text-red-400 bg-red-500/10 px-3 py-2 rounded-none border border-red-500/20">
                   {exactCount} row(s) match existing members exactly and will be skipped.
                 </p>
               )}
               {fuzzyCount > 0 && (
-                <p className="text-xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-lg border border-amber-500/20">
+                <p className="text-xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-none border border-amber-500/20">
                   {fuzzyCount} row(s) have names similar to existing members — please review.
                 </p>
               )}
 
-              <div className="overflow-x-auto rounded-xl border border-border-dark">
+              <div className="overflow-x-auto rounded-none border border-border-dark">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-background-dark text-left text-2xs font-bold uppercase tracking-wider text-slate-500 border-b border-white/[0.06]">
@@ -695,7 +695,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
                         <td className="px-3 py-2.5 text-slate-500">{r.phone ?? '—'}</td>
                         <td className="px-3 py-2.5 text-slate-500">{r.section ?? '—'}</td>
                         <td className="px-3 py-2.5">
-                          <span className={`rounded-full px-2 py-0.5 text-2xs font-bold uppercase ${r.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-500'}`}>
+                          <span className={`rounded-none px-2 py-0.5 text-2xs font-bold uppercase ${r.status === 'active' ? 'bg-teal/10 text-teal' : 'bg-slate-700 text-slate-500'}`}>
                             {r.status}
                           </span>
                         </td>
@@ -707,7 +707,7 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
               </div>
 
               {importError && (
-                <div className="flex items-start gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2.5 rounded-xl">
+                <div className="flex items-start gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2.5 rounded-none">
                   <span className="material-symbols-outlined text-base mt-0.5 shrink-0">error_outline</span>
                   <span>{importError}</span>
                 </div>
@@ -718,12 +718,12 @@ function CsvImportModal({ csvRows, csvSkipped, csvFilename, importDone, importin
                   Choose different file
                 </button>
                 <div className="flex gap-2">
-                  <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-xl hover:bg-border-dark transition-colors">
+                  <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-none hover:bg-border-dark transition-colors">
                     Cancel
                   </button>
                   <button onClick={onImport} disabled={importing || importableCount === 0}
-                    className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-40 flex items-center gap-2">
-                    {importing && <span className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                    className="px-5 py-2 bg-white text-charcoal text-sm font-bold rounded-none hover:opacity-90 active:scale-95 transition-all shadow-none disabled:opacity-40 flex items-center gap-2">
+                    {importing && <span className="size-4 border-2 border-charcoal/30 border-t-charcoal rounded-none animate-spin" />}
                     Import {importableCount} member{importableCount !== 1 ? 's' : ''}
                   </button>
                 </div>
@@ -971,7 +971,7 @@ export default function UnitMembers() {
           <div className="flex items-center justify-between py-4">
             <button
               onClick={() => navigate(`/admin/units/${unitId}`)}
-              className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors"
+              className="size-10 flex items-center justify-center rounded-none hover:bg-surface-dark transition-colors"
             >
               <span className="material-symbols-outlined text-slate-100">arrow_back</span>
             </button>
@@ -987,7 +987,7 @@ export default function UnitMembers() {
               <ThemeToggle />
               <button
                 onClick={() => navigate('/help')}
-                className="size-10 flex items-center justify-center rounded-full bg-surface-dark/50 border border-border-dark hover:bg-surface-dark transition-colors"
+                className="size-10 flex items-center justify-center rounded-none bg-surface-dark/50 border border-border-dark hover:bg-surface-dark transition-colors"
                 title="User Guide"
               >
                 <span className="material-symbols-outlined text-slate-400 hover:text-slate-100 transition-colors text-lg">help</span>
@@ -1003,10 +1003,10 @@ export default function UnitMembers() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search members by name or section…"
-                className="w-full bg-surface-dark border border-border-dark rounded-xl pl-11 pr-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all"
+                className="w-full bg-surface-dark border border-border-dark rounded-none pl-11 pr-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all"
               />
               {search && (
-                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 size-6 flex items-center justify-center rounded-full hover:bg-border-dark transition-colors">
+                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 size-6 flex items-center justify-center rounded-none hover:bg-border-dark transition-colors">
                   <span className="material-symbols-outlined text-slate-500 text-sm">close</span>
                 </button>
               )}
@@ -1018,14 +1018,14 @@ export default function UnitMembers() {
             <div className="flex gap-2.5 pb-3">
               <button
                 onClick={openImport}
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-surface-dark border border-border-dark rounded-xl text-xs font-bold text-slate-300 hover:border-primary/40 hover:text-primary active:scale-[0.98] transition-all"
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-surface-dark border border-border-dark rounded-none text-xs font-bold text-slate-300 hover:border-primary/40 hover:text-primary active:scale-[0.98] transition-all"
               >
                 <span className="material-symbols-outlined text-lg">upload</span>
                 Import CSV
               </button>
               <button
                 onClick={openCreate}
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary rounded-xl text-xs font-bold text-white hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/30"
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary rounded-none text-xs font-bold text-white hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/30"
               >
                 <span className="material-symbols-outlined text-lg">person_add</span>
                 Add Member
@@ -1039,22 +1039,22 @@ export default function UnitMembers() {
       <main className="max-w-2xl mx-auto px-4 sm:px-6 pb-24">
         {loading ? (
           <div className="mt-4 space-y-3">
-            <div className="h-4 w-36 animate-pulse rounded-lg bg-white/[0.06]" />
-            <div className="bg-surface-dark rounded-2xl border border-border-dark overflow-hidden">
+            <div className="h-4 w-36 animate-pulse rounded-none bg-white/[0.06]" />
+            <div className="bg-surface-dark rounded-none border border-border-dark overflow-hidden">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-3 px-4 py-3.5">
-                  <div className="size-10 rounded-full flex-shrink-0 animate-pulse bg-white/[0.06]" />
+                  <div className="size-10 rounded-none flex-shrink-0 animate-pulse bg-white/[0.06]" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-3.5 w-32 animate-pulse rounded-lg bg-white/[0.06]" />
-                    <div className="h-2.5 w-20 animate-pulse rounded-lg bg-white/[0.06]" />
+                    <div className="h-3.5 w-32 animate-pulse rounded-none bg-white/[0.06]" />
+                    <div className="h-2.5 w-20 animate-pulse rounded-none bg-white/[0.06]" />
                   </div>
-                  <div className="h-5 w-14 rounded-full animate-pulse bg-white/[0.06]" />
+                  <div className="h-5 w-14 rounded-none animate-pulse bg-white/[0.06]" />
                 </div>
               ))}
             </div>
           </div>
         ) : members.length === 0 ? (
-          <div className="bg-surface-dark rounded-2xl border border-dashed border-border-dark p-12 text-center mt-4">
+          <div className="bg-surface-dark rounded-none border border-dashed border-border-dark p-12 text-center mt-4">
             <span className="material-symbols-outlined text-5xl text-slate-600 block mb-3">group</span>
             <p className="font-bold text-slate-300 mb-1">{search ? 'No results' : 'No members yet'}</p>
             <p className="text-sm text-slate-500 mb-5">
@@ -1062,7 +1062,7 @@ export default function UnitMembers() {
             </p>
             {!search && isOwnerOrCreator && (
               <button onClick={openCreate}
-                className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30">
+                className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-none hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30">
                 Add Member
               </button>
             )}
@@ -1077,7 +1077,7 @@ export default function UnitMembers() {
             </div>
 
             {/* Grouped members */}
-            <div className="bg-surface-dark rounded-2xl border border-border-dark overflow-hidden">
+            <div className="bg-surface-dark rounded-none border border-border-dark overflow-hidden">
               {sections.map((section, si) => (
                 <div key={section}>
                   {section && (
@@ -1105,10 +1105,10 @@ export default function UnitMembers() {
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="px-6 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-100 border border-border-dark hover:border-primary/40 hover:bg-primary/5 rounded-xl transition-all duration-150 flex items-center gap-2 disabled:opacity-40 active:scale-[0.97]"
+                  className="px-6 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-100 border border-border-dark hover:border-primary/40 hover:bg-primary/5 rounded-none transition-all duration-150 flex items-center gap-2 disabled:opacity-40 active:scale-[0.97]"
                 >
                   {loadingMore
-                    ? <><span className="size-4 border-2 border-primary/40 border-t-primary rounded-full animate-spin" /> Loading…</>
+                    ? <><span className="size-4 border-2 border-primary/40 border-t-primary rounded-none animate-spin" /> Loading…</>
                     : 'Load more'}
                 </button>
               </div>
@@ -1160,3 +1160,5 @@ export default function UnitMembers() {
     </div>
   )
 }
+
+

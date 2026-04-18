@@ -83,7 +83,7 @@ export default function PrivacyPolicy() {
 
         {/* Hero */}
         <div className="mb-14 animate-in fade-in slide-in-from-top-4 duration-700">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-none bg-primary/10 mb-6">
             <span className="material-symbols-outlined text-primary text-sm">shield</span>
             <span className="text-2xs font-black uppercase tracking-widest text-primary">Legal</span>
           </div>
@@ -144,7 +144,7 @@ export default function PrivacyPolicy() {
             <Section id="data-collected" title="3. Data We Collect">
               <P>We collect the following categories of personal information:</P>
 
-              <div className="bg-surface-low rounded-2xl p-5 space-y-0 mt-2">
+              <div className="bg-surface-low rounded-none p-5 space-y-0 mt-2">
                 <TableRow label="Account data" value="Email address and hashed password for administrator accounts." />
                 <TableRow label="Member data" value="Name, phone number, section/group, birthday (optional) — uploaded by administrators." />
                 <TableRow label="Attendance data" value="Event attendance records, check-in timestamps, and device identifiers used to enforce the one-device-per-member-per-event rule." />
@@ -437,7 +437,7 @@ export default function PrivacyPolicy() {
                 For any questions, concerns, or requests relating to this Privacy Policy or our data
                 practices, please contact our privacy team:
               </P>
-              <div className="bg-surface-low rounded-2xl p-5 space-y-2">
+              <div className="bg-surface-low rounded-none p-5 space-y-2">
                 <p className="font-bold text-white">{COMPANY}</p>
                 <p>Privacy enquiries: <a href={`mailto:${EMAIL}`} className="text-primary hover:underline">{EMAIL}</a></p>
                 <p>General: <a href="mailto:legal@rollcally.com" className="text-primary hover:underline">legal@rollcally.com</a></p>
@@ -469,3 +469,5 @@ export default function PrivacyPolicy() {
     </div>
   )
 }
+
+

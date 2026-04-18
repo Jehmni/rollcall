@@ -149,7 +149,7 @@ export function VenueMapPicker({
           style={{ height: '100%', width: '100%', background: '#1e293b' }}
         />
         <div className="absolute top-3 right-3 z-[400] pointer-events-none">
-          <div className="bg-background-dark/80 backdrop-blur-sm rounded-xl px-2.5 py-1.5 text-2xs text-slate-500 border border-border-dark text-center">
+          <div className="bg-background-dark/80 backdrop-blur-sm rounded-none px-2.5 py-1.5 text-2xs text-slate-500 border border-border-dark text-center">
             Pinch to zoom
           </div>
         </div>
@@ -161,7 +161,7 @@ export function VenueMapPicker({
         style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
       >
         <div className="flex items-start gap-3 mb-4">
-          <div className="size-10 flex-shrink-0 rounded-xl bg-primary/20 flex items-center justify-center">
+          <div className="size-10 flex-shrink-0 rounded-none bg-primary/20 flex items-center justify-center">
             <span className="material-symbols-outlined text-primary text-xl">location_on</span>
           </div>
           <div className="flex-1 min-w-0">
@@ -189,13 +189,13 @@ export function VenueMapPicker({
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 rounded-2xl border border-border-dark text-slate-400 text-sm font-semibold hover:text-white hover:border-slate-600 active:scale-[0.98] transition-all"
+            className="flex-1 py-3 rounded-none border border-border-dark text-slate-400 text-sm font-semibold hover:text-white hover:border-slate-600 active:scale-[0.98] transition-all"
           >
             Back
           </button>
           <button
             onClick={() => onConfirm(pinLat, pinLng)}
-            className="flex-[2] py-3 bg-primary text-white text-sm font-black rounded-2xl shadow-lg shadow-primary/30 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            className="flex-[2] py-3 bg-primary text-white text-sm font-black rounded-none shadow-lg shadow-primary/30 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-lg">check_circle</span>
             Use this location
@@ -205,3 +205,5 @@ export function VenueMapPicker({
     </div>
   )
 }
+
+

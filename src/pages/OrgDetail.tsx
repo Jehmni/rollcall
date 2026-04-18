@@ -19,7 +19,7 @@ function unitAccent(name: string) {
 // ── Stat Pill ──────────────────────────────────────────────────────────────────
 function StatPill({ icon, label, value, color = '#5247e6' }: { icon: string; label: string; value: string | number; color?: string }) {
   return (
-    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-none bg-white/5 border border-white/10">
       <span className="material-symbols-outlined text-[14px]" style={{ color }}>{icon}</span>
       <span className="text-2xs font-semibold text-slate-400 leading-none">{value} <span className="text-slate-500">{label}</span></span>
     </div>
@@ -39,7 +39,7 @@ function UnitCard({
 
   return (
     <div
-      className="group relative bg-surface-dark rounded-xl border border-border-dark hover:border-primary/40 transition-all cursor-pointer animate-in slide-in-from-bottom-2 duration-300 overflow-hidden"
+      className="group relative bg-surface-dark rounded-none border border-border-dark hover:border-primary/40 transition-all cursor-pointer animate-in slide-in-from-bottom-2 duration-300 overflow-hidden"
       onClick={onClick}
     >
       {/* Subtle accent glow on hover */}
@@ -48,7 +48,7 @@ function UnitCard({
 
       <div className="relative flex items-center gap-4 p-4 sm:p-5">
         {/* Icon */}
-        <div className="size-12 sm:size-14 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 duration-300" style={{ backgroundColor: bg }}>
+        <div className="size-12 sm:size-14 rounded-none flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 duration-300" style={{ backgroundColor: bg }}>
           <span className="material-symbols-outlined text-xl sm:text-2xl" style={{ color }}>{icon}</span>
         </div>
 
@@ -63,7 +63,7 @@ function UnitCard({
             {memberCount !== null ? (
               <StatPill icon="person" label="members" value={memberCount} color={color} />
             ) : (
-              <div className="h-5 w-20 bg-white/5 rounded-full animate-pulse" />
+              <div className="h-5 w-20 bg-white/5 rounded-none animate-pulse" />
             )}
             {sessionCount !== null && (
               <StatPill
@@ -82,14 +82,14 @@ function UnitCard({
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); onEdit() }}
-                className="size-8 flex items-center justify-center rounded-lg text-slate-600 hover:text-primary hover:bg-primary/10 transition-all sm:opacity-0 sm:group-hover:opacity-100"
+                className="size-8 flex items-center justify-center rounded-none text-slate-600 hover:text-primary hover:bg-primary/10 transition-all sm:opacity-0 sm:group-hover:opacity-100"
                 title="Edit unit"
               >
                 <span className="material-symbols-outlined text-[18px]">edit</span>
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete() }}
-                className="size-8 flex items-center justify-center rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all sm:opacity-0 sm:group-hover:opacity-100"
+                className="size-8 flex items-center justify-center rounded-none text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all sm:opacity-0 sm:group-hover:opacity-100"
                 title="Delete unit"
               >
                 <span className="material-symbols-outlined text-[18px]">delete</span>
@@ -111,29 +111,29 @@ function UnitFormModal({ editing, name, desc, error, loading, onChangeName, onCh
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300">
-        <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mb-5 sm:hidden" />
+      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-none p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300">
+        <div className="w-10 h-1 bg-border-dark rounded-none mx-auto mb-5 sm:hidden" />
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold text-slate-100">{editing ? 'Edit Unit' : 'New Unit'}</h3>
-          <button onClick={onClose} className="size-10 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 active:scale-95 transition-all">
+          <button onClick={onClose} className="size-10 flex items-center justify-center rounded-none hover:bg-border-dark text-slate-400 active:scale-95 transition-all">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Unit Name</span>
-            <input className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
+            <input className="w-full bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
               placeholder="e.g. Volunteers, Backend Team…" value={name} onChange={e => onChangeName(e.target.value)} required autoFocus />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Description <span className="text-slate-500 normal-case font-normal">(optional)</span></span>
-            <input className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
+            <input className="w-full bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
               placeholder="Purpose of this group…" value={desc} onChange={e => onChangeDesc(e.target.value)} />
           </label>
-          {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
+          {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-none">{error}</p>}
           <div className="flex gap-3 justify-end pt-2">
-            <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 transition-colors rounded-xl hover:bg-border-dark">Cancel</button>
-            <button type="submit" disabled={loading} className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50">
+            <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 transition-colors rounded-none hover:bg-border-dark">Cancel</button>
+            <button type="submit" disabled={loading} className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-none hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50">
               {loading ? 'Saving…' : editing ? 'Update Unit' : 'Create Unit'}
             </button>
           </div>
@@ -150,31 +150,31 @@ function SettingsModal({ orgName, onChange, onSave, onDelete, onClose, loading, 
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300">
-        <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mb-5 sm:hidden" />
+      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-none p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300">
+        <div className="w-10 h-1 bg-border-dark rounded-none mx-auto mb-5 sm:hidden" />
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
             <span className="material-symbols-outlined text-primary text-xl">settings</span>
             Organisation Settings
           </h3>
-          <button onClick={onClose} className="size-10 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 active:scale-95 transition-all">
+          <button onClick={onClose} className="size-10 flex items-center justify-center rounded-none hover:bg-border-dark text-slate-400 active:scale-95 transition-all">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
         <form onSubmit={onSave} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Organisation Name</span>
-            <input className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
+            <input className="w-full bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
               value={orgName} onChange={e => onChange(e.target.value)} required />
           </label>
-          {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
+          {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-none">{error}</p>}
           <div className="flex items-center justify-between pt-2">
             <button type="button" onClick={onDelete} className="text-sm font-semibold text-red-400 hover:text-red-300 flex items-center gap-1.5 transition-colors">
               <span className="material-symbols-outlined text-lg">delete</span> Delete Organisation
             </button>
             <div className="flex gap-2">
-              <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-xl hover:bg-border-dark transition-colors">Cancel</button>
-              <button type="submit" disabled={loading} className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50">
+              <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-none hover:bg-border-dark transition-colors">Cancel</button>
+              <button type="submit" disabled={loading} className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-none hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50">
                 {loading ? 'Saving…' : 'Save'}
               </button>
             </div>
@@ -282,7 +282,7 @@ export default function OrgDetail() {
     return (
       <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased">
         <header className="grid grid-cols-3 items-center px-4 py-4 sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md">
-          <button onClick={() => navigate(`/admin/units/${createdUnit.id}`)} className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors">
+          <button onClick={() => navigate(`/admin/units/${createdUnit.id}`)} className="size-10 flex items-center justify-center rounded-none hover:bg-surface-dark transition-colors">
             <span className="material-symbols-outlined text-white">close</span>
           </button>
           <span className="text-center font-display font-bold text-white uppercase tracking-tighter text-sm">Unit Created</span>
@@ -292,7 +292,7 @@ export default function OrgDetail() {
           <div className="w-full max-w-sm pt-4 animate-in zoom-in-95 duration-500">
             <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-12 duration-1000">
               <div className="relative flex flex-col items-center justify-center mb-8">
-                <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150" />
+                <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-none scale-150" />
                 <div className="relative bg-primary text-white rounded-[2.5rem] p-6 shadow-[0_0_60px_rgba(82,71,230,0.5)] border border-white/20">
                   <span className="material-symbols-outlined !text-7xl">check_circle</span>
                 </div>
@@ -302,7 +302,7 @@ export default function OrgDetail() {
                 <p className="text-slate-400 text-lg font-medium tracking-tight">New unit is online and ready</p>
               </div>
               <div className="w-full bg-primary/5 border border-primary/20 rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
-                <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl" />
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-none blur-3xl" />
                 <div className="p-8 text-center pb-0">
                   <div className="inline-flex size-20 rounded-[2rem] bg-primary/10 border border-primary/20 items-center justify-center mb-4">
                     <span className="material-symbols-outlined text-primary text-4xl">groups</span>
@@ -312,7 +312,7 @@ export default function OrgDetail() {
                 </div>
                 <div className="p-8 space-y-6">
                   <div className="flex items-center gap-5">
-                    <div className="bg-primary/10 p-3 rounded-2xl text-primary border border-primary/20">
+                    <div className="bg-primary/10 p-3 rounded-none text-primary border border-primary/20">
                       <span className="material-symbols-outlined text-2xl">corporate_fare</span>
                     </div>
                     <div>
@@ -322,7 +322,7 @@ export default function OrgDetail() {
                   </div>
                   {createdUnit.description && (
                     <div className="flex items-center gap-5">
-                      <div className="bg-primary/10 p-3 rounded-2xl text-primary border border-primary/20">
+                      <div className="bg-primary/10 p-3 rounded-none text-primary border border-primary/20">
                         <span className="material-symbols-outlined text-2xl">info</span>
                       </div>
                       <div>
@@ -335,7 +335,7 @@ export default function OrgDetail() {
               </div>
               <div className="w-full mt-10">
                 <button onClick={() => navigate(`/admin/units/${createdUnit.id}`)}
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-3xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-spread text-xs">
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-none shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-spread text-xs">
                   <span>Enter Unit</span>
                   <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
                 </button>
@@ -356,7 +356,7 @@ export default function OrgDetail() {
 
       {/* Header */}
       <header className="sticky top-0 z-50 flex items-center justify-between bg-background-dark/90 px-4 py-4 backdrop-blur-md">
-        <button onClick={() => navigate('/admin')} className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors">
+        <button onClick={() => navigate('/admin')} className="size-10 flex items-center justify-center rounded-none hover:bg-surface-dark transition-colors">
           <span className="material-symbols-outlined text-slate-100">arrow_back</span>
         </button>
         <h1 className="text-base font-bold tracking-tight text-slate-100 truncate max-w-[60vw]">{org?.name ?? 'Organisation'}</h1>
@@ -364,13 +364,13 @@ export default function OrgDetail() {
           <ThemeToggle />
           <button
             onClick={() => navigate('/help')}
-            className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors"
+            className="size-10 flex items-center justify-center rounded-none hover:bg-surface-dark transition-colors"
             title="User Guide"
           >
             <span className="material-symbols-outlined text-slate-400 hover:text-slate-100 transition-colors">help</span>
           </button>
           {isOwner && (
-            <button onClick={() => setShowSettings(true)} className="size-10 flex items-center justify-center rounded-full hover:bg-surface-dark transition-colors">
+            <button onClick={() => setShowSettings(true)} className="size-10 flex items-center justify-center rounded-none hover:bg-surface-dark transition-colors">
               <span className="material-symbols-outlined text-slate-400 hover:text-slate-100 transition-colors">settings</span>
             </button>
           )}
@@ -389,21 +389,21 @@ export default function OrgDetail() {
         {/* ── Top Analytics Row ───────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {/* Total Members */}
-          <div className="bg-surface-dark p-4 rounded-xl border border-border-dark col-span-1">
+          <div className="bg-surface-dark p-4 rounded-none border border-border-dark col-span-1">
             <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Total Members</p>
             {statsLoading ? (
               <div className="h-7 w-16 bg-white/5 rounded animate-pulse mb-2" />
             ) : (
               <p className="text-2xl font-bold text-slate-100 mb-1">{stats.totalMembers}</p>
             )}
-            <div className="flex items-center gap-1 text-xs text-emerald-400 font-medium">
+            <div className="flex items-center gap-1 text-xs text-teal font-medium">
               <span className="material-symbols-outlined text-sm">people</span>
               <span>active</span>
             </div>
           </div>
 
           {/* Total Units */}
-          <div className="bg-surface-dark p-4 rounded-xl border border-border-dark col-span-1">
+          <div className="bg-surface-dark p-4 rounded-none border border-border-dark col-span-1">
             <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Active Units</p>
             {loading ? (
               <div className="h-7 w-8 bg-white/5 rounded animate-pulse mb-2" />
@@ -417,7 +417,7 @@ export default function OrgDetail() {
           </div>
 
           {/* Pending Requests */}
-          <div className="bg-surface-dark p-4 rounded-xl border border-border-dark col-span-1">
+          <div className="bg-surface-dark p-4 rounded-none border border-border-dark col-span-1">
             <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Requests</p>
             <p className="text-2xl font-bold text-slate-100 mb-1">{loadingRequests ? '—' : pendingCount}</p>
             <div className={`flex items-center gap-1 text-xs font-medium ${pendingCount > 0 ? 'text-amber-400' : 'text-slate-600'}`}>
@@ -427,7 +427,7 @@ export default function OrgDetail() {
           </div>
 
           {/* Sessions (30d) */}
-          <div className="bg-surface-dark p-4 rounded-xl border border-border-dark col-span-1">
+          <div className="bg-surface-dark p-4 rounded-none border border-border-dark col-span-1">
             <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Sessions (30d)</p>
             {statsLoading ? (
               <div className="h-7 w-10 bg-white/5 rounded animate-pulse mb-2" />
@@ -436,7 +436,7 @@ export default function OrgDetail() {
                 {Object.values(stats.unitStats).reduce((s, u) => s + u.sessionCount, 0)}
               </p>
             )}
-            <div className="flex items-center gap-1 text-xs text-cyan-400 font-medium">
+            <div className="flex items-center gap-1 text-xs text-amber-400 font-medium">
               <span className="material-symbols-outlined text-sm">event_available</span>
               <span>meetings</span>
             </div>
@@ -445,20 +445,20 @@ export default function OrgDetail() {
 
         {/* ── Tab Switcher ────────────────────────────────────────────────────── */}
         {isOwner && (
-          <div className="flex gap-1 bg-surface-dark border border-border-dark p-1 rounded-xl mb-5">
+          <div className="flex gap-1 bg-surface-dark border border-border-dark p-1 rounded-none mb-5">
             <button
               onClick={() => setActiveTab('units')}
-              className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'units' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-500 hover:text-slate-300'}`}
+              className={`flex-1 py-2.5 rounded-none text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'units' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-500 hover:text-slate-300'}`}
             >
               Active Units
             </button>
             <button
               onClick={() => setActiveTab('requests')}
-              className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all relative ${activeTab === 'requests' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-500 hover:text-slate-300'}`}
+              className={`flex-1 py-2.5 rounded-none text-xs font-bold uppercase tracking-wider transition-all relative ${activeTab === 'requests' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-500 hover:text-slate-300'}`}
             >
               Requests
               {pendingCount > 0 && (
-                <span className="absolute -top-1.5 -right-1 bg-amber-400 text-black text-2xs font-black size-4 flex items-center justify-center rounded-full">{pendingCount}</span>
+                <span className="absolute -top-1.5 -right-1 bg-amber-400 text-black text-2xs font-black size-4 flex items-center justify-center rounded-none">{pendingCount}</span>
               )}
             </button>
           </div>
@@ -476,7 +476,7 @@ export default function OrgDetail() {
             {(isOwner || org?.userRole === 'member') && (
               <button
                 onClick={openCreate}
-                className="w-full mb-5 flex items-center justify-center gap-2 py-4 rounded-xl bg-primary/10 border-2 border-dashed border-primary/40 text-primary font-bold text-sm hover:bg-primary/20 hover:border-primary/70 active:scale-[0.98] transition-all group"
+                className="w-full mb-5 flex items-center justify-center gap-2 py-4 rounded-none bg-primary/10 border-2 border-dashed border-primary/40 text-primary font-bold text-sm hover:bg-primary/20 hover:border-primary/70 active:scale-[0.98] transition-all group"
               >
                 <span className="material-symbols-outlined text-xl group-hover:rotate-90 transition-transform duration-300">add_circle</span>
                 Create New Unit
@@ -486,17 +486,17 @@ export default function OrgDetail() {
             {loading ? (
               <div className="space-y-3 animate-in fade-in duration-200">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="rounded-2xl bg-surface-dark border border-border-dark p-4 flex items-center gap-4">
-                    <div className="size-12 rounded-xl flex-shrink-0 animate-pulse bg-white/[0.06]" />
+                  <div key={i} className="rounded-none bg-surface-dark border border-border-dark p-4 flex items-center gap-4">
+                    <div className="size-12 rounded-none flex-shrink-0 animate-pulse bg-white/[0.06]" />
                     <div className="flex-1 space-y-2.5">
-                      <div className="h-4 w-32 animate-pulse rounded-lg bg-white/[0.06]" />
-                      <div className="h-3 w-20 animate-pulse rounded-lg bg-white/[0.06]" />
+                      <div className="h-4 w-32 animate-pulse rounded-none bg-white/[0.06]" />
+                      <div className="h-3 w-20 animate-pulse rounded-none bg-white/[0.06]" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : units.length === 0 ? (
-              <div className="bg-surface-dark rounded-xl border border-dashed border-border-dark p-10 text-center">
+              <div className="bg-surface-dark rounded-none border border-dashed border-border-dark p-10 text-center">
                 <span className="material-symbols-outlined text-5xl text-slate-700 block mb-3">groups</span>
                 <p className="font-bold text-slate-300 mb-1">No units yet</p>
                 <p className="text-sm text-slate-500 mb-4 max-w-xs mx-auto">
@@ -527,38 +527,38 @@ export default function OrgDetail() {
             <h3 className="text-lg font-bold text-slate-100 mb-4">
               Membership Requests
               {pendingCount > 0 && (
-                <span className="ml-2 inline-flex items-center justify-center size-5 bg-amber-400 text-black rounded-full text-2xs font-black">{pendingCount}</span>
+                <span className="ml-2 inline-flex items-center justify-center size-5 bg-amber-400 text-black rounded-none text-2xs font-black">{pendingCount}</span>
               )}
             </h3>
             {loadingRequests ? (
               <div className="space-y-2 animate-in fade-in duration-200">
                 {Array.from({ length: 2 }).map((_, i) => (
-                  <div key={i} className="rounded-xl bg-surface-dark border border-border-dark p-4 flex items-center gap-3">
-                    <div className="size-9 rounded-full flex-shrink-0 animate-pulse bg-white/[0.06]" />
+                  <div key={i} className="rounded-none bg-surface-dark border border-border-dark p-4 flex items-center gap-3">
+                    <div className="size-9 rounded-none flex-shrink-0 animate-pulse bg-white/[0.06]" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-3.5 w-28 animate-pulse rounded-md bg-white/[0.06]" />
-                      <div className="h-2.5 w-20 animate-pulse rounded-md bg-white/[0.06]" />
+                      <div className="h-3.5 w-28 animate-pulse rounded-none bg-white/[0.06]" />
+                      <div className="h-2.5 w-20 animate-pulse rounded-none bg-white/[0.06]" />
                     </div>
                     <div className="flex gap-2">
-                      <div className="size-9 rounded-xl animate-pulse bg-white/[0.06]" />
-                      <div className="size-9 rounded-xl animate-pulse bg-white/[0.06]" />
+                      <div className="size-9 rounded-none animate-pulse bg-white/[0.06]" />
+                      <div className="size-9 rounded-none animate-pulse bg-white/[0.06]" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : joinRequests.length === 0 ? (
-              <div className="bg-surface-dark rounded-xl border border-border-dark p-10 text-center">
+              <div className="bg-surface-dark rounded-none border border-border-dark p-10 text-center">
                 <span className="material-symbols-outlined text-4xl text-slate-700 block mb-2">inbox</span>
                 <p className="font-semibold text-slate-400 mb-1">No requests</p>
                 <p className="text-sm text-slate-500">All membership requests will appear here.</p>
               </div>
             ) : (
-              <div className="bg-surface-dark rounded-xl border border-border-dark overflow-hidden">
+              <div className="bg-surface-dark rounded-none border border-border-dark overflow-hidden">
                 <div className="flex flex-col gap-1 p-1">
                   {joinRequests.map(req => (
                     <div key={req.id} className="p-4 flex items-center justify-between gap-4 hover:bg-border-dark/30 transition-colors">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="size-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                        <div className="size-10 rounded-none bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
                           <span className="material-symbols-outlined text-primary text-xl">person</span>
                         </div>
                         <div className="min-w-0">
@@ -575,17 +575,17 @@ export default function OrgDetail() {
                           <>
                             <button
                               onClick={async () => { await respondToJoinRequest(req.id, 'rejected'); setJoinRequests(p => p.filter(r => r.id !== req.id)) }}
-                              className="size-10 flex items-center justify-center rounded-xl bg-border-dark text-slate-500 hover:text-red-400 hover:bg-red-500/10 active:scale-95 transition-all" title="Decline">
+                              className="size-10 flex items-center justify-center rounded-none bg-border-dark text-slate-500 hover:text-red-400 hover:bg-red-500/10 active:scale-95 transition-all" title="Decline">
                               <span className="material-symbols-outlined text-lg">close</span>
                             </button>
                             <button
                               onClick={async () => { await respondToJoinRequest(req.id, 'approved'); setJoinRequests(p => p.filter(r => r.id !== req.id)) }}
-                              className="size-10 flex items-center justify-center rounded-xl bg-primary text-white hover:opacity-90 active:scale-95 transition-all" title="Approve">
+                              className="size-10 flex items-center justify-center rounded-none bg-primary text-white hover:opacity-90 active:scale-95 transition-all" title="Approve">
                               <span className="material-symbols-outlined text-lg">check</span>
                             </button>
                           </>
                         ) : (
-                          <span className={`px-3 py-1 rounded-lg text-2xs font-bold uppercase tracking-wider ${req.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                          <span className={`px-3 py-1 rounded-none text-2xs font-bold uppercase tracking-wider ${req.status === 'approved' ? 'bg-teal/10 text-teal border border-teal/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
                             {req.status}
                           </span>
                         )}
@@ -608,7 +608,7 @@ export default function OrgDetail() {
           </button>
           {isOwner && (
             <button onClick={() => setActiveTab('requests')} className={`flex flex-col items-center gap-1 p-2 transition-colors relative ${activeTab === 'requests' ? 'text-primary' : 'text-slate-500'}`}>
-              {pendingCount > 0 && <span className="absolute top-1 right-1 bg-amber-400 size-2 rounded-full" />}
+              {pendingCount > 0 && <span className="absolute top-1 right-1 bg-amber-400 size-2 rounded-none" />}
               <span className="material-symbols-outlined" style={activeTab === 'requests' ? { fontVariationSettings: "'FILL' 1" } : {}}>group_add</span>
               <span className="text-2xs font-bold">Requests</span>
             </button>
@@ -650,3 +650,5 @@ export default function OrgDetail() {
     </div>
   )
 }
+
+

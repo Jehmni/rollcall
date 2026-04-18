@@ -32,20 +32,20 @@ function PlanCard({
   loading:  boolean
 }) {
   return (
-    <div className={`relative rounded-2xl border p-6 flex flex-col gap-4 transition-all ${
+    <div className={`relative rounded-none border p-6 flex flex-col gap-4 transition-all ${
       plan.highlight
         ? 'border-primary/40 bg-primary/5 shadow-lg shadow-primary/10'
         : 'border-white/10 bg-white/3'
     } ${current ? 'ring-2 ring-primary/60' : ''}`}>
 
       {plan.highlight && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-primary text-white text-2xs font-black uppercase tracking-widest rounded-full">
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-primary text-white text-2xs font-black uppercase tracking-widest rounded-none">
           Most popular
         </span>
       )}
 
       <div>
-        <span className={`inline-block px-2.5 py-1 text-2xs font-black uppercase tracking-widest rounded-lg border mb-3 ${plan.color} ${plan.bg} border-current/30`}>
+        <span className={`inline-block px-2.5 py-1 text-2xs font-black uppercase tracking-widest rounded-none border mb-3 ${plan.color} ${plan.bg} border-current/30`}>
           {plan.badge}
         </span>
         <div className="flex items-baseline gap-1">
@@ -62,7 +62,7 @@ function PlanCard({
       <ul className="flex flex-col gap-2 flex-1">
         {plan.features.map(f => (
           <li key={f} className="flex items-start gap-2 text-xs text-slate-400">
-            <span className="material-symbols-outlined text-emerald-400 text-base leading-none mt-0.5 flex-shrink-0">check_circle</span>
+            <span className="material-symbols-outlined text-teal text-base leading-none mt-0.5 flex-shrink-0">check_circle</span>
             {f}
           </li>
         ))}
@@ -71,7 +71,7 @@ function PlanCard({
       <button
         disabled={current || loading}
         onClick={() => onSelect(plan.id)}
-        className={`w-full py-3 rounded-xl text-sm font-black uppercase tracking-spaced transition-all active:scale-95 ${
+        className={`w-full py-3 rounded-none text-sm font-black uppercase tracking-spaced transition-all active:scale-95 ${
           current
             ? 'bg-white/5 text-slate-500 cursor-default border border-white/10'
             : plan.highlight
@@ -100,9 +100,9 @@ function UsageBar({ used, total }: { used: number; total: number }) {
           {used.toLocaleString()} <span className="text-slate-500 font-medium">of</span> {total.toLocaleString()}
         </span>
       </div>
-      <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+      <div className="h-2 rounded-none bg-white/10 overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all duration-500 ${
+          className={`h-full rounded-none transition-all duration-500 ${
             critical ? 'bg-red-500' : warning ? 'bg-amber-500' : 'bg-primary'
           }`}
           style={{ width: `${pct}%` }}
@@ -240,7 +240,7 @@ export default function Billing() {
       <header className="sticky top-0 z-20 bg-background-dark/80 backdrop-blur-md border-b border-white/5 px-4 py-4 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
-          className="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+          className="w-9 h-9 flex items-center justify-center rounded-none bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
         >
           <span className="material-symbols-outlined text-xl">arrow_back</span>
         </button>
@@ -260,7 +260,7 @@ export default function Billing() {
             <select
               value={selectedOrg ?? ''}
               onChange={e => setSelectedOrg(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/50 appearance-none max-w-xs"
+              className="bg-white/5 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/50 appearance-none max-w-xs"
             >
               <option value="" disabled>Select an organisation</option>
               {orgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
@@ -277,7 +277,7 @@ export default function Billing() {
 
         {selectedOrg && loading && (
           <div className="flex items-center gap-3 text-slate-500 py-10">
-            <div className="w-5 h-5 border-2 border-primary/40 border-t-primary rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-primary/40 border-t-primary rounded-none animate-spin" />
             <span className="text-sm">Loading billing details…</span>
           </div>
         )}
@@ -285,7 +285,7 @@ export default function Billing() {
         {selectedOrg && !loading && (
           <>
             {/* ── Current plan status ────────────────────────────────────── */}
-            <section className="rounded-2xl border border-white/10 bg-white/3 p-6 space-y-5">
+            <section className="rounded-none border border-white/10 bg-white/3 p-6 space-y-5">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-1">Current plan</p>
@@ -298,7 +298,7 @@ export default function Billing() {
                     </p>
                   )}
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border ${subStatusColor(sub?.status)}`}>
+                <span className={`px-3 py-1 rounded-none text-xs font-black uppercase tracking-wider border ${subStatusColor(sub?.status)}`}>
                   {subStatusLabel(sub?.status)}
                 </span>
               </div>
@@ -313,7 +313,7 @@ export default function Billing() {
 
               {/* Blocked state — no active sub */}
               {!active && sub && (
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                <div className="flex items-start gap-3 p-4 rounded-none bg-amber-500/10 border border-amber-500/20">
                   <span className="material-symbols-outlined text-amber-400 flex-shrink-0">warning</span>
                   <div>
                     <p className="text-sm font-bold text-amber-300">Automated follow-ups paused</p>
@@ -328,7 +328,7 @@ export default function Billing() {
 
               {/* No subscription at all */}
               {!sub && (
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/10 border border-primary/20">
+                <div className="flex items-start gap-3 p-4 rounded-none bg-primary/10 border border-primary/20">
                   <span className="material-symbols-outlined text-primary flex-shrink-0">info</span>
                   <div>
                     <p className="text-sm font-bold text-white">Start your free trial</p>
@@ -352,7 +352,7 @@ export default function Billing() {
                       { label: 'Sent this cycle',   value: monthlyUsed.toLocaleString() },
                       { label: 'Plan allowance',     value: (currentPlan?.followUps ?? 0).toLocaleString() },
                     ].map(({ label, value }) => (
-                      <div key={label} className="rounded-xl bg-white/5 border border-white/10 p-3">
+                      <div key={label} className="rounded-none bg-white/5 border border-white/10 p-3">
                         <p className="text-2xs text-slate-500 font-medium">{label}</p>
                         <p className="text-lg font-extrabold text-white mt-0.5">{value}</p>
                       </div>
@@ -385,7 +385,7 @@ export default function Billing() {
 
             {/* ── Manage existing subscription (Stripe portal) ───────────── */}
             {sub?.stripe_customer_id && (
-              <section className="rounded-2xl border border-white/10 bg-white/3 p-6 flex items-center justify-between gap-4 flex-wrap">
+              <section className="rounded-none border border-white/10 bg-white/3 p-6 flex items-center justify-between gap-4 flex-wrap">
                 <div>
                   <p className="text-sm font-bold text-white">Payment & invoices</p>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -395,7 +395,7 @@ export default function Billing() {
                 <button
                   onClick={() => handleSelectPlan(sub?.plan_id ?? 'starter')}
                   disabled={checkoutLoading}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-sm font-bold text-white transition-all active:scale-95"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-none bg-white/10 hover:bg-white/15 border border-white/10 text-sm font-bold text-white transition-all active:scale-95"
                 >
                   <span className="material-symbols-outlined text-base">open_in_new</span>
                   Manage billing
@@ -404,7 +404,7 @@ export default function Billing() {
             )}
 
             {/* ── What's included explainer ──────────────────────────────── */}
-            <section className="rounded-2xl border border-white/10 bg-white/3 p-6">
+            <section className="rounded-none border border-white/10 bg-white/3 p-6">
               <h3 className="text-sm font-extrabold text-white mb-4">What are automated follow-ups?</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 When a member misses a session, Rollcally automatically sends them a personalised
@@ -422,3 +422,5 @@ export default function Billing() {
     </div>
   )
 }
+
+

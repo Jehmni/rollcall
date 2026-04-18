@@ -33,9 +33,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
     return (
       <div className="min-h-screen bg-background-dark flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-surface-dark border border-border-dark rounded-2xl p-8 text-center space-y-5">
+        <div className="max-w-md w-full bg-surface-dark border border-border-dark rounded-none p-8 text-center space-y-5">
           {/* Icon */}
-          <div className="mx-auto size-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+          <div className="mx-auto size-14 rounded-none bg-red-500/10 border border-red-500/20 flex items-center justify-center">
             <span className="material-symbols-outlined text-red-400 text-2xl">error</span>
           </div>
 
@@ -45,7 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <p className="text-xs text-slate-500 mb-2 uppercase tracking-wider">{this.props.label}</p>
             )}
             {this.state.error && (
-              <p className="text-xs text-red-300/70 bg-red-500/5 border border-red-500/10 rounded-xl px-4 py-3 font-mono break-all leading-relaxed">
+              <p className="text-xs text-red-300/70 bg-red-500/5 border border-red-500/10 rounded-none px-4 py-3 font-mono break-all leading-relaxed">
                 {this.state.error.message}
               </p>
             )}
@@ -54,13 +54,13 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="flex gap-3 justify-center">
             <button
               onClick={this.reset}
-              className="px-5 py-2.5 text-sm font-bold rounded-xl bg-primary hover:bg-primary/90 text-white transition-all active:scale-[0.97]"
+              className="px-5 py-2.5 text-sm font-bold rounded-none bg-primary hover:bg-primary/90 text-white transition-all active:scale-[0.97]"
             >
               Try again
             </button>
             <button
               onClick={() => window.location.assign('/')}
-              className="px-5 py-2.5 text-sm font-bold rounded-xl border border-border-dark hover:border-primary/30 text-slate-400 hover:text-slate-100 transition-all active:scale-[0.97]"
+              className="px-5 py-2.5 text-sm font-bold rounded-none border border-border-dark hover:border-primary/30 text-slate-400 hover:text-slate-100 transition-all active:scale-[0.97]"
             >
               Go home
             </button>
@@ -70,3 +70,5 @@ export class ErrorBoundary extends Component<Props, State> {
     )
   }
 }
+
+

@@ -49,3 +49,5 @@ export function usePushNotifications() {
 
   return { isSupported, currentPermission, subscribe }
 }
+
+

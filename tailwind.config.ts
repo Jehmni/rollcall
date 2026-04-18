@@ -26,12 +26,13 @@ export default {
         'surface-dark':     'rgb(var(--color-surface-low) / <alpha-value>)',
         'border-dark':      'rgb(var(--color-border) / <alpha-value>)',
         brand: {
-          primary:   '#1F3A8A',
-          secondary: '#F8FAFC',
-          slate:     '#94A3B8',
-          gold:      '#F0A500',
-          text:      '#1E293B',
-          border:    '#E2E8F0',
+          charcoal:  '#131313',
+          grey:      '#757575',
+          offwhite:  '#F5F5F5',
+          amber:     '#F0A500',
+          teal:      '#00C9A7',
+          red:       '#EF5350',
+          border:    '#2E2E2E',
         },
         // ── Brand accent overrides ────────────────────────────────────────────
         // Replaces Tailwind's default amber/emerald/green shades with the

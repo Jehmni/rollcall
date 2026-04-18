@@ -8,14 +8,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  primary: 'bg-brand-primary text-white hover:opacity-90 active:scale-[0.97] disabled:bg-brand-slate/50',
-  secondary: 'bg-white text-brand-primary border border-brand-border hover:bg-brand-secondary active:scale-[0.97] disabled:opacity-50',
-  danger: 'bg-red-600 text-white hover:bg-red-700 active:scale-[0.97] disabled:bg-red-300',
-  ghost: 'text-brand-slate hover:bg-brand-secondary active:scale-[0.97] disabled:opacity-50',
+  primary: 'bg-white text-charcoal hover:bg-white/90 active:scale-[0.97] disabled:bg-grey/50',
+  secondary: 'bg-transparent text-white border border-border hover:bg-white/5 active:scale-[0.97] disabled:opacity-50',
+  danger: 'bg-red text-white hover:bg-red/90 active:scale-[0.97] disabled:bg-red/30',
+  ghost: 'text-grey hover:bg-white/5 active:scale-[0.97] disabled:opacity-50',
 }
 
 const sizes = {
-  sm: 'px-3 py-1.5 text-sm',
+  sm: 'px-3 py-1.5 text-xs',
   md: 'px-4 py-2 text-sm',
   lg: 'px-6 py-3 text-base',
   xl: 'px-8 py-4 text-xl',
@@ -34,8 +34,8 @@ export function Button({
     <button
       disabled={disabled || loading}
       className={`
-        inline-flex items-center justify-center gap-2 rounded-lg font-medium
-        transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2
+        inline-flex items-center justify-center gap-2 rounded-none font-medium
+        transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-white/20
         ${variants[variant]} ${sizes[size]} ${className}
       `}
       {...props}
@@ -54,3 +54,5 @@ export function Button({
     </button>
   )
 }
+
+

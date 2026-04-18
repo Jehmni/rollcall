@@ -186,7 +186,7 @@ export default function CheckIn() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => step === 'confirm' ? handleBack() : navigate('/')}
-            className="flex size-10 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-primary/20 transition-colors"
+            className="flex size-10 items-center justify-center rounded-none hover:bg-slate-100 dark:hover:bg-primary/20 transition-colors"
           >
             <span className="material-symbols-outlined text-white">{step === 'done' ? 'close' : 'arrow_back'}</span>
           </button>
@@ -208,7 +208,7 @@ export default function CheckIn() {
           <ThemeToggle />
           <button
             onClick={() => navigate('/help')}
-            className="flex size-10 items-center justify-center rounded-full hover:bg-primary/20 transition-colors text-slate-400 hover:text-white"
+            className="flex size-10 items-center justify-center rounded-none hover:bg-primary/20 transition-colors text-slate-400 hover:text-white"
             title="User Guide"
           >
             <span className="material-symbols-outlined">help</span>
@@ -231,15 +231,15 @@ export default function CheckIn() {
               <div className="absolute -bottom-1 -left-1 size-8 border-b-4 border-l-4 border-primary rounded-bl-xl shadow-[0_0_15px_rgba(82,71,230,0.5)]"></div>
               <div className="absolute -bottom-1 -right-1 size-8 border-b-4 border-r-4 border-primary rounded-br-xl shadow-[0_0_15px_rgba(82,71,230,0.5)]"></div>
 
-              <div className="w-full h-full rounded-2xl bg-primary/5 flex flex-col items-center justify-center overflow-hidden border border-primary/20 shadow-2xl relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
+              <div className="w-full h-full rounded-none bg-primary/5 flex flex-col items-center justify-center overflow-hidden border border-primary/20 shadow-2xl relative">
+                <div className="absolute inset-0 bg-transparent from-primary/10 to-transparent"></div>
                 <div className="relative z-10 flex flex-col items-center gap-6">
-                  <div className="size-32 rounded-3xl bg-primary/20 flex items-center justify-center mb-2 shadow-inner border border-primary/30">
+                  <div className="size-32 rounded-none bg-primary/20 flex items-center justify-center mb-2 shadow-inner border border-primary/30">
                     <span className="material-symbols-outlined text-primary text-7xl">qr_code_scanner</span>
                   </div>
                   <button
                     onClick={() => setShowScanner(true)}
-                    className="bg-primary hover:bg-primary/90 text-white font-black py-4 px-10 rounded-2xl shadow-xl shadow-primary/30 flex items-center gap-3 transition-all active:scale-95 uppercase tracking-widest text-sm"
+                    className="bg-primary hover:bg-primary/90 text-white font-black py-4 px-10 rounded-none shadow-xl shadow-primary/30 flex items-center gap-3 transition-all active:scale-95 uppercase tracking-widest text-sm"
                   >
                     <span className="material-symbols-outlined text-2xl">photo_camera</span>
                     <span>Tap to Scan</span>
@@ -253,8 +253,8 @@ export default function CheckIn() {
             </div>
 
             <div className="mt-12 w-full max-w-sm">
-              <div className="flex items-center gap-4 p-5 rounded-2xl bg-primary/5 border border-primary/10 shadow-lg">
-                <div className="size-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary shadow-inner">
+              <div className="flex items-center gap-4 p-5 rounded-none bg-primary/5 border border-primary/10 shadow-lg">
+                <div className="size-12 rounded-none bg-primary/20 flex items-center justify-center text-primary shadow-inner">
                   <span className="material-symbols-outlined text-2xl">location_on</span>
                 </div>
                 <div>
@@ -278,14 +278,14 @@ export default function CheckIn() {
               <h2 className="font-display text-4xl font-bold text-white leading-tight uppercase tracking-tighter">
                 Hi, {selected.name.split(' ')[0]}!
               </h2>
-              <div className="h-1.5 w-16 bg-primary mx-auto mt-4 rounded-full shadow-[0_0_10px_rgba(82,71,230,0.5)]"></div>
+              <div className="h-1.5 w-16 bg-primary mx-auto mt-4 rounded-none shadow-[0_0_10px_rgba(82,71,230,0.5)]"></div>
               <p className="text-slate-400 mt-6 text-xl font-medium">Glad to see you again.</p>
             </div>
 
             <div className="flex flex-col gap-4 w-full">
               <button
                 onClick={handleConfirm}
-                className="w-full py-8 text-xl font-black uppercase tracking-spaced bg-primary text-white rounded-3xl shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="w-full py-8 text-xl font-black uppercase tracking-spaced bg-primary text-white rounded-none shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 I&apos;m Here
               </button>
@@ -298,8 +298,8 @@ export default function CheckIn() {
             </div>
 
             {venueDisplayName && (
-              <div className="w-full p-6 rounded-3xl bg-primary/5 border border-primary/10 shadow-xl flex items-center gap-4">
-                <div className="size-14 rounded-2xl bg-primary/20 flex items-center justify-center text-primary shadow-inner">
+              <div className="w-full p-6 rounded-none bg-primary/5 border border-primary/10 shadow-xl flex items-center gap-4">
+                <div className="size-14 rounded-none bg-primary/20 flex items-center justify-center text-primary shadow-inner">
                   <span className="material-symbols-outlined text-3xl">location_on</span>
                 </div>
                 <div>
@@ -317,21 +317,21 @@ export default function CheckIn() {
             </div>
 
             <div className="relative group">
-              <div className="pointer-events-none absolute inset-0 bg-primary/10 rounded-2xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
+              <div className="pointer-events-none absolute inset-0 bg-primary/10 rounded-none blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
               <span className="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">search</span>
               <input
                 type="search"
                 placeholder="Search your name…"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                className="w-full rounded-2xl border border-primary/10 bg-primary/5 py-5 pl-12 pr-6 text-lg font-bold transition-all focus:border-primary/50 focus:ring-8 focus:ring-primary/5 placeholder:text-slate-500 text-white shadow-xl"
+                className="w-full rounded-none border border-primary/10 bg-primary/5 py-5 pl-12 pr-6 text-lg font-bold transition-all focus:border-primary/50 focus:ring-8 focus:ring-primary/5 placeholder:text-slate-500 text-white shadow-xl"
                 autoFocus
               />
             </div>
 
             {query.length < 3 ? (
-              <div className="flex flex-col items-center gap-6 py-12 px-8 rounded-3xl bg-primary/5 border border-dashed border-primary/20 text-center animate-in fade-in duration-700">
-                <div className="size-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary/40 mb-2">
+              <div className="flex flex-col items-center gap-6 py-12 px-8 rounded-none bg-primary/5 border border-dashed border-primary/20 text-center animate-in fade-in duration-700">
+                <div className="size-20 rounded-none bg-primary/10 flex items-center justify-center text-primary/40 mb-2">
                   <span className="material-symbols-outlined text-4xl">person_search</span>
                 </div>
                 <div className="space-y-2">
@@ -344,11 +344,11 @@ export default function CheckIn() {
             ) : listLoading ? (
               <div className="flex flex-col gap-3 w-full">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-primary/5 border border-primary/10">
-                    <div className="size-10 rounded-full flex-shrink-0 animate-pulse bg-white/[0.08]" />
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-none bg-primary/5 border border-primary/10">
+                    <div className="size-10 rounded-none flex-shrink-0 animate-pulse bg-white/[0.08]" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-3.5 w-28 animate-pulse rounded-lg bg-white/[0.08]" />
-                      <div className="h-2.5 w-16 animate-pulse rounded-lg bg-white/[0.08]" />
+                      <div className="h-3.5 w-28 animate-pulse rounded-none bg-white/[0.08]" />
+                      <div className="h-2.5 w-16 animate-pulse rounded-none bg-white/[0.08]" />
                     </div>
                   </div>
                 ))}
@@ -356,12 +356,12 @@ export default function CheckIn() {
             ) : (
               <div className="flex flex-col gap-4 max-h-[45vh] overflow-y-auto pr-2 scrollbar-hide">
                 {listError && (
-                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-bold text-center">
+                  <div className="p-4 rounded-none bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-bold text-center">
                     {listError}
                   </div>
                 )}
                 {members.length === 0 && query && (
-                  <div className="flex flex-col items-center gap-3 py-10 px-4 rounded-2xl bg-primary/5 border border-primary/10">
+                  <div className="flex flex-col items-center gap-3 py-10 px-4 rounded-none bg-primary/5 border border-primary/10">
                     <span className="material-symbols-outlined text-4xl text-slate-500">search_off</span>
                     <p className="text-sm font-semibold text-slate-400 text-center">No members match <span className="text-white">"{query}"</span></p>
                     <p className="text-2xs text-slate-500 text-center">Check the spelling or try a different name.</p>
@@ -385,7 +385,7 @@ export default function CheckIn() {
                         className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-primary/5 border border-primary/10 hover:border-primary/40 hover:bg-primary/10 hover:shadow-2xl active:scale-[0.98] active:bg-primary/15 transition-all duration-150 text-left group"
                       >
                         <span className="font-extrabold text-white text-lg tracking-tight uppercase">{m.name}</span>
-                        <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">
+                        <div className="size-10 rounded-none bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">
                           <span className="material-symbols-outlined text-primary group-hover:text-white rotate-180">arrow_back</span>
                         </div>
                       </button>
@@ -407,7 +407,7 @@ export default function CheckIn() {
               <h3 className="text-2xs font-black uppercase tracking-super text-slate-500 mb-4">Confirm Your Name</h3>
               <h2 className="font-display text-4xl font-bold text-white uppercase tracking-tighter">Is this you?</h2>
               <div className="mt-10 p-8 rounded-[2.5rem] bg-primary/5 border border-primary/20 shadow-[0_0_50px_rgba(82,71,230,0.1)] w-full relative overflow-hidden">
-                <div className="absolute top-0 right-0 -mt-8 -mr-8 h-24 w-24 bg-primary/10 rounded-full blur-2xl"></div>
+                <div className="absolute top-0 right-0 -mt-8 -mr-8 h-24 w-24 bg-primary/10 rounded-none blur-2xl"></div>
                 <p className="text-3xl font-black text-white uppercase tracking-tighter relative z-10">{selected.name}</p>
                 {selected.section && (
                   <p className="text-2xs font-black uppercase tracking-spread text-primary mt-3 relative z-10">
@@ -419,11 +419,11 @@ export default function CheckIn() {
 
             {/* Location pre-check banner — only shown when location is required */}
             {requireLocation && (
-              <div className={`w-full rounded-2xl border px-5 py-4 flex items-start gap-3 transition-colors ${
+              <div className={`w-full rounded-none border px-5 py-4 flex items-start gap-3 transition-colors ${
                 locationStatus === 'checking'
                   ? 'bg-primary/5 border-primary/20'
                   : locationStatus === 'within'
-                  ? 'bg-emerald-500/10 border-emerald-500/30'
+                  ? 'bg-teal/10 border-teal/30'
                   : locationStatus === 'permission_denied'
                   ? 'bg-red-500/10 border-red-500/30'
                   : locationStatus === 'outside'
@@ -432,7 +432,7 @@ export default function CheckIn() {
               }`}>
                 <span className={`material-symbols-outlined text-xl flex-shrink-0 mt-0.5 ${
                   locationStatus === 'checking'    ? 'text-primary animate-pulse'
-                  : locationStatus === 'within'   ? 'text-emerald-400'
+                  : locationStatus === 'within'   ? 'text-teal'
                   : locationStatus === 'permission_denied' ? 'text-red-400'
                   : locationStatus === 'outside'  ? 'text-amber-400'
                   : 'text-slate-400'
@@ -446,7 +446,7 @@ export default function CheckIn() {
                 <div>
                   <p className={`text-sm font-bold mb-0.5 ${
                     locationStatus === 'checking'          ? 'text-primary'
-                    : locationStatus === 'within'          ? 'text-emerald-300'
+                    : locationStatus === 'within'          ? 'text-teal'
                     : locationStatus === 'permission_denied' ? 'text-red-300'
                     : locationStatus === 'outside'         ? 'text-amber-300'
                     : 'text-slate-300'
@@ -476,7 +476,7 @@ export default function CheckIn() {
               <button
                 onClick={handleConfirm}
                 disabled={requireLocation && (locationStatus === 'outside' || locationStatus === 'permission_denied')}
-                className="w-full h-24 text-xl font-black uppercase tracking-spaced bg-primary text-white rounded-3xl shadow-2xl shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed"
+                className="w-full h-24 text-xl font-black uppercase tracking-spaced bg-primary text-white rounded-none shadow-2xl shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed"
               >
                 {requireLocation && locationStatus === 'checking'
                   ? 'Checking Location…'
@@ -495,8 +495,8 @@ export default function CheckIn() {
             {status === 'loading' ? (
               <div className="flex flex-col items-center gap-8 py-20 rounded-[4rem] bg-primary/5 border border-primary/20 shadow-2xl">
                 <div className="relative size-20">
-                  <div className="absolute inset-0 rounded-full border-[6px] border-primary/20" />
-                  <div className="absolute inset-0 rounded-full border-[6px] border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+                  <div className="absolute inset-0 rounded-none border-[6px] border-primary/20" />
+                  <div className="absolute inset-0 rounded-none border-[6px] border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
                   <div className="absolute inset-3 flex items-center justify-center">
                     <img src="/logo.png" alt="" className="w-full h-full object-contain opacity-70" />
                   </div>
@@ -506,7 +506,7 @@ export default function CheckIn() {
             ) : status === 'success' ? (
               <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-12 duration-1000">
                 <div className="relative flex flex-col items-center justify-center mb-8">
-                  <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150"></div>
+                  <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-none scale-150"></div>
                   <div className="relative bg-primary text-white rounded-[2.5rem] p-6 shadow-[0_0_60px_rgba(82,71,230,0.5)] border border-white/20">
                     <span className="material-symbols-outlined !text-7xl">check_circle</span>
                   </div>
@@ -518,12 +518,12 @@ export default function CheckIn() {
                 </div>
 
                 <div className="w-full bg-primary/5 border border-primary/20 rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
-                  <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl"></div>
+                  <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-none blur-3xl"></div>
 
                   <div className="p-8 text-center pb-0">
-                    <div className="inline-block size-24 rounded-full border-2 border-primary p-2 mb-6 group relative">
-                      <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <div className="relative w-full h-full rounded-full bg-background-dark border border-primary/30 flex items-center justify-center text-3xl font-black text-primary">
+                    <div className="inline-block size-24 rounded-none border-2 border-primary p-2 mb-6 group relative">
+                      <div className="absolute inset-0 bg-primary/20 blur-xl rounded-none scale-110 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <div className="relative w-full h-full rounded-none bg-background-dark border border-primary/30 flex items-center justify-center text-3xl font-black text-primary">
                         {selected?.name.charAt(0)}
                       </div>
                     </div>
@@ -536,7 +536,7 @@ export default function CheckIn() {
                   <div className="p-8 space-y-6">
                     {venueDisplayName && (
                       <div className="flex items-center gap-5">
-                        <div className="bg-primary/10 p-3 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/10">
+                        <div className="bg-primary/10 p-3 rounded-none text-primary border border-primary/20 shadow-lg shadow-primary/10">
                           <span className="material-symbols-outlined text-2xl">corporate_fare</span>
                         </div>
                         <div>
@@ -549,7 +549,7 @@ export default function CheckIn() {
                     )}
 
                     <div className="flex items-center gap-5">
-                      <div className="bg-primary/10 p-3 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/10">
+                      <div className="bg-primary/10 p-3 rounded-none text-primary border border-primary/20 shadow-lg shadow-primary/10">
                         <span className="material-symbols-outlined text-2xl">schedule</span>
                       </div>
                       <div>
@@ -562,7 +562,7 @@ export default function CheckIn() {
 
                 {/* Push opt-in card */}
                 {pushOptIn === 'asking' && (
-                  <div className="w-full mt-6 rounded-2xl bg-primary/10 border border-primary/30 p-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="w-full mt-6 rounded-none bg-primary/10 border border-primary/30 p-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="flex items-start gap-4">
                       <span className="material-symbols-outlined text-primary text-3xl flex-shrink-0">notifications</span>
                       <div className="flex-1 min-w-0">
@@ -571,13 +571,13 @@ export default function CheckIn() {
                         <div className="flex gap-2 mt-4">
                           <button
                             onClick={handlePushEnable}
-                            className="flex-1 bg-primary text-white text-2xs font-black uppercase tracking-spaced py-2.5 rounded-xl hover:opacity-90 active:scale-95 transition-all"
+                            className="flex-1 bg-primary text-white text-2xs font-black uppercase tracking-spaced py-2.5 rounded-none hover:opacity-90 active:scale-95 transition-all"
                           >
                             Enable
                           </button>
                           <button
                             onClick={() => setPushOptIn('done')}
-                            className="flex-1 text-slate-400 text-2xs font-black uppercase tracking-spaced py-2.5 rounded-xl border border-border-dark hover:text-white hover:border-slate-500 active:scale-95 transition-all"
+                            className="flex-1 text-slate-400 text-2xs font-black uppercase tracking-spaced py-2.5 rounded-none border border-border-dark hover:text-white hover:border-slate-500 active:scale-95 transition-all"
                           >
                             Not now
                           </button>
@@ -589,7 +589,7 @@ export default function CheckIn() {
 
                 {/* SMS consent card */}
                 {smsConsent === 'asking' && (
-                  <div className="w-full mt-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 p-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="w-full mt-4 rounded-none bg-amber-500/10 border border-amber-500/30 p-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="flex items-start gap-4">
                       <span className="material-symbols-outlined text-amber-400 text-3xl flex-shrink-0">sms</span>
                       <div className="flex-1 min-w-0">
@@ -608,13 +608,13 @@ export default function CheckIn() {
                         <div className="flex gap-2 mt-4">
                           <button
                             onClick={() => handleSmsConsent(true)}
-                            className="flex-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 text-2xs font-black uppercase tracking-spaced py-2.5 rounded-xl hover:bg-amber-500/30 active:scale-95 transition-all"
+                            className="flex-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 text-2xs font-black uppercase tracking-spaced py-2.5 rounded-none hover:bg-amber-500/30 active:scale-95 transition-all"
                           >
                             Yes, that's fine
                           </button>
                           <button
                             onClick={() => handleSmsConsent(false)}
-                            className="flex-1 text-slate-400 text-2xs font-black uppercase tracking-spaced py-2.5 rounded-xl border border-border-dark hover:text-white hover:border-slate-500 active:scale-95 transition-all"
+                            className="flex-1 text-slate-400 text-2xs font-black uppercase tracking-spaced py-2.5 rounded-none border border-border-dark hover:text-white hover:border-slate-500 active:scale-95 transition-all"
                           >
                             No thanks
                           </button>
@@ -627,7 +627,7 @@ export default function CheckIn() {
                 <div className="w-full mt-10">
                   <button
                     onClick={() => navigate('/')}
-                    className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-3xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-spread text-xs"
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-none shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-spread text-xs"
                   >
                     <span>Done</span>
                     <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
@@ -675,7 +675,7 @@ export default function CheckIn() {
                     Please enable location access in your browser or device settings and try again.
                   </p>
                   {/* Platform-specific guidance */}
-                  <div className="mt-4 text-left bg-red-500/5 border border-red-500/15 rounded-2xl p-4 space-y-2">
+                  <div className="mt-4 text-left bg-red-500/5 border border-red-500/15 rounded-none p-4 space-y-2">
                     <p className="text-2xs font-bold text-slate-400 uppercase tracking-wider">How to enable location</p>
                     <p className="text-2xs text-slate-500 leading-relaxed">
                       <span className="text-slate-300 font-semibold">iOS Safari:</span> Settings → Privacy &amp; Security → Location Services → Safari → Allow
@@ -687,7 +687,7 @@ export default function CheckIn() {
                 </div>
                 <button
                   onClick={handleBack}
-                  className="w-full max-w-xs bg-primary text-white font-black py-4 rounded-2xl shadow-lg shadow-primary/30 uppercase tracking-spaced text-sm hover:opacity-90 active:scale-95 transition-all"
+                  className="w-full max-w-xs bg-primary text-white font-black py-4 rounded-none shadow-lg shadow-primary/30 uppercase tracking-spaced text-sm hover:opacity-90 active:scale-95 transition-all"
                 >
                   Try Again
                 </button>
@@ -711,7 +711,7 @@ export default function CheckIn() {
                 </div>
                 <button
                   onClick={handleBack}
-                  className="w-full max-w-xs bg-primary text-white font-black py-4 rounded-2xl shadow-lg shadow-primary/30 uppercase tracking-spaced text-sm hover:opacity-90 active:scale-95 transition-all"
+                  className="w-full max-w-xs bg-primary text-white font-black py-4 rounded-none shadow-lg shadow-primary/30 uppercase tracking-spaced text-sm hover:opacity-90 active:scale-95 transition-all"
                 >
                   Try Again
                 </button>
@@ -744,7 +744,7 @@ export default function CheckIn() {
                 </div>
                 <button
                   onClick={handleBack}
-                  className="w-full max-w-xs bg-primary text-white font-black py-4 rounded-2xl shadow-lg shadow-primary/30 uppercase tracking-spaced text-sm hover:opacity-90 active:scale-95 transition-all"
+                  className="w-full max-w-xs bg-primary text-white font-black py-4 rounded-none shadow-lg shadow-primary/30 uppercase tracking-spaced text-sm hover:opacity-90 active:scale-95 transition-all"
                 >
                   Try Again
                 </button>
@@ -813,7 +813,7 @@ export default function CheckIn() {
           onClick={() => { setStep('list'); setSelected(null); }}
           className="flex flex-1 flex-col items-center justify-center gap-1 text-primary relative"
         >
-          <div className="absolute -top-1 w-12 h-1 bg-primary rounded-full blur-sm"></div>
+          <div className="absolute -top-1 w-12 h-1 bg-primary rounded-none blur-sm"></div>
           <span className="material-symbols-outlined text-2xl scale-125" style={{ fontVariationSettings: "'FILL' 1" }}>person_check</span>
           <span className="text-2xs font-black uppercase tracking-widest">Check-in</span>
         </button>
@@ -828,3 +828,5 @@ export default function CheckIn() {
     </div>
   )
 }
+
+

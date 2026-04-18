@@ -77,7 +77,7 @@ export default function TermsOfService() {
 
         {/* Hero */}
         <div className="mb-14 animate-in fade-in slide-in-from-top-4 duration-700">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-none bg-primary/10 mb-6">
             <span className="material-symbols-outlined text-primary text-sm">gavel</span>
             <span className="text-2xs font-black uppercase tracking-widest text-primary">Legal</span>
           </div>
@@ -481,7 +481,7 @@ export default function TermsOfService() {
               <P>
                 If you have any questions about these Terms, please contact us:
               </P>
-              <div className="bg-surface-low rounded-2xl p-5 space-y-2">
+              <div className="bg-surface-low rounded-none p-5 space-y-2">
                 <p className="font-bold text-white">{COMPANY}</p>
                 <p>Email: <a href={`mailto:${EMAIL}`} className="text-primary hover:underline">{EMAIL}</a></p>
               </div>
@@ -512,3 +512,5 @@ export default function TermsOfService() {
     </div>
   )
 }
+
+

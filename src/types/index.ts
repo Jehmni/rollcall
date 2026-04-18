@@ -186,3 +186,5 @@ export interface AbsenceMessageLogEntry {
   error_text: string | null
   sent_at: string
 }
+
+

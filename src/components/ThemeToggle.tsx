@@ -11,7 +11,7 @@ export function ThemeToggle({ className = '' }: Props) {
   return (
     <button
       onClick={toggleTheme}
-      className={`size-10 flex items-center justify-center rounded-full transition-colors
+      className={`size-10 flex items-center justify-center rounded-none transition-colors
         bg-black/5 hover:bg-black/10 text-slate-600
         dark:bg-white/10 dark:hover:bg-white/20 dark:text-white
         ${className}`}
@@ -24,3 +24,5 @@ export function ThemeToggle({ className = '' }: Props) {
     </button>
   )
 }
+
+

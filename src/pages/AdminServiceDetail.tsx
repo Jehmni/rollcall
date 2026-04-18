@@ -50,7 +50,7 @@ function LocationToggle({ service, onUpdate }: { service: Service; onUpdate: (up
       <button
         onClick={toggle}
         disabled={saving}
-        className={`w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl border transition-all active:scale-[0.98] disabled:opacity-40 ${on ? 'bg-primary/10 border-primary/30' : 'bg-surface-dark border-border-dark hover:border-slate-600'}`}
+        className={`w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-none border transition-all active:scale-[0.98] disabled:opacity-40 ${on ? 'bg-primary/10 border-primary/30' : 'bg-surface-dark border-border-dark hover:border-slate-600'}`}
       >
         <div className="flex items-center gap-3">
           <span className={`material-symbols-outlined text-2xl ${on ? 'text-primary-light' : 'text-slate-500'}`}>
@@ -65,12 +65,12 @@ function LocationToggle({ service, onUpdate }: { service: Service; onUpdate: (up
             </p>
           </div>
         </div>
-        <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-0.5 flex-shrink-0 ${on ? 'bg-primary' : 'bg-border-dark'}`}>
-          <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${on ? 'translate-x-4' : 'translate-x-0'}`} />
+        <div className={`w-10 h-6 rounded-none transition-colors flex items-center px-0.5 flex-shrink-0 ${on ? 'bg-primary' : 'bg-border-dark'}`}>
+          <div className={`w-5 h-5 rounded-none bg-white shadow transition-transform ${on ? 'translate-x-4' : 'translate-x-0'}`} />
         </div>
       </button>
       {showCoordsWarning && (
-        <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
+        <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-none bg-amber-500/10 border border-amber-500/30">
           <span className="material-symbols-outlined text-amber-400 text-lg flex-shrink-0 mt-0.5">warning</span>
           <p className="text-2xs text-amber-300 leading-relaxed">
             <span className="font-bold">Venue coordinates not set.</span> Members won't be able to check in until you add them in Unit Settings.
@@ -124,9 +124,9 @@ function GoLiveButton({ service }: { service: Service }) {
   return (
     <div className="flex flex-col gap-2">
       {sentAt ? (
-        <div className="rounded-xl bg-surface-dark border border-emerald-500/20 px-4 py-3.5 flex items-center justify-between gap-3">
+        <div className="rounded-none bg-surface-dark border border-teal/20 px-4 py-3.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-emerald-400 text-2xl">cell_tower</span>
+            <span className="material-symbols-outlined text-teal text-2xl">cell_tower</span>
             <div>
               <p className="text-sm font-bold text-white">Notified at {sentAt}</p>
               <p className="text-2xs text-slate-500 font-medium">Members were sent a push notification</p>
@@ -135,7 +135,7 @@ function GoLiveButton({ service }: { service: Service }) {
           <button
             onClick={goLive}
             disabled={sending}
-            className="text-2xs font-black uppercase tracking-spaced text-emerald-400 hover:text-white transition-colors disabled:opacity-40"
+            className="text-2xs font-black uppercase tracking-spaced text-teal hover:text-white transition-colors disabled:opacity-40"
           >
             Re-send
           </button>
@@ -144,7 +144,7 @@ function GoLiveButton({ service }: { service: Service }) {
         <button
           onClick={goLive}
           disabled={sending || subCount === 0}
-          className="w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/40 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed group"
+          className="w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-none bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/40 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed group"
         >
           <div className="flex items-center gap-3">
             <span className="material-symbols-outlined text-primary text-2xl group-disabled:text-slate-500">cell_tower</span>
@@ -161,7 +161,7 @@ function GoLiveButton({ service }: { service: Service }) {
         </button>
       )}
       {sendError && (
-        <div className="flex items-start gap-2 rounded-lg bg-red-500/10 px-3 py-2.5">
+        <div className="flex items-start gap-2 rounded-none bg-red-500/10 px-3 py-2.5">
           <span className="material-symbols-outlined text-red-400 text-base mt-0.5 flex-shrink-0">error</span>
           <p className="text-xs text-red-400 font-medium">{sendError}</p>
         </div>
@@ -523,11 +523,11 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
   }, {})
 
   return (
-    <div className={`rounded-xl border transition-all ${enabled ? 'border-amber-500/30 bg-amber-500/5' : 'border-border-dark bg-surface-dark'}`}>
+    <div className={`rounded-none border transition-all ${enabled ? 'border-amber-500/30 bg-amber-500/5' : 'border-border-dark bg-surface-dark'}`}>
       {/* Header row */}
       <button
         onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center justify-between gap-3 px-4 py-3.5 hover:bg-white/[0.02] transition-colors rounded-xl"
+        className="w-full flex items-center justify-between gap-3 px-4 py-3.5 hover:bg-white/[0.02] transition-colors rounded-none"
       >
         <div className="flex items-center gap-3">
           {/* SMS icon with notification dot when enabled but panel is closed */}
@@ -536,7 +536,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
               sms
             </span>
             {enabled && !open && (
-              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-amber-400 border-2 border-surface-dark" />
+              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-none bg-amber-400 border-2 border-surface-dark" />
             )}
           </div>
           <div className="text-left">
@@ -556,9 +556,9 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
             role="switch"
             aria-checked={enabled}
             onClick={e => { e.stopPropagation(); toggleEnabled() }}
-            className={`w-10 h-6 rounded-full transition-colors flex items-center px-0.5 flex-shrink-0 cursor-pointer ${enabled ? 'bg-amber-500' : 'bg-border-dark'}`}
+            className={`w-10 h-6 rounded-none transition-colors flex items-center px-0.5 flex-shrink-0 cursor-pointer ${enabled ? 'bg-amber-500' : 'bg-border-dark'}`}
           >
-            <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${enabled ? 'translate-x-4' : 'translate-x-0'}`} />
+            <div className={`w-5 h-5 rounded-none bg-white shadow transition-transform ${enabled ? 'translate-x-4' : 'translate-x-0'}`} />
           </div>
           {/* CTA — explicit when closed, subtle when open */}
           {open ? (
@@ -580,7 +580,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
 
           {/* Delivery log — HIGH-8: paginated, LOW-20: sorted by sent_at + id */}
           {log.length > 0 && (
-            <div className="rounded-lg bg-background-dark p-3 space-y-1">
+            <div className="rounded-none bg-background-dark p-3 space-y-1">
               <p className="text-2xs font-black uppercase tracking-spaced text-slate-600 mb-2">
                 Delivery log
                 {logLoading && <span className="ml-2 text-slate-700">loading…</span>}
@@ -594,7 +594,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
                         {entry.error_text.slice(0, 30)}
                       </span>
                     )}
-                    <span className={`font-bold uppercase ${entry.status === 'sent' ? 'text-emerald-400' : entry.status === 'failed' ? 'text-red-400' : 'text-slate-500'}`}>
+                    <span className={`font-bold uppercase ${entry.status === 'sent' ? 'text-teal' : entry.status === 'failed' ? 'text-red-400' : 'text-slate-500'}`}>
                       {entry.status}
                     </span>
                   </div>
@@ -614,8 +614,8 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
 
           {/* Reachability summary */}
           {absentMembers.length > 0 && (
-            <div className="rounded-lg bg-background-dark border border-border-dark px-3 py-2.5 flex flex-wrap gap-x-4 gap-y-1">
-              <span className="text-2xs font-bold text-emerald-400">
+            <div className="rounded-none bg-background-dark border border-border-dark px-3 py-2.5 flex flex-wrap gap-x-4 gap-y-1">
+              <span className="text-2xs font-bold text-teal">
                 {absentEligible} will receive SMS
               </span>
               {absentNoConsent > 0 && (
@@ -640,7 +640,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
               value={template}
               onChange={e => setTemplate(e.target.value)}
               rows={3}
-              className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-amber-500/50 resize-none"
+              className="w-full rounded-none bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-amber-500/50 resize-none"
             />
             <p className="text-2xs text-slate-500 mt-1.5 leading-relaxed">
               Use{' '}
@@ -654,7 +654,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
 
           {/* Preview — MEDIUM-16: uses real absent member's name */}
           {showPreview && (
-            <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2.5">
+            <div className="rounded-none bg-amber-500/10 border border-amber-500/20 px-3 py-2.5">
               <p className="text-2xs font-black uppercase tracking-spaced text-amber-500/60 mb-1">
                 Preview {absentMembers[0] ? `(${absentMembers[0].name})` : ''}
               </p>
@@ -671,7 +671,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
               <select
                 value={sendHour}
                 onChange={e => setSendHour(Number(e.target.value))}
-                className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                className="w-full rounded-none bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
               >
                 {SEND_HOUR_OPTIONS.map(o => (
                   <option key={o.value} value={o.value}>{o.label}</option>
@@ -685,7 +685,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
               <select
                 value={timezone}
                 onChange={e => setTimezone(e.target.value)}
-                className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                className="w-full rounded-none bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
               >
                 {Object.entries(tzGroups).map(([group, zones]) => (
                   <optgroup key={group} label={group}>
@@ -707,7 +707,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
             <select
               value={smsCountryCode ?? ''}
               onChange={e => setSmsCountryCode(e.target.value || null)}
-              className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+              className="w-full rounded-none bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
             >
               <option value="">Not set — uses platform default (Twilio)</option>
               {countries.map(c => (
@@ -717,7 +717,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
               ))}
             </select>
             {smsCountryCode ? (
-              <div className="flex items-start gap-2 mt-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <div className="flex items-start gap-2 mt-2 px-3 py-2 rounded-none bg-amber-500/10 border border-amber-500/20">
                 <span className="material-symbols-outlined text-amber-400 text-base flex-shrink-0 mt-0.5">info</span>
                 <p className="text-2xs text-amber-300 leading-relaxed">
                   Your country is set to <span className="font-bold">{countries.find(c => c.code === smsCountryCode)?.name ?? smsCountryCode}</span> — messages to international numbers may not deliver.
@@ -741,7 +741,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
                 onChange={e => setSenderName(e.target.value.slice(0, 11))}
                 placeholder="e.g. GraceChoir"
                 maxLength={11}
-                className={`w-full rounded-lg bg-background-dark border px-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                className={`w-full rounded-none bg-background-dark border px-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
                   senderNameError(senderName) ? 'border-red-500/50 focus:ring-red-500/30' : 'border-border-dark focus:ring-amber-500/50'
                 }`}
               />
@@ -763,7 +763,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
                 min={0}
                 max={90}
                 onChange={e => setCooldownDays(Math.min(90, Math.max(0, Number(e.target.value))))}
-                className="w-full rounded-lg bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                className="w-full rounded-none bg-background-dark border border-border-dark px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
               />
               <p className="text-2xs text-slate-600 mt-1">
                 {cooldownDays === 0 ? 'No cooldown — messages every missed event' : `Min ${cooldownDays} day${cooldownDays !== 1 ? 's' : ''} between messages`}
@@ -775,7 +775,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowPreview(v => !v)}
-              className="flex items-center gap-1.5 px-3 py-2 text-2xs font-bold rounded-lg bg-background-dark border border-border-dark text-slate-400 hover:text-white transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 text-2xs font-bold rounded-none bg-background-dark border border-border-dark text-slate-400 hover:text-white transition-all"
             >
               <span className="material-symbols-outlined text-base">visibility</span>
               {showPreview ? 'Hide' : 'Preview'}
@@ -783,7 +783,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
             <button
               onClick={saveSettings}
               disabled={saving}
-              className="flex items-center gap-1.5 px-3 py-2 text-2xs font-bold rounded-lg bg-background-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all disabled:opacity-40"
+              className="flex items-center gap-1.5 px-3 py-2 text-2xs font-bold rounded-none bg-background-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all disabled:opacity-40"
             >
               <span className="material-symbols-outlined text-base">save</span>
               {saving ? 'Saving…' : 'Save'}
@@ -792,7 +792,7 @@ function MessagingPanel({ service, absentMembers }: { service: Service; absentMe
             <button
               onClick={sendNow}
               disabled={sending || absentEligible === 0}
-              className="ml-auto flex items-center gap-1.5 px-3 py-2 text-2xs font-bold rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-all disabled:opacity-40"
+              className="ml-auto flex items-center gap-1.5 px-3 py-2 text-2xs font-bold rounded-none bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-all disabled:opacity-40"
               title={
                 absentEligible === 0
                   ? `No eligible members (${absentNoConsent} haven't consented, ${absentNoPhone} have no phone)`
@@ -902,7 +902,7 @@ export default function AdminServiceDetail() {
   if (serviceLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background-dark">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-none border-4 border-primary border-t-transparent" />
       </div>
     )
   }
@@ -911,7 +911,7 @@ export default function AdminServiceDetail() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 bg-background-dark text-center">
         <p className="text-slate-400">Event not found.</p>
-        <button onClick={() => navigate(`/admin/units/${unitId}`)} className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 transition-all">
+        <button onClick={() => navigate(`/admin/units/${unitId}`)} className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-none hover:opacity-90 transition-all">
           Back to Unit
         </button>
       </div>
@@ -926,7 +926,7 @@ export default function AdminServiceDetail() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate(`/admin/units/${unitId}`)}
-            className="size-10 flex items-center justify-center rounded-full hover:bg-primary/20 transition-colors"
+            className="size-10 flex items-center justify-center rounded-none hover:bg-primary/20 transition-colors"
           >
             <span className="material-symbols-outlined text-2xl">arrow_back</span>
           </button>
@@ -941,14 +941,14 @@ export default function AdminServiceDetail() {
           <ThemeToggle />
           <button
             onClick={() => navigate('/help')}
-            className="size-10 flex items-center justify-center rounded-full hover:bg-primary/20 transition-colors text-slate-400 hover:text-slate-100"
+            className="size-10 flex items-center justify-center rounded-none hover:bg-primary/20 transition-colors text-slate-400 hover:text-slate-100"
             title="User Guide"
           >
             <span className="material-symbols-outlined">help</span>
           </button>
           <button
             onClick={refetch}
-            className="size-10 flex items-center justify-center rounded-full hover:bg-primary/20 transition-colors text-slate-400 hover:text-slate-100"
+            className="size-10 flex items-center justify-center rounded-none hover:bg-primary/20 transition-colors text-slate-400 hover:text-slate-100"
             title="Refresh"
           >
             <span className="material-symbols-outlined">refresh</span>
@@ -966,15 +966,15 @@ export default function AdminServiceDetail() {
           <div className="lg:sticky lg:top-[73px] lg:self-start flex flex-col gap-4">
         {/* ── QR Section (Collapsed by default) ─────────────────────────── */}
         <section className="p-4">
-          <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-primary to-primary/60 p-[1px]">
-            <div className="rounded-xl bg-surface-dark overflow-hidden">
+          <div className="group relative overflow-hidden rounded-none border border-border-dark bg-white/5 p-[1px]">
+            <div className="rounded-none bg-surface-dark overflow-hidden">
               {/* Toggle row */}
               <button
                 onClick={() => setShowQR(v => !v)}
                 className="w-full flex items-center justify-between gap-4 p-4 hover:bg-primary/5 transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="size-12 flex items-center justify-center rounded-lg bg-primary/10 text-primary flex-shrink-0">
+                  <div className="size-12 flex items-center justify-center rounded-none bg-primary/10 text-primary flex-shrink-0">
                     <span className="material-symbols-outlined text-2xl">qr_code_2</span>
                   </div>
                   <div className="text-left space-y-0.5">
@@ -984,7 +984,7 @@ export default function AdminServiceDetail() {
                     </p>
                   </div>
                 </div>
-                <span className="rounded-full bg-primary/20 px-4 py-1.5 text-xs font-bold text-white uppercase tracking-wider transition-all hover:bg-primary hover:shadow-lg hover:shadow-primary/20 active:scale-95 border border-primary/30 flex-shrink-0">
+                <span className="rounded-none bg-primary/20 px-4 py-1.5 text-xs font-bold text-white uppercase tracking-wider transition-all hover:bg-primary hover:shadow-lg hover:shadow-primary/20 active:scale-95 border border-primary/30 flex-shrink-0">
                   {showQR ? 'Collapse' : 'Expand'}
                 </span>
               </button>
@@ -993,7 +993,7 @@ export default function AdminServiceDetail() {
               {showQR && (
                 <div className="mt-2 bg-background-dark px-6 py-8 flex flex-col items-center gap-5 animate-in fade-in zoom-in-95 duration-300">
                   {/* QR canvas — white bg required for scanning */}
-                  <div className="p-4 bg-white rounded-2xl shadow-2xl shadow-primary/30 ring-1 ring-primary/20">
+                  <div className="p-4 bg-white rounded-none shadow-2xl shadow-primary/30 ring-1 ring-primary/20">
                     <QRCodeCanvas id="service-qr" value={qrUrl} size={220} marginSize={2} level="H" />
                   </div>
                   <div className="text-center space-y-1">
@@ -1002,7 +1002,7 @@ export default function AdminServiceDetail() {
                   </div>
                   <button
                     onClick={downloadQR}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-xs font-bold rounded-none hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30"
                   >
                     <span className="material-symbols-outlined text-lg">download</span>
                     Download QR PNG
@@ -1026,7 +1026,7 @@ export default function AdminServiceDetail() {
         {/* ── Real-time Stats ────────────────────────────────────────────── */}
         <section className="grid grid-cols-2 gap-3 px-4 md:grid-cols-4">
           {/* Total */}
-          <div className="flex flex-col gap-1 rounded-xl bg-surface-dark p-4 border border-primary/10">
+          <div className="flex flex-col gap-1 rounded-none bg-surface-dark p-4 border border-primary/10">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total</p>
             <div className="flex items-baseline justify-between">
               <p className="text-2xl font-bold">{total}</p>
@@ -1034,35 +1034,35 @@ export default function AdminServiceDetail() {
             </div>
           </div>
           {/* Present */}
-          <div className="flex flex-col gap-1 rounded-xl bg-surface-dark p-4 border border-primary/10">
+          <div className="flex flex-col gap-1 rounded-none bg-surface-dark p-4 border border-primary/10">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Present</p>
             <div className="flex items-baseline justify-between">
-              <p className="text-2xl font-bold text-emerald-500">{present.length}</p>
-              <span className="text-2xs font-bold text-emerald-500/80">
+              <p className="text-2xl font-bold text-teal">{present.length}</p>
+              <span className="text-2xs font-bold text-teal/80">
                 {total > 0 ? `${Math.round((present.length / total) * 100)}%` : '—'}
               </span>
             </div>
           </div>
           {/* Absent */}
-          <div className="flex flex-col gap-1 rounded-xl bg-surface-dark p-4 border border-primary/10">
+          <div className="flex flex-col gap-1 rounded-none bg-surface-dark p-4 border border-primary/10">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Absent</p>
             <div className="flex items-baseline justify-between">
-              <p className="text-2xl font-bold text-rose-500">{absent.length}</p>
-              <span className="text-2xs font-bold text-rose-500/80">
+              <p className="text-2xl font-bold text-red">{absent.length}</p>
+              <span className="text-2xs font-bold text-red/80">
                 {total > 0 ? `${Math.round((absent.length / total) * 100)}%` : '—'}
               </span>
             </div>
           </div>
           {/* Rate */}
-          <div className="flex flex-col gap-1 rounded-xl bg-surface-dark p-4 border border-primary/10">
+          <div className="flex flex-col gap-1 rounded-none bg-surface-dark p-4 border border-primary/10">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Rate</p>
             <div className="flex items-baseline justify-between">
-              <p className={`text-2xl font-bold ${attendanceRate >= 75 ? 'text-primary' : attendanceRate >= 50 ? 'text-amber-400' : 'text-rose-500'}`}>
+              <p className={`text-2xl font-bold ${attendanceRate >= 75 ? 'text-primary' : attendanceRate >= 50 ? 'text-amber-400' : 'text-red'}`}>
                 {attendanceRate}%
               </p>
-              <div className="h-1.5 w-8 rounded-full bg-slate-700 overflow-hidden">
+              <div className="h-1.5 w-8 rounded-none bg-slate-700 overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all duration-700 ease-out ${attendanceRate >= 75 ? 'bg-primary' : attendanceRate >= 50 ? 'bg-amber-400' : 'bg-rose-500'}`}
+                  className={`h-full rounded-none transition-all duration-700 ease-out ${attendanceRate >= 75 ? 'bg-primary' : attendanceRate >= 50 ? 'bg-amber-400' : 'bg-red'}`}
                   style={{ width: `${attendanceRate}%` }}
                 />
               </div>
@@ -1083,12 +1083,12 @@ export default function AdminServiceDetail() {
           <section className="mt-4">
             <div className="sticky top-[73px] z-40 bg-background-dark/95 backdrop-blur-sm pt-2">
             {/* Tab pills */}
-            <div className="flex gap-1 rounded-lg bg-surface-dark p-1">
+            <div className="flex gap-1 rounded-none bg-surface-dark p-1">
               {(['all', 'present', 'absent'] as const).map(t => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className={`flex-1 rounded-md py-2 text-sm font-bold transition-all duration-150 capitalize active:scale-[0.97] ${
+                  className={`flex-1 rounded-none py-2 text-sm font-bold transition-all duration-150 capitalize active:scale-[0.97] ${
                     tab === t
                       ? 'bg-primary text-white shadow-sm'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -1107,7 +1107,7 @@ export default function AdminServiceDetail() {
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Search members…"
-                  className="w-full rounded-lg bg-surface-dark pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all border border-border-dark"
+                  className="w-full rounded-none bg-surface-dark pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all border border-border-dark"
                 />
               </div>
               {/* Export (absent tab only) */}
@@ -1117,7 +1117,7 @@ export default function AdminServiceDetail() {
                     onClick={() => handleExport('txt')}
                     disabled={exporting}
                     title="Download plain-text absence list"
-                    className="flex items-center gap-1.5 px-2.5 py-2 text-2xs font-bold rounded-lg bg-surface-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all disabled:opacity-40"
+                    className="flex items-center gap-1.5 px-2.5 py-2 text-2xs font-bold rounded-none bg-surface-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all disabled:opacity-40"
                   >
                     <span className="material-symbols-outlined text-base">description</span>
                     {exporting ? '…' : 'TXT'}
@@ -1126,7 +1126,7 @@ export default function AdminServiceDetail() {
                     onClick={() => handleExport('csv')}
                     disabled={exporting}
                     title="Download CSV for Excel / Google Sheets"
-                    className="flex items-center gap-1.5 px-2.5 py-2 text-2xs font-bold rounded-lg bg-surface-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all disabled:opacity-40"
+                    className="flex items-center gap-1.5 px-2.5 py-2 text-2xs font-bold rounded-none bg-surface-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all disabled:opacity-40"
                   >
                     <span className="material-symbols-outlined text-base">table_view</span>
                     {exporting ? '…' : 'CSV'}
@@ -1135,7 +1135,7 @@ export default function AdminServiceDetail() {
                     onClick={() => handleExport('rtf')}
                     disabled={exporting}
                     title="Download RTF (opens in Word / Pages)"
-                    className="flex items-center gap-1.5 px-2.5 py-2 text-2xs font-bold rounded-lg bg-surface-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all disabled:opacity-40"
+                    className="flex items-center gap-1.5 px-2.5 py-2 text-2xs font-bold rounded-none bg-surface-dark border border-border-dark text-slate-400 hover:text-primary hover:border-primary/40 transition-all disabled:opacity-40"
                   >
                     <span className="material-symbols-outlined text-base">format_align_left</span>
                     {exporting ? '…' : 'DOC'}
@@ -1150,17 +1150,17 @@ export default function AdminServiceDetail() {
             {loading ? (
               <div className="space-y-1 mt-1">
                 {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className="flex items-center justify-between gap-3 rounded-xl bg-surface-dark p-3 border border-border-dark mb-1">
+                  <div key={i} className="flex items-center justify-between gap-3 rounded-none bg-surface-dark p-3 border border-border-dark mb-1">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="size-9 rounded-full flex-shrink-0 animate-pulse bg-white/[0.06]" />
+                      <div className="size-9 rounded-none flex-shrink-0 animate-pulse bg-white/[0.06]" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-3.5 w-28 animate-pulse rounded-md bg-white/[0.06]" />
-                        <div className="h-2.5 w-20 animate-pulse rounded-md bg-white/[0.06]" />
+                        <div className="h-3.5 w-28 animate-pulse rounded-none bg-white/[0.06]" />
+                        <div className="h-2.5 w-20 animate-pulse rounded-none bg-white/[0.06]" />
                       </div>
                     </div>
                     <div className="flex items-center gap-3 flex-shrink-0">
-                      <div className="h-5 w-16 rounded-full animate-pulse bg-white/[0.06]" />
-                      <div className="size-10 rounded-xl animate-pulse bg-white/[0.06]" />
+                      <div className="h-5 w-16 rounded-none animate-pulse bg-white/[0.06]" />
+                      <div className="size-10 rounded-none animate-pulse bg-white/[0.06]" />
                     </div>
                   </div>
                 ))}
@@ -1193,12 +1193,12 @@ export default function AdminServiceDetail() {
                       return (
                       <div
                         key={m.id}
-                        className="group flex items-center justify-between gap-3 rounded-xl bg-surface-dark p-3 border border-transparent hover:border-primary/20 hover:bg-primary/[0.03] transition-all duration-150 cursor-default mb-1"
+                        className="group flex items-center justify-between gap-3 rounded-none bg-surface-dark p-3 border border-transparent hover:border-primary/20 hover:bg-primary/[0.03] transition-all duration-150 cursor-default mb-1"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           {/* Avatar */}
                           <div
-                            className="size-9 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white"
+                            className="size-9 rounded-none flex items-center justify-center flex-shrink-0 text-xs font-bold text-white"
                             style={{ backgroundColor: `${color}25`, border: `1.5px solid ${color}40` }}
                           >
                             <span style={{ color }}>{getInitials(m.name)}</span>
@@ -1212,7 +1212,7 @@ export default function AdminServiceDetail() {
                           <div className="flex flex-col items-end gap-1">
                             {m.checked_in ? (
                               <>
-                                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-2xs font-bold text-emerald-500 uppercase">Checked In</span>
+                                <span className="rounded-none bg-teal/10 px-2 py-0.5 text-2xs font-bold text-teal uppercase">Checked In</span>
                                 {m.checkin_time && (
                                   <p className="text-2xs text-slate-500">
                                     {new Date(m.checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -1221,7 +1221,7 @@ export default function AdminServiceDetail() {
                               </>
                             ) : (
                               <>
-                                <span className="rounded-full bg-rose-500/10 px-2 py-0.5 text-2xs font-bold text-rose-500 uppercase">Absent</span>
+                                <span className="rounded-none bg-red/10 px-2 py-0.5 text-2xs font-bold text-red uppercase">Absent</span>
                                 {m.phone ? (
                                   <a
                                     href={`tel:${m.phone}`}
@@ -1242,10 +1242,10 @@ export default function AdminServiceDetail() {
                               e.stopPropagation();
                               markAttendance(m.id, !m.checked_in);
                             }}
-                            className={`size-11 flex items-center justify-center rounded-xl transition-all duration-150 active:scale-95 border ${
+                            className={`size-11 flex items-center justify-center rounded-none transition-all duration-150 active:scale-95 border ${
                               m.checked_in
-                                ? 'bg-rose-500/10 border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white'
-                                : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white'
+                                ? 'bg-red/10 border-red/20 text-red hover:bg-red hover:text-white'
+                                : 'bg-teal/10 border-teal/20 text-teal hover:bg-teal hover:text-white'
                             }`}
                             title={m.checked_in ? "Mark Absent" : "Mark Present"}
                           >
@@ -1266,10 +1266,10 @@ export default function AdminServiceDetail() {
                     <button
                       onClick={loadMore}
                       disabled={loadingMore}
-                      className="px-6 py-3 text-sm font-bold text-slate-400 hover:text-slate-100 border border-border-dark hover:border-primary/40 hover:bg-primary/5 rounded-xl transition-all duration-150 flex items-center gap-2 disabled:opacity-40 active:scale-[0.97]"
+                      className="px-6 py-3 text-sm font-bold text-slate-400 hover:text-slate-100 border border-border-dark hover:border-primary/40 hover:bg-primary/5 rounded-none transition-all duration-150 flex items-center gap-2 disabled:opacity-40 active:scale-[0.97]"
                     >
                       {loadingMore
-                        ? <><span className="size-4 border-2 border-primary/40 border-t-primary rounded-full animate-spin" /> Loading…</>
+                        ? <><span className="size-4 border-2 border-primary/40 border-t-primary rounded-none animate-spin" /> Loading…</>
                         : 'Load more'}
                     </button>
                   </div>
@@ -1286,3 +1286,5 @@ export default function AdminServiceDetail() {
     </div>
   )
 }
+
+

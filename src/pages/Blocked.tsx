@@ -25,7 +25,7 @@ export default function Blocked() {
       <div className="max-w-md w-full text-center flex flex-col items-center gap-6">
 
         {/* Icon */}
-        <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+        <div className="w-20 h-20 rounded-none bg-red-500/10 border border-red-500/20 flex items-center justify-center">
           <span className="material-symbols-outlined text-red-400 text-4xl">block</span>
         </div>
 
@@ -56,3 +56,5 @@ export default function Blocked() {
     </div>
   )
 }
+
+

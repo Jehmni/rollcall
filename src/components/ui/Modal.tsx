@@ -33,12 +33,12 @@ export function Modal({ isOpen, onClose, title, description, children }: ModalPr
         onClick={onClose}
       />
       
-      <div className={`relative w-full max-w-sm overflow-hidden rounded-3xl bg-white shadow-2xl transition-all duration-300 transform ${isOpen ? 'translate-y-0 scale-100' : 'translate-y-8 scale-95'} border border-brand-border`}>
+      <div className={`relative w-full max-w-sm overflow-hidden rounded-none bg-white shadow-2xl transition-all duration-300 transform ${isOpen ? 'translate-y-0 scale-100' : 'translate-y-8 scale-95'} border border-brand-border`}>
         <div className="flex items-center justify-between border-b border-brand-border px-6 py-4">
           <h3 className="text-lg font-bold text-brand-text">{title}</h3>
           <button
             onClick={onClose}
-            className="size-10 flex items-center justify-center rounded-xl text-brand-slate hover:bg-brand-secondary hover:text-brand-text active:scale-95 transition-all"
+            className="size-10 flex items-center justify-center rounded-none text-brand-slate hover:bg-brand-secondary hover:text-brand-text active:scale-95 transition-all"
           >
             <X className="h-5 w-5" />
           </button>
@@ -80,7 +80,7 @@ export function ConfirmDialog({
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="flex flex-col gap-6">
         <div className="flex items-start gap-4">
-          <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl ${variant === 'danger' ? 'bg-red-50 text-red-600' : 'bg-brand-primary/10 text-brand-primary'}`}>
+          <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-none ${variant === 'danger' ? 'bg-red-50 text-red-600' : 'bg-brand-primary/10 text-brand-primary'}`}>
             <AlertTriangle className="h-6 w-6" />
           </div>
           <p className="text-sm leading-relaxed text-brand-slate">
@@ -106,3 +106,5 @@ export function ConfirmDialog({
     </Modal>
   )
 }
+
+

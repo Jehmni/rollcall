@@ -44,7 +44,7 @@ function ServiceCard({
 
   return (
     <div
-      className={`group rounded-xl border transition-all duration-300 animate-in slide-in-from-bottom-2 overflow-hidden ${
+      className={`group rounded-none border transition-all duration-300 animate-in slide-in-from-bottom-2 overflow-hidden ${
         isPast
           ? 'bg-surface-dark border-border-dark opacity-60 hover:opacity-90'
           : 'bg-surface-dark border-border-dark hover:border-primary/40'
@@ -56,7 +56,7 @@ function ServiceCard({
       <div className="flex items-center gap-3 p-4 sm:p-5">
         {/* Icon */}
         <div
-          className="size-12 sm:size-14 flex-shrink-0 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 duration-300"
+          className="size-12 sm:size-14 flex-shrink-0 rounded-none flex items-center justify-center transition-transform group-hover:scale-105 duration-300"
           style={{ backgroundColor: accentBg }}
         >
           <span className="material-symbols-outlined text-xl sm:text-2xl" style={{ color: accentColor }}>
@@ -74,7 +74,7 @@ function ServiceCard({
               {service.service_type}
             </p>
             <span
-              className="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-black uppercase tracking-wider border"
+              className="inline-flex items-center px-2 py-0.5 rounded-none text-2xs font-black uppercase tracking-wider border"
               style={{ color: accentColor, borderColor: `${accentColor}40`, backgroundColor: accentBg }}
             >
               {statusLabel}
@@ -89,14 +89,14 @@ function ServiceCard({
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); onEdit(service) }}
-                className="size-9 flex items-center justify-center rounded-xl text-slate-600 hover:text-primary hover:bg-primary/10 active:scale-95 transition-all sm:opacity-0 sm:group-hover:opacity-100"
+                className="size-9 flex items-center justify-center rounded-none text-slate-600 hover:text-primary hover:bg-primary/10 active:scale-95 transition-all sm:opacity-0 sm:group-hover:opacity-100"
                 title="Edit event"
               >
                 <span className="material-symbols-outlined text-lg">edit</span>
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete(service) }}
-                className="size-9 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 active:scale-95 transition-all sm:opacity-0 sm:group-hover:opacity-100"
+                className="size-9 flex items-center justify-center rounded-none text-slate-600 hover:text-red-400 hover:bg-red-500/10 active:scale-95 transition-all sm:opacity-0 sm:group-hover:opacity-100"
                 title="Delete event"
               >
                 <span className="material-symbols-outlined text-lg">delete</span>
@@ -105,7 +105,7 @@ function ServiceCard({
           )}
           <button
             onClick={onClick}
-            className="size-9 flex items-center justify-center rounded-xl text-slate-600 group-hover:text-slate-400 transition-all"
+            className="size-9 flex items-center justify-center rounded-none text-slate-600 group-hover:text-slate-400 transition-all"
           >
             <span className="material-symbols-outlined text-lg group-hover:translate-x-0.5 transition-transform">chevron_right</span>
           </button>
@@ -216,11 +216,11 @@ function EventFormModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
-        <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mb-5 sm:hidden" />
+      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-none p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
+        <div className="w-10 h-1 bg-border-dark rounded-none mx-auto mb-5 sm:hidden" />
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="size-12 bg-primary/10 rounded-xl flex items-center justify-center">
+          <div className="size-12 bg-primary/10 rounded-none flex items-center justify-center">
             <span className="material-symbols-outlined text-primary text-xl">
               {editing ? 'edit_calendar' : 'calendar_add_on'}
             </span>
@@ -231,7 +231,7 @@ function EventFormModal({
               {editing ? 'Update the date or type for this session' : 'Initialise a formal session for attendance tracking'}
             </p>
           </div>
-          <button onClick={onClose} className="ml-auto size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
+          <button onClick={onClose} className="ml-auto size-9 flex items-center justify-center rounded-none hover:bg-border-dark text-slate-400 transition-colors">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -244,7 +244,7 @@ function EventFormModal({
               value={date}
               onChange={e => onChangeDate(e.target.value)}
               required
-              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all [color-scheme:dark]"
+              className="w-full bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all [color-scheme:dark]"
             />
           </label>
           <label className="flex flex-col gap-1.5">
@@ -255,7 +255,7 @@ function EventFormModal({
               onChange={e => onChangeType(e.target.value)}
               placeholder="e.g. Rehearsal, Sunday Service, Standup…"
               required
-              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
+              className="w-full bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all"
             />
           </label>
 
@@ -263,7 +263,7 @@ function EventFormModal({
           <button
             type="button"
             onClick={() => onChangeRequireLocation(!requireLocation)}
-            className={`flex items-center justify-between gap-3 w-full px-4 py-3 rounded-xl border transition-all ${requireLocation ? 'bg-primary/10 border-primary/40' : 'bg-background-dark border-border-dark'}`}
+            className={`flex items-center justify-between gap-3 w-full px-4 py-3 rounded-none border transition-all ${requireLocation ? 'bg-primary/10 border-primary/40' : 'bg-background-dark border-border-dark'}`}
           >
             <div className="flex items-center gap-3">
               <span className={`material-symbols-outlined text-xl ${requireLocation ? 'text-primary-light' : 'text-slate-500'}`}>
@@ -278,14 +278,14 @@ function EventFormModal({
                 </p>
               </div>
             </div>
-            <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-0.5 ${requireLocation ? 'bg-primary' : 'bg-border-dark'}`}>
-              <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${requireLocation ? 'translate-x-4' : 'translate-x-0'}`} />
+            <div className={`w-10 h-6 rounded-none transition-colors flex items-center px-0.5 ${requireLocation ? 'bg-primary' : 'bg-border-dark'}`}>
+              <div className={`w-5 h-5 rounded-none bg-white shadow transition-transform ${requireLocation ? 'translate-x-4' : 'translate-x-0'}`} />
             </div>
           </button>
 
           {/* Meeting-level location override — only shown when location is required */}
           {requireLocation && (
-            <div className="flex flex-col gap-3 rounded-xl bg-background-dark border border-border-dark p-4 animate-in fade-in duration-200">
+            <div className="flex flex-col gap-3 rounded-none bg-background-dark border border-border-dark p-4 animate-in fade-in duration-200">
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Venue for this meeting</p>
 
               {/* Mode selector */}
@@ -295,16 +295,16 @@ function EventFormModal({
                     key={mode}
                     type="button"
                     onClick={() => onChangeVenueMode(mode)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all ${
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-none border text-left transition-all ${
                       venueMode === mode
                         ? 'bg-primary/10 border-primary/40 text-white'
                         : 'bg-surface-dark border-border-dark text-slate-400 hover:border-slate-600'
                     }`}
                   >
-                    <div className={`size-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                    <div className={`size-4 rounded-none border-2 flex-shrink-0 flex items-center justify-center ${
                       venueMode === mode ? 'border-primary' : 'border-slate-600'
                     }`}>
-                      {venueMode === mode && <div className="size-2 rounded-full bg-primary" />}
+                      {venueMode === mode && <div className="size-2 rounded-none bg-primary" />}
                     </div>
                     <div>
                       <p className="text-sm font-semibold">
@@ -327,7 +327,7 @@ function EventFormModal({
                     <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Venue Name</span>
                     <input value={venueName} onChange={e => onChangeVenueName(e.target.value)}
                       placeholder="e.g. Town Hall — Main Room"
-                      className="w-full bg-surface-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+                      className="w-full bg-surface-dark border border-border-dark rounded-none px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
                   </label>
 
                   {/* Search */}
@@ -338,13 +338,13 @@ function EventFormModal({
                         onChange={e => setSearchQuery(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleSearch())}
                         placeholder="Search by address, postcode, area…"
-                        className="w-full bg-surface-dark border border-border-dark rounded-xl pl-3 pr-9 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
+                        className="w-full bg-surface-dark border border-border-dark rounded-none pl-3 pr-9 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
                       />
                       {searchQuery && (
                         <button
                           type="button"
                           onClick={() => setSearchQuery('')}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 size-6 flex items-center justify-center rounded-lg hover:bg-white/5 text-slate-500 hover:text-slate-300 transition-colors"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 size-6 flex items-center justify-center rounded-none hover:bg-white/5 text-slate-500 hover:text-slate-300 transition-colors"
                         >
                           <span className="material-symbols-outlined text-base">close</span>
                         </button>
@@ -354,7 +354,7 @@ function EventFormModal({
                       type="button"
                       onClick={handleSearch}
                       disabled={!searchQuery.trim() || geoLoading}
-                      className="px-3 py-2 bg-primary/20 border border-primary/30 text-primary text-sm font-bold rounded-xl hover:bg-primary/30 active:scale-95 transition-all disabled:opacity-40 flex-shrink-0"
+                      className="px-3 py-2 bg-primary/20 border border-primary/30 text-primary text-sm font-bold rounded-none hover:bg-primary/30 active:scale-95 transition-all disabled:opacity-40 flex-shrink-0"
                     >
                       {geoLoading ? '…' : 'Search'}
                     </button>
@@ -364,12 +364,12 @@ function EventFormModal({
                   </p>
 
                   {geoError && (
-                    <p className="text-2xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-lg">{geoError}</p>
+                    <p className="text-2xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-none">{geoError}</p>
                   )}
 
                   {/* Notice banner */}
                   {geoNotice && geoResults.length > 0 && confirmedIdx === null && (
-                    <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                    <div className="flex items-start gap-2 px-3 py-2 rounded-none bg-amber-500/10 border border-amber-500/20">
                       <span className="material-symbols-outlined text-amber-400 text-base flex-shrink-0 mt-0.5">info</span>
                       <p className="text-2xs text-amber-300 leading-relaxed">{geoNotice}</p>
                     </div>
@@ -385,11 +385,11 @@ function EventFormModal({
                           key={i}
                           type="button"
                           onClick={() => selectResult(i)}
-                          className="text-left px-3 py-2.5 rounded-xl bg-surface-dark border border-border-dark hover:border-primary/50 hover:bg-primary/5 active:scale-[0.99] transition-all"
+                          className="text-left px-3 py-2.5 rounded-none bg-surface-dark border border-border-dark hover:border-primary/50 hover:bg-primary/5 active:scale-[0.99] transition-all"
                         >
                           <div className="flex items-start gap-2 mb-0.5">
                             <p className="text-sm text-slate-100 font-medium leading-snug flex-1">{formatGeoResult(r)}</p>
-                            <span className={`flex-shrink-0 text-2xs font-bold px-1.5 py-0.5 rounded-md ${QUALITY_COLOR[r.quality]}`}>
+                            <span className={`flex-shrink-0 text-2xs font-bold px-1.5 py-0.5 rounded-none ${QUALITY_COLOR[r.quality]}`}>
                               {QUALITY_LABEL[r.quality]}
                             </span>
                           </div>
@@ -406,7 +406,7 @@ function EventFormModal({
                     <button
                       type="button"
                       onClick={openMapManually}
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border-dark text-slate-400 hover:text-white hover:border-slate-600 text-sm transition-all active:scale-[0.98]"
+                      className="flex items-center gap-2 px-3 py-2 rounded-none border border-border-dark text-slate-400 hover:text-white hover:border-slate-600 text-sm transition-all active:scale-[0.98]"
                     >
                       <span className="material-symbols-outlined text-base">map</span>
                       Place on map manually
@@ -414,10 +414,10 @@ function EventFormModal({
                   )}
 
                   {confirmedIdx !== null && (
-                    <div className="flex items-start gap-3 px-3 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
-                      <span className="material-symbols-outlined text-emerald-400 text-lg mt-0.5 flex-shrink-0">check_circle</span>
+                    <div className="flex items-start gap-3 px-3 py-2.5 rounded-none bg-teal/10 border border-teal/30">
+                      <span className="material-symbols-outlined text-teal text-lg mt-0.5 flex-shrink-0">check_circle</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-2xs text-emerald-300 font-semibold">Location confirmed</p>
+                        <p className="text-2xs text-teal font-semibold">Location confirmed</p>
                         <p className="text-2xs text-slate-400 mt-0.5 leading-relaxed">{venueAddress}</p>
                         <p className="text-2xs text-slate-600">{venueLat}, {venueLng}</p>
                       </div>
@@ -439,12 +439,12 @@ function EventFormModal({
                         <label className="flex flex-col gap-1">
                           <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Latitude</span>
                           <input value={venueLat} onChange={e => onChangeVenueLat(e.target.value)} placeholder="e.g. 51.5074"
-                            className="w-full bg-surface-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 text-sm transition-all" />
+                            className="w-full bg-surface-dark border border-border-dark rounded-none px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 text-sm transition-all" />
                         </label>
                         <label className="flex flex-col gap-1">
                           <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Longitude</span>
                           <input value={venueLng} onChange={e => onChangeVenueLng(e.target.value)} placeholder="e.g. -0.1278"
-                            className="w-full bg-surface-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 text-sm transition-all" />
+                            className="w-full bg-surface-dark border border-border-dark rounded-none px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 text-sm transition-all" />
                         </label>
                       </div>
                     </details>
@@ -454,21 +454,21 @@ function EventFormModal({
                     <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Check-in radius (metres)</span>
                     <input value={venueRadius} onChange={e => onChangeVenueRadius(e.target.value)}
                       placeholder="100" type="number" min="10" max="5000"
-                      className="w-full bg-surface-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 text-sm transition-all" />
+                      className="w-full bg-surface-dark border border-border-dark rounded-none px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 text-sm transition-all" />
                   </label>
                 </div>
               )}
             </div>
           )}
 
-          {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
+          {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-none">{error}</p>}
           <div className="flex gap-3 justify-end pt-2">
-            <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-xl hover:bg-border-dark transition-colors">
+            <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-none hover:bg-border-dark transition-colors">
               Cancel
             </button>
             <button type="submit" disabled={loading}
-              className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50 flex items-center gap-2">
-              {loading && <span className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-none hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50 flex items-center gap-2">
+              {loading && <span className="size-4 border-2 border-white/30 border-t-white rounded-none animate-spin" />}
               {loading ? (editing ? 'Saving…' : 'Creating…') : (editing ? 'Save Changes' : 'Create Event')}
             </button>
           </div>
@@ -576,14 +576,14 @@ function SettingsModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
-        <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mb-5 sm:hidden" />
+      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-none p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-y-auto">
+        <div className="w-10 h-1 bg-border-dark rounded-none mx-auto mb-5 sm:hidden" />
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
             <span className="material-symbols-outlined text-primary text-xl">settings</span>
             Unit Settings
           </h3>
-          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
+          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-none hover:bg-border-dark text-slate-400 transition-colors">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -591,12 +591,12 @@ function SettingsModal({
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Unit Name</span>
             <input value={name} onChange={e => onChangeName(e.target.value)} required
-              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
+              className="w-full bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Description <span className="normal-case font-normal text-slate-500">(optional)</span></span>
             <input value={desc} onChange={e => onChangeDesc(e.target.value)} placeholder="Purpose of this unit…"
-              className="w-full bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
+              className="w-full bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
           </label>
 
           {/* ── Default Venue Location ─────────────────────────────────────── */}
@@ -608,7 +608,7 @@ function SettingsModal({
                 <p className="text-2xs text-slate-500">Used for all meetings unless overridden per-event.</p>
               </div>
               {hasCoords && (
-                <span className="ml-auto text-2xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Set</span>
+                <span className="ml-auto text-2xs font-bold text-teal bg-teal/10 px-2 py-0.5 rounded-none">Set</span>
               )}
             </div>
 
@@ -617,7 +617,7 @@ function SettingsModal({
               <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Venue Name</span>
               <input value={venueName} onChange={e => onChangeVenueName(e.target.value)}
                 placeholder="e.g. St Andrew's Church Hall"
-                className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+                className="w-full bg-background-dark border border-border-dark rounded-none px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
             </label>
 
             {/* Address search */}
@@ -630,13 +630,13 @@ function SettingsModal({
                     onChange={e => setSearchQuery(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleSearch())}
                     placeholder="Search by address, postcode, area…"
-                    className="w-full bg-background-dark border border-border-dark rounded-xl pl-4 pr-10 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
+                    className="w-full bg-background-dark border border-border-dark rounded-none pl-4 pr-10 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
                   />
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 size-7 flex items-center justify-center rounded-lg hover:bg-white/5 text-slate-500 hover:text-slate-300 transition-colors"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 size-7 flex items-center justify-center rounded-none hover:bg-white/5 text-slate-500 hover:text-slate-300 transition-colors"
                     >
                       <span className="material-symbols-outlined text-base">close</span>
                     </button>
@@ -646,7 +646,7 @@ function SettingsModal({
                   type="button"
                   onClick={handleSearch}
                   disabled={!searchQuery.trim() || geoLoading}
-                  className="px-4 py-2 bg-primary/20 border border-primary/30 text-primary text-sm font-bold rounded-xl hover:bg-primary/30 active:scale-95 transition-all disabled:opacity-40 flex-shrink-0"
+                  className="px-4 py-2 bg-primary/20 border border-primary/30 text-primary text-sm font-bold rounded-none hover:bg-primary/30 active:scale-95 transition-all disabled:opacity-40 flex-shrink-0"
                 >
                   {geoLoading ? '…' : 'Search'}
                 </button>
@@ -658,12 +658,12 @@ function SettingsModal({
 
             {/* Geocode error */}
             {geoError && (
-              <p className="text-2xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-lg">{geoError}</p>
+              <p className="text-2xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-none">{geoError}</p>
             )}
 
             {/* Notice banner (e.g. postcode centroid warning) */}
             {geoNotice && geoResults.length > 0 && confirmedIdx === null && (
-              <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <div className="flex items-start gap-2 px-3 py-2 rounded-none bg-amber-500/10 border border-amber-500/20">
                 <span className="material-symbols-outlined text-amber-400 text-base flex-shrink-0 mt-0.5">info</span>
                 <p className="text-2xs text-amber-300 leading-relaxed">{geoNotice}</p>
               </div>
@@ -680,11 +680,11 @@ function SettingsModal({
                     key={i}
                     type="button"
                     onClick={() => selectResult(i)}
-                    className="text-left px-3 py-2.5 rounded-xl bg-background-dark border border-border-dark hover:border-primary/50 hover:bg-primary/5 active:scale-[0.99] transition-all"
+                    className="text-left px-3 py-2.5 rounded-none bg-background-dark border border-border-dark hover:border-primary/50 hover:bg-primary/5 active:scale-[0.99] transition-all"
                   >
                     <div className="flex items-start gap-2 mb-0.5">
                       <p className="text-sm text-slate-100 font-medium leading-snug flex-1">{formatGeoResult(r)}</p>
-                      <span className={`flex-shrink-0 text-2xs font-bold px-1.5 py-0.5 rounded-md ${QUALITY_COLOR[r.quality]}`}>
+                      <span className={`flex-shrink-0 text-2xs font-bold px-1.5 py-0.5 rounded-none ${QUALITY_COLOR[r.quality]}`}>
                         {QUALITY_LABEL[r.quality]}
                       </span>
                     </div>
@@ -701,7 +701,7 @@ function SettingsModal({
               <button
                 type="button"
                 onClick={openMapManually}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border-dark text-slate-400 hover:text-white hover:border-slate-600 text-sm transition-all active:scale-[0.98]"
+                className="flex items-center gap-2 px-3 py-2 rounded-none border border-border-dark text-slate-400 hover:text-white hover:border-slate-600 text-sm transition-all active:scale-[0.98]"
               >
                 <span className="material-symbols-outlined text-base">map</span>
                 Place on map manually
@@ -710,10 +710,10 @@ function SettingsModal({
 
             {/* Confirmed selection summary */}
             {confirmedIdx !== null && (
-              <div className="flex items-start gap-3 px-3 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
-                <span className="material-symbols-outlined text-emerald-400 text-lg mt-0.5 flex-shrink-0">check_circle</span>
+              <div className="flex items-start gap-3 px-3 py-3 rounded-none bg-teal/10 border border-teal/30">
+                <span className="material-symbols-outlined text-teal text-lg mt-0.5 flex-shrink-0">check_circle</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-emerald-300 font-semibold">Location confirmed</p>
+                  <p className="text-sm text-teal font-semibold">Location confirmed</p>
                   <p className="text-2xs text-slate-400 mt-0.5 leading-relaxed">{address}</p>
                   <p className="text-2xs text-slate-600 mt-0.5">{lat}, {lng}</p>
                 </div>
@@ -735,19 +735,19 @@ function SettingsModal({
                   <label className="flex flex-col gap-1">
                     <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Latitude</span>
                     <input value={lat} onChange={e => onChangeLat(e.target.value)} placeholder="e.g. 51.5074"
-                      className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+                      className="w-full bg-background-dark border border-border-dark rounded-none px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
                   </label>
                   <label className="flex flex-col gap-1">
                     <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Longitude</span>
                     <input value={lng} onChange={e => onChangeLng(e.target.value)} placeholder="e.g. -0.1278"
-                      className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+                      className="w-full bg-background-dark border border-border-dark rounded-none px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
                   </label>
                 </div>
                 <label className="flex flex-col gap-1">
                   <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Stored Address</span>
                   <input value={address} onChange={e => onChangeAddress(e.target.value)}
                     placeholder="Full address (used for display)"
-                    className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+                    className="w-full bg-background-dark border border-border-dark rounded-none px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
                 </label>
               </div>
             </details>
@@ -756,22 +756,22 @@ function SettingsModal({
               <span className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Check-in radius (metres)</span>
               <input value={radius} onChange={e => onChangeRadius(e.target.value)} placeholder="100"
                 type="number" min="10" max="5000"
-                className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
+                className="w-full bg-background-dark border border-border-dark rounded-none px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all" />
               <p className="text-2xs text-slate-600 leading-relaxed">
                 Members must be within this radius to check in when location enforcement is enabled.
               </p>
             </label>
           </div>
 
-          {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
+          {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-none">{error}</p>}
           <div className="flex items-center justify-between pt-2">
             <button type="button" onClick={onDelete} className="text-sm font-semibold text-red-400 hover:text-red-300 flex items-center gap-1.5 transition-colors">
               <span className="material-symbols-outlined text-lg">delete</span> Delete Unit
             </button>
             <div className="flex gap-2">
-              <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-xl hover:bg-border-dark transition-colors">Cancel</button>
+              <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200 rounded-none hover:bg-border-dark transition-colors">Cancel</button>
               <button type="submit" disabled={loading}
-                className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50">
+                className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-none hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50">
                 {loading ? 'Saving…' : 'Save Changes'}
               </button>
             </div>
@@ -793,35 +793,35 @@ function AdminsModal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[80vh] overflow-y-auto">
-        <div className="w-10 h-1 bg-border-dark rounded-full mx-auto mb-5 sm:hidden" />
+      <div className="w-full sm:max-w-md bg-surface-dark border border-border-dark rounded-t-3xl sm:rounded-none p-6 shadow-2xl animate-in slide-in-from-bottom-8 duration-300 max-h-[80vh] overflow-y-auto">
+        <div className="w-10 h-1 bg-border-dark rounded-none mx-auto mb-5 sm:hidden" />
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
             <span className="material-symbols-outlined text-primary text-xl">manage_accounts</span>
             Unit Admins
           </h3>
-          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-xl hover:bg-border-dark text-slate-400 transition-colors">
+          <button onClick={onClose} className="size-9 flex items-center justify-center rounded-none hover:bg-border-dark text-slate-400 transition-colors">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
         <form onSubmit={onSubmit} className="flex gap-2 mb-5">
           <input
             type="email" value={newEmail} onChange={e => onChangeEmail(e.target.value)} placeholder="admin@email.com" required
-            className="flex-1 bg-background-dark border border-border-dark rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
+            className="flex-1 bg-background-dark border border-border-dark rounded-none px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 text-sm transition-all"
           />
           <button type="submit" disabled={loading}
-            className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50 flex-shrink-0">
+            className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-none hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 disabled:opacity-50 flex-shrink-0">
             {loading ? '…' : 'Add'}
           </button>
         </form>
-        {error && <p className="text-sm text-red-400 mb-4 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
+        {error && <p className="text-sm text-red-400 mb-4 bg-red-500/10 px-3 py-2 rounded-none">{error}</p>}
         <div className="flex flex-col gap-2">
           {admins.length === 0 ? (
             <p className="text-sm text-slate-500 text-center py-4">No unit admins assigned yet.</p>
           ) : admins.map(a => (
-            <div key={a.id} className="flex items-center justify-between rounded-xl px-4 py-3 bg-background-dark border border-border-dark">
+            <div key={a.id} className="flex items-center justify-between rounded-none px-4 py-3 bg-background-dark border border-border-dark">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="size-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                <div className="size-8 rounded-none bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
                   <span className="material-symbols-outlined text-primary text-sm">person</span>
                 </div>
                 <span className="text-sm font-medium text-slate-300 truncate">{a.email !== '—' ? a.email : a.user_id}</span>
@@ -1043,15 +1043,15 @@ export default function UnitDashboard() {
       <header className="relative overflow-hidden pb-8">
         {/* Background glows */}
         <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-primary/5 to-transparent pointer-events-none" />
-        <div className="absolute top-0 right-0 -mt-16 -mr-16 size-72 bg-primary/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-8 size-48 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 -mt-16 -mr-16 size-72 bg-primary/15 rounded-none blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-8 size-48 bg-primary/10 rounded-none blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6">
           {/* Top bar */}
           <div className="flex items-center justify-between pt-4 pb-6 sm:pt-6">
             <button
               onClick={() => navigate(isSuper && orgId ? `/admin/orgs/${orgId}` : '/admin')}
-              className="size-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
+              className="size-10 flex items-center justify-center rounded-none bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
             >
               <span className="material-symbols-outlined text-white">arrow_back</span>
             </button>
@@ -1063,14 +1063,14 @@ export default function UnitDashboard() {
               <ThemeToggle className="bg-white/10 hover:bg-white/20 border border-white/10 dark:bg-white/10 dark:hover:bg-white/20" />
               <button
                 onClick={() => navigate('/help')}
-                className="size-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
+                className="size-10 flex items-center justify-center rounded-none bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
                 title="User Guide"
               >
                 <span className="material-symbols-outlined text-white text-xl">help</span>
               </button>
               <button
                 onClick={() => signOut()}
-                className="size-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
+                className="size-10 flex items-center justify-center rounded-none bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
                 title="Sign Out"
               >
                 <span className="material-symbols-outlined text-white text-xl">logout</span>
@@ -1080,7 +1080,7 @@ export default function UnitDashboard() {
 
           {/* Unit identity */}
           <div className="flex flex-col items-center text-center mb-6">
-            <div className="size-20 sm:size-24 bg-primary/20 border-2 border-primary/40 rounded-3xl flex items-center justify-center mb-4 shadow-2xl shadow-primary/30">
+            <div className="size-20 sm:size-24 bg-primary/20 border-2 border-primary/40 rounded-none flex items-center justify-center mb-4 shadow-2xl shadow-primary/30">
               <span className="material-symbols-outlined text-primary text-4xl sm:text-5xl" style={{ fontVariationSettings: "'FILL' 1" }}>groups</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-1">{unit?.name ?? 'Unit'}</h1>
@@ -1088,7 +1088,7 @@ export default function UnitDashboard() {
               {orgName && <span className="text-xs font-medium text-white/60 uppercase tracking-wider">{orgName}</span>}
               {orgName && <span className="text-white/40">·</span>}
               <span
-                className="text-2xs font-black uppercase tracking-widest px-2.5 py-1 rounded-full border"
+                className="text-2xs font-black uppercase tracking-widest px-2.5 py-1 rounded-none border"
                 style={{ color: roleBadgeColor, borderColor: `${roleBadgeColor}40`, backgroundColor: `${roleBadgeColor}15` }}
               >
                 {roleLabel}
@@ -1101,16 +1101,16 @@ export default function UnitDashboard() {
 
           {/* Quick stat pills */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-none p-3 sm:p-4 text-center">
               <p className="text-xl sm:text-2xl font-extrabold text-white">{servicesLoading ? '–' : upcoming.length}</p>
               <p className="text-2xs font-bold uppercase tracking-wider text-white/65 mt-0.5">Upcoming</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-none p-3 sm:p-4 text-center">
               <p className="text-xl sm:text-2xl font-extrabold text-white">{servicesLoading ? '–' : totalSessions}</p>
               <p className="text-2xs font-bold uppercase tracking-wider text-white/65 mt-0.5">Total</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
-              <p className={`text-xl sm:text-2xl font-extrabold ${todaySessions > 0 ? 'text-emerald-300' : 'text-white'}`}>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-none p-3 sm:p-4 text-center">
+              <p className={`text-xl sm:text-2xl font-extrabold ${todaySessions > 0 ? 'text-teal' : 'text-white'}`}>
                 {servicesLoading ? '–' : todaySessions > 0 ? 'Live' : '—'}
               </p>
               <p className="text-2xs font-bold uppercase tracking-wider text-white/65 mt-0.5">Today</p>
@@ -1125,7 +1125,7 @@ export default function UnitDashboard() {
           {/* Members — always visible */}
           <button
             onClick={() => navigate(`/admin/units/${unitId}/members`)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-xs font-black uppercase tracking-wider rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 flex-1 sm:flex-none justify-center sm:justify-start"
+            className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-xs font-black uppercase tracking-wider rounded-none hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30 flex-1 sm:flex-none justify-center sm:justify-start"
           >
             <span className="material-symbols-outlined text-sm">group</span>
             Members
@@ -1135,7 +1135,7 @@ export default function UnitDashboard() {
           {isOwnerOrCreator && (
             <button
               onClick={openCreate}
-              className="flex items-center gap-2 px-4 py-2.5 bg-surface-dark border border-border-dark text-slate-200 text-xs font-black uppercase tracking-wider rounded-xl hover:border-primary/50 hover:text-primary active:scale-95 transition-all flex-1 sm:flex-none justify-center sm:justify-start"
+              className="flex items-center gap-2 px-4 py-2.5 bg-surface-dark border border-border-dark text-slate-200 text-xs font-black uppercase tracking-wider rounded-none hover:border-primary/50 hover:text-primary active:scale-95 transition-all flex-1 sm:flex-none justify-center sm:justify-start"
             >
               <span className="material-symbols-outlined text-sm">add</span>
               New Event
@@ -1148,7 +1148,7 @@ export default function UnitDashboard() {
             {isOwnerOrCreator && (
               <button
                 onClick={() => setShowSettings(true)}
-                className="size-11 flex items-center justify-center rounded-xl bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 active:scale-95 transition-all"
+                className="size-11 flex items-center justify-center rounded-none bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 active:scale-95 transition-all"
                 title="Unit Settings"
               >
                 <span className="material-symbols-outlined text-lg">settings</span>
@@ -1159,7 +1159,7 @@ export default function UnitDashboard() {
             {isSuper && (
               <button
                 onClick={() => setShowAdmins(true)}
-                className="size-11 flex items-center justify-center rounded-xl bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 active:scale-95 transition-all"
+                className="size-11 flex items-center justify-center rounded-none bg-surface-dark border border-border-dark text-slate-500 hover:text-primary hover:border-primary/40 active:scale-95 transition-all"
                 title="Manage Admins"
               >
                 <span className="material-symbols-outlined text-lg">manage_accounts</span>
@@ -1176,14 +1176,14 @@ export default function UnitDashboard() {
         {servicesLoading && (
           <div className="space-y-3 animate-in fade-in duration-300">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-2xl bg-surface-dark border border-border-dark p-4">
+              <div key={i} className="rounded-none bg-surface-dark border border-border-dark p-4">
                 <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-xl flex-shrink-0 animate-pulse bg-white/[0.06]" />
+                  <div className="size-10 rounded-none flex-shrink-0 animate-pulse bg-white/[0.06]" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-3.5 w-24 animate-pulse rounded-md bg-white/[0.06]" />
-                    <div className="h-2.5 w-36 animate-pulse rounded-md bg-white/[0.06]" />
+                    <div className="h-3.5 w-24 animate-pulse rounded-none bg-white/[0.06]" />
+                    <div className="h-2.5 w-36 animate-pulse rounded-none bg-white/[0.06]" />
                   </div>
-                  <div className="h-5 w-14 rounded-full animate-pulse bg-white/[0.06]" />
+                  <div className="h-5 w-14 rounded-none animate-pulse bg-white/[0.06]" />
                 </div>
               </div>
             ))}
@@ -1192,8 +1192,8 @@ export default function UnitDashboard() {
 
         {/* Empty state */}
         {!servicesLoading && services.length === 0 && (
-          <div className="bg-surface-dark rounded-2xl border border-dashed border-border-dark p-12 text-center animate-in fade-in duration-300">
-            <div className="size-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-5">
+          <div className="bg-surface-dark rounded-none border border-dashed border-border-dark p-12 text-center animate-in fade-in duration-300">
+            <div className="size-20 bg-primary/10 rounded-none flex items-center justify-center mx-auto mb-5">
               <span className="material-symbols-outlined text-4xl text-primary">calendar_month</span>
             </div>
             <h3 className="text-xl font-bold text-slate-100 mb-2">No Events Yet</h3>
@@ -1203,7 +1203,7 @@ export default function UnitDashboard() {
             {isOwnerOrCreator && (
               <button
                 onClick={() => setShowCreate(true)}
-                className="px-8 py-3 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30"
+                className="px-8 py-3 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-none hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/30"
               >
                 Schedule First Event
               </button>
@@ -1216,7 +1216,7 @@ export default function UnitDashboard() {
           <section className="mb-8 animate-in fade-in duration-300">
             <div className="flex items-center gap-3 mb-4">
               <h2 className="text-base font-bold text-slate-100">Upcoming Sessions</h2>
-              <span className="px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-2xs font-black uppercase tracking-wider">
+              <span className="px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-none text-2xs font-black uppercase tracking-wider">
                 {upcoming.length}
               </span>
             </div>
@@ -1240,7 +1240,7 @@ export default function UnitDashboard() {
           <section className="animate-in fade-in duration-300">
             <div className="flex items-center gap-3 mb-4">
               <h2 className="text-base font-bold text-slate-400">Past Sessions</h2>
-              <span className="px-2 py-0.5 bg-slate-800 text-slate-500 border border-slate-700 rounded-full text-2xs font-black uppercase tracking-wider">
+              <span className="px-2 py-0.5 bg-slate-800 text-slate-500 border border-slate-700 rounded-none text-2xs font-black uppercase tracking-wider">
                 {past.length}
               </span>
             </div>
@@ -1323,3 +1323,5 @@ export default function UnitDashboard() {
     </div>
   )
 }
+
+

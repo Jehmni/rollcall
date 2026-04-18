@@ -65,10 +65,10 @@ export default function AdminSignup() {
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-hidden">
         {/* Decorative background blurs */}
         <div className="absolute top-0 right-0 -z-10 opacity-20 pointer-events-none">
-          <div className="w-[500px] h-[500px] bg-primary/20 blur-[120px] rounded-full"></div>
+          <div className="w-[500px] h-[500px] bg-primary/20 blur-[120px] rounded-none"></div>
         </div>
         <div className="absolute bottom-0 left-0 -z-10 opacity-10 pointer-events-none">
-          <div className="w-[300px] h-[300px] bg-primary/30 blur-[100px] rounded-full"></div>
+          <div className="w-[300px] h-[300px] bg-primary/30 blur-[100px] rounded-none"></div>
         </div>
 
         <div className="w-full max-w-md mx-auto relative z-10">
@@ -88,7 +88,7 @@ export default function AdminSignup() {
           <div className="bg-primary/5 rounded-[2.5rem] p-8 shadow-2xl border border-primary/10 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-500 delay-200">
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="rounded-xl bg-red-500/10 p-4 text-xs font-black uppercase tracking-spaced text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
+                <div className="rounded-none bg-red-500/10 p-4 text-xs font-black uppercase tracking-spaced text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
                   <span className="material-symbols-outlined text-base">warning</span>
                   {error}
                 </div>
@@ -161,7 +161,7 @@ export default function AdminSignup() {
                 >
                   {loading ? (
                     <div className="flex items-center justify-center gap-3">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      <div className="h-4 w-4 animate-spin rounded-none border-2 border-white border-t-transparent"></div>
                       <span>Enlisting...</span>
                     </div>
                   ) : (
@@ -193,8 +193,10 @@ export default function AdminSignup() {
         </div>
         
         {/* Mobile-style home indicator decoration */}
-        <div className="fixed bottom-2 w-32 h-1 bg-white/10 rounded-full left-1/2 -translate-x-1/2"></div>
+        <div className="fixed bottom-2 w-32 h-1 bg-white/10 rounded-none left-1/2 -translate-x-1/2"></div>
       </div>
     </div>
   )
 }
+
+

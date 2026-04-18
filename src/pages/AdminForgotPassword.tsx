@@ -31,10 +31,10 @@ export default function AdminForgotPassword() {
     <div className="bg-background-dark font-display text-white min-h-screen flex flex-col antialiased relative overflow-hidden">
       {/* Visual Decoration Elements */}
       <div className="fixed top-0 right-0 -z-10 opacity-20 pointer-events-none">
-        <div className="w-[500px] h-[500px] bg-primary/20 blur-[120px] rounded-full"></div>
+        <div className="w-[500px] h-[500px] bg-primary/20 blur-[120px] rounded-none"></div>
       </div>
       <div className="fixed bottom-0 left-0 -z-10 opacity-10 pointer-events-none">
-        <div className="w-[300px] h-[300px] bg-primary/30 blur-[100px] rounded-full"></div>
+        <div className="w-[300px] h-[300px] bg-primary/30 blur-[100px] rounded-none"></div>
       </div>
 
       {/* Top Navigation Bar */}
@@ -47,7 +47,7 @@ export default function AdminForgotPassword() {
           <span className="text-sm font-bold uppercase tracking-wider">sign in</span>
         </button>
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-[0_0_15px_rgba(82,71,230,0.2)]">
+          <div className="w-10 h-10 rounded-none bg-primary/10 border border-primary/20 flex items-center justify-center shadow-[0_0_15px_rgba(82,71,230,0.2)]">
             <span className="material-symbols-outlined text-primary text-xl">shield_person</span>
           </div>
         </div>
@@ -58,8 +58,8 @@ export default function AdminForgotPassword() {
           <div className="animate-in fade-in zoom-in-95 duration-700 h-full flex flex-col items-center">
             {/* Icon Illustration */}
             <div className="mb-8 relative">
-              <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full"></div>
-              <div className="relative w-24 h-24 bg-primary/10 border border-primary/30 rounded-2xl flex items-center justify-center">
+              <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-none"></div>
+              <div className="relative w-24 h-24 bg-primary/10 border border-primary/30 rounded-none flex items-center justify-center">
                 <span className="material-symbols-outlined text-primary text-5xl">mark_email_read</span>
               </div>
             </div>
@@ -112,7 +112,7 @@ export default function AdminForgotPassword() {
             {/* Brand/Icon Section */}
             <div className="mb-10">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-[2rem] bg-primary/10 mb-8 border border-primary/20 shadow-2xl relative group">
-                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <span className="material-symbols-outlined text-primary text-4xl relative z-10">fingerprint</span>
               </div>
               <h1 className="text-white text-5xl font-display font-bold leading-tight tracking-tighter mb-4 uppercase">Reset Your Password</h1>
@@ -122,7 +122,7 @@ export default function AdminForgotPassword() {
             {/* Recovery Form */}
             <form onSubmit={handleSubmit} className="space-y-8">
               {error && (
-                <div className="rounded-2xl bg-red-500/10 p-4 text-2xs font-black uppercase tracking-spaced text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
+                <div className="rounded-none bg-red-500/10 p-4 text-2xs font-black uppercase tracking-spaced text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
                   <span className="material-symbols-outlined text-base">warning</span>
                   {error}
                 </div>
@@ -154,7 +154,7 @@ export default function AdminForgotPassword() {
               >
                 {loading ? (
                   <div className="flex items-center gap-3">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                    <div className="h-4 w-4 animate-spin rounded-none border-2 border-white border-t-transparent"></div>
                     <span>Processing...</span>
                   </div>
                 ) : (
@@ -172,3 +172,5 @@ export default function AdminForgotPassword() {
     </div>
   )
 }
+
+

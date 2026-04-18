@@ -30,7 +30,7 @@ export function useToast() {
 function ToastIcon({ type }: { type: ToastType }) {
   if (type === 'success') {
     return (
-      <svg className="w-5 h-5 shrink-0 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <svg className="w-5 h-5 shrink-0 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
       </svg>
     )
@@ -43,7 +43,7 @@ function ToastIcon({ type }: { type: ToastType }) {
     )
   }
   return (
-    <svg className="w-5 h-5 shrink-0 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg className="w-5 h-5 shrink-0 text-primary-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z" />
     </svg>
   )
@@ -51,8 +51,8 @@ function ToastIcon({ type }: { type: ToastType }) {
 
 const BORDER: Record<ToastType, string> = {
   error:   'border-red-500/40',
-  success: 'border-emerald-500/40',
-  info:    'border-blue-500/40',
+  success: 'border-teal/40',
+  info:    'border-primary/40',
 }
 
 // ── Provider ──────────────────────────────────────────────────────────────────
@@ -89,7 +89,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             key={t.id}
             role="alert"
             className={`
-              flex items-start gap-3 px-4 py-3 rounded-xl
+              flex items-start gap-3 px-4 py-3 rounded-none
               bg-[#1a1a2e]/95 backdrop-blur border ${BORDER[t.type]}
               shadow-2xl pointer-events-auto
               animate-in slide-in-from-bottom-2 fade-in duration-200
@@ -112,3 +112,5 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     </ToastContext.Provider>
   )
 }
+
+

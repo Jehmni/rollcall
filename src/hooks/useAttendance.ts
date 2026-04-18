@@ -184,3 +184,5 @@ export function useAttendance(serviceId: string | null, requireLocation = false)
     reset,
   }
 }
+
+

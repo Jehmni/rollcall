@@ -6,8 +6,8 @@ function Spinner() {
   return (
     <div className="flex min-h-screen items-center justify-center flex-col gap-4 bg-background-dark">
       <div className="relative size-14">
-        <div className="absolute inset-0 rounded-full border-4 border-primary/10" />
-        <div className="absolute inset-0 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+        <div className="absolute inset-0 rounded-none border-4 border-primary/10" />
+        <div className="absolute inset-0 rounded-none border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
         <div className="absolute inset-2 flex items-center justify-center">
           <img src="/logo.png" alt="" className="size-7 object-contain opacity-80" />
         </div>
@@ -39,3 +39,5 @@ export function SuperRoute({ children }: { children: ReactNode }) {
   }
   return <>{children}</>
 }
+
+

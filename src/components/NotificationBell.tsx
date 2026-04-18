@@ -23,19 +23,19 @@ export function NotificationBell({ unitId }: { unitId: string }) {
         <div className="relative" ref={popoverRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative size-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
+                className="relative size-10 flex items-center justify-center rounded-none bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
                 title="Birthday alerts"
             >
                 <Bell className="h-5 w-5 text-white" />
                 {count > 0 && (
-                    <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-pink-500 text-2xs font-bold text-white ring-2 ring-background-dark">
+                    <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-none bg-amber-500 text-2xs font-bold text-white ring-2 ring-background-dark">
                         {count}
                     </span>
                 )}
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-surface-dark border border-border-dark p-2 shadow-2xl shadow-black/40 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute right-0 mt-2 w-72 origin-top-right rounded-none bg-surface-dark border border-border-dark p-2 shadow-2xl shadow-black/40 z-50 animate-in fade-in zoom-in-95 duration-150">
                     <div className="flex items-center justify-between px-3 py-2 border-b border-border-dark mb-1">
                         <h3 className="text-2xs font-bold uppercase tracking-spaced text-slate-400">
                             Birthday Alerts
@@ -55,9 +55,9 @@ export function NotificationBell({ unitId }: { unitId: string }) {
                             notifications.map((n) => (
                                 <div
                                     key={n.id}
-                                    className="group relative flex items-start gap-3 rounded-xl p-2.5 hover:bg-white/5 transition-colors"
+                                    className="group relative flex items-start gap-3 rounded-none p-2.5 hover:bg-white/5 transition-colors"
                                 >
-                                    <div className="size-8 flex items-center justify-center rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-400 flex-shrink-0">
+                                    <div className="size-8 flex items-center justify-center rounded-none bg-amber-500/10 border border-amber-500/20 text-amber-400 flex-shrink-0">
                                         <User className="h-4 w-4" />
                                     </div>
                                     <div className="flex-1 min-w-0 pr-6">
@@ -70,7 +70,7 @@ export function NotificationBell({ unitId }: { unitId: string }) {
                                     </div>
                                     <button
                                         onClick={() => dismissNotification(n.id)}
-                                        className="absolute right-1.5 top-1.5 p-1 text-slate-500 hover:text-slate-300 rounded-lg hover:bg-white/5 transition-colors"
+                                        className="absolute right-1.5 top-1.5 p-1 text-slate-500 hover:text-slate-300 rounded-none hover:bg-white/5 transition-colors"
                                         title="Dismiss"
                                     >
                                         <X className="h-3.5 w-3.5" />
@@ -84,3 +84,5 @@ export function NotificationBell({ unitId }: { unitId: string }) {
         </div>
     )
 }
+
+

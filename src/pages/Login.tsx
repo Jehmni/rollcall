@@ -47,15 +47,15 @@ export default function Login() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background-dark px-4 relative overflow-hidden font-sans">
       {/* Decorative glow orbs */}
-      <div className="absolute top-0 -left-10 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -z-10 pointer-events-none" aria-hidden="true"></div>
-      <div className="absolute bottom-0 -right-10 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -z-10 pointer-events-none" aria-hidden="true"></div>
+      <div className="absolute top-0 -left-10 w-[500px] h-[500px] bg-primary/10 rounded-none blur-[120px] -z-10 pointer-events-none" aria-hidden="true"></div>
+      <div className="absolute bottom-0 -right-10 w-[500px] h-[500px] bg-primary/10 rounded-none blur-[120px] -z-10 pointer-events-none" aria-hidden="true"></div>
 
       <div className="w-full max-w-md relative z-10">
         {/* Logo/Header */}
         <div className="mb-16 flex flex-col items-center gap-7 text-center animate-in fade-in slide-in-from-top-10 duration-1000">
           <div className="group relative">
             <div className="absolute inset-0 bg-primary blur-3xl opacity-20 transition-opacity duration-500" aria-hidden="true"></div>
-            <div className="relative flex h-24 w-24 items-center justify-center rounded-[2.5rem] bg-gradient-to-br from-primary to-primary/70 shadow-[0_0_60px_rgba(82,71,230,0.4)] ring-1 ring-white/10">
+            <div className="relative flex h-24 w-24 items-center justify-center rounded-[2.5rem] bg-transparent from-primary to-primary/70 shadow-[0_0_60px_rgba(82,71,230,0.4)] ring-1 ring-white/10">
               <span className="material-symbols-outlined text-primary-light text-5xl" aria-hidden="true">groups</span>
             </div>
           </div>
@@ -122,3 +122,5 @@ export default function Login() {
     </div>
   )
 }
+
+

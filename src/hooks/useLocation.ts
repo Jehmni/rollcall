@@ -119,3 +119,5 @@ export function useLocation(
 
   return { locationStatus: status, configured }
 }
+
+

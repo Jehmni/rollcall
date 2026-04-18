@@ -97,8 +97,8 @@ export function subStatusLabel(status: string | null | undefined): string {
 /** Tailwind colour classes for each status. */
 export function subStatusColor(status: string | null | undefined): string {
   switch (status) {
-    case 'active':    return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30'
-    case 'trialing':  return 'text-sky-400 bg-sky-500/10 border-sky-500/30'
+    case 'active':    return 'text-teal bg-teal/10 border-teal/30'
+    case 'trialing':  return 'text-primary-light bg-sky-500/10 border-sky-500/30'
     case 'past_due':
     case 'unpaid':    return 'text-amber-400 bg-amber-500/10 border-amber-500/30'
     case 'canceled':
@@ -106,3 +106,5 @@ export function subStatusColor(status: string | null | undefined): string {
     default:          return 'text-slate-400 bg-white/5 border-white/10'
   }
 }
+
+

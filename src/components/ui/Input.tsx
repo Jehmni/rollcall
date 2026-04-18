@@ -17,7 +17,7 @@ export function Input({ label, error, className = '', id, ...props }: InputProps
       <input
         id={inputId}
         className={`
-          w-full rounded-xl border px-4 py-3 text-sm text-brand-text placeholder-brand-slate/50
+          w-full rounded-none border px-4 py-3 text-sm text-brand-text placeholder-brand-slate/50
           transition-all duration-150
           focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary
           disabled:bg-brand-secondary disabled:text-brand-slate disabled:cursor-not-allowed
@@ -35,3 +35,5 @@ export function Input({ label, error, className = '', id, ...props }: InputProps
     </div>
   )
 }
+
+

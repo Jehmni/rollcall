@@ -45,22 +45,22 @@ export default function AdminUpdatePassword() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background-dark px-4 relative overflow-hidden font-display">
       {/* Decorative glow orbs */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -z-10 pointer-events-none" aria-hidden="true"></div>
-      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-primary/8 rounded-full blur-[100px] -z-10 pointer-events-none" aria-hidden="true"></div>
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-none blur-[120px] -z-10 pointer-events-none" aria-hidden="true"></div>
+      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-primary/8 rounded-none blur-[100px] -z-10 pointer-events-none" aria-hidden="true"></div>
 
       <div className="relative w-full max-w-lg">
         <button
           onClick={() => navigate('/admin/login')}
           className="absolute -top-16 left-0 inline-flex items-center gap-3 text-2xs font-black uppercase tracking-spread text-slate-500 hover:text-primary-light transition-all group"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-surface-low border border-white/5 group-hover:scale-110 transition-all">
+          <div className="flex h-10 w-10 items-center justify-center rounded-none bg-surface-low border border-white/5 group-hover:scale-110 transition-all">
             <span className="material-symbols-outlined text-xl" aria-hidden="true">arrow_back</span>
           </div>
           Portal Access
         </button>
 
         <div className="mb-16 flex flex-col items-center gap-6 text-center animate-in fade-in slide-in-from-top-4 duration-1000">
-          <div className="flex h-24 w-24 items-center justify-center rounded-[2.5rem] bg-gradient-to-br from-primary to-primary/70 shadow-[0_0_60px_rgba(82,71,230,0.4)] ring-1 ring-white/10 relative group">
+          <div className="flex h-24 w-24 items-center justify-center rounded-[2.5rem] bg-transparent from-primary to-primary/70 shadow-[0_0_60px_rgba(82,71,230,0.4)] ring-1 ring-white/10 relative group">
             <span className="material-symbols-outlined text-primary-light text-5xl" aria-hidden="true">key</span>
           </div>
           <div>
@@ -96,13 +96,13 @@ export default function AdminUpdatePassword() {
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-8">
               {error && (
-                <div className="rounded-2xl bg-red-500/10 p-5 text-xs font-bold text-red-400 border border-red-500/20 flex items-center gap-3 animate-in shake duration-500">
+                <div className="rounded-none bg-red-500/10 p-5 text-xs font-bold text-red-400 border border-red-500/20 flex items-center gap-3 animate-in shake duration-500">
                   <span className="material-symbols-outlined text-base flex-shrink-0" aria-hidden="true">warning</span>
                   {error}
                 </div>
               )}
 
-              <div className="rounded-2xl bg-primary/5 p-5 flex gap-4 text-2xs font-bold text-primary-light border border-primary/10 leading-relaxed uppercase tracking-widest">
+              <div className="rounded-none bg-primary/5 p-5 flex gap-4 text-2xs font-bold text-primary-light border border-primary/10 leading-relaxed uppercase tracking-widest">
                 <span className="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">shield_lock</span>
                 <p>Your password must be at least 6 characters long.</p>
               </div>
@@ -149,3 +149,5 @@ export default function AdminUpdatePassword() {
     </div>
   )
 }
+
+

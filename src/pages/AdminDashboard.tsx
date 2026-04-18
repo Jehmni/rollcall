@@ -25,9 +25,9 @@ function OrgCard({
   const canManage = isSuper || userRole === 'owner'
 
   return (
-    <div className="bg-primary/5 border border-primary/10 p-5 rounded-2xl flex items-center gap-4 group active:scale-[0.98] transition-all relative hover:bg-primary/10 hover:border-primary/20">
+    <div className="bg-primary/5 border border-primary/10 p-5 rounded-none flex items-center gap-4 group active:scale-[0.98] transition-all relative hover:bg-primary/10 hover:border-primary/20">
       <button onClick={onClick} className="flex-1 flex items-center gap-4 text-left">
-        <div className="w-14 h-14 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+        <div className="w-14 h-14 bg-primary/10 border border-primary/20 rounded-none flex items-center justify-center text-primary transition-colors group-hover:bg-primary group-hover:text-white">
           <span className="material-symbols-outlined text-3xl">corporate_fare</span>
         </div>
         <div className="flex-1 min-w-0">
@@ -39,7 +39,7 @@ function OrgCard({
       </button>
 
       <div className="flex items-center gap-3">
-        <span className={`px-3 py-1 text-2xs font-bold rounded-full uppercase tracking-wider border ${
+        <span className={`px-3 py-1 text-2xs font-bold rounded-none uppercase tracking-wider border ${
           userRole === 'owner'
             ? 'bg-primary/10 text-primary border-primary/20'
             : 'bg-white/5 text-slate-400 border-white/10'
@@ -51,14 +51,14 @@ function OrgCard({
           <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
             <button
               onClick={(e) => { e.stopPropagation(); onRename() }}
-              className="size-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-primary hover:bg-primary/10 active:scale-95 transition-all"
+              className="size-9 flex items-center justify-center rounded-none text-slate-500 hover:text-primary hover:bg-primary/10 active:scale-95 transition-all"
               title="Rename"
             >
               <span className="material-symbols-outlined text-xl">edit</span>
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onDelete() }}
-              className="size-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-red-400 hover:bg-red-500/10 active:scale-95 transition-all"
+              className="size-9 flex items-center justify-center rounded-none text-slate-500 hover:text-red-400 hover:bg-red-500/10 active:scale-95 transition-all"
               title="Delete"
             >
               <span className="material-symbols-outlined text-xl">delete</span>
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(`/admin/orgs/${createdOrg.id}`)}
-              className="flex size-10 items-center justify-center rounded-full hover:bg-primary/20 transition-colors"
+              className="flex size-10 items-center justify-center rounded-none hover:bg-primary/20 transition-colors"
             >
               <span className="material-symbols-outlined text-white">close</span>
             </button>
@@ -185,7 +185,7 @@ export default function AdminDashboard() {
           <div className="w-full max-w-sm pt-4 animate-in zoom-in-95 duration-500">
             <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-12 duration-1000">
               <div className="relative flex flex-col items-center justify-center mb-8">
-                <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150" />
+                <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-none scale-150" />
                 <div className="relative bg-primary text-white rounded-[2.5rem] p-6 shadow-[0_0_60px_rgba(82,71,230,0.5)] border border-white/20">
                   <span className="material-symbols-outlined !text-7xl">check_circle</span>
                 </div>
@@ -195,7 +195,7 @@ export default function AdminDashboard() {
                 <p className="text-slate-400 text-lg font-medium tracking-tight">Organisation is live and active</p>
               </div>
               <div className="w-full bg-primary/5 border border-primary/20 rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
-                <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl" />
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-none blur-3xl" />
                 <div className="p-8 text-center pb-0">
                   <div className="inline-flex size-20 rounded-[2rem] bg-primary/10 border border-primary/20 items-center justify-center mb-4">
                     <span className="material-symbols-outlined text-primary text-4xl">corporate_fare</span>
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="p-8 space-y-6">
                   <div className="flex items-center gap-5">
-                    <div className="bg-primary/10 p-3 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/10">
+                    <div className="bg-primary/10 p-3 rounded-none text-primary border border-primary/20 shadow-lg shadow-primary/10">
                       <span className="material-symbols-outlined text-2xl">calendar_today</span>
                     </div>
                     <div>
@@ -216,7 +216,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className="flex items-center gap-5">
-                    <div className="bg-primary/10 p-3 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/10">
+                    <div className="bg-primary/10 p-3 rounded-none text-primary border border-primary/20 shadow-lg shadow-primary/10">
                       <span className="material-symbols-outlined text-2xl">shield_person</span>
                     </div>
                     <div>
@@ -229,7 +229,7 @@ export default function AdminDashboard() {
               <div className="w-full mt-10">
                 <button
                   onClick={() => navigate(`/admin/orgs/${createdOrg.id}`)}
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-3xl shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-spread text-xs"
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-none shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-spread text-xs"
                 >
                   <span>Open Organisation</span>
                   <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
@@ -259,20 +259,20 @@ export default function AdminDashboard() {
           <h2 className="text-white text-lg font-extrabold tracking-tight">Rollcally</h2>
         </div>
         <nav className="flex-1 px-4 py-6 flex flex-col gap-2 overflow-y-auto">
-          <button className="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-bold text-sm border border-primary/10">
+          <button className="flex items-center gap-3 px-4 py-3 rounded-none bg-primary/10 text-primary font-bold text-sm border border-primary/10">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
             Dashboard
           </button>
           <button
             onClick={() => navigate('/admin/discover')}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-primary/5 font-medium text-sm transition-colors"
+            className="flex items-center gap-3 px-4 py-3 rounded-none text-slate-400 hover:text-white hover:bg-primary/5 font-medium text-sm transition-colors"
           >
             <span className="material-symbols-outlined">explore</span>
             Explore
           </button>
           <button
             onClick={() => navigate('/admin/billing')}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-primary/5 font-medium text-sm transition-colors"
+            className="flex items-center gap-3 px-4 py-3 rounded-none text-slate-400 hover:text-white hover:bg-primary/5 font-medium text-sm transition-colors"
           >
             <span className="material-symbols-outlined">credit_card</span>
             Billing
@@ -281,7 +281,7 @@ export default function AdminDashboard() {
         <div className="px-4 py-4 mt-auto">
           <button
             onClick={signOut}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-primary/5 font-medium text-sm transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-none text-slate-400 hover:text-white hover:bg-primary/5 font-medium text-sm transition-colors"
           >
             <span className="material-symbols-outlined text-xl">logout</span>
             Sign Out
@@ -293,13 +293,13 @@ export default function AdminDashboard() {
 
         {/* Hero Header */}
         <header className="relative overflow-hidden bg-background-dark pt-12 pb-10 px-6">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none" />
-          <div className="absolute top-0 right-0 w-72 h-72 bg-primary/10 rounded-full -mr-36 -mt-36 blur-3xl pointer-events-none" />
+          <div className="absolute inset-0 bg-transparent from-primary/10 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute top-0 right-0 w-72 h-72 bg-primary/10 rounded-none -mr-36 -mt-36 blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex justify-between items-center mb-8 w-full max-w-5xl mx-auto">
             <button
               onClick={() => navigate('/')}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-none bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
             >
               <span className="material-symbols-outlined text-xl">arrow_back</span>
             </button>
@@ -310,14 +310,14 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate('/help')}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+                className="w-10 h-10 flex items-center justify-center rounded-none bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
                 title="User Guide"
               >
                 <span className="material-symbols-outlined text-xl">help</span>
               </button>
               <button
                 onClick={signOut}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+                className="w-10 h-10 flex items-center justify-center rounded-none bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
               >
                 <span className="material-symbols-outlined text-xl">logout</span>
               </button>
@@ -345,13 +345,13 @@ export default function AdminDashboard() {
             <div className="flex gap-2">
               <button
                 onClick={() => navigate('/admin/discover')}
-                className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 bg-primary/5 border border-primary/10 rounded-xl hover:bg-primary/10 hover:text-white transition-colors"
+                className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 bg-primary/5 border border-primary/10 rounded-none hover:bg-primary/10 hover:text-white transition-colors"
               >
                 Explore
               </button>
               <button
                 onClick={() => { setShowCreate(!showCreate); setEditingOrg(null); setNewName('') }}
-                className="px-4 py-2 text-xs font-bold uppercase tracking-wider bg-primary text-white rounded-xl shadow-lg shadow-primary/20 flex items-center gap-1 hover:bg-primary/90 transition-colors"
+                className="px-4 py-2 text-xs font-bold uppercase tracking-wider bg-primary text-white rounded-none shadow-lg shadow-primary/20 flex items-center gap-1 hover:bg-primary/90 transition-colors"
               >
                 <span className="material-symbols-outlined text-sm">add</span>
                 New
@@ -361,11 +361,11 @@ export default function AdminDashboard() {
 
           {/* Create / Edit Form */}
           {(showCreate || editingOrg) && (
-            <div className="mb-8 rounded-2xl bg-primary/5 border border-primary/20 p-6 sm:p-8 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-500 relative overflow-hidden">
-              <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="mb-8 rounded-none bg-primary/5 border border-primary/20 p-6 sm:p-8 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-500 relative overflow-hidden">
+              <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-primary/10 rounded-none blur-3xl pointer-events-none" />
               <form onSubmit={editingOrg ? handleUpdate : handleCreate} className="flex flex-col gap-6 relative z-10">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-primary shadow-xl shadow-primary/20 rounded-2xl flex items-center justify-center text-white flex-shrink-0">
+                  <div className="w-14 h-14 bg-primary shadow-xl shadow-primary/20 rounded-none flex items-center justify-center text-white flex-shrink-0">
                     <span className="material-symbols-outlined text-2xl">
                       {editingOrg ? 'edit' : 'add'}
                     </span>
@@ -400,7 +400,7 @@ export default function AdminDashboard() {
                   <Button
                     type="submit"
                     loading={isUpdating}
-                    className="px-8 shadow-xl shadow-primary/20 text-xs font-bold uppercase tracking-spaced rounded-xl"
+                    className="px-8 shadow-xl shadow-primary/20 text-xs font-bold uppercase tracking-spaced rounded-none"
                   >
                     {editingOrg ? 'Update Hub' : 'Create'}
                   </Button>
@@ -413,25 +413,25 @@ export default function AdminDashboard() {
           {loading ? (
             <div className="space-y-3 animate-in fade-in duration-300">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="bg-primary/5 border border-primary/10 p-5 rounded-2xl flex items-center gap-4">
-                  <div className="size-14 rounded-xl flex-shrink-0 animate-pulse bg-white/[0.06]" />
+                <div key={i} className="bg-primary/5 border border-primary/10 p-5 rounded-none flex items-center gap-4">
+                  <div className="size-14 rounded-none flex-shrink-0 animate-pulse bg-white/[0.06]" />
                   <div className="flex-1 space-y-2.5">
-                    <div className="h-4 w-40 animate-pulse rounded-lg bg-white/[0.06]" />
-                    <div className="h-3 w-24 animate-pulse rounded-lg bg-white/[0.06]" />
+                    <div className="h-4 w-40 animate-pulse rounded-none bg-white/[0.06]" />
+                    <div className="h-3 w-24 animate-pulse rounded-none bg-white/[0.06]" />
                   </div>
-                  <div className="h-6 w-16 rounded-full animate-pulse bg-white/[0.06]" />
+                  <div className="h-6 w-16 rounded-none animate-pulse bg-white/[0.06]" />
                 </div>
               ))}
             </div>
           ) : orgs.length === 0 ? (
-            <div className="rounded-2xl bg-primary/5 border border-primary/10 p-10 sm:p-20 text-center shadow-2xl relative overflow-hidden group">
-              <div className="absolute -top-10 -right-10 h-40 w-40 bg-primary/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000 pointer-events-none" />
+            <div className="rounded-none bg-primary/5 border border-primary/10 p-10 sm:p-20 text-center shadow-2xl relative overflow-hidden group">
+              <div className="absolute -top-10 -right-10 h-40 w-40 bg-primary/5 rounded-none blur-3xl group-hover:scale-150 transition-transform duration-1000 pointer-events-none" />
               <span className="material-symbols-outlined text-8xl text-primary/20 group-hover:text-primary/30 transition-colors mb-6 block">corporate_fare</span>
               <h3 className="text-2xl font-display font-bold text-white uppercase tracking-tighter">Welcome to Rollcally</h3>
               <p className="text-sm font-medium text-slate-400 mb-10 max-w-sm mx-auto mt-3">
                 Ready to start tracking? Launch your first organization to begin managing units and take attendance.
               </p>
-              <Button onClick={() => setShowCreate(true)} className="px-12 py-6 shadow-2xl shadow-primary/30 rounded-2xl text-xs font-black uppercase tracking-widest">
+              <Button onClick={() => setShowCreate(true)} className="px-12 py-6 shadow-2xl shadow-primary/30 rounded-none text-xs font-black uppercase tracking-widest">
                 Setup first Organization
               </Button>
             </div>
@@ -463,9 +463,9 @@ export default function AdminDashboard() {
                   <div
                     key={u.id}
                     onClick={() => navigate(`/admin/units/${u.id}`)}
-                    className="bg-primary/5 border border-primary/10 p-5 rounded-2xl flex items-center gap-4 group active:scale-[0.98] transition-all cursor-pointer hover:bg-primary/10 hover:border-primary/20"
+                    className="bg-primary/5 border border-primary/10 p-5 rounded-none flex items-center gap-4 group active:scale-[0.98] transition-all cursor-pointer hover:bg-primary/10 hover:border-primary/20"
                   >
-                    <div className="w-14 h-14 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                    <div className="w-14 h-14 bg-primary/10 border border-primary/20 rounded-none flex items-center justify-center text-primary transition-colors group-hover:bg-primary group-hover:text-white">
                       <span className="material-symbols-outlined text-3xl">groups</span>
                     </div>
                     <div className="flex-1 min-w-0">
@@ -483,7 +483,7 @@ export default function AdminDashboard() {
         {/* FAB — mobile only */}
         <button
           onClick={() => { setShowCreate(true); setEditingOrg(null); setNewName('') }}
-          className="fixed right-6 bottom-24 sm:right-8 sm:bottom-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-20 sm:hidden"
+          className="fixed right-6 bottom-24 sm:right-8 sm:bottom-8 w-14 h-14 bg-primary text-white rounded-none shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-20 sm:hidden"
         >
           <span className="material-symbols-outlined text-3xl">add</span>
         </button>
@@ -533,3 +533,5 @@ export default function AdminDashboard() {
     </div>
   )
 }
+
+

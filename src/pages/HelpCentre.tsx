@@ -27,8 +27,8 @@ function CardGrid({ children }: { children: React.ReactNode }) {
 
 function FeatureCard({ icon, title, children }: { icon: string; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-surface-low rounded-2xl p-5 transition-colors">
-      <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+    <div className="bg-surface-low rounded-none p-5 transition-colors">
+      <div className="size-10 rounded-none bg-primary/10 flex items-center justify-center text-primary mb-4">
         <span className="material-symbols-outlined text-xl">{icon}</span>
       </div>
       <h4 className="text-sm font-bold text-white mb-1.5">{title}</h4>
@@ -44,7 +44,7 @@ function StepFlow({ steps }: { steps: { icon: string; title: string; detail: str
         <div key={i} className="flex gap-4">
           {/* Left: number + connector */}
           <div className="flex flex-col items-center">
-            <div className="size-9 rounded-full bg-primary flex items-center justify-center text-white text-sm font-black shadow-lg shadow-primary/30 shrink-0 z-10">
+            <div className="size-9 rounded-none bg-primary flex items-center justify-center text-white text-sm font-black shadow-lg shadow-primary/30 shrink-0 z-10">
               {i + 1}
             </div>
             {i < steps.length - 1 && (
@@ -72,14 +72,14 @@ function IssueCard({
 }) {
   const palette = {
     warning: { bg: 'bg-amber-500/8', border: 'border-amber-500/20', pill: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-    info:    { bg: 'bg-blue-500/8',  border: 'border-blue-500/20',  pill: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
-    success: { bg: 'bg-emerald-500/8', border: 'border-emerald-500/20', pill: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+    info:    { bg: 'bg-primary/8',  border: 'border-primary/20',  pill: 'bg-primary/10 text-primary-light border-primary/20' },
+    success: { bg: 'bg-teal/8', border: 'border-teal/20', pill: 'bg-teal/10 text-teal border-teal/20' },
   }[type]
 
   return (
-    <div className={`rounded-2xl border p-4 ${palette.bg} ${palette.border}`}>
+    <div className={`rounded-none border p-4 ${palette.bg} ${palette.border}`}>
       <div className="flex items-start gap-3">
-        <div className={`size-9 rounded-xl flex items-center justify-center shrink-0 border ${palette.pill}`}>
+        <div className={`size-9 rounded-none flex items-center justify-center shrink-0 border ${palette.pill}`}>
           <span className="material-symbols-outlined text-lg" style={{ color: iconColor }}>{icon}</span>
         </div>
         <div className="flex-1 min-w-0">
@@ -96,8 +96,8 @@ function IssueCard({
 
 function TipBox({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-surface-low rounded-2xl p-5 flex gap-3">
-      <div className="size-8 rounded-xl bg-primary/15 flex items-center justify-center text-primary shrink-0">
+    <div className="bg-surface-low rounded-none p-5 flex gap-3">
+      <div className="size-8 rounded-none bg-primary/15 flex items-center justify-center text-primary shrink-0">
         <span className="material-symbols-outlined text-lg">lightbulb</span>
       </div>
       <div className="text-sm text-slate-300 leading-relaxed">{children}</div>
@@ -109,12 +109,12 @@ function RoleCard({
   icon, role, badge, description, permissions,
 }: { icon: string; role: string; badge: string; description: string; permissions: string[] }) {
   return (
-    <div className="bg-surface-low rounded-2xl p-5 transition-colors">
+    <div className="bg-surface-low rounded-none p-5 transition-colors">
       <div className="flex items-start justify-between mb-3">
-        <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+        <div className="size-10 rounded-none bg-primary/10 flex items-center justify-center text-primary">
           <span className="material-symbols-outlined">{icon}</span>
         </div>
-        <span className="text-2xs font-black uppercase tracking-spaced text-primary/70 bg-primary/10 px-2.5 py-1 rounded-full">
+        <span className="text-2xs font-black uppercase tracking-spaced text-primary/70 bg-primary/10 px-2.5 py-1 rounded-none">
           {badge}
         </span>
       </div>
@@ -123,7 +123,7 @@ function RoleCard({
       <ul className="space-y-1">
         {permissions.map((p, i) => (
           <li key={i} className="flex items-center gap-2 text-xs text-slate-400">
-            <span className="material-symbols-outlined text-emerald-400 text-sm">check_small</span>
+            <span className="material-symbols-outlined text-teal text-sm">check_small</span>
             {p}
           </li>
         ))}
@@ -139,7 +139,7 @@ function CsvColumnRow({ field, required, accepted, example }: { field: string; r
         <div className="flex items-center gap-2">
           <span className="text-sm font-bold text-white font-mono">{field}</span>
           {required && (
-            <span className="text-2xs font-black uppercase tracking-wider text-red-400 bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 rounded-full">Required</span>
+            <span className="text-2xs font-black uppercase tracking-wider text-red-400 bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 rounded-none">Required</span>
           )}
         </div>
       </td>
@@ -156,7 +156,7 @@ function CsvColumnRow({ field, required, accepted, example }: { field: string; r
 function AccordionItem({ question, answer }: { question: string; answer: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className={`rounded-2xl overflow-hidden transition-colors border ${open ? 'border-white/[0.08] bg-surface-low' : 'border-white/[0.04] bg-white/[0.02]'}`}>
+    <div className={`rounded-none overflow-hidden transition-colors border ${open ? 'border-white/[0.08] bg-surface-low' : 'border-white/[0.04] bg-white/[0.02]'}`}>
       <button
         onClick={() => setOpen(v => !v)}
         className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-primary/5 transition-colors"
@@ -193,8 +193,8 @@ function OverviewTab() {
             { icon: 'person_check', label: 'Tap your name' },
             { icon: 'check_circle', label: 'Checked in instantly' },
           ].map(({ icon, label }) => (
-            <div key={icon} className="flex flex-col items-center gap-3 p-4 bg-emerald-500/5 border border-emerald-500/15 rounded-2xl text-center">
-              <span className="material-symbols-outlined text-emerald-400 text-2xl">{icon}</span>
+            <div key={icon} className="flex flex-col items-center gap-3 p-4 bg-teal/5 border border-teal/15 rounded-none text-center">
+              <span className="material-symbols-outlined text-teal text-2xl">{icon}</span>
               <span className="text-xs font-semibold text-slate-300">{label}</span>
             </div>
           ))}
@@ -247,7 +247,7 @@ function MembersTab() {
       <div>
         <SectionLabel>Return Visits</SectionLabel>
         <h3 className="font-display text-xl font-bold text-white mb-4">Faster Every Time</h3>
-        <div className="bg-surface-low rounded-2xl p-5 space-y-3">
+        <div className="bg-surface-low rounded-none p-5 space-y-3">
           {[
             { icon: 'memory', text: 'Your name is remembered on this device after your first check-in' },
             { icon: 'bolt', text: 'On your next visit, just confirm — no searching needed' },
@@ -312,14 +312,14 @@ function AdminsTab() {
       <div>
         <SectionLabel>Roster</SectionLabel>
         <h3 className="font-display text-xl font-bold text-white mb-4">Managing Members</h3>
-        <div className="bg-surface-low overflow-hidden rounded-2xl flex flex-col gap-1 p-1">
+        <div className="bg-surface-low overflow-hidden rounded-none flex flex-col gap-1 p-1">
           {[
-            { action: 'Add', icon: 'person_add', detail: 'Enter name, section, phone, birthday', color: 'text-emerald-400' },
-            { action: 'Edit', icon: 'edit', detail: 'Update any detail at any time', color: 'text-blue-400' },
+            { action: 'Add', icon: 'person_add', detail: 'Enter name, section, phone, birthday', color: 'text-teal' },
+            { action: 'Edit', icon: 'edit', detail: 'Update any detail at any time', color: 'text-primary-light' },
             { action: 'Deactivate', icon: 'person_off', detail: 'Hides from roster, preserves history', color: 'text-amber-400' },
             { action: 'Delete', icon: 'delete', detail: 'Permanent — removes all history', color: 'text-red-400' },
           ].map(({ action, icon, detail, color }) => (
-            <div key={action} className="flex items-center gap-4 px-5 py-4 rounded-xl hover:bg-white/[0.04] transition-colors">
+            <div key={action} className="flex items-center gap-4 px-5 py-4 rounded-none hover:bg-white/[0.04] transition-colors">
               <span className={`material-symbols-outlined text-xl ${color}`}>{icon}</span>
               <div className="flex-1">
                 <span className="text-sm font-bold text-white">{action}</span>
@@ -341,7 +341,7 @@ function AdminsTab() {
         ]} />
 
         {/* Column reference table */}
-        <div className="mt-6 rounded-2xl bg-surface-low overflow-hidden">
+        <div className="mt-6 rounded-none bg-surface-low overflow-hidden">
           <div className="bg-surface-high px-4 py-3 flex items-center gap-2">
             <span className="material-symbols-outlined text-primary text-lg">table_chart</span>
             <span className="text-sm font-bold text-white">Recognised Column Names</span>
@@ -392,7 +392,7 @@ function AdminsTab() {
         </div>
 
         {/* Date formats */}
-        <div className="mt-4 rounded-2xl bg-amber-500/5 p-5">
+        <div className="mt-4 rounded-none bg-amber-500/5 p-5">
           <div className="flex items-center gap-2 mb-3">
             <span className="material-symbols-outlined text-amber-400 text-lg">calendar_month</span>
             <span className="text-sm font-bold text-white">Birthday Date Formats</span>
@@ -407,7 +407,7 @@ function AdminsTab() {
               { fmt: 'Month name', ex: 'Nov 18 1990', ok: false },
             ].map(({ fmt, ex, ok }) => (
               <div key={fmt} className="flex items-center gap-3">
-                <span className={`material-symbols-outlined text-base ${ok ? 'text-emerald-400' : 'text-red-400'}`}>
+                <span className={`material-symbols-outlined text-base ${ok ? 'text-teal' : 'text-red-400'}`}>
                   {ok ? 'check_circle' : 'cancel'}
                 </span>
                 <code className="text-xs font-mono text-slate-300 w-32">{fmt}</code>
@@ -631,7 +631,7 @@ function OrgsTab() {
             { icon: 'location_on', label: 'Set venue location', detail: 'Enter an address or coordinates in Unit Settings — required for location-enforced events' },
             { icon: 'remove_circle', label: 'Delete unit', detail: 'Removes all members and attendance history' },
           ].map(({ icon, label, detail }) => (
-            <div key={icon} className="flex items-center gap-4 p-4 bg-surface-low rounded-xl hover:bg-surface-high transition-colors">
+            <div key={icon} className="flex items-center gap-4 p-4 bg-surface-low rounded-none hover:bg-surface-high transition-colors">
               <span className="material-symbols-outlined text-slate-500 text-lg">{icon}</span>
               <div>
                 <p className="text-sm font-bold text-white">{label}</p>
@@ -782,7 +782,7 @@ function TroubleshootingTab() {
       a: (
         <div className="space-y-3">
           <p>If you created the organisation and are still seeing this error, a database migration may need to be applied. Ask your system administrator to run the following in the Supabase SQL Editor:</p>
-          <div className="bg-surface-highest rounded-xl p-3 mt-2">
+          <div className="bg-surface-highest rounded-none p-3 mt-2">
             <code className="text-xs font-mono text-primary/80 leading-relaxed whitespace-pre-wrap">{`drop policy if exists "Managers: full access to members" on members;
 
 create policy "Managers: full access to members"
@@ -832,18 +832,18 @@ create policy "Managers: full access to members"
       </div>
 
       {/* Need help CTA */}
-      <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl p-8 text-center">
-        <div className="size-14 rounded-2xl bg-primary/20 flex items-center justify-center text-primary mx-auto mb-4">
+      <div className="bg-transparent from-primary/10 to-primary/5 rounded-none p-8 text-center">
+        <div className="size-14 rounded-none bg-primary/20 flex items-center justify-center text-primary mx-auto mb-4">
           <span className="material-symbols-outlined text-3xl">support_agent</span>
         </div>
         <h3 className="font-display text-xl font-bold text-white mb-2">Still need help?</h3>
         <p className="text-sm text-slate-400 mb-6">Contact your organisation admin or reach us via the Rollcally website.</p>
         <div className="flex gap-3 justify-center flex-wrap">
-          <div className="flex items-center gap-2 bg-surface-low rounded-xl px-4 py-2.5">
+          <div className="flex items-center gap-2 bg-surface-low rounded-none px-4 py-2.5">
             <span className="material-symbols-outlined text-primary text-lg">admin_panel_settings</span>
             <span className="text-sm font-bold text-white">Contact your admin</span>
           </div>
-          <div className="flex items-center gap-2 bg-surface-low rounded-xl px-4 py-2.5">
+          <div className="flex items-center gap-2 bg-surface-low rounded-none px-4 py-2.5">
             <span className="material-symbols-outlined text-primary text-lg">language</span>
             <span className="text-sm font-bold text-white">rollcally.com</span>
           </div>
@@ -875,7 +875,7 @@ export default function HelpCentre() {
         <div className="max-w-3xl mx-auto flex items-center gap-4 px-4 py-3">
           <button
             onClick={() => navigate(-1)}
-            className="size-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-primary/20 transition-all active:scale-95 shrink-0"
+            className="size-10 flex items-center justify-center rounded-none bg-white/5 hover:bg-primary/20 transition-all active:scale-95 shrink-0"
           >
             <span className="material-symbols-outlined text-white">arrow_back</span>
           </button>
@@ -910,7 +910,7 @@ export default function HelpCentre() {
       {/* ── Hero ───────────────────────────────────────────────────────────── */}
       {active === 'overview' && (
         <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-transparent from-primary/15 via-primary/5 to-transparent pointer-events-none" />
           <div className="max-w-3xl mx-auto px-6 py-12 relative">
             <div className="flex items-center gap-3 mb-6">
               <img src="/logo.png" alt="Rollcally" className="h-12 w-12 object-contain" />
@@ -956,7 +956,7 @@ export default function HelpCentre() {
               <button
                 key={t.id}
                 onClick={() => setActive(t.id)}
-                className={`size-2 rounded-full transition-all ${active === t.id ? 'bg-primary scale-125' : 'bg-slate-700 hover:bg-slate-500'}`}
+                className={`size-2 rounded-none transition-all ${active === t.id ? 'bg-primary scale-125' : 'bg-slate-700 hover:bg-slate-500'}`}
               />
             ))}
           </div>
@@ -976,3 +976,5 @@ export default function HelpCentre() {
     </div>
   )
 }
+
+

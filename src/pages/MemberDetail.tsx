@@ -49,14 +49,14 @@ function StatCard({
 }: { label: string; value: string | number; color?: 'gray' | 'green' | 'amber' | 'red' | 'blue' }) {
   const valueClass = {
     gray:  'text-white',
-    green: 'text-green-400',
-    amber: 'text-amber-400',
-    red:   'text-red-400',
-    blue:  'text-primary-light',
+    green: 'text-teal',
+    amber: 'text-amber-500',
+    red:   'text-red',
+    blue:  'text-amber-500',
   }[color]
 
   return (
-    <div className="rounded-[1.5rem] bg-surface-low p-6 text-center shadow-[0_20px_40px_rgba(7,13,31,0.4)] hover:-translate-y-1 transition-all group">
+    <div className="rounded-none bg-surface-low p-6 text-center shadow-none hover:-translate-y-1 transition-all group">
       <p className={`text-4xl font-display font-black tracking-tighter ${valueClass} group-hover:scale-110 transition-transform duration-500`}>{value}</p>
       <div className="h-px w-8 bg-white/5 mx-auto my-3" aria-hidden="true"></div>
       <p className="text-2xs font-black uppercase tracking-spaced text-slate-500 leading-tight">{label}</p>
@@ -133,20 +133,20 @@ export default function MemberDetail() {
     return (
       <div className="min-h-screen bg-background-dark font-display">
         <div className="px-5 sm:px-8 pt-24 pb-24 bg-surface-low relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-primary/10 blur-[80px]" aria-hidden="true" />
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-none bg-primary/10 blur-[80px]" aria-hidden="true" />
           <div className="flex items-center justify-between relative z-10 w-full">
-            <div className="h-12 w-12 rounded-2xl bg-white/5 animate-pulse" />
+            <div className="h-12 w-12 rounded-none bg-white/5 animate-pulse" />
             <div className="flex-1 mx-4 space-y-2 flex flex-col items-center">
-              <div className="h-5 w-36 rounded-lg bg-white/5 animate-pulse" />
-              <div className="h-3 w-20 rounded-full bg-white/5 animate-pulse" />
+              <div className="h-5 w-36 rounded-none bg-white/5 animate-pulse" />
+              <div className="h-3 w-20 rounded-none bg-white/5 animate-pulse" />
             </div>
-            <div className="h-12 w-12 rounded-2xl bg-white/5 animate-pulse" />
+            <div className="h-12 w-12 rounded-none bg-white/5 animate-pulse" />
           </div>
         </div>
         <div className="px-5 sm:px-8 py-8 space-y-4">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-2xl bg-surface-low p-6 space-y-2">
+              <div key={i} className="rounded-none bg-surface-low p-6 space-y-2">
                 <div className="h-3 w-12 rounded animate-pulse bg-white/5" />
                 <div className="h-7 w-10 rounded animate-pulse bg-white/5" />
               </div>
@@ -178,13 +178,13 @@ export default function MemberDetail() {
 
       {/* Header */}
       <header className="flex flex-col gap-8 px-5 sm:px-8 pt-24 pb-24 bg-surface-low text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none" aria-hidden="true" />
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-primary/10 blur-[80px] pointer-events-none" aria-hidden="true"></div>
+        <div className="absolute inset-0 bg-transparent from-primary/10 via-transparent to-transparent pointer-events-none" aria-hidden="true" />
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-none bg-primary/10 blur-[80px] pointer-events-none" aria-hidden="true"></div>
 
         <div className="flex items-center justify-between relative z-10 w-full">
           <button
             onClick={() => navigate(`/admin/units/${unitId}/members`)}
-            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 hover:bg-primary/20 transition-all text-white active:scale-95"
+            className="flex h-12 w-12 items-center justify-center rounded-none bg-white/5 hover:bg-primary/20 transition-all text-white active:scale-95"
             title="Back to Roster"
           >
             <span className="material-symbols-outlined text-xl" aria-hidden="true">arrow_back</span>
@@ -194,7 +194,7 @@ export default function MemberDetail() {
             <h1 className="text-3xl font-black tracking-tighter truncate w-full">{member.name}</h1>
             <div className="flex items-center gap-2 mt-1">
               {member.section && (
-                <span className="text-2xs font-black uppercase tracking-spaced bg-primary/10 text-primary-light px-3 py-0.5 rounded-full">
+                <span className="text-2xs font-black uppercase tracking-spaced bg-primary/10 text-primary-light px-3 py-0.5 rounded-none">
                   {member.section}
                 </span>
               )}
@@ -205,10 +205,10 @@ export default function MemberDetail() {
           </div>
 
           <div className="flex items-center gap-1">
-            <ThemeToggle className="rounded-2xl" />
+            <ThemeToggle className="rounded-none" />
             <button
               onClick={() => navigate('/help')}
-              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 hover:bg-primary/20 transition-all active:scale-95"
+              className="flex h-12 w-12 items-center justify-center rounded-none bg-white/5 hover:bg-primary/20 transition-all active:scale-95"
               title="User Guide"
             >
               <span className="material-symbols-outlined text-slate-400 hover:text-white transition-colors text-xl" aria-hidden="true">help</span>
@@ -220,14 +220,14 @@ export default function MemberDetail() {
           {member.phone && (
             <a
               href={`tel:${member.phone}`}
-              className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-primary/10 text-primary-light border border-primary/20 font-black text-2xs uppercase tracking-spaced hover:bg-primary/20 hover:scale-105 transition-all active:scale-95"
+              className="flex items-center gap-3 px-6 py-4 rounded-none bg-primary/10 text-primary-light border border-primary/20 font-black text-2xs uppercase tracking-spaced hover:bg-primary/20 hover:scale-105 transition-all active:scale-95"
             >
               <span className="material-symbols-outlined text-base" aria-hidden="true">phone</span>
               {member.phone}
             </a>
           )}
           {member.birthday && (
-            <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-black text-2xs uppercase tracking-spaced transition-all ${isBirthday(member.birthday) ? 'bg-pink-600/20 border border-pink-500/30 text-pink-300' : 'bg-white/5 text-slate-400'}`}>
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-none font-black text-2xs uppercase tracking-spaced transition-all ${isBirthday(member.birthday) ? 'bg-amber-500/20 border border-amber-500/30 text-amber-500' : 'bg-white/5 text-slate-400'}`}>
               <span className="material-symbols-outlined text-base" aria-hidden="true">cake</span>
               {formatBirthday(member.birthday)}
               {isBirthday(member.birthday) && <span className="ml-2">🎂 Anniversary</span>}
@@ -248,7 +248,7 @@ export default function MemberDetail() {
         {/* ── Recent trend ─────────────────────────────────────────────────── */}
         {recentTrend.length > 0 && (
           <section className="rounded-[2.5rem] bg-surface-low p-8 sm:p-10 shadow-[0_20px_40px_rgba(7,13,31,0.4)] relative overflow-hidden">
-            <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-primary/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+            <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-primary/10 rounded-none blur-3xl pointer-events-none" aria-hidden="true"></div>
             <div className="relative z-10">
               <h2 className="text-2xs font-black uppercase tracking-spread text-slate-500 mb-8">
                 Activity Score · Last {recentTrend.length} Events
@@ -259,8 +259,8 @@ export default function MemberDetail() {
                   <div
                     key={r.serviceId}
                     title={`${r.serviceType} · ${r.date}`}
-                    className={`h-7 w-7 rounded-lg flex-shrink-0 transition-all hover:scale-125 hover:rotate-6 cursor-help ${r.status === 'attended'
-                        ? 'bg-green-500 shadow-md shadow-green-500/20'
+                    className={`h-7 w-7 rounded-none flex-shrink-0 transition-all hover:scale-125 hover:rotate-6 cursor-help ${r.status === 'attended'
+                        ? 'bg-teal shadow-md shadow-teal/20'
                         : 'bg-white/5'
                       }`}
                     aria-hidden="true"
@@ -271,11 +271,11 @@ export default function MemberDetail() {
 
               <div className="mt-8 flex items-center gap-6">
                 <span className="flex items-center gap-2.5">
-                  <span className="h-3 w-3 rounded-md bg-green-500 shadow-sm" aria-hidden="true" />
+                  <span className="h-3 w-3 rounded-none bg-teal shadow-sm" aria-hidden="true" />
                   <span className="text-2xs font-black uppercase tracking-widest text-white">Check-in</span>
                 </span>
                 <span className="flex items-center gap-2.5">
-                  <span className="h-3 w-3 rounded-md bg-white/10" aria-hidden="true" />
+                  <span className="h-3 w-3 rounded-none bg-white/10" aria-hidden="true" />
                   <span className="text-2xs font-black uppercase tracking-widest text-slate-500">Missed</span>
                 </span>
               </div>
@@ -300,13 +300,13 @@ export default function MemberDetail() {
               {records.map(r => (
                 <div
                   key={r.serviceId}
-                  className="flex items-center gap-6 px-6 sm:px-8 py-6 rounded-2xl bg-surface-low hover:bg-surface-highest transition-colors group"
+                  className="flex items-center gap-6 px-6 sm:px-8 py-6 rounded-none bg-surface-low hover:bg-surface-highest transition-colors group"
                 >
                   <div
-                    className={`h-4 w-4 rounded-full flex-shrink-0 shadow-lg ${r.status === 'attended'
-                        ? 'bg-green-500 ring-4 ring-green-500/10'
+                    className={`h-4 w-4 rounded-none flex-shrink-0 shadow-none ${r.status === 'attended'
+                        ? 'bg-teal ring-4 ring-teal/10'
                         : r.status === 'absent'
-                          ? 'bg-red-400 ring-4 ring-red-400/10'
+                          ? 'bg-red ring-4 ring-red/10'
                           : 'bg-white/10'
                       }`}
                     aria-hidden="true"
@@ -318,10 +318,10 @@ export default function MemberDetail() {
                         {r.serviceType}
                       </p>
                       <span
-                        className={`rounded-full px-3 py-1 text-2xs font-black uppercase tracking-widest ${r.status === 'attended'
-                            ? 'bg-green-500/10 text-green-400'
+                        className={`rounded-none px-3 py-1 text-2xs font-black uppercase tracking-widest ${r.status === 'attended'
+                            ? 'bg-teal/10 text-teal'
                             : r.status === 'absent'
-                              ? 'bg-red-500/10 text-red-400'
+                              ? 'bg-red/10 text-red'
                               : 'bg-white/5 text-slate-400'
                           }`}
                       >
@@ -351,3 +351,5 @@ export default function MemberDetail() {
     </div>
   )
 }
+
+

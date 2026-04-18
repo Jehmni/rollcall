@@ -79,12 +79,12 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 animate-in fade-in duration-500 font-display">
       <div className="relative w-full max-w-md overflow-hidden rounded-[2.5rem] bg-background-dark border border-primary/20 shadow-[0_0_100px_rgba(82,71,230,0.15)] animate-in zoom-in-95 duration-500">
-        <div className="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 bg-primary/10 rounded-full blur-[80px]"></div>
+        <div className="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 bg-primary/10 rounded-none blur-[80px]"></div>
         
         {/* Header */}
         <div className="relative flex items-center justify-between px-8 py-6 border-b border-primary/10 bg-white/[0.02] backdrop-blur-md">
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/30">
+            <div className="flex h-10 w-10 items-center justify-center rounded-none bg-primary shadow-lg shadow-primary/30">
               <span className="material-symbols-outlined text-white text-2xl">qr_code_scanner</span>
             </div>
             <div>
@@ -93,7 +93,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
           </div>
           <button
             onClick={onClose}
-            className="group rounded-2xl bg-white/5 p-3 text-slate-400 hover:text-white hover:bg-red-500/20 transition-all border border-white/5"
+            className="group rounded-none bg-white/5 p-3 text-slate-400 hover:text-white hover:bg-red-500/20 transition-all border border-white/5"
           >
             <span className="material-symbols-outlined text-2xl group-hover:rotate-90 transition-transform">close</span>
           </button>
@@ -109,7 +109,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-background-dark p-8 text-center backdrop-blur-md transition-all duration-300 z-10">
                 {permissionState === 'denied' ? (
                   <>
-                    <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-red-500/10 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.1)]">
+                    <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-none bg-red-500/10 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.1)]">
                       <span className="material-symbols-outlined text-4xl text-red-500">no_photography</span>
                     </div>
                     <p className="mb-2 text-xl font-display font-bold text-white uppercase tracking-tighter">Camera Blocked</p>
@@ -117,7 +117,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                       Please allow camera access to scan the QR code.
                     </p>
                     <button
-                      className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95 uppercase tracking-widest text-xs"
+                      className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-none shadow-xl shadow-primary/20 transition-all active:scale-95 uppercase tracking-widest text-xs"
                       onClick={() => startScanner()}
                     >
                       Try Again
@@ -127,7 +127,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                   <>
                     <div className="mb-6 relative">
                       <div className="absolute inset-0 bg-primary/20 blur-2xl animate-pulse"></div>
-                      <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 border border-primary/20">
+                      <div className="relative flex h-20 w-20 items-center justify-center rounded-none bg-primary/10 border border-primary/20">
                         <span className="material-symbols-outlined text-5xl animate-spin text-primary">progress_activity</span>
                       </div>
                     </div>
@@ -136,7 +136,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                   </>
                 ) : (
                   <>
-                    <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 border border-primary/20">
+                    <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-none bg-primary/10 border border-primary/20">
                       <span className="material-symbols-outlined text-4xl text-primary">photo_camera</span>
                     </div>
                     <p className="mb-2 text-xl font-display font-bold text-white uppercase tracking-tighter">Ready to Scan</p>
@@ -144,7 +144,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                       Tap the button below to turn on your camera.
                     </p>
                     <button 
-                      className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-2xl shadow-xl shadow-primary/30 transition-all active:scale-95 uppercase tracking-spaced text-xs"
+                      className="w-full bg-primary hover:bg-primary/90 text-white font-black py-5 rounded-none shadow-xl shadow-primary/30 transition-all active:scale-95 uppercase tracking-spaced text-xs"
                       onClick={() => startScanner()}
                     >
                       Enable Scanner
@@ -166,13 +166,13 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                 <div className="absolute bottom-8 left-8 size-10 border-b-4 border-l-4 border-primary rounded-bl-2xl shadow-[0_0_10px_rgba(82,71,230,0.3)]"></div>
                 <div className="absolute bottom-8 right-8 size-10 border-b-4 border-r-4 border-primary rounded-br-2xl shadow-[0_0_10px_rgba(82,71,230,0.3)]"></div>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent pointer-events-none"></div>
+                <div className="absolute inset-0 bg-primary from-primary/10 to-transparent pointer-events-none"></div>
               </div>
             )}
           </div>
           
           {error && permissionState === 'granted' && (
-            <div className="mt-6 rounded-2xl bg-red-500/10 border border-red-500/20 p-4 flex items-center gap-4 animate-in slide-in-from-top-2">
+            <div className="mt-6 rounded-none bg-red-500/10 border border-red-500/20 p-4 flex items-center gap-4 animate-in slide-in-from-top-2">
               <span className="material-symbols-outlined text-red-500">error</span>
               <p className="text-xs font-bold text-red-500 uppercase tracking-wide">
                 {error}
@@ -193,3 +193,5 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
     </div>
   )
 }
+
+

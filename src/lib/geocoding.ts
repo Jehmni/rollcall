@@ -28,8 +28,8 @@ export type MatchQuality =
 // ── UI Helpers (Aesthetics & Labels) ──────────────────────────────────────────
 
 export const QUALITY_COLOR: Record<MatchQuality, string> = {
-  exact:    'text-emerald-400 bg-emerald-500/10',
-  street:   'text-blue-400 bg-blue-500/10',
+  exact:    'text-teal bg-teal/10',
+  street:   'text-primary-light bg-primary/10',
   postcode: 'text-amber-400 bg-amber-500/10',
   area:     'text-slate-400 bg-slate-500/10',
   city:     'text-slate-400 bg-slate-500/10',
@@ -320,3 +320,5 @@ export async function searchVenue(query: string): Promise<{
 
   return { results, inputType, notice }
 }
+
+

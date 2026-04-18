@@ -57,7 +57,7 @@ export default function AdminLogin() {
           <div className="flex items-center gap-3">
             <button 
               onClick={() => navigate('/')}
-              className="text-primary flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+              className="text-primary flex size-10 shrink-0 items-center justify-center rounded-none bg-primary/10 hover:bg-primary/20 transition-colors"
             >
               <span className="material-symbols-outlined">arrow_back</span>
             </button>
@@ -67,7 +67,7 @@ export default function AdminLogin() {
             <ThemeToggle />
             <button
               onClick={() => navigate('/help')}
-              className="size-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_15px_rgba(82,71,230,0.2)] hover:bg-primary/20 transition-colors"
+              className="size-10 rounded-none bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_15px_rgba(82,71,230,0.2)] hover:bg-primary/20 transition-colors"
               title="User Guide"
             >
               <span className="material-symbols-outlined text-primary text-xl">help</span>
@@ -78,8 +78,8 @@ export default function AdminLogin() {
         {/* Main Content Area */}
         <main className="flex-1 flex flex-col px-6 py-8 max-w-md mx-auto w-full">
           <div className="text-center mb-10 animate-in fade-in slide-in-from-top-6 duration-700">
-            <div className="mb-6 inline-flex p-4 rounded-2xl bg-gradient-to-tr from-primary/20 to-primary/5 border border-primary/20 shadow-2xl relative group">
-              <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="mb-6 inline-flex p-4 rounded-none bg-primaryr from-primary/20 to-primary/5 border border-primary/20 shadow-2xl relative group">
+              <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <span className="material-symbols-outlined text-primary text-5xl relative z-10">shield_person</span>
             </div>
             <h3 className="text-white tracking-tight text-2xl font-display font-bold leading-tight flex items-center justify-center gap-3">
@@ -91,14 +91,14 @@ export default function AdminLogin() {
 
           <form onSubmit={handleSubmit} className="space-y-6 animate-in fade-in zoom-in-95 duration-500 delay-200">
             {successMessage && (
-              <div className="rounded-2xl bg-green-500/10 p-4 text-2xs font-black uppercase tracking-spaced text-green-400 border border-green-500/20 flex items-center gap-2 animate-in slide-in-from-top-4">
+              <div className="rounded-none bg-teal/10 p-4 text-2xs font-black uppercase tracking-spaced text-teal border border-teal/20 flex items-center gap-2 animate-in slide-in-from-top-4">
                 <span className="material-symbols-outlined text-base">check_circle</span>
                 {successMessage}
               </div>
             )}
 
             {error && (
-              <div className="rounded-2xl bg-red-500/10 p-4 text-2xs font-black uppercase tracking-spaced text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
+              <div className="rounded-none bg-red-500/10 p-4 text-2xs font-black uppercase tracking-spaced text-red-400 border border-red-500/20 flex items-center gap-2 animate-in shake duration-500">
                 <span className="material-symbols-outlined text-base">warning</span>
                 {error}
               </div>
@@ -115,7 +115,7 @@ export default function AdminLogin() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
-                  className="w-full rounded-2xl text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-primary/20 bg-primary/5 h-16 pl-14 placeholder:text-slate-500 text-base font-medium transition-all"
+                  className="w-full rounded-none text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-primary/20 bg-primary/5 h-16 pl-14 placeholder:text-slate-500 text-base font-medium transition-all"
                 />
               </div>
             </div>
@@ -140,7 +140,7 @@ export default function AdminLogin() {
                   onChange={e => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
-                  className="w-full rounded-2xl text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-primary/20 bg-primary/5 h-16 pl-14 pr-14 placeholder:text-slate-500 text-base font-medium transition-all"
+                  className="w-full rounded-none text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-primary/20 bg-primary/5 h-16 pl-14 pr-14 placeholder:text-slate-500 text-base font-medium transition-all"
                 />
                 <button 
                   type="button"
@@ -159,7 +159,7 @@ export default function AdminLogin() {
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-3">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  <div className="h-4 w-4 animate-spin rounded-none border-2 border-white border-t-transparent"></div>
                   <span>Authenticating...</span>
                 </div>
               ) : (
@@ -174,11 +174,11 @@ export default function AdminLogin() {
           {/* Secondary Actions */}
           <div className="mt-auto pt-16 animate-in fade-in duration-1000 delay-500">
             <div className="bg-primary/5 rounded-[2.5rem] p-8 border border-primary/10 shadow-inner relative overflow-hidden">
-              <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-full blur-3xl"></div>
+              <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-none blur-3xl"></div>
               <p className="text-slate-400 text-center text-xs font-bold uppercase tracking-widest mb-6">New organization?</p>
               <button 
                 onClick={() => navigate('/admin/signup')}
-                className="w-full bg-background-dark text-white border border-primary/30 font-black py-4 rounded-2xl hover:bg-primary/10 transition-colors uppercase tracking-spread text-2xs"
+                className="w-full bg-background-dark text-white border border-primary/30 font-black py-4 rounded-none hover:bg-primary/10 transition-colors uppercase tracking-spread text-2xs"
               >
                 REGISTER
               </button>
@@ -189,7 +189,7 @@ export default function AdminLogin() {
                 onClick={() => navigate('/')}
                 className="flex items-center justify-center gap-3 text-slate-500 hover:text-primary py-3 transition-all group"
               >
-                <div className="bg-slate-500/10 p-2 rounded-xl group-hover:bg-primary/10 group-hover:text-primary">
+                <div className="bg-slate-500/10 p-2 rounded-none group-hover:bg-primary/10 group-hover:text-primary">
                   <span className="material-symbols-outlined text-xl">home</span>
                 </div>
                 <span className="text-2xs uppercase tracking-spaced font-black">HOME</span>
@@ -198,7 +198,7 @@ export default function AdminLogin() {
                 onClick={() => navigate('/checkin')}
                 className="flex items-center justify-center gap-3 text-slate-500 hover:text-primary py-3 transition-all group"
               >
-                <div className="bg-slate-500/10 p-2 rounded-xl group-hover:bg-primary/10 group-hover:text-primary">
+                <div className="bg-slate-500/10 p-2 rounded-none group-hover:bg-primary/10 group-hover:text-primary">
                   <span className="material-symbols-outlined text-xl">how_to_reg</span>
                 </div>
                 <span className="text-2xs uppercase tracking-spaced font-black text-center">CHECK-IN</span>
@@ -208,8 +208,10 @@ export default function AdminLogin() {
         </main>
 
         {/* Subtle Gradient Decor */}
-        <div className="fixed bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-20"></div>
+        <div className="fixed bottom-0 left-0 w-full h-1 bg-transparent from-transparent via-primary to-transparent opacity-20"></div>
       </div>
     </div>
   )
 }
+
+

@@ -28,7 +28,7 @@ type Tab = 'overview' | 'orgs' | 'admins'
 
 function StatCard({ icon, label, value }: { icon: string; label: string; value: number }) {
   return (
-    <div className="bg-surface-low rounded-2xl p-5 flex flex-col gap-2">
+    <div className="bg-surface-low rounded-none p-5 flex flex-col gap-2">
       <div className="flex items-center gap-2 text-slate-400">
         <span className="material-symbols-outlined text-base">{icon}</span>
         <span className="text-2xs font-black uppercase tracking-spaced">{label}</span>
@@ -47,16 +47,16 @@ function ConfirmModal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-      <div className="w-full max-w-sm bg-surface-dark border border-border-dark rounded-2xl p-6 flex flex-col gap-5 shadow-2xl">
+      <div className="w-full max-w-sm bg-surface-dark border border-border-dark rounded-none p-6 flex flex-col gap-5 shadow-2xl">
         <h3 className="text-lg font-bold text-white">{title}</h3>
         <p className="text-sm text-slate-400 leading-relaxed">{body}</p>
         <div className="flex gap-3 justify-end">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white rounded-xl hover:bg-border-dark transition-colors">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white rounded-none hover:bg-border-dark transition-colors">
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className={`px-5 py-2 text-sm font-bold rounded-xl transition-all active:scale-95 ${danger ? 'bg-red-500 hover:bg-red-400 text-white' : 'bg-primary hover:opacity-90 text-white'}`}
+            className={`px-5 py-2 text-sm font-bold rounded-none transition-all active:scale-95 ${danger ? 'bg-red-500 hover:bg-red-400 text-white' : 'bg-primary hover:opacity-90 text-white'}`}
           >
             {confirmLabel}
           </button>
@@ -206,8 +206,8 @@ export default function SuperAdminDashboard() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background-dark">
         <div className="relative size-14">
-          <div className="absolute inset-0 rounded-full border-4 border-primary/10" />
-          <div className="absolute inset-0 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+          <div className="absolute inset-0 rounded-none border-4 border-primary/10" />
+          <div className="absolute inset-0 rounded-none border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
         </div>
       </div>
     )
@@ -219,7 +219,7 @@ export default function SuperAdminDashboard() {
       {/* Header */}
       <header className="sticky top-0 z-30 bg-background-dark/90 backdrop-blur px-6 py-4 flex items-center justify-between border-b border-white/[0.06]">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
+          <div className="w-8 h-8 rounded-none bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
             <span className="material-symbols-outlined text-white text-base">shield_person</span>
           </div>
           <div>
@@ -256,7 +256,7 @@ export default function SuperAdminDashboard() {
 
         {/* Global error banner */}
         {actionError && (
-          <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/20 rounded-2xl px-5 py-4">
+          <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/20 rounded-none px-5 py-4">
             <span className="material-symbols-outlined text-red-400 text-xl flex-shrink-0 mt-0.5">error</span>
             <div className="flex-1">
               <p className="text-sm text-red-400 font-medium">{actionError}</p>
@@ -284,7 +284,7 @@ export default function SuperAdminDashboard() {
 
             <section>
               <h2 className="text-2xs font-black uppercase tracking-spaced text-slate-500 mb-4">Check-ins — Last 14 Days</h2>
-              <div className="bg-surface-low rounded-2xl p-5">
+              <div className="bg-surface-low rounded-none p-5">
                 {attendanceTrend.every(t => t.count === 0) ? (
                   <p className="text-slate-500 text-sm text-center py-4">No check-ins in the last 14 days.</p>
                 ) : (
@@ -314,7 +314,7 @@ export default function SuperAdminDashboard() {
             <h2 className="text-2xs font-black uppercase tracking-spaced text-slate-500 mb-4">
               All Organisations <span className="text-slate-600">({orgs.length})</span>
             </h2>
-            <div className="bg-surface-low rounded-2xl overflow-hidden">
+            <div className="bg-surface-low rounded-none overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/[0.06]">
@@ -341,11 +341,11 @@ export default function SuperAdminDashboard() {
                       <td className="px-3 py-3.5 text-center text-slate-400 tabular-nums hidden sm:table-cell">{org.member_count}</td>
                       <td className="px-3 py-3.5 text-center">
                         {org.blocked_at ? (
-                          <span className="inline-flex items-center gap-1 bg-red-500/20 text-red-400 text-2xs font-bold px-2 py-1 rounded-full">
+                          <span className="inline-flex items-center gap-1 bg-red-500/20 text-red-400 text-2xs font-bold px-2 py-1 rounded-none">
                             <span className="material-symbols-outlined text-xs">block</span>Blocked
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 text-2xs font-bold px-2 py-1 rounded-full">
+                          <span className="inline-flex items-center gap-1 bg-teal/10 text-teal text-2xs font-bold px-2 py-1 rounded-none">
                             <span className="material-symbols-outlined text-xs">check_circle</span>Active
                           </span>
                         )}
@@ -360,7 +360,7 @@ export default function SuperAdminDashboard() {
                                 label: 'Unblock',
                                 onConfirm: () => { unblockOrg(org); setConfirm(null) },
                               })}
-                              className="text-2xs font-bold text-emerald-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+                              className="text-2xs font-bold text-teal hover:text-white transition-colors px-2 py-1 rounded-none hover:bg-white/5"
                             >
                               Unblock
                             </button>
@@ -372,7 +372,7 @@ export default function SuperAdminDashboard() {
                                 label: 'Block', danger: true,
                                 onConfirm: () => { blockOrg(org); setConfirm(null) },
                               })}
-                              className="text-2xs font-bold text-amber-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+                              className="text-2xs font-bold text-amber-400 hover:text-white transition-colors px-2 py-1 rounded-none hover:bg-white/5"
                             >
                               Block
                             </button>
@@ -384,7 +384,7 @@ export default function SuperAdminDashboard() {
                               label: 'Delete', danger: true,
                               onConfirm: () => { deleteOrg(org); setConfirm(null) },
                             })}
-                            className="text-2xs font-bold text-red-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+                            className="text-2xs font-bold text-red-400 hover:text-white transition-colors px-2 py-1 rounded-none hover:bg-white/5"
                           >
                             Delete
                           </button>
@@ -405,14 +405,14 @@ export default function SuperAdminDashboard() {
               All Admins <span className="text-slate-600">({admins.length})</span>
             </h2>
             {adminsLoading ? (
-              <div className="bg-surface-low rounded-2xl p-10 flex items-center justify-center">
+              <div className="bg-surface-low rounded-none p-10 flex items-center justify-center">
                 <div className="relative size-8">
-                  <div className="absolute inset-0 rounded-full border-2 border-primary/10" />
-                  <div className="absolute inset-0 rounded-full border-2 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+                  <div className="absolute inset-0 rounded-none border-2 border-primary/10" />
+                  <div className="absolute inset-0 rounded-none border-2 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
                 </div>
               </div>
             ) : (
-              <div className="bg-surface-low rounded-2xl overflow-hidden">
+              <div className="bg-surface-low rounded-none overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-white/[0.06]">
@@ -437,11 +437,11 @@ export default function SuperAdminDashboard() {
                         <td className="px-3 py-3.5 text-slate-400 text-sm hidden sm:table-cell">{admin.org_name ?? '—'}</td>
                         <td className="px-3 py-3.5 text-center">
                           {admin.blocked ? (
-                            <span className="inline-flex items-center gap-1 bg-red-500/20 text-red-400 text-2xs font-bold px-2 py-1 rounded-full">
+                            <span className="inline-flex items-center gap-1 bg-red-500/20 text-red-400 text-2xs font-bold px-2 py-1 rounded-none">
                               <span className="material-symbols-outlined text-xs">block</span>Blocked
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 text-2xs font-bold px-2 py-1 rounded-full">
+                            <span className="inline-flex items-center gap-1 bg-teal/10 text-teal text-2xs font-bold px-2 py-1 rounded-none">
                               <span className="material-symbols-outlined text-xs">check_circle</span>Active
                             </span>
                           )}
@@ -456,7 +456,7 @@ export default function SuperAdminDashboard() {
                                   label: 'Unblock',
                                   onConfirm: () => { unblockAdmin(admin); setConfirm(null) },
                                 })}
-                                className="text-2xs font-bold text-emerald-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+                                className="text-2xs font-bold text-teal hover:text-white transition-colors px-2 py-1 rounded-none hover:bg-white/5"
                               >
                                 Unblock
                               </button>
@@ -468,7 +468,7 @@ export default function SuperAdminDashboard() {
                                   label: 'Block', danger: true,
                                   onConfirm: () => { blockAdmin(admin); setConfirm(null) },
                                 })}
-                                className="text-2xs font-bold text-amber-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+                                className="text-2xs font-bold text-amber-400 hover:text-white transition-colors px-2 py-1 rounded-none hover:bg-white/5"
                               >
                                 Block
                               </button>
@@ -480,7 +480,7 @@ export default function SuperAdminDashboard() {
                                 label: 'Delete', danger: true,
                                 onConfirm: () => { deleteAdmin(admin); setConfirm(null) },
                               })}
-                              className="text-2xs font-bold text-red-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+                              className="text-2xs font-bold text-red-400 hover:text-white transition-colors px-2 py-1 rounded-none hover:bg-white/5"
                             >
                               Delete
                             </button>
@@ -511,3 +511,5 @@ export default function SuperAdminDashboard() {
     </div>
   )
 }
+
+
