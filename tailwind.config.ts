@@ -29,9 +29,32 @@ export default {
           primary:   '#1F3A8A',
           secondary: '#F8FAFC',
           slate:     '#94A3B8',
-          gold:      '#F0A500',  // Yevo amber
+          gold:      '#F0A500',
           text:      '#1E293B',
           border:    '#E2E8F0',
+        },
+        // ── Brand accent overrides ────────────────────────────────────────────
+        // Replaces Tailwind's default amber/emerald/green shades with the
+        // brand palette. Opacity modifiers (bg-amber-500/30) still work because
+        // Tailwind converts hex → RGB internally.
+        amber: {
+          100: '#FEF3CF',  // very light tint
+          300: '#FACF6E',  // light
+          400: '#F5BA38',  // medium
+          500: '#F0A500',  // ← brand yellow
+          600: '#CC8C00',  // pressed / hover
+        },
+        emerald: {
+          300: '#4DE0CC',  // light tint
+          400: '#26D4BA',  // medium
+          500: '#00C9A7',  // ← brand green
+          600: '#00A589',  // pressed / hover
+        },
+        green: {
+          50:  '#E6FAF7',  // very light background tint
+          400: '#26D4BA',  // medium
+          500: '#00C9A7',  // ← brand green
+          700: '#007D68',  // dark
         },
       },
       fontFamily: {
