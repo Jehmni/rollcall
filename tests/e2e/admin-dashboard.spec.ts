@@ -453,7 +453,7 @@ test.describe('MemberDetail', () => {
 
   test('past attended service shows Present badge', async ({ page }) => {
     await page.goto(`/admin/units/${IDS.unit}/members/${IDS.member1}`)
-    await expect(page.locator('span.rounded-full', { hasText: 'Present' })).toBeVisible()
+    await expect(page.getByText('Present', { exact: true })).toBeVisible()
   })
 
   test('upcoming service shows Upcoming badge', async ({ page }) => {
