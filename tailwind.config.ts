@@ -2,33 +2,37 @@ import type { Config } from 'tailwindcss'
 
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
+        // Switchable tokens: CSS variables with space-separated RGB so that
+        // Tailwind opacity modifiers (bg-primary/10, border-primary/30) still work.
         primary: {
-          DEFAULT: '#5247e6',   // primary-container — solid fills, buttons
-          light: '#c3c0ff',    // true primary accent — text on dark surfaces
-          dark: '#1f00a4',     // on-primary — text on filled primary buttons
+          DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)',
+          light:   'rgb(var(--color-primary-light) / <alpha-value>)',
+          dark:    'rgb(var(--color-primary-dark) / <alpha-value>)',
         },
-        secondary: '#ddb7ff',  // categorical labels, secondary metadata
+        secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
         surface: {
-          DEFAULT: '#0c1324',  // base surface layer
-          low: '#151b2d',      // surface-container-low — card/section recess
-          high: '#252e45',     // surface-container-high — elevated cards
-          highest: '#2e3447',  // surface-container-highest — interactive cards
+          DEFAULT: 'rgb(var(--color-bg) / <alpha-value>)',
+          low:     'rgb(var(--color-surface-low) / <alpha-value>)',
+          high:    'rgb(var(--color-surface-high) / <alpha-value>)',
+          highest: 'rgb(var(--color-surface-highest) / <alpha-value>)',
         },
+        // Legacy aliases — same CSS variables, no component renames needed
+        'background-light': 'rgb(var(--color-bg) / <alpha-value>)',
+        'background-dark':  'rgb(var(--color-bg) / <alpha-value>)',
+        'surface-dark':     'rgb(var(--color-surface-low) / <alpha-value>)',
+        'border-dark':      'rgb(var(--color-border) / <alpha-value>)',
         brand: {
-          primary: '#1F3A8A',    // Deep Royal Blue
-          secondary: '#F8FAFC',  // Cool Grey background
-          slate: '#94A3B8',      // Inactive/Neutral Grey
-          gold: '#EAB308',       // Celebration Gold
-          text: '#1E293B',       // Deep Slate Text
-          border: '#E2E8F0',     // Subtle Border
+          primary:   '#1F3A8A',
+          secondary: '#F8FAFC',
+          slate:     '#94A3B8',
+          gold:      '#F0A500',  // Yevo amber
+          text:      '#1E293B',
+          border:    '#E2E8F0',
         },
-        'background-light': '#f6f6f8',
-        'background-dark': '#0c1324',   // surface base (was #121121)
-        'surface-dark': '#151b2d',      // surface-container-low (was #1e1b38)
-        'border-dark': '#2e3447',       // surface-container-highest (was #2d2a52)
       },
       fontFamily: {
         // Body & UI: Inter

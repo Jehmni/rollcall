@@ -11,6 +11,41 @@
  *   Bespoke serif for "Reimagined" or "Elite" headline accents only.
  */
 
+/* ── Colour tokens — Yevo-inspired palette ────────────────────────────────
+ * All values are space-separated RGB channels so Tailwind's opacity
+ * modifiers (e.g. bg-primary/10, border-primary/30) continue to work.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/* Light mode */
+:root {
+  --color-bg:               250 249 246; /* #faf9f6 */
+  --color-surface-low:      237 238 234; /* #edeeea */
+  --color-surface-high:     230 233 228; /* #e6e9e4 */
+  --color-surface-highest:  224 228 222; /* #e0e4de */
+  --color-border:           175 179 174; /* #afb3ae */
+  --color-text:              47  51  48; /* #2f3330 */
+  --color-text-muted:        92  96  92; /* #5c605c */
+  --color-primary:          129  87   0; /* #815700 — amber */
+  --color-primary-light:    249 173  18; /* #f9ad12 */
+  --color-primary-dark:      50  31   0; /* #321f00 */
+  --color-secondary:         91  95 101; /* #5b5f65 */
+}
+
+/* Dark mode */
+.dark {
+  --color-bg:                19  19  19; /* #131313 */
+  --color-surface-low:       32  31  31; /* #201f1f */
+  --color-surface-high:      42  42  42; /* #2a2a2a */
+  --color-surface-highest:   53  53  53; /* #353535 */
+  --color-border:            71  71  71; /* #474747 */
+  --color-text:             229 226 225; /* #e5e2e1 */
+  --color-text-muted:       198 198 198; /* #c6c6c6 */
+  --color-primary:          240 165   0; /* #F0A500 — amber */
+  --color-primary-light:    255 221 175; /* #ffddaf */
+  --color-primary-dark:      40  24   0; /* #281800 */
+  --color-secondary:        198 198 198; /* #c6c6c6 */
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -23,13 +58,18 @@
   }
 
   body {
-    @apply text-slate-100 antialiased font-sans selection:bg-primary/30 selection:text-white;
+    @apply antialiased font-sans selection:bg-primary/30 selection:text-white;
+    color: rgb(var(--color-text));
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100svh;
     min-height: 100dvh;
-    background-color: #020617; /* deeply dark slate */
-    background-image: radial-gradient(circle at top center, #1b173f 0%, #020617 100%);
+    background-color: rgb(var(--color-bg));
+    background-image: radial-gradient(
+      circle at top center,
+      rgb(var(--color-surface-high)) 0%,
+      rgb(var(--color-bg)) 100%
+    );
     background-attachment: fixed;
   }
 
