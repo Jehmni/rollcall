@@ -552,17 +552,19 @@ This section is for **organisation owners** — the person who created the organ
 
 Rollcally offers three monthly subscription plans. Automated follow-ups (absence SMS notifications) are included in every plan:
 
-| Plan | Price | Automated follow-ups included | Extra follow-ups |
+| Plan | Price | Automated follow-ups included | Beyond allowance |
 |---|---|---|---|
-| Starter | $25 / month | 200 | $0.18 each |
-| Growth | $59 / month | 600 | $0.15 each |
-| Pro | $119 / month | 1,500 | $0.12 each |
+| Starter | $25 / month | 200 | Not available (hard cap) |
+| Growth | $59 / month | 600 | Not available (hard cap) |
+| Pro | $119 / month | 1,500 | Not available (hard cap) |
 
 **All new subscriptions include a 14-day free trial.** No charge is made until the trial ends. You can cancel any time before that.
 
-Follow-ups are automated absence notifications sent to members who missed a session and have consented to receive them. See [Section 4.12](#412-automated-absence-follow-ups) for how to set them up.
+Follow-ups are automated absence notifications sent to members who missed a session and have consented to receive them. See [Section 4.10](#410-sms-absence-messaging) for how to set them up.
 
-If your organisation sends more follow-ups than your plan includes in a given month, the extras are charged at the per-credit rate shown above. You can see your usage at any time on the Billing page.
+If your organisation reaches the monthly follow-up allowance, new sends are blocked until either:
+- your next billing cycle resets the allowance, or
+- you upgrade to a higher plan.
 
 ---
 
@@ -636,4 +638,4 @@ When you upgrade mid-cycle, the extra credits are added to your existing balance
 Successfully sent messages (`sent`) and failed delivery attempts (`failed`) both count — in both cases the message was submitted to the carrier and a cost was incurred. Blocked sends (when your balance is zero) do not count and are not charged. Stale-pending recoveries (`stale_pending_recovered`) are also marked `failed` in the log — whether a credit was consumed depends on whether the original send attempt reached the provider before the function crashed; when in doubt treat it as consumed and check your provider dashboard.
 
 **What happens when I run out of included follow-ups mid-month?**
-Follow-ups continue sending, but each one beyond your allowance is charged at the extra-credit rate for your plan. You'll see this on your next Stripe invoice. If you prefer to stop at the limit rather than incur overages, contact us and we can configure a hard cap for your account.
+Follow-ups pause immediately when your allowance reaches zero. No additional messages are sent until your allowance resets at the next billing cycle, or you upgrade your plan.

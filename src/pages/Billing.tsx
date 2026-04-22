@@ -171,7 +171,7 @@ export default function Billing() {
           .from('usage_events')
           .select('id', { count: 'exact', head: true })
           .eq('org_id', orgId)
-          .eq('event_type', 'sms_sent')
+          .in('event_type', ['sms_sent', 'sms_failed'])
           .gte('created_at', resetAt)
         setMonthlyUsed(count ?? 0)
       }

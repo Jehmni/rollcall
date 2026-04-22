@@ -22,9 +22,7 @@ create table if not exists pricing_plans (
 -- Pricing rationale (documented here for auditability):
 --   SMS cost ≈ $0.055 blended (Twilio UK + Nigeria).
 --   Plans priced for 45–63% gross margin at 70% credit utilisation.
---   Overage charges (enforced in application layer, not here) are:
---     Starter: $0.18/extra  Growth: $0.15/extra  Pro: $0.12/extra
---   Heavy users on overage yield 54–69% margin — more than base plan rate.
+--   Current send policy is hard-capped at included credits (no overage billing).
 --   All plans profitable even at 100% credit utilisation.
 insert into pricing_plans (id, display_name, price_usd_cents, credits_included, sort_order) values
   ('starter', 'Starter',  2500,   200,  1),

@@ -31,7 +31,7 @@ export const PLANS: Plan[] = [
     highlight: false,
     features: [
       '200 automated follow-ups / month',
-      'Extra follow-ups at $0.18 each',
+      'Hard cap at 200 per billing cycle',
       'Per-unit sender identity',
       'Delivery log & consent management',
     ],
@@ -47,7 +47,7 @@ export const PLANS: Plan[] = [
     highlight: true,
     features: [
       '600 automated follow-ups / month',
-      'Extra follow-ups at $0.15 each',
+      'Hard cap at 600 per billing cycle',
       'Per-unit sender identity',
       'Delivery log & consent management',
       'Cooldown controls',
@@ -64,7 +64,7 @@ export const PLANS: Plan[] = [
     highlight: false,
     features: [
       '1,500 automated follow-ups / month',
-      'Extra follow-ups at $0.12 each',
+      'Hard cap at 1,500 per billing cycle',
       'Per-unit sender identity',
       'Delivery log & consent management',
       'Cooldown controls',
