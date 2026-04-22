@@ -69,9 +69,13 @@ Deno.serve(async (req) => {
   const startedAt = Date.now()
 
   try {
-    const { service_id, unit_id } = await req.json() as { service_id: string; unit_id: string }
+    const { service_id, unit_id } = await req.json() as { service_id?: string; unit_id?: string }
+    if (!service_id) return json(400, { error: 'service_id is required' })
 
-    console.info(`[send-push] Sending push for service=${service_id} unit=${unit_id}`)
+    const authHeader = req.headers.get('Authorization') ?? ''
+    const bearerToken = authHeader.replace(/^Bearer\s+/i, '').trim()
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    const isServiceRole = serviceRoleKey.length > 0 && bearerToken === serviceRoleKey
 
     const vapidSubject    = Deno.env.get('VAPID_SUBJECT')
     const vapidPublicKey  = Deno.env.get('VAPID_PUBLIC_KEY')
@@ -94,11 +98,44 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
 
+    const { data: service, error: serviceErr } = await supabase
+      .from('services')
+      .select('id, unit_id')
+      .eq('id', service_id)
+      .maybeSingle() as { data: { id: string; unit_id: string } | null; error: unknown }
+
+    if (serviceErr) {
+      console.error('[send-push] Failed to load service:', String(serviceErr))
+      return json(500, { error: 'Failed to load service' })
+    }
+    if (!service) return json(404, { error: 'Service not found' })
+
+    if (unit_id && unit_id !== service.unit_id) {
+      return json(400, { error: 'unit_id does not match service_id' })
+    }
+
+    if (!isServiceRole) {
+      const userClient = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_ANON_KEY')!,
+        { global: { headers: { Authorization: authHeader } } },
+      )
+
+      const { data: { user }, error: authErr } = await userClient.auth.getUser()
+      if (authErr || !user) return json(401, { error: 'Unauthenticated' })
+
+      const { data: allowed } = await userClient
+        .rpc('is_org_admin_by_service', { p_service_id: service_id })
+      if (!allowed) return json(403, { error: 'Forbidden' })
+    }
+
+    console.info(`[send-push] Sending push for service=${service_id} unit=${service.unit_id}`)
+
     // Fetch all subscriptions for the unit
     const { data: subs, error: subsError } = await supabase
       .from('member_push_subscriptions')
       .select('id, endpoint, p256dh, auth')
-      .eq('unit_id', unit_id)
+      .eq('unit_id', service.unit_id)
 
     if (subsError) {
       console.error('[send-push] Failed to fetch subscriptions:', subsError.message)
@@ -106,7 +143,7 @@ Deno.serve(async (req) => {
     }
 
     if (!subs || subs.length === 0) {
-      console.info(`[send-push] No subscriptions for unit=${unit_id}`)
+      console.info(`[send-push] No subscriptions for unit=${service.unit_id}`)
       return json(200, { sent: 0, stale: 0, failed: 0, elapsed_ms: Date.now() - startedAt })
     }
 

@@ -1,6 +1,6 @@
 -- ============================================================
 -- Rollcally — Canonical Schema (bootstrap reference)
--- Last updated: 2026-04-15
+-- Last updated: 2026-04-20
 --
 -- ⚠️  MANUAL BOOTSTRAP ONLY — DO NOT AUTOMATE
 -- Run once on a fresh Supabase project via the SQL Editor.
@@ -20,7 +20,10 @@
 --   20260408_units_location_columns.sql
 --   20260411_location_improvements.sql
 --   20260412_harden_anon_attendance_and_sms_consent.sql
+--   20260415_absence_log_housekeeping.sql
 --   20260415_enforce_search_minimum.sql   -- get_service_members (3-char guard)
+--   20260416_sms_country_routing.sql
+--   20260420_harden_privileged_rpc_and_notifications.sql
 --
 -- NOTE: This file covers the core schema through 20260315 plus columns from
 -- later migrations that were backported here for readability (attendance
@@ -812,7 +815,13 @@ returns table (
   type        text,
   fire_at     timestamptz
 )
-language sql stable security definer as $$
+language plpgsql stable security definer as $$
+begin
+  if not (is_unit_admin(p_unit_id) or is_org_owner_by_unit(p_unit_id) or is_super_admin()) then
+    raise exception 'Unauthorized';
+  end if;
+
+  return query
   select
     n.id,
     n.member_id,
@@ -825,6 +834,7 @@ language sql stable security definer as $$
     and n.dismissed  = false
     and n.fire_at   <= now()
   order by n.fire_at desc;
+end;
 $$;
 
 grant execute on function public.get_pending_notifications(uuid) to authenticated;
@@ -907,7 +917,13 @@ returns table(
   created_at timestamptz,
   org_name   text,
   blocked    boolean
-) language sql security definer stable as $$
+) language plpgsql security definer stable as $$
+begin
+  if not is_super_admin() then
+    raise exception 'Unauthorized';
+  end if;
+
+  return query
   select distinct
     u.id                        as user_id,
     u.email                     as email,
@@ -927,6 +943,7 @@ returns table(
     exists(select 1 from public.organization_members om where om.admin_id = u.id)
     or exists(select 1 from public.unit_admins ua where ua.user_id = u.id)
   order by u.created_at desc;
+end;
 $$;
 
 grant execute on function public.list_admin_users() to authenticated;
