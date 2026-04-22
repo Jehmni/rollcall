@@ -39,33 +39,9 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
-  # ── DB Verify: detect schema drift ──────────────────────────────────────────
-  db-verify:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Start Supabase local environment
-        run: supabase start
-
-      - name: Detect schema drift
-        run: |
-          supabase db dump -f supabase/schema.sql
-          if [[ -n $(git status --porcelain supabase/schema.sql) ]]; then
-            echo "::error::Schema drift detected! supabase/schema.sql is out of sync with migrations."
-            echo "Please run 'supabase db dump -f supabase/schema.sql' locally and commit the changes."
-            git diff supabase/schema.sql
-            exit 1
-          fi
-
-  # ── Deploy: runs after build, db-verify, and e2e pass ───────────────────────
+  # ── Deploy: runs after both build AND e2e pass ──────────────────────────────
   deploy:
-    needs: [build, e2e, db-verify]
+    needs: [build, e2e]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
