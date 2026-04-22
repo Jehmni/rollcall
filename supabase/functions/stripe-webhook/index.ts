@@ -27,8 +27,7 @@ const CORS = {
 }
 
 // Plan ID → credits included. Kept in sync with pricing_plans table seed.
-// Overage rates (enforced in application layer):
-//   starter: $0.18/extra   growth: $0.15/extra   pro: $0.12/extra
+// Sending is blocked at zero credits (hard cap per billing cycle).
 const PLAN_CREDITS: Record<string, number> = {
   starter:  200,
   growth:   600,
@@ -168,6 +167,13 @@ Deno.serve(async (req) => {
         const priceId  = stripeSub.items.data[0]?.price?.id ?? ''
         const planId   = planIdFromPriceId(priceId)
         const credits  = creditsForPlan(planId)
+        const { data: previousSub } = await supabase
+          .from('subscriptions')
+          .select('credits_included')
+          .eq('org_id', orgId)
+          .maybeSingle() as { data: { credits_included: number } | null }
+
+        const previousIncluded = previousSub?.credits_included ?? 0
 
         await upsertSubscription(supabase, {
           orgId,
@@ -182,25 +188,25 @@ Deno.serve(async (req) => {
 
         // If the org upgraded mid-cycle, top up the difference immediately.
         // If downgraded, do nothing — let them use what they've already got.
-        const { data: currentCredit } = await supabase
-          .from('sms_credits')
-          .select('balance, last_reset_at')
-          .eq('org_id', orgId)
-          .maybeSingle() as { data: { balance: number; last_reset_at: string } | null }
-
-        const { data: currentSub } = await supabase
-          .from('subscriptions')
-          .select('credits_included')
-          .eq('org_id', orgId)
-          .maybeSingle() as { data: { credits_included: number } | null }
-
-        if (currentCredit && currentSub && credits > currentSub.credits_included) {
+        if (credits > previousIncluded) {
           // Upgrade: add the extra credits
-          const extra = credits - currentSub.credits_included
-          await supabase
+          const extra = credits - previousIncluded
+          const { data: currentCredit } = await supabase
             .from('sms_credits')
-            .update({ balance: currentCredit.balance + extra })
+            .select('balance')
             .eq('org_id', orgId)
+            .maybeSingle() as { data: { balance: number } | null }
+
+          if (currentCredit) {
+            await supabase
+              .from('sms_credits')
+              .update({ balance: currentCredit.balance + extra })
+              .eq('org_id', orgId)
+          } else {
+            // Defensive fallback: if credits row is missing, recreate it with the
+            // new plan allowance so the org is not left blocked.
+            await supabase.rpc('reset_sms_credits', { p_org_id: orgId, p_credits: credits })
+          }
         }
 
         console.log(`✓ subscription.updated: org=${orgId} plan=${planId} status=${stripeSub.status}`)
@@ -240,8 +246,9 @@ Deno.serve(async (req) => {
 
   } catch (err) {
     console.error('stripe-webhook handler error:', err)
-    // Return 200 so Stripe doesn't retry — log errors are surfaced in Supabase logs
-    return json(200, { received: true, warning: String(err) })
+    // Return 5xx so Stripe retries transient/processing failures and we do not
+    // silently drift billing state.
+    return json(500, { error: String(err) })
   }
 })
 
