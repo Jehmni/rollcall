@@ -320,7 +320,7 @@ Evidence: `src/pages/AdminServiceDetail.tsx:458`, `supabase/functions/send-absen
 ### 11.1 Gaps (As-Built vs Enterprise)
 
 1. Release governance:
-- E2E is informational and not release-blocking.
+- E2E is release-blocking in CI (`deploy` depends on `build` and `e2e`).
 
 2. Migration governance:
 - Canonical schema and migration timeline are split; stronger single-path bootstrapping is needed.

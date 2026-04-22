@@ -304,8 +304,8 @@ Future providers (Plivo for Europe/US cost savings, Arkesel for Ghana specialisa
 ### 10.2 CI/CD Quality Gates
 
 - Build job runs lint, typecheck, and production build.
-- Deployment job depends on build success.
-- E2E runs as informational (`continue-on-error: true`) and does not block deploy.
+- Deployment job depends on both build and E2E success.
+- E2E is a deployment gate in CI.
 
 [Ref: .github/workflows/ci.yml:10, .github/workflows/ci.yml:37, .github/workflows/ci.yml:66]
 
