@@ -842,28 +842,42 @@ export default function AdminServiceDetail() {
 
   /**
    * Fetch every absent member before exporting.
-   * Warns + aborts if the count is unusually large to protect browser memory.
+   * Warns + caps at 5,000 to protect browser memory.
    */
   async function fetchAllAbsent(): Promise<DashboardMember[]> {
     const EXPORT_CAP = 5_000
     // If the list fits in what's already loaded, use it directly
-    if (!hasMore) return absent
+    if (!hasMore) {
+      if (absent.length > EXPORT_CAP) {
+        toast('Large exports are limited to 5,000 records', 'info')
+        return absent.slice(0, EXPORT_CAP)
+      }
+      return absent
+    }
 
     // Count first to guard against unexpectedly large datasets
     const { count } = await supabase
       .rpc('get_service_members_full', { p_service_id: serviceId, p_limit: 1, p_offset: 0 }, { count: 'exact', head: true })
-    const absentEstimate = (count ?? 0)
-    if (absentEstimate > EXPORT_CAP) {
-      throw new Error(`Too many absent members to export at once (${absentEstimate.toLocaleString()}). Please contact support for large-batch exports.`)
-    }
+    const totalMembers = (count ?? 0)
+    
+    // Fetch up to a safe browser maximum (20,000) to find absent members
+    const fetchLimit = totalMembers > 20000 ? 20000 : (totalMembers || 1)
 
     const { data, error } = await supabase.rpc('get_service_members_full', {
       p_service_id: serviceId,
-      p_limit: EXPORT_CAP,
+      p_limit: fetchLimit,
       p_offset: 0,
     })
     if (error) throw error
-    return ((data ?? []) as DashboardMember[]).filter(m => !m.checked_in)
+    
+    const allAbsent = ((data ?? []) as DashboardMember[]).filter(m => !m.checked_in)
+    
+    if (allAbsent.length > EXPORT_CAP) {
+      toast('Large exports are limited to 5,000 records', 'info')
+      return allAbsent.slice(0, EXPORT_CAP)
+    }
+
+    return allAbsent
   }
 
   async function handleExport(format: 'txt' | 'csv' | 'rtf') {

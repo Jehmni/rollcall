@@ -335,6 +335,7 @@ interface ProcessResult {
   blocked:           number
   already_processed: number  // members skipped due to existing log row
   stale_pending:     number  // pending rows expired TTL, marked failed, not re-sent
+  queued?:           number  // members pushed to background queue
   reason?:           string  // whole-service skip reason (no send attempted)
 }
 
@@ -455,6 +456,7 @@ async function processService(
   supabase: ReturnType<typeof createClient>,
   service:  ServiceRow,
   dryRun:   boolean,
+  targetMemberIds?: string[]
 ): Promise<ProcessResult> {
 
   // ── 1. Check messaging settings ────────────────────────────────────────────
@@ -633,6 +635,32 @@ async function processService(
     return { sent: 0, failed: 0, blocked: 0, already_processed, stale_pending, reason: 'all eligible members already processed' }
   }
 
+  // ── 5.5. Orchestrator Chunking ─────────────────────────────────────────────
+  if (targetMemberIds && targetMemberIds.length > 0) {
+    // Worker mode: filter eligible to only those in the chunk
+    eligible = eligible.filter(m => targetMemberIds.includes(m.id))
+  } else if (eligible.length > 50 && !dryRun) {
+    // Orchestrator mode: chunk the roster and offload to pg_net background queue
+    const chunkSize = 50
+    for (let i = 0; i < eligible.length; i += chunkSize) {
+      const chunk = eligible.slice(i, i + chunkSize).map(m => m.id)
+      const { error: rpcErr } = await supabase.rpc('enqueue_sms_chunk', {
+        p_service_id: service.id,
+        p_member_ids: chunk,
+        p_project_url: Deno.env.get('SUPABASE_URL') ?? '',
+        p_service_role_key: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      })
+      if (rpcErr) {
+        console.error(`Failed to enqueue chunk for service ${service.id}:`, rpcErr.message)
+      }
+    }
+    return { 
+      sent: 0, failed: 0, blocked: 0, already_processed, stale_pending, 
+      queued: eligible.length,
+      reason: `Queued ${eligible.length} members for background processing` 
+    }
+  }
+
   const eventName  = service.service_type || "today's event"
   const senderName = settings.sender_name?.trim() || null
   let sent = 0, failed = 0, blocked = 0
@@ -731,6 +759,7 @@ async function sendAbsenceReportEmail(
     const eventLabel = `${service.service_type} on ${service.date}`
     // Build summary line — only include non-zero counts to keep it readable.
     const parts = [
+      result.queued            ? `${result.queued} queued for background processing` : null,
       result.sent              > 0 ? `${result.sent} sent`                      : null,
       result.failed            > 0 ? `${result.failed} failed (credit consumed)` : null,
       result.blocked           > 0 ? `${result.blocked} blocked (no credits)`    : null,
@@ -804,6 +833,7 @@ Deno.serve(async (req) => {
       service_id?: string
       scheduled?:  boolean
       dry_run?:    boolean
+      member_ids?: string[]
     }
     const dryRun = body.dry_run ?? false
 
@@ -835,7 +865,7 @@ Deno.serve(async (req) => {
 
       if (svcErr || !service) return json(404, { error: 'Service not found' })
 
-      const result = await processService(adminClient, service, dryRun)
+      const result = await processService(adminClient, service, dryRun, body.member_ids)
       if (!dryRun) await sendAbsenceReportEmail(adminClient, service, result)
       return json(200, { ...result, dry_run: dryRun })
     }
