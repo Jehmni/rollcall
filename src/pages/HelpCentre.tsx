@@ -521,7 +521,7 @@ function AdminsTab() {
             <p>Each SMS sent costs one credit from your plan balance.</p>
             <p>→ View balance on the <strong className="text-white">Billing</strong> page</p>
             <p>→ Credits reset monthly with your subscription</p>
-            <p className="text-2xs text-slate-500 mt-2">Blocked sends are logged but not charged.</p>
+            <p className="text-2xs text-slate-500 mt-2">Blocked or failed sends are automatically detected and refunded to your ledger balance.</p>
           </FeatureCard>
         </CardGrid>
       </div>
@@ -615,7 +615,7 @@ function OrgsTab() {
             role="Super Admin"
             badge="Platform"
             description="Global platform administrator. Set up by the system operator."
-            permissions={['Access all organisations', 'Add unit admins by email', 'Full platform visibility']}
+            permissions={['Access all organisations', 'Add unit admins by email', 'Full platform visibility', 'View immutable audit logs']}
           />
         </div>
       </div>
@@ -647,6 +647,17 @@ function OrgsTab() {
 
 function TroubleshootingTab() {
   const items: { q: string; a: React.ReactNode }[] = [
+    {
+      q: 'SMS absence messages not sending',
+      a: (
+        <ul className="space-y-2">
+          <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> Ensure messaging is enabled in unit settings.</li>
+          <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> Verify the member has provided explicit SMS consent on the check-in page.</li>
+          <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> Check your credit balance on the Billing page.</li>
+          <li className="flex gap-2"><span className="material-symbols-outlined text-primary text-sm mt-0.5">arrow_right</span> Rollcally includes an automated "sweep" that recovers interrupted sends every hour. If a batch stalls, you will receive an automated email once it is recovered.</li>
+        </ul>
+      ),
+    },
     {
       q: 'QR code not working',
       a: (

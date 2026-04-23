@@ -20,9 +20,15 @@ interface AdminRow {
   org_name: string | null; blocked: boolean
 }
 
+interface AuditRow {
+  id: string; admin_id: string; action: string;
+  target_type: string; target_id: string;
+  old_data: unknown; new_data: unknown; created_at: string;
+}
+
 interface AttendanceTrend { date: string; count: number }
 
-type Tab = 'overview' | 'orgs' | 'admins'
+type Tab = 'overview' | 'orgs' | 'admins' | 'audit'
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -74,9 +80,11 @@ export default function SuperAdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [orgs, setOrgs] = useState<OrgRow[]>([])
   const [admins, setAdmins] = useState<AdminRow[]>([])
+  const [auditLogs, setAuditLogs] = useState<AuditRow[]>([])
   const [attendanceTrend, setAttendanceTrend] = useState<AttendanceTrend[]>([])
   const [loading, setLoading] = useState(true)
   const [adminsLoading, setAdminsLoading] = useState(false)
+  const [auditLoading, setAuditLoading] = useState(false)
   const [confirm, setConfirm] = useState<{ title: string; body: string; label: string; danger?: boolean; onConfirm: () => void } | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
 
@@ -148,6 +156,22 @@ export default function SuperAdminDashboard() {
       setAdminsLoading(false)
     })
   }, [tab, admins.length])
+
+  // ── Load audit logs when tab switches ──────────────────────────────────────
+  useEffect(() => {
+    if (tab !== 'audit' || auditLogs.length > 0) return
+    setAuditLoading(true)
+    supabase.from('admin_audit_log')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100)
+      .then(({ data, error }) => {
+        if (!error && data) {
+          setAuditLogs(data as AuditRow[])
+        }
+        setAuditLoading(false)
+      })
+  }, [tab, auditLogs.length])
 
   // ── Org actions ────────────────────────────────────────────────────────────
 
@@ -241,13 +265,13 @@ export default function SuperAdminDashboard() {
 
       {/* Tab bar */}
       <div className="sticky top-[65px] z-20 bg-background-dark/90 backdrop-blur border-b border-white/[0.06] px-6 flex gap-1">
-        {(['overview', 'orgs', 'admins'] as Tab[]).map(t => (
+        {(['overview', 'orgs', 'admins', 'audit'] as Tab[]).map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`px-4 py-3 text-xs font-black uppercase tracking-spaced transition-colors border-b-2 -mb-px ${tab === t ? 'text-white border-primary' : 'text-slate-500 border-transparent hover:text-slate-300'}`}
           >
-            {t === 'overview' ? 'Overview' : t === 'orgs' ? 'Organisations' : 'Admins'}
+            {t === 'overview' ? 'Overview' : t === 'orgs' ? 'Organisations' : t === 'admins' ? 'Admins' : 'Audit Log'}
           </button>
         ))}
       </div>
@@ -484,6 +508,97 @@ export default function SuperAdminDashboard() {
                             >
                               Delete
                             </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* ── AUDIT LOG TAB ── */}
+        {tab === 'audit' && (
+          <section>
+            <h2 className="text-2xs font-black uppercase tracking-spaced text-slate-500 mb-4">
+              System Audit Trail <span className="text-slate-600">({auditLogs.length})</span>
+            </h2>
+            {auditLoading ? (
+              <div className="bg-surface-low rounded-none p-10 flex items-center justify-center">
+                <div className="relative size-8">
+                  <div className="absolute inset-0 rounded-none border-2 border-primary/10" />
+                  <div className="absolute inset-0 rounded-none border-2 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+                </div>
+              </div>
+            ) : (
+              <div className="bg-surface-low rounded-none overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-white/[0.06]">
+                      <th className="text-left px-5 py-3 text-2xs font-black uppercase tracking-spaced text-slate-500">Timestamp</th>
+                      <th className="text-left px-3 py-3 text-2xs font-black uppercase tracking-spaced text-slate-500">Action</th>
+                      <th className="text-left px-3 py-3 text-2xs font-black uppercase tracking-spaced text-slate-500 hidden sm:table-cell">Target</th>
+                      <th className="text-left px-3 py-3 text-2xs font-black uppercase tracking-spaced text-slate-500 hidden md:table-cell">Payload</th>
+                      <th className="text-right px-5 py-3 text-2xs font-black uppercase tracking-spaced text-slate-500 hidden lg:table-cell">Admin ID</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {auditLogs.length === 0 && (
+                      <tr><td colSpan={5} className="text-center py-8 text-slate-500 text-sm">No audit logs found.</td></tr>
+                    )}
+                    {auditLogs.map(log => (
+                      <tr key={log.id} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
+                        <td className="px-5 py-3.5 whitespace-nowrap">
+                          <div className="font-medium text-white leading-tight text-sm">
+                            {new Date(log.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </div>
+                          <div className="text-2xs text-slate-600 mt-0.5 tabular-nums">
+                            {new Date(log.created_at).toLocaleTimeString('en-GB')}
+                          </div>
+                        </td>
+                        <td className="px-3 py-3.5 whitespace-nowrap">
+                          <span className="inline-flex items-center bg-white/5 border border-white/10 text-slate-300 text-[10px] font-black px-2 py-1 rounded-none uppercase tracking-spaced">
+                            {log.action}
+                          </span>
+                        </td>
+                        <td className="px-3 py-3.5 hidden sm:table-cell">
+                          <div className="text-slate-400 text-xs font-mono uppercase">{log.target_type}</div>
+                          <div className="text-slate-600 text-[10px] font-mono mt-0.5 truncate max-w-[120px]">{log.target_id}</div>
+                        </td>
+                        <td className="px-3 py-3.5 hidden md:table-cell max-w-[250px]">
+                          {(log.old_data || log.new_data) ? (
+                            <details className="group relative">
+                              <summary className="text-[10px] font-bold uppercase tracking-spaced text-slate-500 hover:text-white cursor-pointer select-none">
+                                View JSON
+                              </summary>
+                              <div className="absolute z-10 top-full mt-2 left-0 w-[300px] p-3 bg-background-dark border border-white/10 shadow-2xl rounded-none">
+                                {log.old_data && (
+                                  <div className="mb-2 last:mb-0">
+                                    <div className="text-[9px] font-black uppercase text-red-400 mb-1">Old Data</div>
+                                    <div className="bg-black/50 p-2 overflow-x-auto text-[10px] font-mono text-slate-400">
+                                      <pre>{JSON.stringify(log.old_data, null, 2)}</pre>
+                                    </div>
+                                  </div>
+                                )}
+                                {log.new_data && (
+                                  <div className="mb-2 last:mb-0">
+                                    <div className="text-[9px] font-black uppercase text-teal mb-1">New Data</div>
+                                    <div className="bg-black/50 p-2 overflow-x-auto text-[10px] font-mono text-slate-400">
+                                      <pre>{JSON.stringify(log.new_data, null, 2)}</pre>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </details>
+                          ) : (
+                            <span className="text-slate-600 text-xs">—</span>
+                          )}
+                        </td>
+                        <td className="px-5 py-3.5 text-right hidden lg:table-cell">
+                          <div className="text-slate-500 text-[10px] font-mono truncate max-w-[120px] inline-block" title={log.admin_id}>
+                            {log.admin_id}
                           </div>
                         </td>
                       </tr>

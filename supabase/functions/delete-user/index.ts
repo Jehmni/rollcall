@@ -51,6 +51,28 @@ Deno.serve(async (req: Request) => {
     return new Response(JSON.stringify({ error: 'Cannot delete your own account' }), { status: 400 })
   }
 
+  // Fetch user data for the audit log
+  const { data: targetUser, error: targetError } = await admin.auth.admin.getUserById(user_id)
+  if (targetError) {
+    return new Response(JSON.stringify({ error: targetError.message }), { status: 400 })
+  }
+
+  // Log the deletion in admin_audit_log
+  const { error: logError } = await admin
+    .from('admin_audit_log')
+    .insert({
+      admin_id: caller.id,
+      action: 'DELETE_USER',
+      target_type: 'user',
+      target_id: user_id,
+      old_data: targetUser.user,
+    })
+
+  if (logError) {
+    console.error('Audit log failed:', logError)
+    return new Response(JSON.stringify({ error: 'Failed to record audit log. Deletion aborted.' }), { status: 500 })
+  }
+
   // Delete from auth.users (cascades to all related data)
   const { error } = await admin.auth.admin.deleteUser(user_id)
   if (error) {

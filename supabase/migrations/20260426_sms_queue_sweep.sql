@@ -1,0 +1,39 @@
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Migration: SMS Queue Background Sweep
+-- Run once in the Supabase SQL editor (Dashboard → SQL Editor → New query).
+-- Safe to re-run — all statements use IF NOT EXISTS / DROP IF EXISTS / OR REPLACE.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- 1. Automated sweep via pg_cron + pg_net ----------------------------------
+--
+-- OPTIONAL: run this block to enable fully-automated background crash sweeps.
+-- pg_cron and pg_net must be enabled (both are on by default in Supabase).
+--
+-- This sweep hits the `send-absence-sms` Edge Function with `sweep: true`.
+-- The Edge Function searches for `absence_message_log` entries stuck in `pending`
+-- for > 30 minutes, marks them as failed due to `stale_pending_recovered`, and
+-- sends an email report to the org admin notifying them of the silent crash.
+--
+-- Replace the two placeholders before running:
+--   SUPABASE_PROJECT_URL  → e.g. https://rlqbnohpepimietldrdj.supabase.co
+--   SERVICE_ROLE_KEY      → Settings → API Keys → Secret key
+--
+-- Fires every hour at minute 30.
+--
+-- select cron.schedule(
+--   'sweep-sms-queue-hourly',
+--   '30 * * * *',
+--   $$
+--     select net.http_post(
+--       url     := 'SUPABASE_PROJECT_URL/functions/v1/send-absence-sms',
+--       headers := jsonb_build_object(
+--                    'Content-Type',  'application/json',
+--                    'Authorization', 'Bearer SERVICE_ROLE_KEY'
+--                  ),
+--       body    := '{"sweep":true}'
+--     );
+--   $$
+-- );
+--
+-- To remove the job later:
+--   select cron.unschedule('sweep-sms-queue-hourly');

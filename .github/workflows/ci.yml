@@ -68,9 +68,26 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
+  # ── Database checks: lint migrations ────────────────────────────────────────
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase
+        run: supabase start
+
+      - name: Lint Database Migrations
+        run: supabase db lint
+
   # ── E2E tests: must pass before deploy ────────────────────────────────────
   e2e:
-    needs: build
+    needs: [build, database]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

@@ -153,7 +153,8 @@ export default function PrivacyPolicy() {
                 <TableRow label="Push subscriptions" value="Browser push subscription endpoints for members who opt in to notifications." />
                 <TableRow label="SMS consent" value="A per-member, per-unit flag recording whether the member has consented to, or opted out of, SMS absence notifications. Null until the member is asked." />
                 <TableRow label="Billing data" value="Organisation name, subscription plan, and subscription status. Payment card details are never stored by Rollcally — they are handled exclusively by Stripe." />
-                <TableRow label="Usage events" value="A log of feature usage (e.g. follow-ups sent, follow-ups blocked) used for billing accounting and service improvement." />
+                <TableRow label="SMS credit ledger" value="An event-sourced ledger that tracks credit purchases, usage deductions, and refunds for transparency and accounting." />
+                <TableRow label="Admin audit logs" value="A secure, immutable log of sensitive administrative actions (e.g. member deletion), including the admin ID and a snapshot of the affected data. Accessible only to super-administrators." />
                 <TableRow label="Usage data" value="Log data including IP address, browser type, pages visited, and timestamps, collected automatically when you access the Service." />
                 <TableRow label="Session data" value="Session tokens stored in browser storage to keep you signed in." />
               </div>
@@ -174,7 +175,7 @@ export default function PrivacyPolicy() {
                 'Send SMS absence notifications to members who have explicitly consented, when a unit administrator has enabled this feature.',
                 'Send absence report emails to the unit owner after an SMS batch is sent, summarising delivery outcomes.',
                 'Verify a member\'s proximity to a venue during check-in when location enforcement is enabled by the administrator.',
-                'Maintain security, detect fraud, and prevent abuse.',
+                'Maintain security, detect fraud, prevent abuse, and maintain an immutable administrative audit trail.',
                 'Diagnose technical issues and improve the reliability and performance of the Service.',
                 'Comply with legal obligations and enforce our Terms of Service.',
                 'Process subscription and billing transactions via Stripe, manage your plan, and enforce plan-level follow-up limits.',
@@ -215,12 +216,12 @@ export default function PrivacyPolicy() {
                 'A Stripe Customer ID — an anonymous reference that allows us to link your organisation to your Stripe account.',
                 'A Stripe Subscription ID and current subscription status (e.g. active, past_due, canceled).',
                 'Your current plan name, billing cycle dates, and cancellation scheduling.',
-                'Invoice events (paid / failed) used to reset your monthly follow-up allowance.',
+                'Invoice events (paid / failed) used to provision your monthly follow-up allowance credits.',
               ]} />
               <P>
-                We store a log of follow-up usage events (sent, failed, blocked) in our database. This log is
-                used to display your usage on the billing page and to audit that credits are correctly
-                accounted for. It contains no payment card information.
+                We store an event-sourced SMS credit ledger in our database. This ledger records credit provisioning,
+                usage deductions for sent messages, and automated refunds for failed deliveries. It is used to
+                audit that credits are correctly accounted for. It contains no payment card information.
               </P>
               <P>
                 Stripe may transfer payment data to the United States or other countries. Stripe operates
@@ -272,11 +273,11 @@ export default function PrivacyPolicy() {
 
               <P><strong className="text-white">Third-party SMS providers</strong></P>
               <P>
-                SMS delivery is handled by third-party providers (Twilio or Africa's Talking,
-                depending on configuration). These providers process the recipient's phone number
-                and the message text in order to deliver the SMS. They operate under their own
-                data processing agreements and privacy policies. Standard carrier message rates
-                may apply to recipients.
+                SMS delivery is handled by third-party providers (Twilio, Africa's Talking, or Termii,
+                depending on configuration and routing requirements). These providers process the
+                recipient's phone number and the message text in order to deliver the SMS. They operate
+                under their own data processing agreements and privacy policies. Standard carrier message
+                rates may apply to recipients.
               </P>
 
               <P><strong className="text-white">Legal basis</strong></P>
@@ -299,7 +300,8 @@ export default function PrivacyPolicy() {
                 'Member and attendance data is retained while the associated administrator account is active. Administrators may delete individual records at any time.',
                 'Push notification subscriptions are automatically removed when the browser signals that the subscription is no longer valid (HTTP 410/404), or upon member opt-out.',
                 'Billing and subscription records are retained for the duration of the subscription and for up to 7 years after termination to comply with financial record-keeping obligations.',
-                'Follow-up usage event logs are retained for up to 24 months.',
+                'SMS credit ledger events are retained for up to 24 months.',
+                'Administrative audit logs are retained indefinitely for security, forensic, and compliance purposes.',
                 'Usage logs are retained for up to 90 days for security and debugging purposes.',
               ]} />
             </Section>
@@ -309,7 +311,7 @@ export default function PrivacyPolicy() {
               <Ul items={[
                 'Infrastructure providers: Supabase (database, authentication, and edge functions). Supabase processes data on our behalf under a data processing agreement.',
                 'Payment processing: Stripe (subscription billing). Stripe receives your organisation name, email address, and billing event data. Stripe processes payment card details directly and we never have access to them. Stripe\'s privacy policy is available at stripe.com/privacy.',
-                'SMS delivery: Twilio (or Africa\'s Talking, depending on configuration) receives member phone numbers and message text for the purpose of delivering absence notifications. This data is shared only when a member has explicitly consented and an administrator has triggered a send.',
+                'SMS delivery: Twilio, Africa\'s Talking, or Termii (depending on configuration) receives member phone numbers and message text for the purpose of delivering absence notifications. This data is shared only when a member has explicitly consented and an administrator has triggered a send.',
                 'Legal requirements: We may disclose data if required by applicable law, court order, or governmental authority, or to protect the rights, property, or safety of Rollcally, its users, or the public.',
                 'Business transfers: In the event of a merger, acquisition, or sale of assets, your data may be transferred. We will notify affected users prior to data being transferred to a new controller.',
               ]} />

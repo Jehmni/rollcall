@@ -832,6 +832,7 @@ Deno.serve(async (req) => {
     const body = await req.json() as {
       service_id?: string
       scheduled?:  boolean
+      sweep?:      boolean
       dry_run?:    boolean
       member_ids?: string[]
     }
@@ -914,7 +915,45 @@ Deno.serve(async (req) => {
       return json(200, { processed: Object.keys(results).length, results, dry_run: dryRun })
     }
 
-    return json(400, { error: 'Provide service_id (manual) or scheduled: true (cron)' })
+    // ── Sweep (cleanup stale chunks via pg_cron) ───────────────────────────
+    if (body.sweep) {
+      if (!isServiceRole) {
+        return json(401, { error: 'Sweep mode requires service-role key' })
+      }
+
+      const staleCutoff = new Date(Date.now() - STALE_PENDING_TTL_MINUTES * 60_000).toISOString()
+
+      const { data: staleRows, error: staleErr } = await adminClient
+        .from('absence_message_log')
+        .select('service_id')
+        .eq('status', 'pending')
+        .lte('created_at', staleCutoff)
+
+      if (staleErr) return json(500, { error: staleErr.message })
+
+      const uniqueServiceIds = [...new Set((staleRows ?? []).map((r: { service_id: string }) => r.service_id))]
+      const results: Record<string, unknown> = {}
+
+      for (const svcId of uniqueServiceIds) {
+        const { data: service } = await adminClient
+          .from('services')
+          .select('id, unit_id, date, service_type')
+          .eq('id', svcId)
+          .single() as { data: ServiceRow | null }
+
+        if (!service) continue
+
+        const svcResult = await processService(adminClient, service, dryRun)
+        results[svcId] = svcResult
+        if (!dryRun && svcResult.stale_pending > 0) {
+          await sendAbsenceReportEmail(adminClient, service, svcResult)
+        }
+      }
+
+      return json(200, { swept: uniqueServiceIds.length, results, dry_run: dryRun })
+    }
+
+    return json(400, { error: 'Provide service_id (manual) or scheduled: true or sweep: true (cron)' })
 
   } catch (err) {
     console.error('send-absence-sms error:', err)

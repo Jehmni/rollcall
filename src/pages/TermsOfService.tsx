@@ -382,9 +382,9 @@ export default function TermsOfService() {
                 stripe.com.
               </P>
               <P>
-                SMS delivery is handled by Twilio (or Africa's Talking, depending on configuration).
-                By enabling SMS absence messaging, you acknowledge that message content and recipient
-                phone numbers are transmitted to these providers for delivery purposes.
+                SMS delivery is handled by Twilio, Africa's Talking, or Termii (depending on configuration
+                and routing requirements). By enabling SMS absence messaging, you acknowledge that message
+                content and recipient phone numbers are transmitted to these providers for delivery purposes.
               </P>
               <P>
                 We are not responsible for the privacy practices or content of any third-party websites or
