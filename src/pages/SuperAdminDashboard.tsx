@@ -26,6 +26,11 @@ interface AuditRow {
   old_data: unknown; new_data: unknown; created_at: string;
 }
 
+/** Type-safe JSON serialiser for `unknown` audit payloads. */
+function stringifyPayload(v: unknown): string {
+  return JSON.stringify(v, null, 2)
+}
+
 interface AttendanceTrend { date: string; count: number }
 
 type Tab = 'overview' | 'orgs' | 'admins' | 'audit'
@@ -574,19 +579,19 @@ export default function SuperAdminDashboard() {
                                 View JSON
                               </summary>
                               <div className="absolute z-10 top-full mt-2 left-0 w-[300px] p-3 bg-background-dark border border-white/10 shadow-2xl rounded-none">
-                                {log.old_data && (
+                                {log.old_data != null && (
                                   <div className="mb-2 last:mb-0">
                                     <div className="text-[9px] font-black uppercase text-red-400 mb-1">Old Data</div>
                                     <div className="bg-black/50 p-2 overflow-x-auto text-[10px] font-mono text-slate-400">
-                                      <pre>{JSON.stringify(log.old_data, null, 2)}</pre>
+                                      <pre>{stringifyPayload(log.old_data)}</pre>
                                     </div>
                                   </div>
                                 )}
-                                {log.new_data && (
+                                {log.new_data != null && (
                                   <div className="mb-2 last:mb-0">
                                     <div className="text-[9px] font-black uppercase text-teal mb-1">New Data</div>
                                     <div className="bg-black/50 p-2 overflow-x-auto text-[10px] font-mono text-slate-400">
-                                      <pre>{JSON.stringify(log.new_data, null, 2)}</pre>
+                                      <pre>{stringifyPayload(log.new_data)}</pre>
                                     </div>
                                   </div>
                                 )}

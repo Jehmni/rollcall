@@ -6,7 +6,19 @@
 -- 1. Organizations: Ownership Update
 -- owner_id already exists and refers to the creator. 
 -- We'll keep it as the "Master Owner" / "Creator".
-alter table organizations rename column owner_id to created_by_admin_id;
+-- Guard: skip if the column has already been renamed (e.g. schema.sql bootstrap already applied it).
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name   = 'organizations'
+      and column_name  = 'owner_id'
+  ) then
+    alter table organizations rename column owner_id to created_by_admin_id;
+  end if;
+end;
+$$;
 
 -- 2. Organization Members
 -- Junction table for admins belonging to an organization.
@@ -32,15 +44,28 @@ create table if not exists join_requests (
 
 -- 4. Units: Ownership Update
 -- Track who created each unit for distributed responsibility.
-alter table units add column created_by_admin_id uuid references auth.users(id);
+-- Guard: skip if the column was already added by the schema.sql bootstrap.
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name   = 'units'
+      and column_name  = 'created_by_admin_id'
+  ) then
+    alter table units add column created_by_admin_id uuid references auth.users(id);
+  end if;
+end;
+$$;
 
--- Migration: Set existing unit creators to the organization owner.
+-- Migration: Set existing unit creators to the organization owner (safe to run even if column exists).
 update units u
 set created_by_admin_id = o.created_by_admin_id
 from organizations o
-where u.org_id = o.id;
+where u.org_id = o.id
+  and u.created_by_admin_id is null;
 
--- Make it not null after migration
+-- Make it not null after migration (idempotent — already not null in schema.sql bootstrap).
 alter table units alter column created_by_admin_id set not null;
 
 -- Migration: Set existing organization creators as owners in organization_members.
