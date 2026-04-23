@@ -154,7 +154,7 @@ export default function PrivacyPolicy() {
                 <TableRow label="SMS consent" value="A per-member, per-unit flag recording whether the member has consented to, or opted out of, SMS absence notifications. Null until the member is asked." />
                 <TableRow label="Billing data" value="Organisation name, subscription plan, and subscription status. Payment card details are never stored by Rollcally — they are handled exclusively by Stripe." />
                 <TableRow label="SMS credit ledger" value="An event-sourced ledger that tracks credit purchases, usage deductions, and refunds for transparency and accounting." />
-                <TableRow label="Admin audit logs" value="A secure, immutable log of sensitive administrative actions (e.g. member deletion), including the admin ID and a snapshot of the affected data. Accessible only to super-administrators." />
+                <TableRow label="Admin audit logs" value="A secure, immutable log of sensitive administrative actions (e.g. member deletion), including the admin ID and a snapshot of the affected data. Accessible only to authorized platform operators." />
                 <TableRow label="Usage data" value="Log data including IP address, browser type, pages visited, and timestamps, collected automatically when you access the Service." />
                 <TableRow label="Session data" value="Session tokens stored in browser storage to keep you signed in." />
               </div>

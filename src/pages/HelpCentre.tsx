@@ -610,13 +610,6 @@ function OrgsTab() {
             description="Created the organisation. Full control over everything inside."
             permissions={['All unit CRUD', 'Approve join requests', 'View all unit dashboards', 'Manage org settings']}
           />
-          <RoleCard
-            icon="admin_panel_settings"
-            role="Super Admin"
-            badge="Platform"
-            description="Global platform administrator. Set up by the system operator."
-            permissions={['Access all organisations', 'Add unit admins by email', 'Full platform visibility', 'View immutable audit logs']}
-          />
         </div>
       </div>
 
