@@ -669,8 +669,8 @@ test.describe('9 · Member check-in for event', () => {
     await page.getByText('Alice Johnson').click()
     await expect(page.getByRole('button', { name: 'Yes, Check Me In' })).toBeVisible()
     await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
-    await expect(page.getByText("You're in!")).toBeVisible()
-    await expect(page.getByText('Attendance confirmed')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'All Checked In' })).toBeVisible()
+    await expect(page.getByText('You do not need to do anything else.')).toBeVisible()
   })
 
   test('admin can toggle attendance from service detail page', async ({ page }) => {

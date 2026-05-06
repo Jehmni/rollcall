@@ -71,7 +71,7 @@ async function doCheckin(page: import('@playwright/test').Page) {
   await page.getByText('Alice Johnson').click()
   await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
   // Wait for success screen
-  await expect(page.getByText("You're in!")).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'All Checked In' })).toBeVisible()
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
@@ -161,8 +161,8 @@ test.describe('SMS consent: enabled (unit has SMS on)', () => {
     const noBtn = page.getByRole('button', { name: /No thanks/i })
     await noBtn.waitFor({ timeout: 5000 })
     await noBtn.click()
-    // Success screen still shown, Done button visible
-    await expect(page.getByRole('button', { name: /Done/i })).toBeVisible()
+    // Success screen still shown, Return Home button visible
+    await expect(page.getByRole('button', { name: /Return Home/i })).toBeVisible()
   })
 
   test('consent prompt not shown again when localStorage key already set', async ({ page }) => {

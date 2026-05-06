@@ -1025,7 +1025,7 @@ export default function UnitMembers() {
               </button>
               <button
                 onClick={openCreate}
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary rounded-none text-xs font-bold text-white hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/30"
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary rounded-none text-xs font-black text-[#131313] hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/30"
               >
                 <span className="material-symbols-outlined text-lg">person_add</span>
                 Add Member

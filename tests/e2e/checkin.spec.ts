@@ -154,7 +154,7 @@ test.describe('Check-in: search input is tappable and typeable', () => {
     await expect(page.getByText('Is this you?')).toBeVisible()
     // Confirm check-in
     await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
-    await expect(page.getByText("You're in!")).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'All Checked In' })).toBeVisible()
   })
 
   test('duplicate check-in still shows correct error after tap-and-type flow', async ({ page }) => {
@@ -183,8 +183,8 @@ test.describe('Check-in: result screens', () => {
     await page.getByPlaceholder('Search your name…').fill('Ali')
     await page.getByText('Alice Johnson').click()
     await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
-    await expect(page.getByText("You're in!")).toBeVisible()
-    await expect(page.getByText('Attendance confirmed')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'All Checked In' })).toBeVisible()
+    await expect(page.getByText('You do not need to do anything else.')).toBeVisible()
   })
 
   test('already checked in shows error screen', async ({ page }) => {
@@ -236,7 +236,7 @@ test.describe('Check-in: result screens', () => {
  * mobile software keyboard is what a real user would get. Running these tests at
  * mobile dimensions means:
  *   • The pointer-events regression is exercised in the exact layout where it bites.
- *   • The full QR-scan → success → Done → landing flow is covered end-to-end.
+   *   • The full QR-scan → success → Return Home → landing flow is covered end-to-end.
  *
  * test.use() scoped inside describe applies only to this block.
  */
@@ -267,9 +267,9 @@ test.describe('Check-in: mobile viewport (390×844 — iPhone 14)', () => {
   /**
    * Full end-to-end flow as a real mobile user experiences it:
    *   QR scan (simulated via URL) → tap search bar → type name →
-   *   select member → confirm → success screen → Done → landing page
+   *   select member → confirm → success screen → Return Home → landing page
    */
-  test('full flow: QR scan → tap → type → select → confirm → success screen → Done → landing', async ({ page }) => {
+  test('full flow: QR scan → tap → type → select → confirm → success screen → Return Home → landing', async ({ page }) => {
     await mockCheckinSuccess(page)
 
     // Step 1 — arrive at check-in without a service (as the device would before scanning)
@@ -297,11 +297,11 @@ test.describe('Check-in: mobile viewport (390×844 — iPhone 14)', () => {
     await page.getByRole('button', { name: 'Yes, Check Me In' }).click()
 
     // Step 7 — success screen
-    await expect(page.getByText("You're in!")).toBeVisible()
-    await expect(page.getByText('Attendance confirmed')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'All Checked In' })).toBeVisible()
+    await expect(page.getByText('You do not need to do anything else.')).toBeVisible()
 
-    // Step 8 — Done button navigates back to landing page
-    await page.getByRole('button', { name: /done/i }).click()
+    // Step 8 — Return Home button navigates back to landing page
+    await page.getByRole('button', { name: /return home/i }).click()
     await expect(page).toHaveURL('/')
   })
 

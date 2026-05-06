@@ -185,8 +185,8 @@ test.describe('Mobile: tap targets and scroll', () => {
     await mockUnitName(page)
     await page.goto(`/admin/units/${IDS.unit}/members`)
     await expect(page.getByText('Alice Johnson')).toBeVisible()
-    // The member row is 2 levels up from the name <p>
-    const memberRow = page.locator('.group').filter({ has: page.getByText('Alice Johnson', { exact: true }) })
+    // The member row is the tappable container around the visible member name.
+    const memberRow = page.getByText('Alice Johnson', { exact: true }).locator('xpath=ancestor::div[contains(@class, "group")][1]')
     const box = await memberRow.boundingBox()
     expect(box?.height).toBeGreaterThanOrEqual(44)
   })

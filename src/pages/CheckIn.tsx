@@ -396,25 +396,43 @@ export default function CheckIn() {
             )}
           </div>
         ) : step === 'confirm' && selected ? (
-          <div className="w-full max-w-sm flex flex-col items-center gap-10 animate-in fade-in slide-in-from-bottom-8 duration-700 pt-8">
-            <div className="text-center">
-              <div className="group relative mx-auto mb-10 inline-block">
+          <div className="w-full max-w-sm flex flex-col items-center gap-5 animate-in fade-in slide-in-from-bottom-6 duration-500 pt-2">
+            <div className="w-full text-center">
+              <div className="group relative mx-auto mb-5 inline-block">
                 <div className="absolute inset-0 bg-primary blur-3xl opacity-20"></div>
-                <div className="relative flex h-36 w-36 items-center justify-center rounded-[3rem] bg-background-dark border border-primary/30 shadow-2xl text-6xl font-black text-primary">
+                <div className="relative flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-background-dark border border-primary/30 shadow-2xl text-4xl font-black text-primary">
                   {selected.name.charAt(0)}
                 </div>
               </div>
-              <h3 className="text-2xs font-black uppercase tracking-super text-slate-500 mb-4">Confirm Your Name</h3>
-              <h2 className="font-display text-4xl font-bold text-white uppercase tracking-tighter">Is this you?</h2>
-              <div className="mt-10 p-8 rounded-[2.5rem] bg-primary/5 border border-primary/20 shadow-[0_0_50px_rgba(82,71,230,0.1)] w-full relative overflow-hidden">
+              <h3 className="text-2xs font-black uppercase tracking-super text-slate-500 mb-2">Confirm Your Name</h3>
+              <h2 className="font-display text-3xl font-bold text-white uppercase tracking-tighter">Is this you?</h2>
+              <div className="mt-5 p-5 rounded-[1.5rem] bg-primary/5 border border-primary/20 shadow-[0_0_40px_rgba(82,71,230,0.1)] w-full relative overflow-hidden">
                 <div className="absolute top-0 right-0 -mt-8 -mr-8 h-24 w-24 bg-primary/10 rounded-none blur-2xl"></div>
-                <p className="text-3xl font-black text-white uppercase tracking-tighter relative z-10">{selected.name}</p>
+                <p className="text-2xl font-black text-white uppercase tracking-tighter relative z-10">{selected.name}</p>
                 {selected.section && (
-                  <p className="text-2xs font-black uppercase tracking-spread text-primary mt-3 relative z-10">
+                  <p className="text-2xs font-black uppercase tracking-spread text-primary mt-2 relative z-10">
                     {selected.section}
                   </p>
                 )}
               </div>
+            </div>
+
+            <div className="flex flex-col gap-3 w-full">
+              <button
+                onClick={handleConfirm}
+                disabled={requireLocation && (locationStatus === 'outside' || locationStatus === 'permission_denied')}
+                className="w-full h-16 text-base font-black uppercase tracking-spaced bg-primary text-[#131313] rounded-none shadow-2xl shadow-primary/40 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed"
+              >
+                {requireLocation && locationStatus === 'checking'
+                  ? 'Checking Location...'
+                  : 'Yes, Check Me In'}
+              </button>
+              <button
+                onClick={handleBack}
+                className="text-2xs font-black uppercase tracking-spread text-slate-500 hover:text-primary py-2"
+              >
+                No, go back
+              </button>
             </div>
 
             {/* Location pre-check banner — only shown when location is required */}
@@ -472,23 +490,6 @@ export default function CheckIn() {
               </div>
             )}
 
-            <div className="flex flex-col gap-4 w-full">
-              <button
-                onClick={handleConfirm}
-                disabled={requireLocation && (locationStatus === 'outside' || locationStatus === 'permission_denied')}
-                className="w-full h-24 text-xl font-black uppercase tracking-spaced bg-primary text-white rounded-none shadow-2xl shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed"
-              >
-                {requireLocation && locationStatus === 'checking'
-                  ? 'Checking Location…'
-                  : 'Yes, Check Me In'}
-              </button>
-              <button
-                onClick={handleBack}
-                className="text-2xs font-black uppercase tracking-spread text-slate-500 hover:text-primary py-4"
-              >
-                No, go back
-              </button>
-            </div>
           </div>
         ) : step === 'done' ? (
           <div className="w-full max-w-sm pt-4 animate-in zoom-in-95 duration-500">
@@ -504,36 +505,40 @@ export default function CheckIn() {
                 <p className="text-xs font-black uppercase tracking-super text-primary animate-pulse">Checking you in…</p>
               </div>
             ) : status === 'success' ? (
-              <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-12 duration-1000">
-                <div className="relative flex flex-col items-center justify-center mb-8">
-                  <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-none scale-150"></div>
-                  <div className="relative bg-primary text-white rounded-[2.5rem] p-6 shadow-[0_0_60px_rgba(82,71,230,0.5)] border border-white/20">
-                    <span className="material-symbols-outlined !text-7xl">check_circle</span>
+              <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-10 duration-700">
+                <div className="relative flex flex-col items-center justify-center mb-6">
+                  <div className="absolute inset-0 bg-primary/25 blur-3xl rounded-none scale-150 animate-pulse"></div>
+                  <div className="absolute size-28 rounded-[2rem] border border-primary/30 animate-ping"></div>
+                  <div className="relative bg-primary text-[#131313] rounded-[2rem] p-5 shadow-[0_0_60px_rgba(240,165,0,0.35)] border border-white/20">
+                    <span className="material-symbols-outlined !text-6xl">check_circle</span>
                   </div>
                 </div>
 
-                <div className="text-center space-y-3 mb-12">
-                  <h1 className="font-display text-white text-5xl font-bold tracking-tighter uppercase">You're in!</h1>
-                  <p className="text-slate-400 text-lg font-medium tracking-tight">Attendance confirmed</p>
+                <div className="text-center space-y-3 mb-8">
+                  <h1 className="font-display text-white text-4xl font-bold tracking-tighter uppercase">All Checked In</h1>
+                  <p className="text-slate-300 text-lg font-bold tracking-tight">You do not need to do anything else.</p>
+                  <p className="text-slate-500 text-sm leading-relaxed">
+                    Your attendance is confirmed and saved for this session.
+                  </p>
                 </div>
 
-                <div className="w-full bg-primary/5 border border-primary/20 rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
+                <div className="w-full bg-primary/5 border border-primary/20 rounded-[2rem] overflow-hidden shadow-2xl backdrop-blur-sm relative">
                   <div className="absolute top-0 right-0 -mt-10 -mr-10 size-32 bg-primary/10 rounded-none blur-3xl"></div>
 
-                  <div className="p-8 text-center pb-0">
-                    <div className="inline-block size-24 rounded-none border-2 border-primary p-2 mb-6 group relative">
+                  <div className="p-6 text-center pb-0">
+                    <div className="inline-block size-20 rounded-none border-2 border-primary p-2 mb-4 group relative">
                       <div className="absolute inset-0 bg-primary/20 blur-xl rounded-none scale-110 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       <div className="relative w-full h-full rounded-none bg-background-dark border border-primary/30 flex items-center justify-center text-3xl font-black text-primary">
                         {selected?.name.charAt(0)}
                       </div>
                     </div>
-                    <h2 className="font-display text-white text-3xl font-bold uppercase tracking-tighter mb-1">
+                    <h2 className="font-display text-white text-2xl font-bold uppercase tracking-tighter mb-1">
                       Welcome, {selected?.name}
                     </h2>
                     <p className="text-primary font-black uppercase tracking-spaced text-2xs">Confirmed Attendee</p>
                   </div>
 
-                  <div className="p-8 space-y-6">
+                  <div className="p-6 space-y-4">
                     {venueDisplayName && (
                       <div className="flex items-center gap-5">
                         <div className="bg-primary/10 p-3 rounded-none text-primary border border-primary/20 shadow-lg shadow-primary/10">
@@ -554,7 +559,7 @@ export default function CheckIn() {
                       </div>
                       <div>
                         <p className="text-slate-500 text-2xs uppercase tracking-spread font-black mb-1">Time</p>
-                        <p className="text-white font-bold text-lg tracking-tight">{successTime || 'Registering...'}</p>
+                        <p className="text-white font-bold text-base tracking-tight">{successTime || 'Registering...'}</p>
                       </div>
                     </div>
                   </div>
@@ -624,12 +629,12 @@ export default function CheckIn() {
                   </div>
                 )}
 
-                <div className="w-full mt-10">
+                <div className="w-full mt-8">
                   <button
                     onClick={() => navigate('/')}
-                    className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-none shadow-2xl shadow-primary/40 flex items-center justify-center gap-4 group transition-all active:scale-95 uppercase tracking-spread text-xs"
+                    className="w-full bg-primary/10 hover:bg-primary/15 border border-primary/30 text-primary font-black py-4 rounded-none flex items-center justify-center gap-3 group transition-all active:scale-95 uppercase tracking-spread text-xs"
                   >
-                    <span>Done</span>
+                    <span>Return Home</span>
                     <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
                   </button>
                   <p className="text-center text-slate-500 text-2xs font-black uppercase tracking-spaced mt-6">
