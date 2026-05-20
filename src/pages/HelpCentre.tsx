@@ -537,7 +537,7 @@ function AdminsTab() {
           </FeatureCard>
           <FeatureCard icon="cake" title="Birthday Notifications">
             <p>Bell icon at top of screen</p>
-            <p>Alerts day before + on the day</p>
+            <p>Alerts one week before + on the day</p>
             <p>Dismiss individually</p>
           </FeatureCard>
         </CardGrid>

@@ -896,7 +896,7 @@ test.describe('12 · Birthday-eve notification', () => {
     // Click bell button to open notification panel
     await page.locator('button[title="Birthday alerts"]').click()
     await expect(page.getByText('Bob Smith')).toBeVisible()
-    await expect(page.getByText('Birthday tomorrow!')).toBeVisible()
+    await expect(page.getByText('Birthday in 1 week!')).toBeVisible()
   })
 
   test('multiple birthday notifications all appear', async ({ page }) => {

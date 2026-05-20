@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
       const hasToday = notifications.some(n => n.type === 'birthday_day')
       const title = hasToday ? 'Birthday today on Rollcally' : 'Birthday reminder on Rollcally'
       const body = notifications.length === 1
-        ? `${firstName}: ${hasToday ? 'birthday today' : 'birthday tomorrow'}`
+        ? `${firstName}: ${hasToday ? 'birthday today' : 'birthday in 1 week'}`
         : `${notifications.length} birthday alerts need attention in ${unitName}`
 
       const payload = JSON.stringify({

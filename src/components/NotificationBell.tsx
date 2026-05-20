@@ -111,7 +111,7 @@ export function NotificationBell({ unitId }: { unitId: string }) {
                                             {n.member_name}
                                         </p>
                                         <p className="text-xs text-slate-400">
-                                            {n.type === 'birthday_eve' ? 'Birthday tomorrow!' : 'Birthday today! 🎉'}
+                                            {n.type === 'birthday_eve' ? 'Birthday in 1 week!' : 'Birthday today! 🎉'}
                                         </p>
                                     </div>
                                     <button

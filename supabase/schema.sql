@@ -839,23 +839,23 @@ $$;
 
 grant execute on function public.get_pending_notifications(uuid) to authenticated;
 
--- Enqueues birthday notifications for today and tomorrow.
+-- Enqueues birthday notifications for today and one week before.
 -- Schedule daily at 9 AM via pg_cron:
 --   select cron.schedule('birthday-notifications', '0 9 * * *', 'select enqueue_birthday_notifications()');
 create or replace function public.enqueue_birthday_notifications()
 returns void language plpgsql security definer as $$
 begin
-  -- Birthday Eve: notify the day before the birthday.
+  -- Birthday Eve: notify one week before the birthday.
   insert into member_notifications (unit_id, member_id, type, fire_at)
   select
     unit_id,
     id as member_id,
     'birthday_eve' as type,
-    (current_date + interval '1 day' + interval '9 hours')::timestamptz
+    (current_date + interval '7 days' + interval '9 hours')::timestamptz
   from members
   where status   = 'active'
     and birthday is not null
-    and to_char(birthday, 'MM-DD') = to_char(current_date + interval '1 day', 'MM-DD')
+    and to_char(birthday, 'MM-DD') = to_char(current_date + interval '7 days', 'MM-DD')
   on conflict (member_id, type, fire_at) do nothing;
 
   -- Birthday Day: notify on the birthday itself.
