@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
-import { Bell, X, User, Cake } from 'lucide-react'
+import { Bell, X, User, Cake, Smartphone } from 'lucide-react'
 import { useBirthdayNotifications } from '../hooks/useBirthdayNotifications'
+import { useAdminPushNotifications } from '../hooks/useAdminPushNotifications'
 
 export function NotificationBell({ unitId }: { unitId: string }) {
     const { notifications, count, dismissNotification } = useBirthdayNotifications(unitId)
+    const adminPush = useAdminPushNotifications(unitId)
     const [isOpen, setIsOpen] = useState(false)
+    const [pushMessage, setPushMessage] = useState<string | null>(null)
     const popoverRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -17,7 +20,17 @@ export function NotificationBell({ unitId }: { unitId: string }) {
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
-    if (count === 0 && !isOpen) return null
+    async function enablePhoneAlerts() {
+        setPushMessage(null)
+        const result = await adminPush.subscribe()
+        if (result === 'granted') {
+            setPushMessage('Phone alerts enabled')
+        } else if (result === 'denied') {
+            setPushMessage('Notifications were not allowed')
+        } else {
+            setPushMessage('Could not enable phone alerts')
+        }
+    }
 
     return (
         <div className="relative" ref={popoverRef}>
@@ -39,7 +52,7 @@ export function NotificationBell({ unitId }: { unitId: string }) {
 
             {isOpen && (
                 <div
-                    className="fixed inset-x-4 top-20 z-50 max-h-[calc(100dvh-6rem)] overflow-hidden rounded-none border border-border-dark bg-surface-dark p-2 shadow-2xl shadow-black/50 animate-in fade-in zoom-in-95 duration-150 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-80 sm:max-h-none sm:origin-top-right"
+                    className="fixed inset-x-4 top-20 z-50 flex max-h-[calc(100dvh-6rem)] flex-col overflow-hidden rounded-none border border-border-dark bg-surface-dark p-2 shadow-2xl shadow-black/50 animate-in fade-in zoom-in-95 duration-150 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-80 sm:max-h-none sm:origin-top-right"
                     role="dialog"
                     aria-label="Birthday alerts"
                 >
@@ -52,7 +65,33 @@ export function NotificationBell({ unitId }: { unitId: string }) {
                         )}
                     </div>
 
-                    <div className="max-h-[calc(100dvh-9.5rem)] overflow-y-auto overscroll-contain flex flex-col gap-0.5 sm:max-h-80">
+                    {adminPush.isSupported && (
+                        <div className="mb-1 flex items-center justify-between gap-3 border-b border-border-dark px-3 py-3">
+                            <div className="flex min-w-0 items-center gap-2.5">
+                                <Smartphone className={`h-4 w-4 flex-shrink-0 ${adminPush.isSubscribed ? 'text-teal' : 'text-slate-400'}`} />
+                                <div className="min-w-0">
+                                    <p className="text-xs font-bold text-slate-100">
+                                        {adminPush.isSubscribed ? 'Phone alerts on' : 'Get phone pings'}
+                                    </p>
+                                    <p className="truncate text-2xs text-slate-500">
+                                        {pushMessage ?? (adminPush.isSubscribed ? 'Birthday alerts can ping this device' : 'Enable birthday reminders on this device')}
+                                    </p>
+                                </div>
+                            </div>
+                            {!adminPush.isSubscribed && (
+                                <button
+                                    type="button"
+                                    onClick={enablePhoneAlerts}
+                                    disabled={adminPush.loading}
+                                    className="flex-shrink-0 rounded-none border border-amber-500/40 bg-amber-500/10 px-2.5 py-1.5 text-2xs font-black uppercase tracking-wider text-amber-400 transition-colors hover:bg-amber-500 hover:text-black disabled:opacity-50"
+                                >
+                                    {adminPush.loading ? 'Wait' : 'Enable'}
+                                </button>
+                            )}
+                        </div>
+                    )}
+
+                    <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain flex flex-col gap-0.5 sm:max-h-80">
                         {notifications.length === 0 ? (
                             <div className="py-8 text-center">
                                 <Cake className="mx-auto h-8 w-8 text-slate-600 mb-2" />
