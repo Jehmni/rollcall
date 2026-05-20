@@ -25,17 +25,24 @@ export function NotificationBell({ unitId }: { unitId: string }) {
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative size-10 flex items-center justify-center rounded-none bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
                 title="Birthday alerts"
+                aria-label={`Birthday alerts${count > 0 ? `, ${count} unread` : ''}`}
+                aria-expanded={isOpen}
+                aria-haspopup="dialog"
             >
                 <Bell className="h-5 w-5 text-white" />
                 {count > 0 && (
-                    <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-none bg-amber-500 text-2xs font-bold text-white ring-2 ring-background-dark">
-                        {count}
+                    <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-none bg-amber-500 px-1 text-2xs font-bold leading-none text-white ring-2 ring-background-dark">
+                        {count > 99 ? '99+' : count}
                     </span>
                 )}
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-72 origin-top-right rounded-none bg-surface-dark border border-border-dark p-2 shadow-2xl shadow-black/40 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div
+                    className="fixed inset-x-4 top-20 z-50 max-h-[calc(100dvh-6rem)] overflow-hidden rounded-none border border-border-dark bg-surface-dark p-2 shadow-2xl shadow-black/50 animate-in fade-in zoom-in-95 duration-150 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-80 sm:max-h-none sm:origin-top-right"
+                    role="dialog"
+                    aria-label="Birthday alerts"
+                >
                     <div className="flex items-center justify-between px-3 py-2 border-b border-border-dark mb-1">
                         <h3 className="text-2xs font-bold uppercase tracking-spaced text-slate-400">
                             Birthday Alerts
@@ -45,7 +52,7 @@ export function NotificationBell({ unitId }: { unitId: string }) {
                         )}
                     </div>
 
-                    <div className="max-h-80 overflow-y-auto flex flex-col gap-0.5">
+                    <div className="max-h-[calc(100dvh-9.5rem)] overflow-y-auto overscroll-contain flex flex-col gap-0.5 sm:max-h-80">
                         {notifications.length === 0 ? (
                             <div className="py-8 text-center">
                                 <Cake className="mx-auto h-8 w-8 text-slate-600 mb-2" />
