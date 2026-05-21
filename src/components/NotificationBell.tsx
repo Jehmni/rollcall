@@ -22,6 +22,7 @@ export function NotificationBell({ unitId }: { unitId: string }) {
 
     async function enablePhoneAlerts() {
         setPushMessage(null)
+        adminPush.refreshPermission()
         const result = await adminPush.subscribe()
         if (result === 'granted') {
             setPushMessage('Phone alerts enabled')
@@ -35,7 +36,10 @@ export function NotificationBell({ unitId }: { unitId: string }) {
     return (
         <div className="relative" ref={popoverRef}>
             <button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => {
+                    adminPush.refreshPermission()
+                    setIsOpen(!isOpen)
+                }}
                 className="relative size-10 flex items-center justify-center rounded-none bg-white/10 hover:bg-white/20 border border-white/10 transition-all active:scale-95"
                 title="Birthday alerts"
                 aria-label={`Birthday alerts${count > 0 ? `, ${count} unread` : ''}`}
@@ -72,7 +76,9 @@ export function NotificationBell({ unitId }: { unitId: string }) {
                                     <p className="text-xs font-bold text-slate-100">
                                         {adminPush.isSubscribed
                                             ? 'Phone alerts on'
-                                            : adminPush.isSupported
+                                            : adminPush.permission === 'denied'
+                                                ? 'Phone alerts blocked'
+                                                : adminPush.isSupported
                                                 ? 'Get phone pings'
                                                 : 'Phone alerts unavailable'}
                                     </p>
@@ -81,7 +87,7 @@ export function NotificationBell({ unitId }: { unitId: string }) {
                                             adminPush.isSubscribed
                                                 ? 'Birthday alerts can ping this device'
                                                 : adminPush.permission === 'denied'
-                                                    ? 'Notifications are blocked in device settings'
+                                                    ? 'Allow Rollcally in phone notification settings, then reopen this panel'
                                                     : adminPush.unsupportedReason ?? 'Enable birthday reminders on this device'
                                         )}
                                     </p>

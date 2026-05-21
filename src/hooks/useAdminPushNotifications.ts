@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -29,6 +29,30 @@ export function useAdminPushNotifications(unitId: string) {
   )
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  const refreshPermission = useCallback(() => {
+    if (hasNotificationApi) {
+      setPermission(Notification.permission)
+    }
+  }, [hasNotificationApi])
+
+  useEffect(() => {
+    refreshPermission()
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible') refreshPermission()
+    }
+
+    window.addEventListener('focus', refreshPermission)
+    window.addEventListener('pageshow', refreshPermission)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      window.removeEventListener('focus', refreshPermission)
+      window.removeEventListener('pageshow', refreshPermission)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [refreshPermission])
 
   useEffect(() => {
     let cancelled = false
@@ -117,6 +141,7 @@ export function useAdminPushNotifications(unitId: string) {
     permission,
     isSubscribed,
     loading,
+    refreshPermission,
     subscribe,
   }
 }
