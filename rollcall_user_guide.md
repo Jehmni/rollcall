@@ -1,6 +1,6 @@
 # Rollcally — User System Guide
 
-> **Version:** 2.0 · **March 2026**
+> **Version:** 2.1 · **May 2026**
 > A plain-language guide for everyone who uses Rollcally — whether you're checking yourself in or running the show.
 
 ---
@@ -36,7 +36,7 @@ Instead of passing around a clipboard, members simply **scan a QR code** and tap
 - A live dashboard showing who's present and who's absent
 - Individual attendance history per member
 - Exportable absence lists
-- Birthday reminders for your members
+- Birthday reminders for your members, including optional phone push alerts for admins
 - Everything works on a phone — no app download needed
 
 ---
@@ -235,9 +235,24 @@ Tap any member's name on the roster to open their profile. You'll see:
 
 ### 4.9 Birthday Notifications
 
-If members have a birthday stored in their profile, Rollcally will remind you the day before and on the day itself.
+If members have a birthday stored in their profile, Rollcally will remind you one week before and on the day itself.
 
 Look for the **bell icon** at the top of your admin pages. A number badge shows how many notifications are waiting. Tap the bell to see who has a birthday — and dismiss each one when you've acknowledged it.
+
+**Phone alerts for admins:**
+
+Admins can also enable phone pings for birthday notifications. This means Rollcally can send a real browser push notification to your phone when a birthday reminder is due, even if the Rollcally tab is not open.
+
+To enable phone alerts:
+
+1. Open Rollcally on your phone.
+2. If you use an iPhone, add Rollcally to your Home Screen first. Push notifications for web apps on iPhone require the Home Screen app.
+3. Open Rollcally from the Home Screen icon.
+4. Tap the **birthday bell**.
+5. Tap **Enable phone pings**.
+6. Allow notifications when your phone asks.
+
+Each admin enables phone alerts for their own device. If you use multiple phones or browsers, enable alerts separately on each one. You can turn them off later from your browser or device notification settings.
 
 ---
 
@@ -378,6 +393,7 @@ Once approved, the organisation will appear on your dashboard.
 | Add / edit members | — | ✅ | — | ✅ | ✅ |
 | Import CSV | — | ✅ | — | ✅ | ✅ |
 | Export absence lists | — | ✅ | — | ✅ | ✅ |
+| Receive birthday phone alerts | — | ✅ | ✅ | ✅ | ✅ |
 | Create units in org | — | — | ✅ | ✅ | ✅ |
 | Approve join requests | — | — | — | ✅ | ✅ |
 | Create organisations | — | — | — | ✅ | ✅ |
@@ -412,6 +428,8 @@ Once approved, the organisation will appear on your dashboard.
 **Keep sections consistent.** Section names are free-text (e.g. "Soprano", "Alto", "Tenor", "Bass"). Use the same spelling every time — the member list and exports are grouped by section.
 
 **Add birthdays when registering members.** It only takes a second and unlocks the birthday notification feature. Birthdays are stored as a date (e.g. 15 March) — no year required.
+
+**Enable birthday phone alerts on your admin phone.** If you want to be pinged when reminders are due, add Rollcally to your phone's Home Screen if required, then open the birthday bell and enable phone pings.
 
 **Use CSV import for large rosters.** If you're starting with an existing spreadsheet, the CSV import is the fastest way to populate your roster. Review the duplicate warnings carefully before confirming.
 
@@ -487,6 +505,16 @@ On the admin login page, tap **"Forgot password?"**, enter your email, and follo
 ### The check-in page isn't working offline
 
 The check-in page can work without an internet connection **only if** you've visited it before on the same device and searched for names while online. If this is your first visit or you're using a different device, an internet connection is required.
+
+---
+
+### I enabled birthday phone alerts but I am not getting pings
+
+- Make sure notifications are allowed for Rollcally in your phone or browser settings
+- On iPhone, open Rollcally from the Home Screen app, not only from a browser tab
+- Keep at least one member birthday saved in your unit so reminders can be generated
+- Birthday pings are sent one week before the birthday and on the birthday
+- If you changed phone or browser, enable phone pings again on the new device
 
 ---
 

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-const EFFECTIVE_DATE = 'April 2, 2026'
+const EFFECTIVE_DATE = 'May 21, 2026'
 const COMPANY = 'Rollcally Inc.'
 const EMAIL = 'privacy@rollcally.com'
 
@@ -47,6 +47,7 @@ const TOC = [
   { id: 'legal-basis', label: '5. Legal Basis (GDPR)' },
   { id: 'billing', label: '6. Billing & Payment Data' },
   { id: 'sms-messaging', label: '7. SMS Absence Messaging' },
+  { id: 'admin-push', label: '7a. Admin Push Notifications' },
   { id: 'retention', label: '8. Data Retention' },
   { id: 'sharing', label: '9. Data Sharing' },
   { id: 'international', label: '10. International Transfers' },
@@ -150,7 +151,7 @@ export default function PrivacyPolicy() {
                 <TableRow label="Attendance data" value="Event attendance records, check-in timestamps, and device identifiers used to enforce the one-device-per-member-per-event rule." />
                 <TableRow label="Location data" value="Approximate geolocation (latitude/longitude) captured from the member's device at check-in time, only when the administrator has enabled location enforcement for that event. This data is passed to our server to verify proximity to the venue and is not stored independently." />
                 <TableRow label="Venue data" value="Venue coordinates (latitude, longitude, radius in metres) stored per unit by administrators to support location-enforced check-in." />
-                <TableRow label="Push subscriptions" value="Browser push subscription endpoints for members who opt in to notifications." />
+                <TableRow label="Push subscriptions" value="Browser push subscription endpoints for members and administrators who opt in to notifications, including admin birthday phone alerts." />
                 <TableRow label="SMS consent" value="A per-member, per-unit flag recording whether the member has consented to, or opted out of, SMS absence notifications. Null until the member is asked." />
                 <TableRow label="Billing data" value="Organisation name, subscription plan, and subscription status. Payment card details are never stored by Rollcally — they are handled exclusively by Stripe." />
                 <TableRow label="SMS credit ledger" value="An event-sourced ledger that tracks credit purchases, usage deductions, and refunds for transparency and accounting." />
@@ -171,7 +172,7 @@ export default function PrivacyPolicy() {
               <Ul items={[
                 'Create and manage your administrator account and authenticate you.',
                 'Provide the attendance tracking, roster management, and notification features of the Service.',
-                'Send push notifications to members who have consented (triggered by administrators).',
+                'Send push notifications to members and administrators who have consented, including member check-in notifications and admin birthday reminders.',
                 'Send SMS absence notifications to members who have explicitly consented, when a unit administrator has enabled this feature.',
                 'Send absence report emails to the unit owner after an SMS batch is sent, summarising delivery outcomes.',
                 'Verify a member\'s proximity to a venue during check-in when location enforcement is enabled by the administrator.',
@@ -192,7 +193,7 @@ export default function PrivacyPolicy() {
               <Ul items={[
                 'Contract — processing necessary to provide the Service you have signed up for (administrator account data, subscription and billing data).',
                 'Legitimate interests — improving and securing the Service, fraud prevention, and service analytics, where these interests are not overridden by your rights.',
-                'Consent — for push notification and SMS absence notification subscriptions, which members may withdraw at any time.',
+                'Consent — for push notification and SMS absence notification subscriptions, which members and administrators may withdraw at any time.',
                 'Legal obligation — where we are required to process data to comply with applicable law (e.g. financial record-keeping).',
               ]} />
               <P>
@@ -289,6 +290,28 @@ export default function PrivacyPolicy() {
               </P>
             </Section>
 
+            <Section id="admin-push" title="7a. Admin Birthday Push Notifications">
+              <P>
+                Rollcally provides optional browser push notifications for administrators who choose to
+                receive birthday reminders on their phone or browser. These reminders are generated from
+                member birthday data already stored by the administrator and are sent one week before and
+                on the birthday.
+              </P>
+              <P><strong className="text-white">How administrator consent works</strong></P>
+              <Ul items={[
+                'Administrator phone alerts are off by default and are only enabled when an administrator taps the birthday bell, chooses to enable phone pings, and grants notification permission through their browser or device.',
+                'On iPhone, administrators may need to add Rollcally to the Home Screen before iOS will allow web push notifications.',
+                'Consent is device-specific. If an administrator uses a different phone, browser, or installed PWA, they must enable phone pings again on that device.',
+                'Administrators may withdraw permission at any time through their browser or device notification settings.',
+              ]} />
+              <P><strong className="text-white">What is stored and sent</strong></P>
+              <Ul items={[
+                'We store the administrator user ID, unit ID, browser push endpoint, and browser-provided push keys needed to deliver the notification.',
+                'Birthday push notifications may include the member name, the relevant unit, and whether the reminder is for one week before or the birthday itself.',
+                'Expired or invalid push subscriptions are removed automatically when the browser push service reports them as stale.',
+              ]} />
+            </Section>
+
             <Section id="retention" title="8. Data Retention">
 
               <P>
@@ -298,7 +321,7 @@ export default function PrivacyPolicy() {
               <Ul items={[
                 'Administrator account data is retained for the duration of the account and deleted within 90 days of account termination upon request.',
                 'Member and attendance data is retained while the associated administrator account is active. Administrators may delete individual records at any time.',
-                'Push notification subscriptions are automatically removed when the browser signals that the subscription is no longer valid (HTTP 410/404), or upon member opt-out.',
+                'Push notification subscriptions are automatically removed when the browser signals that the subscription is no longer valid (HTTP 410/404), or upon opt-out where supported by the relevant device or browser.',
                 'Billing and subscription records are retained for the duration of the subscription and for up to 7 years after termination to comply with financial record-keeping obligations.',
                 'SMS credit ledger events are retained for up to 24 months.',
                 'Administrative audit logs are retained indefinitely for security, forensic, and compliance purposes.',
@@ -312,6 +335,7 @@ export default function PrivacyPolicy() {
                 'Infrastructure providers: Supabase (database, authentication, and edge functions). Supabase processes data on our behalf under a data processing agreement.',
                 'Payment processing: Stripe (subscription billing). Stripe receives your organisation name, email address, and billing event data. Stripe processes payment card details directly and we never have access to them. Stripe\'s privacy policy is available at stripe.com/privacy.',
                 'SMS delivery: Twilio, Africa\'s Talking, or Termii (depending on configuration) receives member phone numbers and message text for the purpose of delivering absence notifications. This data is shared only when a member has explicitly consented and an administrator has triggered a send.',
+                'Browser push delivery: browser push services operated by Apple, Google, Mozilla, Microsoft, or other browser vendors receive push subscription routing data required to deliver opted-in web push notifications. Message payloads are encrypted for delivery.',
                 'Legal requirements: We may disclose data if required by applicable law, court order, or governmental authority, or to protect the rights, property, or safety of Rollcally, its users, or the public.',
                 'Business transfers: In the event of a merger, acquisition, or sale of assets, your data may be transferred. We will notify affected users prior to data being transferred to a new controller.',
               ]} />
@@ -371,7 +395,7 @@ export default function PrivacyPolicy() {
                 'Right to restriction — request that we restrict processing of your data in certain circumstances.',
                 'Right to data portability — receive your data in a structured, machine-readable format.',
                 'Right to object — object to processing based on legitimate interests.',
-                'Right to withdraw consent — where processing is based on consent (e.g. push notifications), withdraw that consent at any time.',
+                'Right to withdraw consent — where processing is based on consent (e.g. push notifications or SMS notifications), withdraw that consent at any time.',
                 'Rights related to automated decision-making — we do not make decisions about you using solely automated means that produce legal or similarly significant effects.',
               ]} />
               <P>

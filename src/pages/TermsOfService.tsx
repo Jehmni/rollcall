@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-const EFFECTIVE_DATE = 'April 2, 2026'
+const EFFECTIVE_DATE = 'May 21, 2026'
 const COMPANY = 'Rollcally Inc.'
 const EMAIL = 'legal@rollcally.com'
 
@@ -240,18 +240,22 @@ export default function TermsOfService() {
 
             <Section id="notifications" title="9. Push Notifications">
               <P>
-                The Service includes an optional push notification feature. Members who have checked in to
-                events may consent to receive push notifications. Rollcally will only send push notifications
-                where a member has granted permission through their browser or device.
+                The Service includes optional push notification features. Members who have checked in to
+                events may consent to receive check-in related push notifications. Administrators may also
+                enable birthday reminder phone alerts for units they manage. Rollcally will only send push
+                notifications where the relevant member or administrator has granted permission through
+                their browser or device.
               </P>
               <P>
-                As an administrator, you agree to use the notification feature only for legitimate attendance
-                and event-related communications relevant to your organisation. Mass or unsolicited notifications
-                unrelated to the Service's purpose are prohibited.
+                As an administrator, you agree to use notification features only for legitimate attendance,
+                birthday, and event-related communications relevant to your organisation. Mass or unsolicited
+                notifications unrelated to the Service's purpose are prohibited.
               </P>
               <P>
-                Members may withdraw their consent to receive push notifications at any time through their
-                browser or device settings.
+                Members and administrators may withdraw their consent to receive push notifications at any
+                time through their browser or device settings. Browser and operating-system vendors control
+                final delivery of push notifications, so Rollcally does not guarantee that any notification
+                will be delivered immediately or at all.
               </P>
             </Section>
 
