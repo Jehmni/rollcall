@@ -24,6 +24,11 @@ type DueNotification = {
   unit: { name: string } | null
 }
 
+type RequestBody = {
+  unit_id?: string
+  cron_secret?: string
+}
+
 async function sendNotification(
   sub: AdminSubscription,
   payload: string,
@@ -53,7 +58,7 @@ Deno.serve(async (req) => {
   const startedAt = Date.now()
 
   try {
-    const { unit_id } = await req.json().catch(() => ({})) as { unit_id?: string }
+    const { unit_id, cron_secret } = await req.json().catch(() => ({})) as RequestBody
 
     const vapidSubject = Deno.env.get('VAPID_SUBJECT')
     const vapidPublicKey = Deno.env.get('VAPID_PUBLIC_KEY')
@@ -67,15 +72,32 @@ Deno.serve(async (req) => {
 
     const authHeader = req.headers.get('Authorization') ?? ''
     const bearerToken = authHeader.replace(/^Bearer\s+/i, '').trim()
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    const serviceRoleKey = Deno.env.get('SERVICE_ROLE_KEY') ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     const isServiceRole = serviceRoleKey.length > 0 && bearerToken === serviceRoleKey
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+      serviceRoleKey,
     )
 
-    if (!isServiceRole) {
+    let isCronRequest = false
+    if (!isServiceRole && cron_secret) {
+      const { data: storedSecret, error: secretError } = await supabase
+        .schema('private')
+        .from('app_secrets')
+        .select('secret')
+        .eq('key', 'admin_birthday_push_cron_secret')
+        .maybeSingle() as { data: { secret: string } | null; error: { message: string } | null }
+
+      if (secretError) {
+        console.error('[send-admin-birthday-push] Failed to load cron secret:', secretError.message)
+        return json(500, { error: 'Failed to validate scheduled request' })
+      }
+
+      isCronRequest = storedSecret?.secret === cron_secret
+    }
+
+    if (!isServiceRole && !isCronRequest) {
       if (!unit_id) return json(400, { error: 'unit_id is required for admin-triggered sends' })
 
       const userClient = createClient(
