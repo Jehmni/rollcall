@@ -13,12 +13,16 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 
 export function useAdminPushNotifications(unitId: string) {
   const { session } = useAuth()
-  const isSupported =
-    typeof window !== 'undefined' &&
-    'Notification' in window &&
-    'serviceWorker' in navigator &&
-    'PushManager' in window &&
-    Boolean(VAPID_PUBLIC_KEY)
+  const hasNotificationApi = typeof window !== 'undefined' && 'Notification' in window
+  const hasServiceWorker = typeof navigator !== 'undefined' && 'serviceWorker' in navigator
+  const hasPushManager = typeof window !== 'undefined' && 'PushManager' in window
+  const hasVapidKey = Boolean(VAPID_PUBLIC_KEY)
+  const isSupported = hasNotificationApi && hasServiceWorker && hasPushManager && hasVapidKey
+  const unsupportedReason = !hasVapidKey
+    ? 'Phone alerts are not configured yet'
+    : !hasNotificationApi || !hasServiceWorker || !hasPushManager
+      ? 'Open Rollcally from a supported browser or installed app'
+      : null
 
   const [permission, setPermission] = useState<NotificationPermission>(
     isSupported ? Notification.permission : 'denied'
@@ -109,6 +113,7 @@ export function useAdminPushNotifications(unitId: string) {
 
   return {
     isSupported,
+    unsupportedReason,
     permission,
     isSubscribed,
     loading,

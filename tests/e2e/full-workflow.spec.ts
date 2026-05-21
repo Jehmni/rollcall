@@ -865,6 +865,22 @@ test.describe('11 · Birthday-day notification', () => {
     // Birthday banner should include the "today" notification text
     await expect(page.getByText('Birthday today! 🎉')).toBeVisible()
   })
+
+  test('birthday bell shows phone alert setup state', async ({ page }) => {
+    silenceRealtime(page)
+    await asSuperAdmin(page)
+    await mockUnitAdmins(page)
+    await mockServicesAll(page)
+    await mockUnitLookup(page)
+    await page.route(`${SUPABASE_URL}/rest/v1/rpc/get_pending_notifications`, route =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+    )
+
+    await page.goto(`/admin/units/${IDS.unit}`)
+    await page.locator('button[title="Birthday alerts"]').click()
+
+    await expect(page.getByText(/Phone alerts|Get phone pings/i)).toBeVisible()
+  })
 })
 
 // ─────────────────────────────────────────────────────────────────────────────

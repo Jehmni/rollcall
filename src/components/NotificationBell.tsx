@@ -65,31 +65,39 @@ export function NotificationBell({ unitId }: { unitId: string }) {
                         )}
                     </div>
 
-                    {adminPush.isSupported && (
-                        <div className="mb-1 flex items-center justify-between gap-3 border-b border-border-dark px-3 py-3">
+                    <div className="mb-1 flex items-center justify-between gap-3 border-b border-border-dark px-3 py-3">
                             <div className="flex min-w-0 items-center gap-2.5">
                                 <Smartphone className={`h-4 w-4 flex-shrink-0 ${adminPush.isSubscribed ? 'text-teal' : 'text-slate-400'}`} />
                                 <div className="min-w-0">
                                     <p className="text-xs font-bold text-slate-100">
-                                        {adminPush.isSubscribed ? 'Phone alerts on' : 'Get phone pings'}
+                                        {adminPush.isSubscribed
+                                            ? 'Phone alerts on'
+                                            : adminPush.isSupported
+                                                ? 'Get phone pings'
+                                                : 'Phone alerts unavailable'}
                                     </p>
-                                    <p className="truncate text-2xs text-slate-500">
-                                        {pushMessage ?? (adminPush.isSubscribed ? 'Birthday alerts can ping this device' : 'Enable birthday reminders on this device')}
+                                    <p className="line-clamp-2 text-2xs leading-snug text-slate-500">
+                                        {pushMessage ?? (
+                                            adminPush.isSubscribed
+                                                ? 'Birthday alerts can ping this device'
+                                                : adminPush.permission === 'denied'
+                                                    ? 'Notifications are blocked in device settings'
+                                                    : adminPush.unsupportedReason ?? 'Enable birthday reminders on this device'
+                                        )}
                                     </p>
                                 </div>
                             </div>
-                            {!adminPush.isSubscribed && (
+                            {adminPush.isSupported && !adminPush.isSubscribed && adminPush.permission !== 'denied' && (
                                 <button
                                     type="button"
                                     onClick={enablePhoneAlerts}
                                     disabled={adminPush.loading}
-                                    className="flex-shrink-0 rounded-none border border-amber-500/40 bg-amber-500/10 px-2.5 py-1.5 text-2xs font-black uppercase tracking-wider text-amber-400 transition-colors hover:bg-amber-500 hover:text-black disabled:opacity-50"
+                                    className="max-w-24 flex-shrink-0 whitespace-normal rounded-none border border-amber-500/40 bg-amber-500/10 px-2.5 py-1.5 text-2xs font-black uppercase leading-tight tracking-wider text-amber-400 transition-colors hover:bg-amber-500 hover:text-black disabled:opacity-50"
                                 >
-                                    {adminPush.loading ? 'Wait' : 'Enable'}
+                                    {adminPush.loading ? 'Wait' : 'Enable phone pings'}
                                 </button>
                             )}
-                        </div>
-                    )}
+                    </div>
 
                     <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain flex flex-col gap-0.5 sm:max-h-80">
                         {notifications.length === 0 ? (
