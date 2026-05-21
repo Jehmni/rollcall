@@ -252,6 +252,8 @@ To enable phone alerts:
 5. Tap **Enable phone pings**.
 6. Allow notifications when your phone asks.
 
+The phone alerts option appears at the top of the birthday bell panel, above any birthday alerts or "no new alerts" message. If Rollcally cannot enable phone pings on that device, the panel will explain why, for example **Phone alerts unavailable** or **Notifications are blocked in device settings**.
+
 Each admin enables phone alerts for their own device. If you use multiple phones or browsers, enable alerts separately on each one. You can turn them off later from your browser or device notification settings.
 
 ---
@@ -515,6 +517,34 @@ The check-in page can work without an internet connection **only if** you've vis
 - Keep at least one member birthday saved in your unit so reminders can be generated
 - Birthday pings are sent one week before the birthday and on the birthday
 - If you changed phone or browser, enable phone pings again on the new device
+
+---
+
+### The birthday bell says "Phone alerts unavailable" or "Notifications are blocked in device settings"
+
+This means your phone or browser has blocked notification permission for Rollcally. Rollcally cannot show the permission popup again until you unblock notifications in your device settings.
+
+On iPhone:
+
+1. Open **Settings**.
+2. Go to **Notifications**.
+3. Find **Rollcally**.
+4. Turn on **Allow Notifications**.
+5. Reopen Rollcally from the Home Screen icon.
+6. Tap the **birthday bell** again.
+7. Tap **Enable phone pings** if it is shown.
+
+If you do not see Rollcally in iPhone notification settings:
+
+1. Delete the Rollcally Home Screen icon.
+2. Open Safari and go to Rollcally again.
+3. Add Rollcally to your Home Screen again.
+4. Open Rollcally from the Home Screen icon.
+5. Tap the **birthday bell**.
+6. Tap **Enable phone pings**.
+7. Choose **Allow** when your phone asks.
+
+On Android or desktop browsers, open the browser's site settings for Rollcally, change notifications from **Blocked** to **Allow**, then reload Rollcally and tap the birthday bell again.
 
 ---
 
